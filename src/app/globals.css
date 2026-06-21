@@ -265,6 +265,26 @@ a.gtrack:hover { color: var(--accent); padding-left: 5px; }
   line-height: 1.55;
 }
 
+/* ----- Backlink pills (capstone cross-references) ----- */
+.backlink {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  color: var(--brand);
+  background: color-mix(in srgb, var(--brand) 8%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--brand) 20%, var(--border));
+  border-radius: 999px;
+  padding: 3px 11px;
+  text-decoration: none;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.backlink::before { content: "↳"; opacity: 0.55; }
+.backlink:hover {
+  background: color-mix(in srgb, var(--brand) 16%, var(--surface));
+  border-color: color-mix(in srgb, var(--brand) 42%, var(--border));
+}
+
 /* ----- Scroll-reveal motion ----- */
 .reveal-item {
   opacity: 0;
@@ -281,3 +301,35 @@ a.gtrack:hover { color: var(--accent); padding-left: 5px; }
   * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
   .reveal-item { opacity: 1 !important; transform: none !important; }
 }
+
+/* ----- sugar-high syntax tokens (Light + Dark Frosted Glass) ----- */
+.sh-block {
+  color: var(--ink);
+  background: transparent !important;
+  padding: 0 !important;
+  font-size: inherit !important;
+  font-family: inherit !important;
+  --sh-keyword: #7c3aed;      /* brand purple */
+  --sh-string: #059669;       /* emerald */
+  --sh-comment: #9ca3af;      /* faint gray */
+  --sh-class: #0891b2;        /* cyan */
+  --sh-entity: #d97706;       /* amber */
+  --sh-property: #2563eb;     /* blue */
+  --sh-sign: #6b7280;         /* gray */
+  --sh-identifier: var(--ink);
+}
+
+.dark .sh-block {
+  color: #e2e8f0;
+  --sh-keyword: #ff79c6;      /* Neon pink */
+  --sh-string: #f1fa8c;       /* Bright yellow */
+  --sh-comment: #6272a4;      /* Muted blue-gray */
+  --sh-class: #8be9fd;        /* Cyan */
+  --sh-entity: #bd93f9;       /* Electric purple */
+  --sh-property: #50fa7b;     /* Neon green */
+  --sh-sign: #ffb86c;         /* Orange */
+  --sh-identifier: #f8f8f2;
+}
+
+
+

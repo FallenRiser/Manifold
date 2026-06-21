@@ -135,8 +135,8 @@ export default function BatchVsSGDPage() {
         </div>
 
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 32, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/linear-regression/what-is-a-gradient" style={navLink}>← What is a gradient?</Link>
-          <span style={{ fontSize: 14, color: "var(--faint)" }}>Next up · When do we stop? →</span>
+          <Link href="/learn/linear-regression/descent-on-the-surface" style={navLink}>← Descent on the surface</Link>
+          <Link href="/learn/linear-regression/when-do-we-stop" style={navLink}>Next up · When do we stop? →</Link>
         </div>
       </div>
     </article>

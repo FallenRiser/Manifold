@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ModelSliderLab } from "@/components/labs/ModelSliderLab";
+import { CodeBlock } from "@/components/CodeBlock";
 
 export const metadata = {
   title: "What a model really is — Manifold",
@@ -7,6 +8,41 @@ export const metadata = {
 };
 
 export default function WhatIsAModelPage() {
+  const fromScratch = `import numpy as np
+
+# A linear model is just a function with two parameters
+slope, intercept = 95.3, 112.0   # learned values
+
+def predict(x):
+    return slope * x + intercept
+
+# Evaluate on a single new house
+size = 3.2          # sq ft (thousands)
+print(f"Predicted price: \${predict(size):.0f}k")
+
+# Compute training MSE
+X = np.array([1.4, 1.7, 2.0, 2.3, 2.5, 2.8, 3.1, 3.4, 3.7, 4.0, 4.2, 4.5])
+y = np.array([245, 312, 279, 308, 401, 390, 437, 421, 490, 518, 572, 601])
+y_hat = predict(X)
+mse   = np.mean((y - y_hat) ** 2)
+print(f"Training MSE: {mse:.1f}")`;
+
+  const withLibrary = `import numpy as np
+from sklearn.linear_model import LinearRegression
+
+X = np.array([1.4,1.7,2.0,2.3,2.5,2.8,3.1,3.4,3.7,4.0,4.2,4.5]).reshape(-1, 1)
+y = np.array([245,312,279,308,401,390,437,421,490,518,572,601])
+
+# fit() finds the best slope and intercept automatically
+model = LinearRegression().fit(X, y)
+
+# model.coef_ and model.intercept_ are the learned parameters
+print(f"slope:     {model.coef_[0]:.2f}")
+print(f"intercept: {model.intercept_:.2f}")
+
+# predict() is the model function
+print(f"Prediction for 3.2k sqft: \${model.predict([[3.2]])[0]:.0f}k")`;
+
   return (
     <article>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
@@ -105,6 +141,14 @@ export default function WhatIsAModelPage() {
             The &ldquo;learning&rdquo; in machine learning is just finding those numbers.
           </p>
         </div>
+
+        <h2>The code</h2>
+        <p>
+          A model really is just a function. Here&rsquo;s that idea in Python —
+          written explicitly first, then handed off to scikit-learn.
+        </p>
+
+        <CodeBlock fromScratch={fromScratch} withLibrary={withLibrary} />
 
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 32, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
           <Link href="/learn/linear-regression/why-predict-at-all" style={navLink}>← Why predict at all?</Link>

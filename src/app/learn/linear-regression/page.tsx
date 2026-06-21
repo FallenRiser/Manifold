@@ -1,8 +1,47 @@
 import Link from "next/link";
 import { LineOfBestFitLab } from "@/components/labs/LineOfBestFitLab";
+import { CodeBlock } from "@/components/CodeBlock";
 
 export default function LineOfBestFitPage() {
+  const fromScratch = `import numpy as np
+
+# House sizes (sq ft ÷ 1000) and prices ($k)
+X = np.array([1.4, 1.7, 2.0, 2.3, 2.5, 2.8, 3.1, 3.4, 3.7, 4.0, 4.2, 4.5])
+y = np.array([245, 312, 279, 308, 401, 390, 437, 421, 490, 518, 572, 601])
+
+# OLS closed-form — derive slope and intercept directly
+x_bar, y_bar = X.mean(), y.mean()
+slope     = np.sum((X - x_bar) * (y - y_bar)) / np.sum((X - x_bar) ** 2)
+intercept = y_bar - slope * x_bar
+
+print(f"slope:     {slope:.2f}  (each +1k sqft → +\${slope:.0f}k)")
+print(f"intercept: {intercept:.2f}")
+
+# Predict and score
+y_hat  = slope * X + intercept
+mse    = np.mean((y - y_hat) ** 2)
+ss_tot = np.sum((y - y_bar) ** 2)
+r2     = 1 - np.sum((y - y_hat) ** 2) / ss_tot
+print(f"MSE: {mse:.1f}   R²: {r2:.3f}")`;
+
+  const withLibrary = `import numpy as np
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+
+X = np.array([1.4,1.7,2.0,2.3,2.5,2.8,3.1,3.4,3.7,4.0,4.2,4.5]).reshape(-1, 1)
+y = np.array([245,312,279,308,401,390,437,421,490,518,572,601])
+
+model = LinearRegression().fit(X, y)
+
+print(f"slope:     {model.coef_[0]:.2f}")
+print(f"intercept: {model.intercept_:.2f}")
+
+y_hat = model.predict(X)
+print(f"MSE: {mean_squared_error(y, y_hat):.1f}")
+print(f"R²:  {r2_score(y, y_hat):.3f}")`;
+
   return (
+
     <article>
       {/* page header */}
       <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
@@ -107,6 +146,16 @@ export default function LineOfBestFitPage() {
             machine learning stops looking like a list of random algorithms.
           </p>
         </div>
+
+        <h2>The code</h2>
+        <p>
+          Here&rsquo;s what finding the line of best fit looks like in Python —
+          first built from scratch with NumPy, then in a single call with
+          scikit-learn. Both produce the same slope and intercept.
+        </p>
+
+        <CodeBlock fromScratch={fromScratch} withLibrary={withLibrary} />
+
 
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 32, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
           <Link href="/learn/linear-regression/what-a-model-really-is" style={{ fontSize: 14, color: "var(--brand)", textDecoration: "none" }}>

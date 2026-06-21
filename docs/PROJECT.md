@@ -41,8 +41,7 @@ written in our own voice with our own visuals. Never reproduce its text/proofs/f
 ## 2. Status — what's DONE
 
 The Next.js app is scaffolded, the design system is in place, and the homepage, the `/map`
-curriculum atlas, and the first **4 pages of the Linear Regression track** are live and
-browser-verified (light + dark).
+curriculum atlas, and the first **11 pages of the Linear Regression track** are live.
 
 **Live pages**
 - `/` — homepage hero (serif headline, gradient CTA, loss-landscape art, family chips).
@@ -58,13 +57,17 @@ browser-verified (light + dark).
   live fit panel, with a learning-rate slider that converges ~0.3 / diverges >1.0).
 - `/learn/linear-regression/what-is-a-gradient` — **What is a gradient?** (`GradientTangentLab`
   = drag a ball on a curve → tangent slope = gradient; "step downhill" = 1-D gradient descent).
+- `/learn/linear-regression/batch-vs-sgd` — **Batch, stochastic, and mini-batch**
+  (`SGDComparisonLab` = same start, three noisy/smooth optimisation paths).
+- `/learn/linear-regression/when-do-we-stop` — **When do we stop?** (`StoppingRulesLab` =
+  gradient norm, loss-improvement tolerance, and validation patience stopping rules).
 
 **Component inventory**
 - `src/components/`: `Header`, `ThemeToggle`, `ManifoldMark` (the logo — a wireframe **saddle
   surface**, computed/projected in SVG), `LossLandscapeArt` (hero contour art), `TrackSidebar`
   (the LR outline rail), `Reveal` (IntersectionObserver scroll-reveal wrapper).
 - `src/components/labs/`: `LineOfBestFitLab`, `PenaltyCurves`, `OutlierLab`, `LossSurface3D`,
-  `GradientDescentLab`, `GradientTangentLab`.
+  `GradientDescentLab`, `GradientTangentLab`, `SGDComparisonLab`, `StoppingRulesLab`.
 - `src/lib/`: `linearRegressionTrack.ts` (the 44-page track outline + which pages have `href`s),
   `siteMap.ts` (the `/map` data: tiers, families, pillars, foundations).
 
@@ -78,10 +81,10 @@ breakdown is in `docs/curriculum-map.md`; the live outline + ordering is in
 `src/lib/linearRegressionTrack.ts`.
 
 Remaining LR chapters:
-- **Ch3 Gradient descent (in progress).** Built: "What is a gradient?". Note: roll-downhill /
-  update-rule / learning-rate are already taught on the loss-surface + gradient pages, so build
-  only the *additive* remaining pages — **batch vs stochastic vs mini-batch** (noisy vs smooth
-  path on the contour) and **convergence / when to stop** — rather than thin redundant pages.
+- **Ch3 Gradient descent (complete enough for now).** Built: "What is a gradient?", **batch vs
+  stochastic vs mini-batch**, and **when do we stop?**. Note: roll-downhill / update-rule /
+  learning-rate / descent-on-the-surface are already taught on the loss-surface + gradient pages,
+  so avoid adding thin redundant pages unless the outline is intentionally expanded later.
 - **Ch4 The direct solution** — normal equation; closed-form vs gradient descent.
 - **Ch5 From one feature to many** — multiple regression; **feature scaling** (reuse the contour
   lab: elongated→zig-zag vs circular→straight); categorical/one-hot; polynomial & interactions.
@@ -247,3 +250,27 @@ both must be satisfied. Work style that's worked well:
   badges. Honour these going forward.
 
 See also the persistent memory notes: `manifold-project.md` and `user-design-taste.md`.
+
+---
+
+## 9. Audit — LR built out: true state & remaining work (2026-06-21)
+
+Reality on disk: **all 44 LR pages exist and are linked** in `linearRegressionTrack.ts` (§2's
+"11 pages" line is stale), with **25 labs**. `npx tsc --noEmit` passes clean. Coverage is complete;
+the gaps are about filling to spec:
+
+1. **The "Code" stage is entirely missing** (highest priority). No page has code — no from-scratch
+   (NumPy/TS) and no with-a-library (sklearn/statsmodels); no Shiki/Sandpack installed. Add a Shiki
+   `CodeBlock` + a "The code" section (From scratch → With a library) on the spine pages first.
+2. **Interactivity is uneven.** 24 pages have a lab; **5 have a static visual only** (why-predict,
+   what-best-means, linearity, homoscedasticity, normality-of-residuals); **15 have no visual at
+   all** — highest-value missing labs: residual-vs-fitted, heteroscedasticity-in-depth,
+   detecting-non-normality (Q–Q), r-squared-and-adjusted, cross-validation-bias-variance,
+   bias-variance-revisited, multicollinearity, confidence-intervals, transformations,
+   weighted-least-squares. Prefer one shared residual-diagnostics lab across the residual pages.
+3. **No KaTeX** — math is monospace/Unicode; add proper typesetting.
+4. **Runtime verification** still owed: type-check passes, but do a dev-server screenshot pass of all
+   44 pages (never `build` while dev runs).
+5. **Redundancy/cross-links:** reconcile homoscedasticity vs heteroscedasticity-in-depth and
+   cross-validation-bias-variance vs bias-variance-revisited; add forward links to the future
+   Evaluation & Metrics / Data Workflow pillars.

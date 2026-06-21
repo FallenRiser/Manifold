@@ -83,8 +83,8 @@ export default function WhatIsAGradientPage() {
         </div>
 
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 32, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/linear-regression/the-loss-surface" style={navLink}>← The loss surface</Link>
-          <Link href="/learn/linear-regression/batch-vs-sgd" style={navLink}>Next up · Batch, stochastic, mini-batch →</Link>
+          <Link href="/learn/linear-regression/roll-downhill" style={navLink}>← Roll downhill</Link>
+          <Link href="/learn/linear-regression/the-update-rule" style={navLink}>Next up · The update rule →</Link>
         </div>
       </div>
     </article>
