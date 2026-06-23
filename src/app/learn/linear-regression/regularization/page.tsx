@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { RegularizationLab } from "@/components/labs/RegularizationLab";
 import { CodeBlock } from "@/components/CodeBlock";
+import { MathBlock } from "@/components/Math";
 
 
 export const metadata = {
@@ -81,7 +82,7 @@ for name, pipe in fits:
           function. The model now has to balance two competing goals: fit the
           data, but keep the coefficients as small as possible.
         </p>
-        <div style={mathBlock}>Cost = SSE + λ × (Penalty on coefficients)</div>
+        <MathBlock>{String.raw`\text{Cost} = \mathrm{SSE} + \lambda \times (\text{penalty on coefficients})`}</MathBlock>
         <p>
           The parameter <strong>λ (lambda)</strong> controls the strength of the
           penalty. 
@@ -177,8 +178,6 @@ function PenaltyCard({ title, formula, body, color }: { title: string; formula: 
 
 function chip(color: string): React.CSSProperties {
   return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
-const mathBlock: React.CSSProperties = { fontFamily: "ui-monospace, monospace", fontSize: 15, background: "var(--canvas)", border: "1px solid var(--border-strong)", borderRadius: 10, padding: "12px 18px", margin: "0.8rem 0 1.2rem", color: "var(--ink)", textAlign: "center" };
-const grid2: React.CSSProperties = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 14, margin: "1.4rem 0" };
+}const grid2: React.CSSProperties = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 14, margin: "1.4rem 0" };
 const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
 const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-fundamentals) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-fundamentals) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0 0" };

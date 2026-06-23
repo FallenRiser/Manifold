@@ -1,4 +1,37 @@
 import Link from "next/link";
+import { ConfidenceIntervalLab } from "@/components/labs/ConfidenceIntervalLab";
+import { MathBlock } from "@/components/Math";
+import { CodeBlock } from "@/components/CodeBlock";
+import { Backlinks } from "@/components/Backlinks";
+
+const codeScratch = `import numpy as np
+from scipy import stats
+
+rng = np.random.default_rng(9)
+x = np.linspace(0, 10, 40)
+y = 2 + 1.5*x + rng.normal(scale=2, size=40)
+X = np.column_stack([np.ones_like(x), x]); n, k = X.shape
+
+XtX_inv = np.linalg.inv(X.T @ X)
+beta = XtX_inv @ X.T @ y
+resid = y - X @ beta
+sigma2 = np.sum(resid**2) / (n - k)
+se = np.sqrt(np.diag(sigma2 * XtX_inv))      # standard error of each coefficient
+
+tcrit = stats.t.ppf(0.975, n - k)            # ~1.96 for large n
+lo, hi = beta[1] - tcrit*se[1], beta[1] + tcrit*se[1]
+print(f"slope {beta[1]:.3f}   95% CI [{lo:.3f}, {hi:.3f}]")`;
+
+const codeLib = `import numpy as np
+import statsmodels.api as sm
+
+rng = np.random.default_rng(9)
+x = np.linspace(0, 10, 40)
+y = 2 + 1.5*x + rng.normal(scale=2, size=40)
+
+model = sm.OLS(y, sm.add_constant(x)).fit()
+lo, hi = model.conf_int(alpha=0.05)[1]       # 95% interval for the slope
+print(f"slope {model.params[1]:.3f}   95% CI [{lo:.3f}, {hi:.3f}]")`;
 
 export const metadata = {
   title: "Confidence intervals — Manifold",
@@ -24,6 +57,12 @@ export default function ConfidenceIntervalsPage() {
         could easily be 4.1, or 4.9. Or -1.2.
       </p>
 
+      <Backlinks label="Related" items={[
+        { label: "Hypothesis tests & p-values", href: "/learn/linear-regression/hypothesis-tests-and-p-values" },
+        { label: "Prediction intervals", href: "/learn/linear-regression/prediction-intervals" },
+        { label: "Case C: medical costs", href: "/learn/linear-regression/end-to-end-worked-case/medical-costs" },
+      ]} />
+
       <div className="lesson">
         <h2>Uncertainty in sampling</h2>
         <p>
@@ -40,7 +79,7 @@ export default function ConfidenceIntervalsPage() {
           true population parameter. It is built using the standard error (SE)
           of the coefficient:
         </p>
-        <div style={mathBlock}>CI = Estimate ± (Critical Value × Standard Error)</div>
+        <MathBlock>{String.raw`\text{CI} = \hat\beta \;\pm\; t_{\alpha/2}\,\cdot\,\mathrm{SE}(\hat\beta)`}</MathBlock>
         <p>
           For a 95% confidence level, the critical value (from the t-distribution)
           is usually roughly <strong>1.96</strong> (or just 2 for a quick mental
@@ -53,6 +92,8 @@ export default function ConfidenceIntervalsPage() {
           <DetailCard title="What makes it narrower?" color="var(--good)" 
             body="More data points (N). As N grows, the standard error shrinks toward zero, and the confidence interval tightens around the true parameter." />
         </div>
+
+        <ConfidenceIntervalLab />
 
         <h2>The great interpretation trap</h2>
         <p>
@@ -97,6 +138,14 @@ export default function ConfidenceIntervalsPage() {
           <li>If the CI is <code>[-1.5, 3.2]</code>, the effect crosses zero. The true effect might be positive, might be negative, or might be exactly zero. The feature is not statistically significant.</li>
         </ul>
 
+        <h2>Compute it yourself</h2>
+        <p>
+          A CI is the estimate plus-or-minus a t-multiple of its standard error.
+          From scratch that&rsquo;s the coefficient covariance; statsmodels hands it back
+          with <code>conf_int()</code>.
+        </p>
+        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
+
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 32, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
           <Link href="/learn/linear-regression/bias-variance-revisited" style={navLink}>← Bias-variance, revisited</Link>
           <Link href="/learn/linear-regression/hypothesis-tests-and-p-values" style={navLink}>Next up · Hypothesis tests & p-values →</Link>
@@ -117,8 +166,6 @@ function DetailCard({ title, body, color }: { title: string; body: string; color
 
 function chip(color: string): React.CSSProperties {
   return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
-const mathBlock: React.CSSProperties = { fontFamily: "ui-monospace, monospace", fontSize: 15, background: "var(--canvas)", border: "1px solid var(--border-strong)", borderRadius: 10, padding: "12px 18px", margin: "0.8rem 0 1.2rem", color: "var(--ink)", textAlign: "center" };
-const grid2: React.CSSProperties = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 14, margin: "1.4rem 0" };
+}const grid2: React.CSSProperties = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 14, margin: "1.4rem 0" };
 const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
 const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-fundamentals) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-fundamentals) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0 0" };

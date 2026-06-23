@@ -1,4 +1,42 @@
 import Link from "next/link";
+import { CrossValidationLab } from "@/components/labs/CrossValidationLab";
+import { CodeBlock } from "@/components/CodeBlock";
+import { Backlinks } from "@/components/Backlinks";
+
+const codeScratch = `import numpy as np
+
+rng = np.random.default_rng(12)
+x = np.linspace(0, 1, 80)
+y = np.sin(2*np.pi*x) + rng.normal(scale=0.2, size=80)
+
+def cv_mse(deg, k=5):
+    idx = rng.permutation(len(x))
+    errs = []
+    for fold in np.array_split(idx, k):           # hold out each fold once
+        tr = np.setdiff1d(idx, fold)
+        c = np.polyfit(x[tr], y[tr], deg)          # fit on the rest
+        errs.append(np.mean((np.polyval(c, x[fold]) - y[fold])**2))
+    return np.mean(errs)
+
+for d in [1, 3, 5, 9, 15]:
+    print(f"degree {d:2d}   CV MSE {cv_mse(d):.3f}")   # U-shape: min in the middle`;
+
+const codeLib = `import numpy as np
+from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import PolynomialFeatures
+from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import cross_val_score
+
+rng = np.random.default_rng(12)
+x = np.linspace(0, 1, 80)
+y = np.sin(2*np.pi*x) + rng.normal(scale=0.2, size=80)
+X = x.reshape(-1, 1)
+
+for d in [1, 3, 5, 9, 15]:
+    model = make_pipeline(PolynomialFeatures(d), LinearRegression())
+    mse = -cross_val_score(model, X, y, cv=5,
+                           scoring="neg_mean_squared_error").mean()
+    print(f"degree {d:2d}   CV MSE {mse:.3f}")`;
 
 export const metadata = {
   title: "Cross-validation & bias–variance — Manifold",
@@ -23,6 +61,12 @@ export default function CrossValidationBiasVariancePage() {
         exam with the exact same questions they practiced. It measures
         memorisation, not learning.
       </p>
+
+      <Backlinks label="Related" items={[
+        { label: "Bias–variance revisited", href: "/learn/linear-regression/bias-variance-revisited" },
+        { label: "Regularization", href: "/learn/linear-regression/regularization" },
+        { label: "R² and adjusted R²", href: "/learn/linear-regression/r-squared-and-adjusted" },
+      ]} />
 
       <div className="lesson">
         <h2>The golden rule of ML</h2>
@@ -69,6 +113,8 @@ export default function CrossValidationBiasVariancePage() {
 
         <hr style={{ border: "none", borderTop: "1px solid var(--border)", margin: "2.5rem 0" }} />
 
+        <CrossValidationLab />
+
         <h2>The Bias-Variance Tradeoff</h2>
         <p>
           When you evaluate your models via cross-validation, you'll discover
@@ -100,6 +146,14 @@ export default function CrossValidationBiasVariancePage() {
             over). You find this sweet spot using cross-validation.
           </p>
         </div>
+
+        <h2>Run k-fold yourself</h2>
+        <p>
+          Hold out each fold once, fit on the rest, average the errors. From scratch
+          it&rsquo;s a loop over <code>np.array_split</code>; scikit-learn wraps it in
+          <code>cross_val_score</code>. Both trace the same U across polynomial degree.
+        </p>
+        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
 
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 32, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
           <Link href="/learn/linear-regression/rmse-vs-mae" style={navLink}>← RMSE vs MAE</Link>

@@ -1,5 +1,46 @@
 import Link from "next/link";
 import { GradientTangentLab } from "@/components/labs/GradientTangentLab";
+import { CodeBlock } from "@/components/CodeBlock";
+
+const codeScratch = `import numpy as np
+
+rng = np.random.default_rng(0)
+x = np.linspace(0, 10, 30)
+y = 3 + 2*x + rng.normal(scale=1.0, size=30)
+X = np.column_stack([np.ones_like(x), x])
+
+def mse(t):
+    return np.mean((X @ t - y)**2)
+
+t = np.array([1.0, 1.0])
+
+# analytical gradient of the MSE
+g_analytic = (2/len(y)) * X.T @ (X @ t - y)
+
+# numerical gradient: nudge each parameter and measure the slope
+eps = 1e-5
+g_numeric = np.zeros(2)
+for i in range(2):
+    d = np.zeros(2); d[i] = eps
+    g_numeric[i] = (mse(t + d) - mse(t - d)) / (2*eps)
+
+print("analytic gradient:", g_analytic.round(4))
+print("numeric  gradient:", g_numeric.round(4))   # they match`;
+
+const codeLib = `import numpy as np
+from scipy.optimize import approx_fprime
+
+rng = np.random.default_rng(0)
+x = np.linspace(0, 10, 30)
+y = 3 + 2*x + rng.normal(scale=1.0, size=30)
+X = np.column_stack([np.ones_like(x), x])
+
+def mse(t):
+    return np.mean((X @ t - y)**2)
+
+t = np.array([1.0, 1.0])
+g = approx_fprime(t, mse, 1e-6)     # SciPy estimates the gradient for you
+print("scipy gradient:", g.round(4))`;
 
 export const metadata = {
   title: "What is a gradient? — Manifold",
@@ -81,6 +122,14 @@ export default function WhatIsAGradientPage() {
             walks the other way. Everything else in training is detail on top of this.
           </p>
         </div>
+
+        <h2>Compute it yourself</h2>
+        <p>
+          The analytical gradient and a finite-difference estimate agree to several
+          decimals — proof the formula is just the slope in each direction. SciPy
+          can estimate it numerically with one call.
+        </p>
+        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
 
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 32, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
           <Link href="/learn/linear-regression/roll-downhill" style={navLink}>← Roll downhill</Link>

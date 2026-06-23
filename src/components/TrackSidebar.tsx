@@ -3,26 +3,39 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LR_TRACK, LR_TOTAL, LR_DONE } from "@/lib/linearRegressionTrack";
+import type { TrackChapter } from "@/lib/linearRegressionTrack";
 
-export function TrackSidebar() {
+export function TrackSidebar({
+  track = LR_TRACK,
+  title = "Linear regression",
+  accent = "var(--c-regression)",
+  done = LR_DONE,
+  total = LR_TOTAL,
+}: {
+  track?: TrackChapter[];
+  title?: string;
+  accent?: string;
+  done?: number;
+  total?: number;
+} = {}) {
   const pathname = usePathname();
 
   return (
-    <nav aria-label="Linear regression track">
+    <nav aria-label={`${title} track`}>
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-        <span style={{ width: 9, height: 9, borderRadius: 3, background: "var(--c-regression)" }} />
+        <span style={{ width: 9, height: 9, borderRadius: 3, background: accent }} />
         <span className="font-display" style={{ fontSize: 14, fontWeight: 500, color: "var(--ink)" }}>
-          Linear regression
+          {title}
         </span>
       </div>
       <div style={{ height: 5, borderRadius: 3, background: "var(--surface-2)", overflow: "hidden" }}>
-        <div style={{ width: `${(LR_DONE / LR_TOTAL) * 100}%`, height: "100%", background: "var(--brand)" }} />
+        <div style={{ width: `${(done / total) * 100}%`, height: "100%", background: "var(--brand)" }} />
       </div>
       <div style={{ fontSize: 11, color: "var(--faint)", marginTop: 4 }}>
-        {LR_DONE} / {LR_TOTAL} pages
+        {done} / {total} pages
       </div>
 
-      {LR_TRACK.map((chapter) => (
+      {track.map((chapter) => (
         <div key={chapter.title}>
           <div
             style={{

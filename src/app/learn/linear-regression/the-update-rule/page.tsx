@@ -1,5 +1,33 @@
 import Link from "next/link";
 import { UpdateRuleLab } from "@/components/labs/UpdateRuleLab";
+import { CodeBlock } from "@/components/CodeBlock";
+
+const codeScratch = `import numpy as np
+
+rng = np.random.default_rng(0)
+x = np.linspace(0, 10, 50)
+y = 3 + 2*x + rng.normal(scale=1.5, size=50)
+X = np.column_stack([np.ones_like(x), x])
+
+theta = np.zeros(2)
+lr = 0.01
+for step in range(2000):
+    grad  = (2/len(y)) * X.T @ (X @ theta - y)   # gradient of the MSE
+    theta = theta - lr * grad                    # <-- the update rule
+print("intercept, slope:", theta.round(3))       # ~ [3, 2]`;
+
+const codeLib = `import numpy as np
+from sklearn.linear_model import SGDRegressor
+
+rng = np.random.default_rng(0)
+x = np.linspace(0, 10, 50)
+y = 3 + 2*x + rng.normal(scale=1.5, size=50)
+
+# SGDRegressor applies the same  theta := theta - lr * grad  rule internally
+model = SGDRegressor(learning_rate="constant", eta0=0.01, max_iter=2000, tol=None)
+model.fit(x.reshape(-1, 1), y)
+print("intercept, slope:", round(float(model.intercept_[0]), 3),
+      round(float(model.coef_[0]), 3))`;
 
 export const metadata = {
   title: "The update rule — Manifold",
@@ -161,6 +189,13 @@ export default function UpdateRulePage() {
             gradient points uphill, so subtracting it is always a downhill move.
           </p>
         </div>
+
+        <h2>Run the update rule</h2>
+        <p>
+          A few lines of NumPy: compute the gradient, subtract a scaled copy,
+          repeat. The library version runs the identical rule for you.
+        </p>
+        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
 
         <div
           style={{

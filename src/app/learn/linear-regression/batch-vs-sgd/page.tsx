@@ -1,5 +1,40 @@
 import Link from "next/link";
 import { SGDComparisonLab } from "@/components/labs/SGDComparisonLab";
+import { CodeBlock } from "@/components/CodeBlock";
+
+const codeScratch = `import numpy as np
+
+rng = np.random.default_rng(0)
+x = np.linspace(0, 10, 200)
+y = 3 + 2*x + rng.normal(scale=1.5, size=200)
+X = np.column_stack([np.ones_like(x), x])
+n = len(y)
+
+# full-batch: every step uses ALL n rows
+theta = np.zeros(2)
+for _ in range(50):
+    theta -= 0.01 * (2/n) * X.T @ (X @ theta - y)
+print("batch (50 full passes):     ", theta.round(3))
+
+# SGD: one row at a time, 50 passes = 50*n cheap updates
+theta = np.zeros(2)
+for _ in range(50):
+    for i in rng.permutation(n):
+        xi = X[i]
+        theta -= 0.01 * 2 * xi * (xi @ theta - y[i])
+print("SGD (one row at a time):    ", theta.round(3))`;
+
+const codeLib = `import numpy as np
+from sklearn.linear_model import SGDRegressor
+
+rng = np.random.default_rng(0)
+x = np.linspace(0, 10, 200)
+y = 3 + 2*x + rng.normal(scale=1.5, size=200)
+Xc = x.reshape(-1, 1)
+
+# SGDRegressor is stochastic; LinearRegression is the full-batch / exact analog
+sgd = SGDRegressor(eta0=0.01, max_iter=50, tol=None).fit(Xc, y)
+print("SGDRegressor:", round(float(sgd.intercept_[0]), 3), round(float(sgd.coef_[0]), 3))`;
 
 export const metadata = {
   title: "Batch, stochastic, and mini-batch — Manifold",
@@ -133,6 +168,14 @@ export default function BatchVsSGDPage() {
             where wider loss basins generalise better.
           </p>
         </div>
+
+        <h2>Both loops, side by side</h2>
+        <p>
+          Full-batch uses every row per step; SGD updates from one row at a time.
+          Both land near <code>[3, 2]</code> — SGD just gets there with many more,
+          much cheaper steps.
+        </p>
+        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
 
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 32, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
           <Link href="/learn/linear-regression/descent-on-the-surface" style={navLink}>← Descent on the surface</Link>

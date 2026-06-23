@@ -1,5 +1,39 @@
 import Link from "next/link";
 import { LearningRateLab } from "@/components/labs/LearningRateLab";
+import { CodeBlock } from "@/components/CodeBlock";
+
+const codeScratch = `import numpy as np
+
+rng = np.random.default_rng(0)
+x = np.linspace(0, 10, 50)
+y = 3 + 2*x + rng.normal(scale=1.5, size=50)
+X = np.column_stack([np.ones_like(x), x])
+
+def final_mse(lr, steps=60):
+    theta = np.zeros(2)
+    for _ in range(steps):
+        grad  = (2/len(y)) * X.T @ (X @ theta - y)
+        theta = theta - lr * grad
+    return np.mean((X @ theta - y)**2)
+
+for lr in [0.001, 0.02, 0.12, 0.5]:
+    mse = final_mse(lr)
+    tag = "diverged!" if (np.isnan(mse) or mse > 1e6) else f"MSE {mse:.3f}"
+    print(f"lr = {lr:<6}  ->  {tag}")    # too small crawls, too big explodes`;
+
+const codeLib = `import numpy as np
+from sklearn.linear_model import SGDRegressor
+
+rng = np.random.default_rng(0)
+x = np.linspace(0, 10, 50)
+y = 3 + 2*x + rng.normal(scale=1.5, size=50)
+
+# sklearn exposes the learning rate as eta0 (with an optional schedule)
+for eta in [0.001, 0.02, 0.12]:
+    m = SGDRegressor(learning_rate="constant", eta0=eta, max_iter=60, tol=None)
+    m.fit(x.reshape(-1, 1), y)
+    mse = np.mean((m.predict(x.reshape(-1, 1)) - y)**2)
+    print(f"eta0 = {eta:<6} ->  MSE {mse:.3f}")`;
 
 export const metadata = {
   title: "Learning rate — Manifold",
@@ -150,6 +184,14 @@ export default function LearningRatePage() {
             what's happening.
           </p>
         </div>
+
+        <h2>Sweep it yourself</h2>
+        <p>
+          Run the same descent at four learning rates and watch the final loss:
+          too small barely moves, too big diverges, and there&rsquo;s a sweet spot
+          in between.
+        </p>
+        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
 
         <div
           style={{

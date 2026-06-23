@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { NormalEquationLab } from "@/components/labs/NormalEquationLab";
 import { CodeBlock } from "@/components/CodeBlock";
+import { M, MathBlock } from "@/components/Math";
 
 export const metadata = {
   title: "The normal equation — Manifold",
@@ -84,29 +85,26 @@ print(f"lstsq → intercept={theta[0]:.2f}, slope={theta[1]:.2f}")`;
           the target vector, and <strong>θ</strong> the parameter vector [b, m]ᵀ.
           Then:
         </p>
-        <div style={mathBlock}>
-          L(θ) = ‖Xθ − y‖² / N
-        </div>
+        <MathBlock>{String.raw`L(\theta) = \frac{\lVert X\theta - y \rVert^2}{N}`}</MathBlock>
         <p>
           Take the gradient with respect to θ, set it to zero, and solve:
         </p>
-        <div style={mathBlock}>
-          ∂L/∂θ = 0 &nbsp;⟹&nbsp; 2Xᵀ(Xθ − y) = 0 &nbsp;⟹&nbsp; XᵀXθ = Xᵀy
-        </div>
+        <MathBlock>{String.raw`\frac{\partial L}{\partial \theta} = 0 \;\implies\; 2X^\top(X\theta - y) = 0 \;\implies\; X^\top X\theta = X^\top y`}</MathBlock>
         <p>
           Assuming XᵀX is invertible, multiply both sides by (XᵀX)⁻¹:
         </p>
         <div
           style={{
-            ...mathBlock,
-            fontSize: 20,
-            letterSpacing: "0.02em",
+            textAlign: "center",
+            fontSize: 22,
+            borderRadius: 10,
+            padding: "16px 18px",
+            margin: "0.9rem 0 1.3rem",
             background: "color-mix(in srgb, var(--brand) 8%, var(--canvas))",
             border: "1.5px solid color-mix(in srgb, var(--brand) 25%, var(--border))",
           }}
         >
-          <span style={{ color: "var(--brand)", fontWeight: 700 }}>θ*</span>
-          {" = (XᵀX)⁻¹ Xᵀy"}
+          <M>{String.raw`\textcolor{#7c3aed}{\theta^*} = (X^\top X)^{-1} X^\top y`}</M>
         </div>
         <p>
           That's the normal equation. One formula. No hyperparameters, no loop
@@ -206,18 +204,6 @@ function chip(color: string): React.CSSProperties {
 }
 
 const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-
-const mathBlock: React.CSSProperties = {
-  fontFamily: "ui-monospace, monospace",
-  fontSize: 15,
-  background: "var(--canvas)",
-  border: "1px solid var(--border-strong)",
-  borderRadius: 10,
-  padding: "12px 18px",
-  margin: "0.8rem 0 1.2rem",
-  color: "var(--ink)",
-  textAlign: "center",
-};
 
 const callout: React.CSSProperties = {
   background: "color-mix(in srgb, var(--c-fundamentals) 9%, var(--surface))",

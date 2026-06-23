@@ -1,5 +1,36 @@
 import Link from "next/link";
 import { StoppingRulesLab } from "@/components/labs/StoppingRulesLab";
+import { CodeBlock } from "@/components/CodeBlock";
+
+const codeScratch = `import numpy as np
+
+rng = np.random.default_rng(0)
+x = np.linspace(0, 10, 50)
+y = 3 + 2*x + rng.normal(scale=1.5, size=50)
+X = np.column_stack([np.ones_like(x), x])
+
+theta = np.zeros(2)
+lr, tol = 0.01, 1e-8
+prev = np.inf
+for step in range(100000):
+    theta -= lr * (2/len(y)) * X.T @ (X @ theta - y)
+    loss = np.mean((X @ theta - y)**2)
+    if abs(prev - loss) < tol:          # stop when improvement stalls
+        break
+    prev = loss
+print(f"stopped at step {step}, loss {loss:.4f}")`;
+
+const codeLib = `import numpy as np
+from sklearn.linear_model import SGDRegressor
+
+rng = np.random.default_rng(0)
+x = np.linspace(0, 10, 50)
+y = 3 + 2*x + rng.normal(scale=1.5, size=50)
+
+# tol is sklearn's stopping rule: stop when loss stops improving by > tol
+model = SGDRegressor(eta0=0.01, tol=1e-8, max_iter=100000)
+model.fit(x.reshape(-1, 1), y)
+print("stopped after", model.n_iter_, "iterations")`;
 
 export const metadata = {
   title: "When do we stop? - Manifold",
@@ -121,6 +152,14 @@ export default function WhenDoWeStopPage() {
             reduce overfitting.
           </p>
         </div>
+
+        <h2>Code the stopping rule</h2>
+        <p>
+          The convergence check is one <code>if</code>: break when the loss stops
+          improving by more than a tolerance. scikit-learn calls that tolerance
+          <code>tol</code> and reports the iteration it stopped at.
+        </p>
+        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
 
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 32, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
           <Link href="/learn/linear-regression/batch-vs-sgd" style={navLink}>{"<-"} Batch, stochastic, mini-batch</Link>

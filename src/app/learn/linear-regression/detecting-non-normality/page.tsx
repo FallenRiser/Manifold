@@ -1,4 +1,29 @@
 import Link from "next/link";
+import { QQPlotLab } from "@/components/labs/QQPlotLab";
+import { CodeBlock } from "@/components/CodeBlock";
+import { Backlinks } from "@/components/Backlinks";
+
+const codeScratch = `import numpy as np
+
+rng = np.random.default_rng(4)
+r = rng.standard_t(df=3, size=300)        # heavy-tailed residuals
+n = len(r); m = r.mean(); s = r.std()
+
+S = np.mean(((r - m)/s)**3)               # skewness
+K = np.mean(((r - m)/s)**4)               # kurtosis
+JB = n/6 * (S**2 + (K - 3)**2 / 4)        # Jarque-Bera statistic
+print(f"skew {S:.2f}   kurtosis {K:.2f}   Jarque-Bera {JB:.1f}  (>6 => non-normal)")`;
+
+const codeLib = `import numpy as np
+from scipy import stats
+
+rng = np.random.default_rng(4)
+r = rng.standard_t(df=3, size=300)
+
+jb, p_jb = stats.jarque_bera(r)
+w,  p_sw = stats.shapiro(r)
+print(f"Jarque-Bera: {jb:.1f}  p={p_jb:.5f}")
+print(f"Shapiro-Wilk W: {w:.3f}  p={p_sw:.5f}")   # both p<0.05 => reject normality`;
 
 export const metadata = {
   title: "Detecting non-normality — Manifold",
@@ -23,6 +48,12 @@ export default function DetectingNonNormalityPage() {
         diagnose the distribution of your residuals, you need a Quantile-Quantile (Q-Q) plot.
       </p>
 
+      <Backlinks label="Related" items={[
+        { label: "Normality of residuals", href: "/learn/linear-regression/normality-of-residuals" },
+        { label: "Transformations", href: "/learn/linear-regression/transformations" },
+        { label: "Outliers & influence", href: "/learn/linear-regression/outliers-leverage-influence" },
+      ]} />
+
       <div className="lesson">
         <h2>How a Q-Q plot works</h2>
         <p>
@@ -38,6 +69,8 @@ export default function DetectingNonNormalityPage() {
           If your residuals are perfectly normal, the points will form a strict
           45-degree diagonal line. Deviations from that line tell a specific story.
         </p>
+
+        <QQPlotLab />
 
         <h2>Reading the deviations</h2>
         <div style={readGrid}>
@@ -75,6 +108,13 @@ export default function DetectingNonNormalityPage() {
             p-value of a formal test.
           </p>
         </div>
+
+        <h2>Test it yourself</h2>
+        <p>
+          The Jarque-Bera statistic rolls skew and kurtosis into one number; from
+          scratch it&rsquo;s three lines. SciPy adds Shapiro-Wilk as a second opinion.
+        </p>
+        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
 
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 32, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
           <Link href="/learn/linear-regression/outliers-leverage-influence" style={navLink}>← Outliers, leverage & influence</Link>

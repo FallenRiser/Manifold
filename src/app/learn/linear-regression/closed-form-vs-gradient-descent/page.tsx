@@ -1,5 +1,38 @@
 import Link from "next/link";
 import { ClosedFormVsGDLab } from "@/components/labs/ClosedFormVsGDLab";
+import { CodeBlock } from "@/components/CodeBlock";
+
+const codeScratch = `import numpy as np
+
+rng = np.random.default_rng(0)
+x = np.linspace(0, 10, 50)
+y = 3 + 2*x + rng.normal(scale=1.5, size=50)
+X = np.column_stack([np.ones_like(x), x])
+
+# closed form: solve the normal equation in one shot
+theta_cf = np.linalg.solve(X.T @ X, X.T @ y)
+
+# gradient descent: iterate to the same place
+theta_gd = np.zeros(2)
+for _ in range(5000):
+    theta_gd -= 0.01 * (2/len(y)) * X.T @ (X @ theta_gd - y)
+
+print("closed form:     ", theta_cf.round(3))
+print("gradient descent:", theta_gd.round(3))   # they converge to the same answer`;
+
+const codeLib = `import numpy as np
+from sklearn.linear_model import LinearRegression, SGDRegressor
+
+rng = np.random.default_rng(0)
+x = np.linspace(0, 10, 50)
+y = 3 + 2*x + rng.normal(scale=1.5, size=50)
+Xc = x.reshape(-1, 1)
+
+cf = LinearRegression().fit(Xc, y)                      # closed form internally
+gd = SGDRegressor(eta0=0.01, max_iter=5000, tol=None).fit(Xc, y)  # iterative
+
+print("LinearRegression:", round(float(cf.intercept_), 3), round(float(cf.coef_[0]), 3))
+print("SGDRegressor:    ", round(float(gd.intercept_[0]), 3), round(float(gd.coef_[0]), 3))`;
 
 export const metadata = {
   title: "Closed-form vs gradient descent — Manifold",
@@ -151,6 +184,14 @@ export default function ClosedFormVsGDPage() {
             differentiable loss.
           </p>
         </div>
+
+        <h2>Both, side by side</h2>
+        <p>
+          Solve the normal equation in one line, then grind to the same coefficients
+          with gradient descent. The library mirrors the split: <code>LinearRegression</code>
+          {" "}is closed-form, <code>SGDRegressor</code> is iterative.
+        </p>
+        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
 
         <div
           style={{

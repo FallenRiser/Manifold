@@ -1,4 +1,45 @@
 import Link from "next/link";
+import { HeteroImpactLab } from "@/components/labs/HeteroImpactLab";
+import { MathBlock } from "@/components/Math";
+import { CodeBlock } from "@/components/CodeBlock";
+import { Backlinks } from "@/components/Backlinks";
+
+const codeScratch = `import numpy as np
+
+rng = np.random.default_rng(2)
+x = np.linspace(1, 10, 200)
+y = 2 + 1.5*x + rng.normal(scale=0.3*x, size=200)   # heteroscedastic
+X = np.column_stack([np.ones_like(x), x])
+
+XtX_inv = np.linalg.inv(X.T @ X)
+beta = XtX_inv @ X.T @ y
+resid = y - X @ beta
+n, k = X.shape
+
+# naive OLS standard errors (assume constant variance)
+sigma2 = np.sum(resid**2) / (n - k)
+se_ols = np.sqrt(np.diag(sigma2 * XtX_inv))
+
+# White / HC0 "sandwich" standard errors (robust to heteroscedasticity)
+meat   = X.T @ (resid[:, None]**2 * X)
+cov_hc = XtX_inv @ meat @ XtX_inv
+se_hc  = np.sqrt(np.diag(cov_hc))
+
+print(f"slope SE  OLS: {se_ols[1]:.4f}")
+print(f"slope SE  HC0: {se_hc[1]:.4f}   <- honest under heteroscedasticity")`;
+
+const codeLib = `import numpy as np
+import statsmodels.api as sm
+
+rng = np.random.default_rng(2)
+x = np.linspace(1, 10, 200)
+y = 2 + 1.5*x + rng.normal(scale=0.3*x, size=200)
+Xc = sm.add_constant(x)
+
+ols = sm.OLS(y, Xc).fit()
+hc  = sm.OLS(y, Xc).fit(cov_type="HC0")     # one argument flips on robust SEs
+print(f"slope SE  OLS: {ols.bse[1]:.4f}")
+print(f"slope SE  HC0: {hc.bse[1]:.4f}")`;
 
 export const metadata = {
   title: "Heteroscedasticity in depth — Manifold",
@@ -22,6 +63,12 @@ export default function HeteroscedasticityInDepthPage() {
         Visual checks are great, but sometimes you need formal proof. And when
         you find heteroscedasticity, you need to fix your covariance matrix.
       </p>
+
+      <Backlinks label="Related" items={[
+        { label: "Homoscedasticity", href: "/learn/linear-regression/homoscedasticity" },
+        { label: "Weighted least squares", href: "/learn/linear-regression/weighted-least-squares" },
+        { label: "Case B: house prices", href: "/learn/linear-regression/end-to-end-worked-case/house-prices" },
+      ]} />
 
       <div className="lesson">
         <h2>Formal testing: predicting the variance</h2>
@@ -49,17 +96,19 @@ export default function HeteroscedasticityInDepthPage() {
           homoscedasticity. You have a variance problem.
         </p>
 
+        <HeteroImpactLab />
+
         <h2>The Sandwich Estimator (HC SE)</h2>
         <p>
           The standard OLS covariance matrix for the coefficients is:
         </p>
-        <div style={mathBlock}>Var(θ) = σ²(XᵀX)⁻¹</div>
+        <MathBlock>{String.raw`\operatorname{Var}(\hat\theta) = \sigma^2\,(X^\top X)^{-1}`}</MathBlock>
         <p>
           This assumes σ² is a single scalar number. When heteroscedasticity is
           present, σ² isn't a scalar — it's a diagonal matrix Σ containing a
           different variance for each observation. The correct formula becomes:
         </p>
-        <div style={mathBlock}>Var(θ) = (XᵀX)⁻¹(XᵀΣX)(XᵀX)⁻¹</div>
+        <MathBlock>{String.raw`\operatorname{Var}(\hat\theta) = (X^\top X)^{-1}\,(X^\top \Sigma X)\,(X^\top X)^{-1}`}</MathBlock>
         <p>
           Look at the structure: it has "bread" `(XᵀX)⁻¹` on the outside, and
           "meat" `XᵀΣX` on the inside. This is why Halbert White's 1980
@@ -95,6 +144,14 @@ export default function HeteroscedasticityInDepthPage() {
           </p>
         </div>
 
+        <h2>Compute the sandwich yourself</h2>
+        <p>
+          Robust standard errors come from the &ldquo;sandwich&rdquo; estimator — the same
+          formula from the panel above, in NumPy. statsmodels exposes it as a single
+          <code>cov_type=&quot;HC0&quot;</code> argument.
+        </p>
+        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
+
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 32, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
           <Link href="/learn/linear-regression/residual-vs-fitted" style={navLink}>← Residual-vs-fitted</Link>
           <Link href="/learn/linear-regression/outliers-leverage-influence" style={navLink}>Next up · Outliers, leverage & influence →</Link>
@@ -116,7 +173,5 @@ function TestCard({ title, formula, body }: { title: string; formula: string; bo
 
 function chip(color: string): React.CSSProperties {
   return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
-const mathBlock: React.CSSProperties = { fontFamily: "ui-monospace, monospace", fontSize: 15, background: "var(--canvas)", border: "1px solid var(--border-strong)", borderRadius: 10, padding: "12px 18px", margin: "0.8rem 0 1.2rem", color: "var(--ink)", textAlign: "center" };
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
+}const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
 const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-fundamentals) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-fundamentals) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0 0" };

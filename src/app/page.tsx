@@ -47,8 +47,8 @@ export default function Home() {
             >
               Start with linear regression
             </Link>
-            <Link href="/map" style={{ display: "inline-flex", alignItems: "center", gap: 6, color: "var(--muted)", fontSize: 14, textDecoration: "none" }}>
-              Browse the map →
+            <Link href="/learn/k-means" style={{ display: "inline-flex", alignItems: "center", gap: 6, color: "var(--muted)", fontSize: 14, textDecoration: "none" }}>
+              Or explore k-means clustering →
             </Link>
           </div>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 30 }}>

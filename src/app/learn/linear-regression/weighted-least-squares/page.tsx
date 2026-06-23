@@ -1,4 +1,35 @@
 import Link from "next/link";
+import { WLSLab } from "@/components/labs/WLSLab";
+import { MathBlock } from "@/components/Math";
+import { CodeBlock } from "@/components/CodeBlock";
+import { Backlinks } from "@/components/Backlinks";
+
+const codeScratch = `import numpy as np
+
+rng = np.random.default_rng(8)
+x  = np.linspace(1, 10, 100)
+sd = 0.5 + 0.6*x                                   # noise grows with x
+y  = 2 + 1.5*x + rng.normal(scale=sd, size=100)
+X  = np.column_stack([np.ones_like(x), x])
+
+b_ols = np.linalg.lstsq(X, y, rcond=None)[0]       # every point equal
+
+W = np.diag(1 / sd**2)                             # weight = 1 / variance
+b_wls = np.linalg.inv(X.T @ W @ X) @ X.T @ W @ y   # weighted normal equation
+
+print(f"OLS slope: {b_ols[1]:.3f}")
+print(f"WLS slope: {b_wls[1]:.3f}   (true 1.5)")`;
+
+const codeLib = `import numpy as np
+import statsmodels.api as sm
+
+rng = np.random.default_rng(8)
+x  = np.linspace(1, 10, 100)
+sd = 0.5 + 0.6*x
+y  = 2 + 1.5*x + rng.normal(scale=sd, size=100)
+
+model = sm.WLS(y, sm.add_constant(x), weights=1/sd**2).fit()
+print(f"WLS slope: {model.params[1]:.3f}")`;
 
 export const metadata = {
   title: "Weighted least squares — Manifold",
@@ -24,6 +55,12 @@ export default function WeightedLeastSquaresPage() {
         unreliable?
       </p>
 
+      <Backlinks label="Related" items={[
+        { label: "Homoscedasticity", href: "/learn/linear-regression/homoscedasticity" },
+        { label: "Heteroscedasticity in depth", href: "/learn/linear-regression/heteroscedasticity-in-depth" },
+        { label: "Transformations", href: "/learn/linear-regression/transformations" },
+      ]} />
+
       <div className="lesson">
         <h2>The heteroscedasticity cure</h2>
         <p>
@@ -43,19 +80,21 @@ export default function WeightedLeastSquaresPage() {
           Instead of minimizing the raw sum of squared errors, WLS minimizes a
           weighted sum:
         </p>
-        <div style={mathBlock}>WLS Cost = ∑ wᵢ(yᵢ − ŷᵢ)²</div>
+        <MathBlock>{String.raw`\text{WLS cost} = \sum_{i} w_i\,(y_i - \hat y_i)^2`}</MathBlock>
         <p>
           The mathematically optimal choice for the weight wᵢ is the
           <strong> inverse of the true error variance</strong> for that
           observation:
         </p>
-        <div style={mathBlock}>wᵢ = 1 / Var(εᵢ)</div>
+        <MathBlock>{String.raw`w_i = \frac{1}{\operatorname{Var}(\varepsilon_i)}`}</MathBlock>
         <p>
           If a point lies in a region of high variance (the wide part of the fan),
           its weight approaches zero. The model is essentially told: <em>"This
           point is extremely noisy. Ignore it. Pay attention to the tight points
           near the origin."</em>
         </p>
+
+        <WLSLab />
 
         <h2>Where do the weights come from?</h2>
         <p>
@@ -88,6 +127,13 @@ export default function WeightedLeastSquaresPage() {
           </li>
         </ul>
 
+        <h2>Compute it yourself</h2>
+        <p>
+          WLS is the normal equation with a weight matrix wedged in. From scratch
+          it&rsquo;s one extra <code>W</code>; statsmodels takes a <code>weights</code> argument.
+        </p>
+        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
+
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 32, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
           <Link href="/learn/linear-regression/transformations" style={navLink}>← Transformations</Link>
           <Link href="/learn/linear-regression/regularization" style={navLink}>Next up · Regularization →</Link>
@@ -108,7 +154,5 @@ function SourceCard({ title, body, color }: { title: string; body: string; color
 
 function chip(color: string): React.CSSProperties {
   return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
-const mathBlock: React.CSSProperties = { fontFamily: "ui-monospace, monospace", fontSize: 15, background: "var(--canvas)", border: "1px solid var(--border-strong)", borderRadius: 10, padding: "12px 18px", margin: "0.8rem 0 1.2rem", color: "var(--ink)", textAlign: "center" };
-const grid2: React.CSSProperties = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 14, margin: "1.4rem 0" };
+}const grid2: React.CSSProperties = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 14, margin: "1.4rem 0" };
 const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };

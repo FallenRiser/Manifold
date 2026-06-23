@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { MathBlock } from "@/components/Math";
 
 export const metadata = {
   title: "Linearity — Manifold",
@@ -30,7 +31,7 @@ export default function LinearityPage() {
           The linearity assumption is that the <strong>conditional mean</strong> of
           y is a linear function of the predictors:
         </p>
-        <div style={mathBlock}>E[y | X] = Xθ</div>
+        <MathBlock>{String.raw`\mathbb{E}[\,y \mid X\,] = X\theta`}</MathBlock>
         <p>
           It does <em>not</em> say the relationship between raw x and y must be
           straight. Remember: we can add x², log(x), or x₁·x₂ as features — the
@@ -137,8 +138,6 @@ function ResidPlot({ good, label, caption }: { good: boolean; label: string; cap
 
 function chip(color: string): React.CSSProperties {
   return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
-const mathBlock: React.CSSProperties = { fontFamily: "ui-monospace, monospace", fontSize: 15, background: "var(--canvas)", border: "1px solid var(--border-strong)", borderRadius: 10, padding: "12px 18px", margin: "0.8rem 0 1.2rem", color: "var(--ink)", textAlign: "center" };
-const methodsGrid: React.CSSProperties = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 10, margin: "1.4rem 0" };
+}const methodsGrid: React.CSSProperties = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 10, margin: "1.4rem 0" };
 const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
 const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-fundamentals) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-fundamentals) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0 0" };

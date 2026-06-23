@@ -1,4 +1,36 @@
 import Link from "next/link";
+import { HypothesisTestLab } from "@/components/labs/HypothesisTestLab";
+import { MathBlock } from "@/components/Math";
+import { CodeBlock } from "@/components/CodeBlock";
+import { Backlinks } from "@/components/Backlinks";
+
+const codeScratch = `import numpy as np
+from scipy import stats
+
+rng = np.random.default_rng(10)
+x = np.linspace(0, 10, 40)
+y = 2 + 1.5*x + rng.normal(scale=2, size=40)
+X = np.column_stack([np.ones_like(x), x]); n, k = X.shape
+
+XtX_inv = np.linalg.inv(X.T @ X)
+beta = XtX_inv @ X.T @ y
+resid = y - X @ beta
+sigma2 = np.sum(resid**2) / (n - k)
+se = np.sqrt(np.diag(sigma2 * XtX_inv))
+
+t = beta[1] / se[1]                          # signal-to-noise of the slope
+p = 2 * (1 - stats.t.cdf(abs(t), n - k))     # two-sided p-value
+print(f"slope t = {t:.2f}   p = {p:.2e}")`;
+
+const codeLib = `import numpy as np
+import statsmodels.api as sm
+
+rng = np.random.default_rng(10)
+x = np.linspace(0, 10, 40)
+y = 2 + 1.5*x + rng.normal(scale=2, size=40)
+
+model = sm.OLS(y, sm.add_constant(x)).fit()
+print(f"slope t = {model.tvalues[1]:.2f}   p = {model.pvalues[1]:.2e}")`;
 
 export const metadata = {
   title: "Hypothesis tests & p-values — Manifold",
@@ -24,6 +56,12 @@ export default function HypothesisTestsPage() {
         are they actually doing?
       </p>
 
+      <Backlinks label="Related" items={[
+        { label: "Confidence intervals", href: "/learn/linear-regression/confidence-intervals" },
+        { label: "Prediction intervals", href: "/learn/linear-regression/prediction-intervals" },
+        { label: "R² and adjusted R²", href: "/learn/linear-regression/r-squared-and-adjusted" },
+      ]} />
+
       <div className="lesson">
         <h2>The Null Hypothesis (H₀)</h2>
         <p>
@@ -44,7 +82,7 @@ export default function HypothesisTestsPage() {
           To judge the evidence, we calculate the <em>t</em>-statistic for each
           coefficient. It is incredibly simple:
         </p>
-        <div style={mathBlock}>t = Coefficient / Standard Error</div>
+        <MathBlock>{String.raw`t = \frac{\hat\beta_j}{\mathrm{SE}(\hat\beta_j)}`}</MathBlock>
         <p>
           It's a pure signal-to-noise ratio. The coefficient is the signal
           (how big is the effect?). The standard error is the noise (how
@@ -77,6 +115,8 @@ export default function HypothesisTestsPage() {
           Therefore, I reject the idea that it's useless."
         </p>
 
+        <HypothesisTestLab />
+
         <h2>Two massive misunderstandings</h2>
         <div style={{ display: "grid", gap: 12, margin: "1.4rem 0" }}>
           <MisconceptionCard 
@@ -100,6 +140,14 @@ export default function HypothesisTestsPage() {
           t-tests.
         </p>
 
+        <h2>Compute it yourself</h2>
+        <p>
+          The t-statistic is coefficient over standard error; the p-value is its tail
+          probability. From scratch with SciPy&rsquo;s t-distribution, then straight off the
+          statsmodels fit.
+        </p>
+        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
+
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 32, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
           <Link href="/learn/linear-regression/confidence-intervals" style={navLink}>← Confidence intervals</Link>
           <Link href="/learn/linear-regression/prediction-intervals" style={navLink}>Next up · Prediction intervals →</Link>
@@ -120,7 +168,5 @@ function MisconceptionCard({ myth, truth }: { myth: string; truth: string }) {
 
 function chip(color: string): React.CSSProperties {
   return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
-const mathBlock: React.CSSProperties = { fontFamily: "ui-monospace, monospace", fontSize: 15, background: "var(--canvas)", border: "1px solid var(--border-strong)", borderRadius: 10, padding: "12px 18px", margin: "0.8rem 0 1.2rem", color: "var(--ink)", textAlign: "center" };
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
+}const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
 const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--bad) 6%, var(--surface))", border: "1px solid color-mix(in srgb, var(--bad) 20%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0 0" };

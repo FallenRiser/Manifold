@@ -1,5 +1,39 @@
 import Link from "next/link";
 import { InfluenceLab } from "@/components/labs/InfluenceLab";
+import { MathBlock } from "@/components/Math";
+import { CodeBlock } from "@/components/CodeBlock";
+
+const codeScratch = `import numpy as np
+
+rng = np.random.default_rng(5)
+x = np.linspace(0, 10, 40)
+y = 2 + 1.5*x + rng.normal(scale=1, size=40)
+y[-1] += 15                              # inject one influential point
+X = np.column_stack([np.ones_like(x), x])
+
+XtX_inv = np.linalg.inv(X.T @ X)
+H = X @ XtX_inv @ X.T                     # hat matrix
+h = np.diag(H)                            # leverage of each point
+beta = XtX_inv @ X.T @ y
+resid = y - X @ beta
+p = X.shape[1]
+mse = np.sum(resid**2) / (len(y) - p)
+cooks = resid**2 / (p*mse) * (h / (1 - h)**2)   # Cook's distance
+
+print(f"max leverage: {h.max():.3f}")
+print(f"max Cook's D: {cooks.max():.3f} at index {int(cooks.argmax())}")`;
+
+const codeLib = `import numpy as np
+import statsmodels.api as sm
+
+rng = np.random.default_rng(5)
+x = np.linspace(0, 10, 40)
+y = 2 + 1.5*x + rng.normal(scale=1, size=40)
+y[-1] += 15
+
+infl = sm.OLS(y, sm.add_constant(x)).fit().get_influence()
+cooks = infl.cooks_distance[0]            # statsmodels computes it for you
+print(f"max Cook's D: {cooks.max():.3f} at index {int(cooks.argmax())}")`;
 
 export const metadata = {
   title: "Outliers, leverage & influence — Manifold",
@@ -79,7 +113,7 @@ export default function OutliersLeverageInfluencePage() {
           You don't actually have to refit the model N times to calculate it.
           It can be computed directly from the residual and the leverage:
         </p>
-        <div style={mathBlock}>Dᵢ = (rᵢ² / p·MSE) × [ hᵢᵢ / (1 - hᵢᵢ)² ]</div>
+        <MathBlock>{String.raw`D_i = \frac{r_i^2}{p \cdot \mathrm{MSE}} \times \frac{h_{ii}}{(1 - h_{ii})^2}`}</MathBlock>
         <p>
           Notice the structure: it multiplies a function of the residual (rᵢ) by
           a function of the leverage (hᵢᵢ). A high Cook's D (usually &gt; 1, or
@@ -94,6 +128,14 @@ export default function OutliersLeverageInfluencePage() {
           <li><strong style={{ color: "var(--ink)" }}>Robust regression.</strong> Models like Huber Regressor downweight points with huge residuals, resisting their pull.</li>
           <li><strong style={{ color: "var(--ink)" }}>Don't just delete them.</strong> Deleting a true observation just to make the R² look better is statistical malpractice. If it's real data, the model must account for it.</li>
         </ul>
+
+        <h2>Compute it yourself</h2>
+        <p>
+          Leverage is the diagonal of the hat matrix; Cook&rsquo;s distance combines
+          it with the residual to flag the one point that&rsquo;s actually moving the
+          line. statsmodels reports it in a single call.
+        </p>
+        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
 
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 32, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
           <Link href="/learn/linear-regression/heteroscedasticity-in-depth" style={navLink}>← Heteroscedasticity in depth</Link>
@@ -119,6 +161,4 @@ function TriadCard({ title, icon, body }: { title: string; icon: string; body: s
 function chip(color: string): React.CSSProperties {
   return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
 }
-const grid3: React.CSSProperties = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 10, margin: "1.4rem 0" };
-const mathBlock: React.CSSProperties = { fontFamily: "ui-monospace, monospace", fontSize: 15, background: "var(--canvas)", border: "1px solid var(--border-strong)", borderRadius: 10, padding: "12px 18px", margin: "0.8rem 0 1.2rem", color: "var(--ink)", textAlign: "center" };
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
+const grid3: React.CSSProperties = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 10, margin: "1.4rem 0" };const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };

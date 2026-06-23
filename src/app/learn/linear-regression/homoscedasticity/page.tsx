@@ -1,4 +1,37 @@
 import Link from "next/link";
+import { HomoscedasticityLab } from "@/components/labs/HomoscedasticityLab";
+import { MathBlock } from "@/components/Math";
+import { CodeBlock } from "@/components/CodeBlock";
+import { Backlinks } from "@/components/Backlinks";
+
+const codeScratch = `import numpy as np
+
+rng = np.random.default_rng(2)
+x = np.linspace(1, 10, 200)
+y = 2 + 1.5*x + rng.normal(scale=0.3*x, size=200)   # spread grows with x
+X = np.column_stack([np.ones_like(x), x])
+
+beta, *_ = np.linalg.lstsq(X, y, rcond=None)
+resid = y - X @ beta
+
+# Breusch-Pagan: regress the SQUARED residuals on the predictors
+e2 = resid**2
+b2, *_ = np.linalg.lstsq(X, e2, rcond=None)
+r2_aux = 1 - np.sum((e2 - X @ b2)**2) / np.sum((e2 - e2.mean())**2)
+LM = len(y) * r2_aux        # ~ chi-square; large => heteroscedastic
+print(f"aux R^2: {r2_aux:.3f}   BP statistic n*R^2: {LM:.1f}")`;
+
+const codeLib = `import numpy as np
+import statsmodels.api as sm
+from statsmodels.stats.diagnostic import het_breuschpagan
+
+rng = np.random.default_rng(2)
+x = np.linspace(1, 10, 200)
+y = 2 + 1.5*x + rng.normal(scale=0.3*x, size=200)
+
+model = sm.OLS(y, sm.add_constant(x)).fit()
+lm, lm_p, f, f_p = het_breuschpagan(model.resid, model.model.exog)
+print(f"Breusch-Pagan LM: {lm:.1f}   p-value: {lm_p:.4f}")   # p<0.05 => heteroscedastic`;
 
 export const metadata = {
   title: "Homoscedasticity — Manifold",
@@ -25,6 +58,12 @@ export default function HomoscedasticityPage() {
         wrong.
       </p>
 
+      <Backlinks label="Related" items={[
+        { label: "Heteroscedasticity in depth", href: "/learn/linear-regression/heteroscedasticity-in-depth" },
+        { label: "Weighted least squares", href: "/learn/linear-regression/weighted-least-squares" },
+        { label: "Residual-vs-fitted", href: "/learn/linear-regression/residual-vs-fitted" },
+      ]} />
+
       <div className="lesson">
         <h2>The formal statement</h2>
         <p>
@@ -33,7 +72,7 @@ export default function HomoscedasticityPage() {
           <strong>heteroscedasticity</strong>, means the variance depends on x
           (or on the fitted value ŷ):
         </p>
-        <div style={mathBlock}>Var(εᵢ) = f(xᵢ) &nbsp; — wrong!</div>
+        <MathBlock>{String.raw`\operatorname{Var}(\varepsilon_i) = f(x_i) \quad \text{— wrong!}`}</MathBlock>
 
         <h2>Why it happens</h2>
         <div style={causeGrid}>
@@ -48,6 +87,8 @@ export default function HomoscedasticityPage() {
           <FanPlot good label="✓ Homoscedastic" caption="Residuals maintain constant width across fitted values — a horizontal band." />
           <FanPlot good={false} label="✗ Heteroscedastic (fan)" caption="Variance grows with fitted values — the classic 'fan' or 'cone' shape. OLS treats all residuals equally, inflating error estimates on the left and deflating on the right." />
         </div>
+
+        <HomoscedasticityLab />
 
         <h2>Consequences</h2>
         <p>
@@ -93,6 +134,14 @@ export default function HomoscedasticityPage() {
             "a 1-unit increase in x is associated with a 5% increase in y").
           </p>
         </div>
+
+        <h2>Test for it yourself</h2>
+        <p>
+          The Breusch-Pagan test formalises the fan: regress the squared residuals
+          on your predictors and see if they explain anything. From scratch, then
+          via statsmodels:
+        </p>
+        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
 
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 32, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
           <Link href="/learn/linear-regression/independence-of-errors" style={navLink}>← Independence of errors</Link>
@@ -148,9 +197,7 @@ function FixItem({ title, body, color }: { title: string; body: string; color: s
 
 function chip(color: string): React.CSSProperties {
   return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
-const mathBlock: React.CSSProperties = { fontFamily: "ui-monospace, monospace", fontSize: 15, background: "var(--canvas)", border: "1px solid var(--border-strong)", borderRadius: 10, padding: "12px 18px", margin: "0.8rem 0 1.2rem", color: "var(--ink)", textAlign: "center" };
-const causeGrid: React.CSSProperties = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 10, margin: "1.4rem 0" };
+}const causeGrid: React.CSSProperties = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 10, margin: "1.4rem 0" };
 const fixGrid: React.CSSProperties = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 10, margin: "1.4rem 0" };
 const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
 const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-fundamentals) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-fundamentals) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0 0" };

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { FeatureScalingLab } from "@/components/labs/FeatureScalingLab";
 import { CodeBlock } from "@/components/CodeBlock";
+import { MathBlock } from "@/components/Math";
 
 
 export const metadata = {
@@ -93,9 +94,7 @@ print(f"Learned stds:  {pipe['scaler'].scale_.round(1)}")`;
           Subtract the mean and divide by the standard deviation — every feature
           ends up with mean 0 and standard deviation 1:
         </p>
-        <div style={mathBlock}>
-          x_scaled = (x − μ) / σ
-        </div>
+        <MathBlock>{String.raw`x_{\text{scaled}} = \frac{x - \mu}{\sigma}`}</MathBlock>
         <p>
           Now the loss surface is roughly spherical, a single learning rate
           works well for all parameters, and convergence is dramatically faster.
@@ -125,9 +124,7 @@ print(f"Learned stds:  {pipe['scaler'].scale_.round(1)}")`;
         <p>
           Instead of standardising, you can map every feature into [0, 1]:
         </p>
-        <div style={mathBlock}>
-          x_scaled = (x − x_min) / (x_max − x_min)
-        </div>
+        <MathBlock>{String.raw`x_{\text{scaled}} = \frac{x - x_{\min}}{x_{\max} - x_{\min}}`}</MathBlock>
         <p>
           This is sensitive to outliers (one extreme value compresses all the
           others near 0) but is useful when you need values in a known range —
@@ -185,8 +182,6 @@ function RuleCard({ color, title, items }: { color: string; title: string; items
 
 function chip(color: string): React.CSSProperties {
   return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
-const mathBlock: React.CSSProperties = { fontFamily: "ui-monospace, monospace", fontSize: 15, background: "var(--canvas)", border: "1px solid var(--border-strong)", borderRadius: 10, padding: "12px 18px", margin: "0.8rem 0 1.2rem", color: "var(--ink)", textAlign: "center" };
-const rulesGrid: React.CSSProperties = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 12, margin: "1.4rem 0" };
+}const rulesGrid: React.CSSProperties = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 12, margin: "1.4rem 0" };
 const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
 const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-fundamentals) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-fundamentals) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0 0" };

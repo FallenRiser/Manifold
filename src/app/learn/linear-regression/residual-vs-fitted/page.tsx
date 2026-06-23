@@ -1,4 +1,36 @@
 import Link from "next/link";
+import { ResidualPatternLab } from "@/components/labs/ResidualPatternLab";
+import { CodeBlock } from "@/components/CodeBlock";
+import { Backlinks } from "@/components/Backlinks";
+
+const codeScratch = `import numpy as np
+
+rng = np.random.default_rng(1)
+x = np.linspace(0, 10, 50)
+y = 2 + 1.5*x + rng.normal(scale=2, size=50)
+
+X = np.column_stack([np.ones_like(x), x])      # design matrix [1, x]
+beta, *_ = np.linalg.lstsq(X, y, rcond=None)   # OLS fit
+fitted = X @ beta
+resid  = y - fitted
+
+# in OLS, residuals are uncorrelated with the fitted values and average to ~0
+print("corr(fitted, resid):", round(float(np.corrcoef(fitted, resid)[0, 1]), 6))
+print("mean residual:      ", round(float(resid.mean()), 6))`;
+
+const codeLib = `import numpy as np
+import statsmodels.api as sm
+
+rng = np.random.default_rng(1)
+x = np.linspace(0, 10, 50)
+y = 2 + 1.5*x + rng.normal(scale=2, size=50)
+
+model  = sm.OLS(y, sm.add_constant(x)).fit()
+resid  = model.resid          # statsmodels exposes residuals + fitted directly
+fitted = model.fittedvalues
+
+print("corr(fitted, resid):", round(float(np.corrcoef(fitted, resid)[0, 1]), 6))
+print("mean residual:      ", round(float(resid.mean()), 6))`;
 
 export const metadata = {
   title: "Residual-vs-fitted — Manifold",
@@ -24,6 +56,12 @@ export default function ResidualVsFittedPage() {
         visualisation.
       </p>
 
+      <Backlinks label="Related" items={[
+        { label: "Linearity", href: "/learn/linear-regression/linearity" },
+        { label: "Homoscedasticity", href: "/learn/linear-regression/homoscedasticity" },
+        { label: "Outliers & influence", href: "/learn/linear-regression/outliers-leverage-influence" },
+      ]} />
+
       <div className="lesson">
         <h2>What it is</h2>
         <p>
@@ -42,6 +80,8 @@ export default function ResidualVsFittedPage() {
           is highly misleading. Fitted values (ŷ), on the other hand, are strictly
           uncorrelated with the residuals in OLS.
         </p>
+
+        <ResidualPatternLab />
 
         <h2>How to read it</h2>
         <p>
@@ -73,6 +113,14 @@ export default function ResidualVsFittedPage() {
             line screams heteroscedasticity.
           </p>
         </div>
+
+        <h2>Compute it yourself</h2>
+        <p>
+          Fit the line, subtract to get residuals, plot them against the fitted
+          values. The from-scratch version makes the OLS guarantee visible: fitted
+          and residual are uncorrelated.
+        </p>
+        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
 
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 32, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
           <Link href="/learn/linear-regression/multicollinearity" style={navLink}>← Multicollinearity</Link>

@@ -1,4 +1,33 @@
 import Link from "next/link";
+import { TransformationLab } from "@/components/labs/TransformationLab";
+import { MathBlock } from "@/components/Math";
+import { CodeBlock } from "@/components/CodeBlock";
+import { Backlinks } from "@/components/Backlinks";
+
+const codeScratch = `import numpy as np
+
+rng = np.random.default_rng(7)
+x = np.linspace(1, 6, 60)
+y = 8 * np.exp(0.5*x) * rng.lognormal(sigma=0.1, size=60)   # multiplicative growth
+
+def r2_fit(xx, yy):
+    A = np.column_stack([np.ones_like(xx), xx])
+    b, *_ = np.linalg.lstsq(A, yy, rcond=None)
+    return 1 - np.sum((yy - A @ b)**2) / np.sum((yy - yy.mean())**2)
+
+print(f"R^2 on raw y:    {r2_fit(x, y):.3f}")        # curved -> poor
+print(f"R^2 on log(y):   {r2_fit(x, np.log(y)):.3f}")  # straight -> great`;
+
+const codeLib = `import numpy as np
+from scipy import stats
+
+rng = np.random.default_rng(7)
+x = np.linspace(1, 6, 60)
+y = 8 * np.exp(0.5*x) * rng.lognormal(sigma=0.1, size=60)
+
+# Box-Cox finds the power transform that makes y most normal/linear
+y_trans, lam = stats.boxcox(y)
+print(f"Box-Cox lambda: {lam:.3f}   (near 0 => a log transform is optimal)")`;
 
 export const metadata = {
   title: "Transformations — Manifold",
@@ -23,6 +52,12 @@ export default function TransformationsPage() {
         you just need to look at your data through a different lens.
       </p>
 
+      <Backlinks label="Related" items={[
+        { label: "Normality of residuals", href: "/learn/linear-regression/normality-of-residuals" },
+        { label: "Homoscedasticity", href: "/learn/linear-regression/homoscedasticity" },
+        { label: "Case B: house prices", href: "/learn/linear-regression/end-to-end-worked-case/house-prices" },
+      ]} />
+
       <div className="lesson">
         <h2>The magic of logarithms</h2>
         <p>
@@ -35,6 +70,8 @@ export default function TransformationsPage() {
           <li><strong style={{ color: "var(--ink)" }}>It stabilises variance.</strong> If heteroscedasticity is present (variance of y increases as x increases), logging y compresses the large values, pulling the fan shape into a straight band.</li>
           <li><strong style={{ color: "var(--ink)" }}>It normalises residuals.</strong> By pulling in the long right tail of the outcome, the residuals often become symmetric and normal.</li>
         </ol>
+
+        <TransformationLab />
 
         <h2>Interpreting log transformations</h2>
         <p>
@@ -59,7 +96,7 @@ export default function TransformationsPage() {
           {" "}generalises all of them into a single mathematical family, governed
           by a parameter λ:
         </p>
-        <div style={mathBlock}>y(λ) = (y^λ − 1) / λ</div>
+        <MathBlock>{String.raw`y^{(\lambda)} = \frac{y^{\lambda} - 1}{\lambda}`}</MathBlock>
         <p>
           You let the computer test many values of λ to find the one that makes
           the residuals as perfectly normal as possible.
@@ -85,6 +122,13 @@ export default function TransformationsPage() {
           </p>
         </div>
 
+        <h2>Compute it yourself</h2>
+        <p>
+          Fitting raw exponential data gives a poor R²; logging it first makes the
+          relationship linear. SciPy&rsquo;s Box-Cox even picks the optimal power for you.
+        </p>
+        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
+
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 32, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
           <Link href="/learn/linear-regression/cross-validation-bias-variance" style={navLink}>← Cross-validation & bias–variance</Link>
           <Link href="/learn/linear-regression/weighted-least-squares" style={navLink}>Next up · Weighted least squares →</Link>
@@ -108,7 +152,5 @@ function InterpCard({ title, formula, body, color }: { title: string; formula: s
 
 function chip(color: string): React.CSSProperties {
   return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
-const mathBlock: React.CSSProperties = { fontFamily: "ui-monospace, monospace", fontSize: 15, background: "var(--canvas)", border: "1px solid var(--border-strong)", borderRadius: 10, padding: "12px 18px", margin: "0.8rem 0 1.2rem", color: "var(--ink)", textAlign: "center" };
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
+}const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
 const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-fundamentals) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-fundamentals) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0 0" };

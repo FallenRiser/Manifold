@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { PolynomialLab } from "@/components/labs/PolynomialLab";
 import { CodeBlock } from "@/components/CodeBlock";
+import { MathBlock } from "@/components/Math";
 
 
 export const metadata = {
@@ -84,9 +85,7 @@ for degree in [1, 2, 3, 7]:
         <p>
           For a single feature x, the degree-d polynomial model is:
         </p>
-        <div style={mathBlock}>
-          ŷ = θ₀ + θ₁x + θ₂x² + θ₃x³ + … + θ_d · xᵈ
-        </div>
+        <MathBlock>{String.raw`\hat y = \theta_0 + \theta_1 x + \theta_2 x^2 + \theta_3 x^3 + \dots + \theta_d\, x^{d}`}</MathBlock>
         <p>
           Each power of x is a new column in the design matrix. The algorithm
           sees only those columns — it has no idea they come from the same
@@ -127,9 +126,7 @@ for degree in [1, 2, 3, 7]:
           area is worth more than the same space in a cheap suburb. Capture
           this with a product term:
         </p>
-        <div style={mathBlock}>
-          ŷ = θ₀ + θ₁·sqft + θ₂·location + <span style={{ color: "var(--brand)" }}>θ₃·(sqft × location)</span>
-        </div>
+        <MathBlock>{String.raw`\hat y = \theta_0 + \theta_1\cdot\text{sqft} + \theta_2\cdot\text{location} + \textcolor{#7c3aed}{\theta_3\cdot(\text{sqft} \times \text{location})}`}</MathBlock>
         <p>
           Again, the model sees only columns — the product column is just
           another feature. A positive θ₃ means the slope on sqft increases
@@ -194,8 +191,6 @@ function FeatureCard({ icon, title, body }: { icon: string; title: string; body:
 
 function chip(color: string): React.CSSProperties {
   return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
-const mathBlock: React.CSSProperties = { fontFamily: "ui-monospace, monospace", fontSize: 15, background: "var(--canvas)", border: "1px solid var(--border-strong)", borderRadius: 10, padding: "12px 18px", margin: "0.8rem 0 1.2rem", color: "var(--ink)", textAlign: "center" };
-const grid3: React.CSSProperties = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 12, margin: "1.4rem 0" };
+}const grid3: React.CSSProperties = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 12, margin: "1.4rem 0" };
 const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
 const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-fundamentals) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-fundamentals) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0 0" };

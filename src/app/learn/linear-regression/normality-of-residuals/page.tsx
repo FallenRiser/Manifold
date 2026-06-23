@@ -1,4 +1,34 @@
 import Link from "next/link";
+import { NormalityLab } from "@/components/labs/NormalityLab";
+import { CodeBlock } from "@/components/CodeBlock";
+import { Backlinks } from "@/components/Backlinks";
+
+const codeScratch = `import numpy as np
+
+rng = np.random.default_rng(3)
+x = np.linspace(0, 10, 200)
+y = 2 + 1.5*x + (rng.exponential(scale=2, size=200) - 2)   # skewed errors
+X = np.column_stack([np.ones_like(x), x])
+
+beta, *_ = np.linalg.lstsq(X, y, rcond=None)
+r = y - X @ beta
+z = (r - r.mean()) / r.std()
+
+skew = np.mean(z**3)            # 0 for a normal
+kurt = np.mean(z**4) - 3        # excess kurtosis, 0 for a normal
+print(f"skewness: {skew:.3f}   excess kurtosis: {kurt:.3f}")`;
+
+const codeLib = `import numpy as np
+from scipy import stats
+
+rng = np.random.default_rng(3)
+x = np.linspace(0, 10, 200)
+y = 2 + 1.5*x + (rng.exponential(scale=2, size=200) - 2)
+r = y - np.polyval(np.polyfit(x, y, 1), x)
+
+print(f"skewness: {stats.skew(r):.3f}")
+W, p = stats.shapiro(r)        # formal normality test
+print(f"Shapiro-Wilk W: {W:.3f}   p-value: {p:.4f}")   # p<0.05 => not normal`;
 
 export const metadata = {
   title: "Normality of residuals — Manifold",
@@ -23,6 +53,12 @@ export default function NormalityOfResidualsPage() {
         normal. Your outcome doesn't need to be normal. Only the <em>residuals</em>
         {" "}need to be normal — and even then, only sometimes.
       </p>
+
+      <Backlinks label="Related" items={[
+        { label: "Detecting non-normality", href: "/learn/linear-regression/detecting-non-normality" },
+        { label: "Transformations", href: "/learn/linear-regression/transformations" },
+        { label: "Confidence intervals", href: "/learn/linear-regression/confidence-intervals" },
+      ]} />
 
       <div className="lesson">
         <h2>What it says</h2>
@@ -78,6 +114,8 @@ export default function NormalityOfResidualsPage() {
           normal, your prediction interval will have the wrong coverage.
         </p>
 
+        <NormalityLab />
+
         <h2>How to detect it</h2>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, margin: "1.4rem 0" }}>
           <DiagCard title="Q-Q Plot (Quantile-Quantile)" body="Plots the sorted residuals against theoretical normal quantiles. Points should fall on a 45-degree line. Deviation at the ends = heavy tails." />
@@ -108,6 +146,13 @@ export default function NormalityOfResidualsPage() {
             If you need valid p-values in a small sample with non-normal errors, resample your data with replacement to build an empirical distribution for your coefficients.
           </li>
         </ul>
+
+        <h2>Measure it yourself</h2>
+        <p>
+          Standardise the residuals and the third and fourth moments give skew and
+          kurtosis; SciPy adds the formal Shapiro-Wilk test.
+        </p>
+        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
 
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 32, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
           <Link href="/learn/linear-regression/homoscedasticity" style={navLink}>← Homoscedasticity</Link>

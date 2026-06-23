@@ -1,4 +1,38 @@
 import Link from "next/link";
+import { MulticollinearityLab } from "@/components/labs/MulticollinearityLab";
+import { CodeBlock } from "@/components/CodeBlock";
+import { Backlinks } from "@/components/Backlinks";
+
+const codeScratch = `import numpy as np
+
+# x3 is almost exactly x1 + x2 -> severe collinearity
+rng = np.random.default_rng(0)
+x1 = rng.normal(size=200)
+x2 = rng.normal(size=200)
+x3 = x1 + x2 + rng.normal(scale=0.01, size=200)
+X  = np.column_stack([x1, x2, x3])
+
+def vif(X, j):
+    y = X[:, j]                          # regress feature j on the others
+    others = np.delete(X, j, axis=1)
+    A = np.column_stack([np.ones(len(y)), others])
+    beta, *_ = np.linalg.lstsq(A, y, rcond=None)
+    r2 = 1 - np.sum((y - A @ beta)**2) / np.sum((y - y.mean())**2)
+    return 1 / (1 - r2)
+
+for j in range(X.shape[1]):
+    print(f"VIF x{j+1}: {vif(X, j):6.1f}")   # >10 == severe`;
+
+const codeLib = `import numpy as np
+from statsmodels.stats.outliers_influence import variance_inflation_factor
+
+rng = np.random.default_rng(0)
+x1 = rng.normal(size=200); x2 = rng.normal(size=200)
+x3 = x1 + x2 + rng.normal(scale=0.01, size=200)
+X  = np.column_stack([x1, x2, x3])
+
+for j in range(X.shape[1]):
+    print(f"VIF x{j+1}: {variance_inflation_factor(X, j):6.1f}")`;
 
 export const metadata = {
   title: "Multicollinearity — Manifold",
@@ -23,6 +57,12 @@ export default function MulticollinearityPage() {
         constant</em>. But if A and B always move together, you can't hold one
         constant while changing the other. The math panics.
       </p>
+
+      <Backlinks label="Related" items={[
+        { label: "Regularization", href: "/learn/linear-regression/regularization" },
+        { label: "Feature scaling", href: "/learn/linear-regression/feature-scaling" },
+        { label: "Multiple linear regression", href: "/learn/linear-regression/multiple-linear-regression" },
+      ]} />
 
       <div className="lesson">
         <h2>The intuition</h2>
@@ -73,6 +113,8 @@ export default function MulticollinearityPage() {
           </p>
         </div>
 
+        <MulticollinearityLab />
+
         <h2>How to fix it</h2>
         <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 12, margin: "1.4rem 0" }}>
           <FixRow n="1" title="Do nothing (if you only care about prediction)"
@@ -97,6 +139,14 @@ export default function MulticollinearityPage() {
             can actually distinguish the effects it claims to be measuring.
           </p>
         </div>
+
+        <h2>Compute it yourself</h2>
+        <p>
+          VIF is just &ldquo;regress each feature on all the others and see how well
+          it&rsquo;s predicted.&rdquo; From scratch with a least-squares solve, then the
+          one-liner in statsmodels:
+        </p>
+        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
 
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 32, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
           <Link href="/learn/linear-regression/normality-of-residuals" style={navLink}>← Normality of residuals</Link>

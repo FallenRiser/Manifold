@@ -1,5 +1,42 @@
 import Link from "next/link";
 import { IntervalsLab } from "@/components/labs/IntervalsLab";
+import { CodeBlock } from "@/components/CodeBlock";
+import { Backlinks } from "@/components/Backlinks";
+
+const codeScratch = `import numpy as np
+from scipy import stats
+
+rng = np.random.default_rng(11)
+x = np.linspace(0, 10, 50)
+y = 2 + 1.5*x + rng.normal(scale=2, size=50)
+X = np.column_stack([np.ones_like(x), x]); n, k = X.shape
+
+XtX_inv = np.linalg.inv(X.T @ X)
+beta = XtX_inv @ X.T @ y
+s2 = np.sum((y - X @ beta)**2) / (n - k)
+
+x0 = np.array([1, 7.0])                 # predict at x = 7
+yhat = x0 @ beta
+lev  = x0 @ XtX_inv @ x0
+tcrit = stats.t.ppf(0.975, n - k)
+ci = tcrit * np.sqrt(s2 * lev)          # interval for the MEAN response
+pi = tcrit * np.sqrt(s2 * (1 + lev))    # interval for ONE new observation
+
+print(f"point estimate: {yhat:.2f}")
+print(f"95% CI (mean):  +/- {ci:.2f}")
+print(f"95% PI (new y): +/- {pi:.2f}   <- wider, includes the +1")`;
+
+const codeLib = `import numpy as np
+import statsmodels.api as sm
+
+rng = np.random.default_rng(11)
+x = np.linspace(0, 10, 50)
+y = 2 + 1.5*x + rng.normal(scale=2, size=50)
+
+model = sm.OLS(y, sm.add_constant(x)).fit()
+pred = model.get_prediction([1, 7.0]).summary_frame(alpha=0.05)
+print(pred[["mean", "mean_ci_lower", "mean_ci_upper",
+            "obs_ci_lower", "obs_ci_upper"]].round(2).to_string())`;
 
 export const metadata = {
   title: "Prediction intervals — Manifold",
@@ -24,6 +61,12 @@ export default function PredictionIntervalsPage() {
         Confidence Interval is answering the wrong question. You need a Prediction
         Interval.
       </p>
+
+      <Backlinks label="Related" items={[
+        { label: "Confidence intervals", href: "/learn/linear-regression/confidence-intervals" },
+        { label: "Hypothesis tests & p-values", href: "/learn/linear-regression/hypothesis-tests-and-p-values" },
+        { label: "Case C: medical costs", href: "/learn/linear-regression/end-to-end-worked-case/medical-costs" },
+      ]} />
 
       <div className="lesson">
         <h2>The two types of uncertainty</h2>
@@ -92,6 +135,14 @@ export default function PredictionIntervalsPage() {
           calculated 95% Prediction Interval will be completely wrong, no matter
           how much data you have.
         </p>
+
+        <h2>Compute both intervals yourself</h2>
+        <p>
+          The only difference is a <code>+1</code> under the square root: the prediction
+          interval carries the extra noise of a single new observation. statsmodels
+          returns both as <code>mean_ci</code> and <code>obs_ci</code>.
+        </p>
+        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
 
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 32, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
           <Link href="/learn/linear-regression/hypothesis-tests-and-p-values" style={navLink}>← Hypothesis tests & p-values</Link>
