@@ -15,7 +15,7 @@ export const FAMILIES: Group[] = [
     blurb: "Predict a number. The gentlest on-ramp to all of ML.",
     tracks: [
       { title: "Linear regression", href: "/learn/linear-regression" },
-      { title: "Ridge, Lasso & Elastic-net" },
+      { title: "Ridge, Lasso & Elastic-net", href: "/learn/regularized-regression" },
       { title: "Polynomial & basis-function regression" },
       { title: "Kernel ridge regression" },
       { title: "Support vector regression" },
@@ -99,6 +99,7 @@ export const PILLARS: Group[] = [
     color: "var(--c-metrics)",
     blurb: "Given raw data, what do you actually do — step by step?",
     tracks: [
+      { title: "California housing capstone", href: "/learn/california-housing-capstone" },
       { title: "Exploratory data analysis" },
       { title: "Framing & preprocessing" },
       { title: "Baselines & model selection" },

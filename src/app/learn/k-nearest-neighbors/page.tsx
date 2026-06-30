@@ -79,13 +79,11 @@ export default function KNNHubPage() {
         <h2>What this track covers</h2>
         <p>
           We&rsquo;ll go from this first vote to full mastery: how the prediction and{" "}
-          <Link href="/learn/k-nearest-neighbors/decision-boundaries" style={inlineLink}>decision boundary</Link>{" "}
-          really work, how to <Link href="/learn/k-nearest-neighbors/the-role-of-k" style={inlineLink}>choose k</Link>,
-          why <Link href="/learn/k-nearest-neighbors/why-feature-scaling-matters" style={inlineLink}>scaling and distance</Link>{" "}
-          make or break it, the <Link href="/learn/k-nearest-neighbors/the-curse-of-dimensionality" style={inlineLink}>curse of dimensionality</Link>,
-          the clever <Link href="/learn/k-nearest-neighbors/k-d-trees" style={inlineLink}>search structures</Link> that
-          make it fast, the theory (including the famous result that 1-NN is within 2× of the best possible
-          classifier), and three real cases. Onward.
+          <strong>decision boundary</strong> really work, how to <strong>choose k</strong>, why{" "}
+          <strong>scaling and distance</strong> make or break it, the <strong>curse of
+          dimensionality</strong>, the clever <strong>search structures</strong> that make it fast, the
+          theory (including the famous result that 1-NN is within 2× of the best possible classifier), and
+          three real cases. Onward.
         </p>
 
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 40, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
@@ -122,5 +120,4 @@ function chip(color: string): React.CSSProperties {
   return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
 }
 const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const inlineLink: React.CSSProperties = { color: "var(--brand)", textDecoration: "none" };
 const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-classification) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-classification) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0" };
