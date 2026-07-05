@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { CodeBlock } from "@/components/CodeBlock";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 export const metadata = {
   title: "Case B: customer segmentation — Manifold",
@@ -20,20 +21,16 @@ const BW = 150, BH = 26;
 export default function CaseSegmentationPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-clustering)")}>Clustering</span>
-        <span style={chip("var(--c-metrics)")}>In the wild · Case B</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 9 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        Case B: customer segmentation
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 24px", maxWidth: 620 }}>
-        The most common business application of k-means — and the one where the algorithm is the{" "}
+      <LessonHeader
+        chips={[{ label: "Clustering", color: "var(--c-clustering)" }, { label: "In the wild · Case B", color: "var(--c-metrics)" }]}
+        time="about 9 minutes"
+        title={<>Case B: customer segmentation</>}
+        intro={<>
+          The most common business application of k-means — and the one where the algorithm is the{" "}
         <em>easy</em> part. Grouping customers into segments exercises the entire workflow: features,
         scaling, choosing <em>k</em>, and the real deliverable, interpretation.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <h2>The goal</h2>
@@ -105,26 +102,18 @@ export default function CaseSegmentationPage() {
           ))}
         </div>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-clustering)", marginBottom: 4 }}>
-            The real lesson of this case
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            k-means is maybe 10% of the work. Feature engineering, scaling, the transform, and especially
+        <Callout color="var(--c-clustering)" title={<>The real lesson of this case</>}>
+          k-means is maybe 10% of the work. Feature engineering, scaling, the transform, and especially
             turning centroids into named personas a business can act on — that&rsquo;s the other 90%. The
             algorithm gives you groups; <em>you</em> give them meaning. Validate that the segments are
             stable (resampling) and that they actually differ in ways the business cares about before
             shipping them.
-          </p>
-        </div>
+        </Callout>
 
         <h2>End-to-end pipeline</h2>
         <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 40, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/k-means/case-image-quantization" style={navLink}>← Case A: image colour quantization</Link>
-          <Link href="/learn/k-means/case-clustering-embeddings" style={{ ...navLink, fontWeight: 600 }}>Next up · Case C: clustering embeddings →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/k-means/case-image-quantization", label: <>← Case A: image colour quantization</> }} next={{ href: "/learn/k-means/case-clustering-embeddings", label: <>Next up · Case C: clustering embeddings →</> }} />
       </div>
     </article>
   );
@@ -164,10 +153,5 @@ rfm["segment"] = pipe.fit_predict(rfm[["recency", "frequency", "monetary"]])
 # the deliverable: human-readable profiles
 print(rfm.groupby("segment")[["recency", "frequency", "monetary"]].mean())`;
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
 const ul: React.CSSProperties = { margin: "0 0 10px", paddingLeft: "1.3em", fontSize: 15, color: "var(--muted)", lineHeight: 1.8 };
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
 const inlineLink: React.CSSProperties = { color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-clustering) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-clustering) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0" };

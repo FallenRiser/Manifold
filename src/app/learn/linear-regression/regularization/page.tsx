@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { RegularizationLab } from "@/components/labs/RegularizationLab";
 import { CodeBlock } from "@/components/CodeBlock";
+import { REGRESSION_SETUP } from "@/lib/runtimeSetup";
 import { MathBlock } from "@/components/Math";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 
 export const metadata = {
@@ -59,22 +61,30 @@ for name, pipe in fits:
 
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-regression)")}>Regression</span>
-        <span style={chip("var(--brand)")}>Fixing</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 7 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        Regularization
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 8px", maxWidth: 620 }}>
-        Ordinary Least Squares is greedy. It will contort its coefficients into
+      <LessonHeader
+        chips={[{ label: "Regression", color: "var(--c-regression)" }, { label: "Fixing", color: "var(--brand)" }]}
+        time="about 7 minutes"
+        title={<>Regularization</>}
+        intro={<>
+          Ordinary Least Squares is greedy. It will contort its coefficients into
         massive, opposing numbers just to shave a fraction off the training
         error. Regularization stops the madness.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
+        <Link href="/learn/regularized-regression" style={{ textDecoration: "none", display: "block" }}>
+          <div style={{ background: "color-mix(in srgb, var(--c-regression) 8%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-regression) 24%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "0 0 1.6rem", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+            <div>
+              <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-regression)", marginBottom: 2 }}>This is the short version</div>
+              <div style={{ fontSize: 14, color: "var(--muted)", lineHeight: 1.5 }}>
+                Regularization has its own full track — the geometry of sparsity, elastic-net, choosing λ by CV, the Bayesian view, and a worked capstone.
+              </div>
+            </div>
+            <span style={{ color: "var(--c-regression)", fontSize: 14, whiteSpace: "nowrap", fontWeight: 600 }}>Full track →</span>
+          </div>
+        </Link>
+
         <h2>The penalty term</h2>
         <p>
           Normally, we minimise the Sum of Squared Errors (SSE). Regularization
@@ -134,19 +144,14 @@ for name, pipe in fits:
           </li>
         </ul>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-fundamentals)", marginBottom: 4 }}>
-            Crucial: You must scale your features
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            Because the penalty term sums the raw coefficients, the scale of
+        <Callout color="var(--c-fundamentals)" title={<>Crucial: You must scale your features</>}>
+          Because the penalty term sums the raw coefficients, the scale of
             your features matters immensely. If feature A is measured in miles
             (small coefficient) and feature B is measured in inches (massive
             coefficient), Ridge will unfairly crush feature B just because of its
             units. <strong>Always standardize your features (z-score) before
             applying regularization.</strong>
-          </p>
-        </div>
+        </Callout>
 
         <h2>The code</h2>
         <p>
@@ -154,12 +159,9 @@ for name, pipe in fits:
           scikit-learn handles both Ridge and Lasso in a single call.
         </p>
 
-        <CodeBlock fromScratch={fromScratch} withLibrary={withLibrary} />
+        <CodeBlock setup={REGRESSION_SETUP} fromScratch={fromScratch} withLibrary={withLibrary} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 32, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/linear-regression/weighted-least-squares" style={navLink}>← Weighted least squares</Link>
-          <Link href="/learn/linear-regression/bias-variance-revisited" style={navLink}>Next up · Bias-variance, revisited →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/linear-regression/weighted-least-squares", label: <>← Weighted least squares</> }} next={{ href: "/learn/linear-regression/bias-variance-revisited", label: <>Next up · Bias-variance, revisited →</> }} />
       </div>
 
     </article>
@@ -176,8 +178,6 @@ function PenaltyCard({ title, formula, body, color }: { title: string; formula: 
   );
 }
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}const grid2: React.CSSProperties = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 14, margin: "1.4rem 0" };
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-fundamentals) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-fundamentals) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0 0" };
+const grid2: React.CSSProperties = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 14, margin: "1.4rem 0" };
+
+

@@ -1,6 +1,8 @@
-import Link from "next/link";
 import { M } from "@/components/Math";
 import { CodeBlock } from "@/components/CodeBlock";
+import { RidgeShrinkageLab } from "@/components/labs/RidgeShrinkageLab";
+import { REGRESSION_SETUP } from "@/lib/runtimeSetup";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 export const metadata = {
   title: "Shrinkage: the core idea — Manifold",
@@ -11,18 +13,15 @@ export const metadata = {
 export default function ShrinkagePage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-regression)")}>Regression</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 5 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        Shrinkage: the core idea
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 24px", maxWidth: 620 }}>
-        Strip regularization down to its essence and it&rsquo;s a single word: <strong>shrinkage</strong>. Pull
+      <LessonHeader
+        chips={[{ label: "Regression", color: "var(--c-regression)" }]}
+        time="about 5 minutes"
+        title={<>Shrinkage: the core idea</>}
+        intro={<>
+          Strip regularization down to its essence and it&rsquo;s a single word: <strong>shrinkage</strong>. Pull
         the coefficients toward zero. Everything else — Ridge, Lasso, elastic-net — is a variation on how.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <h2>What shrinkage means</h2>
@@ -59,17 +58,12 @@ export default function ShrinkagePage() {
           that the total error falls below OLS&rsquo;s. Unbiasedness is not the same as accuracy.
         </p>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-regression)", marginBottom: 4 }}>
-            A famous, almost paradoxical result
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            The <strong>James–Stein</strong> result showed that when estimating three or more quantities at
+        <Callout color="var(--c-regression)" title={<>A famous, almost paradoxical result</>}>
+          The <strong>James–Stein</strong> result showed that when estimating three or more quantities at
             once, an estimator that shrinks them toward a common point <em>always</em> beats the obvious
             unbiased estimate, in total squared error. Shrinkage isn&rsquo;t a hack that sometimes helps — there&rsquo;s
             deep theory saying it&rsquo;s the right thing to do. We give that its own page in the theory chapter.
-          </p>
-        </div>
+        </Callout>
 
         <h2>How much to shrink, and how</h2>
         <p>
@@ -89,12 +83,10 @@ export default function ShrinkagePage() {
         </ul>
 
         <h2>Watch coefficients shrink</h2>
-        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
+        <RidgeShrinkageLab />
+        <CodeBlock setup={REGRESSION_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 40, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/regularized-regression/overfitting-and-bias-variance" style={navLink}>← Overfitting &amp; the bias–variance tradeoff</Link>
-          <Link href="/learn/regularized-regression/penalty-vs-constraint" style={{ ...navLink, fontWeight: 600 }}>Next up · Penalty vs constraint: two views →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/regularized-regression/overfitting-and-bias-variance", label: <>← Overfitting &amp; the bias–variance tradeoff</> }} next={{ href: "/learn/regularized-regression/penalty-vs-constraint", label: <>Next up · Penalty vs constraint: two views →</> }} />
       </div>
     </article>
   );
@@ -119,9 +111,7 @@ for lam in [0.01, 1, 100]:
     coef = Ridge(alpha=lam).fit(X, y).coef_
     print(f"λ={lam:>5}:  ||β||={np.linalg.norm(coef):.2f}  max|β|={np.abs(coef).max():.2f}")`;
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
+
 const ul: React.CSSProperties = { margin: "0 0 10px", paddingLeft: "1.3em", fontSize: 15, color: "var(--muted)", lineHeight: 1.8 };
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-regression) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-regression) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0" };
+
+

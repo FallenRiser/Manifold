@@ -1,7 +1,9 @@
-import Link from "next/link";
 import { CrossValidationLab } from "@/components/labs/CrossValidationLab";
 import { CodeBlock } from "@/components/CodeBlock";
+import { REGRESSION_SETUP } from "@/lib/runtimeSetup";
 import { Backlinks } from "@/components/Backlinks";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
+import { Quiz } from "@/components/Quiz";
 
 const codeScratch = `import numpy as np
 
@@ -47,20 +49,16 @@ export const metadata = {
 export default function CrossValidationBiasVariancePage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-regression)")}>Regression</span>
-        <span style={chip("var(--good)")}>Evaluation</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 7 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        Cross-validation &amp; bias–variance
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 8px", maxWidth: 620 }}>
-        Evaluating a model on the data it trained on is like giving a student an
+      <LessonHeader
+        chips={[{ label: "Regression", color: "var(--c-regression)" }, { label: "Evaluation", color: "var(--good)" }]}
+        time="about 7 minutes"
+        title={<>Cross-validation &amp; bias–variance</>}
+        intro={<>
+          Evaluating a model on the data it trained on is like giving a student an
         exam with the exact same questions they practiced. It measures
         memorisation, not learning.
-      </p>
+        </>}
+      />
 
       <Backlinks label="Related" items={[
         { label: "Bias–variance revisited", href: "/learn/linear-regression/bias-variance-revisited" },
@@ -134,18 +132,13 @@ export default function CrossValidationBiasVariancePage() {
           bias goes down, but variance goes up.
         </p>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-fundamentals)", marginBottom: 4 }}>
-            The sweet spot
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            The goal of machine learning is to find the exact level of
+        <Callout color="var(--c-fundamentals)" title={<>The sweet spot</>}>
+          The goal of machine learning is to find the exact level of
             complexity where the test error reaches its minimum. This is the
             U-shaped curve: as complexity increases, test error falls (as bias
             is reduced), hits a minimum, and then rises again (as variance takes
             over). You find this sweet spot using cross-validation.
-          </p>
-        </div>
+        </Callout>
 
         <h2>Run k-fold yourself</h2>
         <p>
@@ -153,12 +146,33 @@ export default function CrossValidationBiasVariancePage() {
           it&rsquo;s a loop over <code>np.array_split</code>; scikit-learn wraps it in
           <code>cross_val_score</code>. Both trace the same U across polynomial degree.
         </p>
-        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
+        <CodeBlock setup={REGRESSION_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 32, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/linear-regression/rmse-vs-mae" style={navLink}>← RMSE vs MAE</Link>
-          <Link href="/learn/linear-regression/transformations" style={navLink}>Next up · Transformations →</Link>
-        </div>
+        <Quiz
+          title="Checkpoint · Evaluation"
+          questions={[
+            {
+              q: <>You add a completely random feature to your model. Training R²:</>,
+              options: ["Goes down — noise hurts", "Stays exactly the same", "Never decreases — which is why adjusted R² exists", "Becomes negative"],
+              answer: 2,
+              explain: <>OLS can always set a useless coefficient to squeeze out a sliver of training fit, so train R² only ever creeps up. Adjusted R² charges a per-feature penalty; held-out metrics tell the real story.</>,
+            },
+            {
+              q: <>Your model&rsquo;s RMSE is much larger than its MAE on the same data. What does the gap tell you?</>,
+              options: ["The model is underfitting", "A few large misses dominate — RMSE's squaring amplifies them, MAE doesn't", "The data was not scaled", "Nothing — they always differ by that ratio"],
+              answer: 1,
+              explain: <>MAE is the typical miss; RMSE inflates when errors are unequal. A wide RMSE-vs-MAE gap is a cheap outlier detector: go find the few rows the model gets badly wrong.</>,
+            },
+            {
+              q: <>Why prefer 5-fold cross-validation over a single train/test split?</>,
+              options: ["It trains one model instead of five", "Every row gets scored while unseen, and the estimate doesn't hinge on one lucky (or cursed) split", "It prevents overfitting during training", "It's faster"],
+              answer: 1,
+              explain: <>One split gives one noisy number that depends on which rows landed in the test set. CV rotates the held-out fold so all data contributes to the estimate — costlier (k fits) but far more stable. It <em>measures</em> generalization; it doesn&rsquo;t by itself prevent overfitting.</>,
+            },
+          ]}
+        />
+
+        <PrevNext prev={{ href: "/learn/linear-regression/rmse-vs-mae", label: <>← RMSE vs MAE</> }} next={{ href: "/learn/linear-regression/transformations", label: <>Next up · Transformations →</> }} />
       </div>
     </article>
   );
@@ -173,9 +187,7 @@ function BVCard({ title, body, color }: { title: string; body: string; color: st
   );
 }
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
+
 const bvGrid: React.CSSProperties = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 14, margin: "1.6rem 0" };
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-fundamentals) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-fundamentals) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0 0" };
+
+

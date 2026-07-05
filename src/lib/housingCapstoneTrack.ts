@@ -41,9 +41,9 @@ export const CAP_TRACK: TrackChapter[] = [
     ],
   },
   {
-    title: "Upgrade 3 · Nonlinear",
+    title: "Upgrade 3 · The model zoo",
     pages: [
-      { title: "Gradient boosting", href: "/learn/california-housing-capstone/gradient-boosting" },
+      { title: "Beyond linear: the model zoo", href: "/learn/california-housing-capstone/gradient-boosting" },
     ],
   },
   {
@@ -51,6 +51,12 @@ export const CAP_TRACK: TrackChapter[] = [
     pages: [
       { title: "Final model selection", href: "/learn/california-housing-capstone/model-selection" },
       { title: "Predictions & takeaways", href: "/learn/california-housing-capstone/takeaways" },
+    ],
+  },
+  {
+    title: "Epilogue · Going further",
+    pages: [
+      { title: "Censored boosting & SHAP", href: "/learn/california-housing-capstone/censored-boosting" },
     ],
   },
 ];

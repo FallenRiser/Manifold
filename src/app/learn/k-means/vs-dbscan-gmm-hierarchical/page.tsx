@@ -1,5 +1,7 @@
-import Link from "next/link";
+import { Quiz } from "@/components/Quiz";
 import { CodeBlock } from "@/components/CodeBlock";
+import { CLUSTER_SETUP } from "@/lib/runtimeSetup";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 export const metadata = {
   title: "k-means vs DBSCAN, GMM, hierarchical — Manifold",
@@ -18,18 +20,15 @@ const ROWS: Row[] = [
 export default function ComparisonPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-clustering)")}>Clustering</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 8 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        k-means vs DBSCAN, GMM, hierarchical
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 24px", maxWidth: 620 }}>
-        k-Means is one option in a toolkit. Three alternatives cover most of what it can&rsquo;t — each makes a
+      <LessonHeader
+        chips={[{ label: "Clustering", color: "var(--c-clustering)" }]}
+        time="about 8 minutes"
+        title={<>k-means vs DBSCAN, GMM, hierarchical</>}
+        intro={<>
+          k-Means is one option in a toolkit. Three alternatives cover most of what it can&rsquo;t — each makes a
         different assumption, so &ldquo;which is best&rdquo; is really &ldquo;which assumption matches your data.&rdquo;
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <h2>GMM — soft, elliptical k-means</h2>
@@ -83,27 +82,43 @@ export default function ComparisonPage() {
           </table>
         </div>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-clustering)", marginBottom: 4 }}>
-            How to choose
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            Round, well-separated blobs and a known k, at scale → <strong>k-means</strong>. Elliptical or
+        <Callout color="var(--c-clustering)" title={<>How to choose</>}>
+          Round, well-separated blobs and a known k, at scale → <strong>k-means</strong>. Elliptical or
             unequal clusters, or you want soft membership → <strong>GMM</strong>. Arbitrary shapes, unknown
             cluster count, real noise → <strong>DBSCAN</strong>. Nested structure or a small dataset where
             you want to see the whole merge tree → <strong>hierarchical</strong>. And often the honest
             answer is to run two or three and compare — they encode different definitions of &ldquo;cluster,&rdquo;
             so disagreement is itself informative.
-          </p>
-        </div>
+        </Callout>
 
         <h2>The same data, four methods</h2>
-        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
+        <CodeBlock setup={CLUSTER_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 40, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/k-means/the-failure-mode-gallery" style={navLink}>← The failure-mode gallery</Link>
-          <Link href="/learn/k-means/k-medoids" style={{ ...navLink, fontWeight: 600 }}>Next up · k-medoids (PAM) →</Link>
-        </div>
+        <Quiz
+          accent="var(--c-clustering)"
+          questions={[
+            {
+              q: "Two interlocking crescents ('two moons'). Which finds them, and why?",
+              options: ["DBSCAN — it follows density, while k-means can only draw straight Voronoi walls", "k-means, given more restarts", "k-means, given larger k and relabelling"],
+              answer: 0,
+              explain: "No placement of 2 centroids separates interlocking crescents — the boundary between two centroids is always a straight line. Density-following methods trace the shape itself.",
+            },
+            {
+              q: "k-means implicitly assumes clusters are…",
+              options: ["Roughly spherical, similarly sized, similar density", "Any shape, any size", "Gaussian with arbitrary covariance"],
+              answer: 0,
+              explain: "Squared Euclidean distance plus hard Voronoi assignment bakes these in. GMMs relax the shape assumption (ellipses); DBSCAN drops it entirely.",
+            },
+            {
+              q: "When one true cluster is much larger than its neighbours, k-means tends to…",
+              options: ["Split the big cluster and let a centroid swallow the small ones", "Handle it fine — size doesn't matter to inertia", "Throw an empty-cluster error"],
+              answer: 0,
+              explain: "Inertia is minimised by balancing squared distances, not by respecting your idea of a cluster: carving a huge blob in half often costs less than giving a tiny blob its own centroid.",
+            },
+          ]}
+        />
+
+        <PrevNext prev={{ href: "/learn/k-means/the-failure-mode-gallery", label: <>← The failure-mode gallery</> }} next={{ href: "/learn/k-means/k-medoids", label: <>Next up · k-medoids (PAM) →</> }} />
       </div>
     </article>
   );
@@ -127,10 +142,8 @@ gmm = GaussianMixture(n_components=2, random_state=0).fit_predict(X)   # still s
 db  = DBSCAN(eps=0.2, min_samples=5).fit_predict(X)                    # follows the moons; -1 = noise
 agg = AgglomerativeClustering(n_clusters=2, linkage="single").fit_predict(X)  # single-link tracks shape`;
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-clustering) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-clustering) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0" };
+
+
+
 const th: React.CSSProperties = { textAlign: "left", padding: "8px 9px", borderBottom: "2px solid var(--border-strong)", color: "var(--muted)", fontWeight: 500, fontSize: 11.5, verticalAlign: "bottom" };
 const td: React.CSSProperties = { padding: "8px 9px", borderBottom: "1px solid var(--border)", color: "var(--muted)", lineHeight: 1.45, verticalAlign: "top" };

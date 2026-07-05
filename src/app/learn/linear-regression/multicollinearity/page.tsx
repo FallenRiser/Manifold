@@ -1,7 +1,9 @@
-import Link from "next/link";
 import { MulticollinearityLab } from "@/components/labs/MulticollinearityLab";
 import { CodeBlock } from "@/components/CodeBlock";
+import { REGRESSION_SETUP } from "@/lib/runtimeSetup";
 import { Backlinks } from "@/components/Backlinks";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
+import { Quiz } from "@/components/Quiz";
 
 const codeScratch = `import numpy as np
 
@@ -43,20 +45,16 @@ export const metadata = {
 export default function MulticollinearityPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-regression)")}>Regression</span>
-        <span style={chip("var(--warn)")}>Assumptions</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 7 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        Multicollinearity
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 8px", maxWidth: 620 }}>
-        A coefficient tells you the effect of feature A <em>holding feature B
+      <LessonHeader
+        chips={[{ label: "Regression", color: "var(--c-regression)" }, { label: "Assumptions", color: "var(--warn)" }]}
+        time="about 7 minutes"
+        title={<>Multicollinearity</>}
+        intro={<>
+          A coefficient tells you the effect of feature A <em>holding feature B
         constant</em>. But if A and B always move together, you can't hold one
         constant while changing the other. The math panics.
-      </p>
+        </>}
+      />
 
       <Backlinks label="Related" items={[
         { label: "Regularization", href: "/learn/linear-regression/regularization" },
@@ -127,18 +125,13 @@ export default function MulticollinearityPage() {
             body="Ridge regression (L2 regularisation) adds a penalty for large coefficients. It acts like a rubber band, pulling the wild, opposing coefficients back to zero and stabilising the model." />
         </div>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-fundamentals)", marginBottom: 4 }}>
-            The overarching lesson of assumptions
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            Every assumption tells you something about how the model works.
+        <Callout color="var(--c-fundamentals)" title={<>The overarching lesson of assumptions</>}>
+          Every assumption tells you something about how the model works.
             Linearity ensures the shape is right. Independence ensures your sample
             size isn't lying to you. Homoscedasticity and normality ensure your
             uncertainty bands are honest. Multicollinearity ensures your model
             can actually distinguish the effects it claims to be measuring.
-          </p>
-        </div>
+        </Callout>
 
         <h2>Compute it yourself</h2>
         <p>
@@ -146,12 +139,33 @@ export default function MulticollinearityPage() {
           it&rsquo;s predicted.&rdquo; From scratch with a least-squares solve, then the
           one-liner in statsmodels:
         </p>
-        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
+        <CodeBlock setup={REGRESSION_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 32, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/linear-regression/normality-of-residuals" style={navLink}>← Normality of residuals</Link>
-          <Link href="/learn/linear-regression/residual-vs-fitted" style={navLink}>Next up · Residual-vs-fitted →</Link>
-        </div>
+        <Quiz
+          title="Checkpoint · The assumptions"
+          questions={[
+            {
+              q: <>Residuals plotted against fitted values fan out — small spread on the left, wide on the right. Which assumption is violated?</>,
+              options: ["Linearity", "Independence of errors", "Homoscedasticity — constant error variance", "Normality of residuals"],
+              answer: 2,
+              explain: <>The fan is the signature of heteroscedasticity: error variance growing with the fitted value. Coefficients stay unbiased, but standard errors — and every interval and p-value built on them — become unreliable.</>,
+            },
+            {
+              q: <>The same plot shows a clear U-shaped curve instead. Which assumption is that?</>,
+              options: ["Linearity — the model is missing a curve the data has", "Homoscedasticity", "Multicollinearity", "Normality"],
+              answer: 0,
+              explain: <>Systematic curvature in the residuals means the straight-line form can&rsquo;t represent the true relationship — the model is leaving structure on the table. Transformations or polynomial terms are the usual fixes.</>,
+            },
+            {
+              q: <>Two predictors have a VIF of 14. What does that actually break?</>,
+              options: ["The model's predictions become badly wrong", "The individual coefficients: their variance inflates, signs can flip, interpretation gets treacherous", "The residuals stop being normal", "Nothing — VIF under 100 is fine"],
+              answer: 1,
+              explain: <>Multicollinearity is a <em>coefficient</em> disease, not a prediction disease: the fit can stay excellent while the model can&rsquo;t tell which of the twins deserves the credit. That instability is exactly what ridge tames — the capstone chose ridge for this reason.</>,
+            },
+          ]}
+        />
+
+        <PrevNext prev={{ href: "/learn/linear-regression/normality-of-residuals", label: <>← Normality of residuals</> }} next={{ href: "/learn/linear-regression/residual-vs-fitted", label: <>Next up · Residual-vs-fitted →</> }} />
       </div>
     </article>
   );
@@ -178,10 +192,8 @@ function FixRow({ n, title, body }: { n: string; title: string; body: string }) 
   );
 }
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
+
 const typeGrid: React.CSSProperties = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 12, margin: "1.4rem 0" };
 const vifBox: React.CSSProperties = { background: "color-mix(in srgb, var(--brand) 6%, var(--surface-2))", border: "1px solid color-mix(in srgb, var(--brand) 20%, var(--border))", borderRadius: 12, padding: "14px 18px", margin: "1.4rem 0" };
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-fundamentals) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-fundamentals) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0 0" };
+
+

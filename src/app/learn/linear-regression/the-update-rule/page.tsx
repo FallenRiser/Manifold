@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { UpdateRuleLab } from "@/components/labs/UpdateRuleLab";
 import { CodeBlock } from "@/components/CodeBlock";
+import { REGRESSION_SETUP } from "@/lib/runtimeSetup";
+import { LessonHeader } from "@/components/lesson";
 
 const codeScratch = `import numpy as np
 
@@ -38,23 +40,16 @@ export const metadata = {
 export default function UpdateRulePage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-regression)")}>Regression</span>
-        <span style={chip("var(--c-fundamentals)")}>Core idea</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 7 minutes</span>
-      </div>
-
-      <h1
-        className="font-serif"
-        style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}
-      >
-        The update rule
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 8px", maxWidth: 620 }}>
-        You've watched the ball roll downhill and understood what a gradient is.
+      <LessonHeader
+        chips={[{ label: "Regression", color: "var(--c-regression)" }, { label: "Core idea", color: "var(--c-fundamentals)" }]}
+        time="about 7 minutes"
+        title={<>The update rule</>}
+        intro={<>
+          You've watched the ball roll downhill and understood what a gradient is.
         Now let's write it as math — one line that runs inside every training
         loop ever written.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <p>
@@ -195,7 +190,7 @@ export default function UpdateRulePage() {
           A few lines of NumPy: compute the gradient, subtract a scaled copy,
           repeat. The library version runs the identical rule for you.
         </p>
-        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
+        <CodeBlock setup={REGRESSION_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
 
         <div
           style={{
@@ -264,17 +259,7 @@ function GlossaryCard({
   );
 }
 
-function chip(color: string): React.CSSProperties {
-  return {
-    display: "inline-flex",
-    alignItems: "center",
-    background: `color-mix(in srgb, ${color} 13%, var(--surface))`,
-    color,
-    fontSize: 12,
-    padding: "3px 10px",
-    borderRadius: 999,
-  };
-}
+
 
 const glossaryGrid: React.CSSProperties = {
   display: "grid",

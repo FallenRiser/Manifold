@@ -1,7 +1,10 @@
 import Link from "next/link";
 import { CaseTracker } from "@/components/CaseTracker";
 import { CodeBlock } from "@/components/CodeBlock";
+import { REGRESSION_SETUP } from "@/lib/runtimeSetup";
 import { Backlinks } from "@/components/Backlinks";
+import { LessonHeader, PrevNext } from "@/components/lesson";
+import { Quiz } from "@/components/Quiz";
 
 export const metadata = {
   title: "Case C: Medical Costs — Manifold",
@@ -140,20 +143,16 @@ for label, r in zip(["non-smoker", "smoker"], range(2)):
 export default function MedicalCostsCasePage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-regression)")}>Regression</span>
-        <span style={chip("var(--brand)")}>Inference</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· Case C · ~18 min</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        Case C: Medical costs
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 24px", maxWidth: 620 }}>
-        The final step up: a relationship that <em>bends</em> between groups (an interaction),
+      <LessonHeader
+        chips={[{ label: "Regression", color: "var(--c-regression)" }, { label: "Inference", color: "var(--brand)" }]}
+        time="Case C · ~18 min"
+        title={<>Case C: Medical costs</>}
+        intro={<>
+          The final step up: a relationship that <em>bends</em> between groups (an interaction),
         error that grows with the prediction, and the question Cases A and B never asked —{" "}
         <strong>are these coefficients real, or could they be noise?</strong> That&rsquo;s inference.
-      </p>
+        </>}
+      />
 
       <CaseTracker />
 
@@ -191,7 +190,7 @@ export default function MedicalCostsCasePage() {
               <text x={13} y={93} fontSize={11} fill="var(--faint)" textAnchor="middle" transform="rotate(-90 13 93)">annual cost →</text>
             </svg>
           </Figure>
-          <CodeBlock fromScratch={codeInteraction} withLibrary={codeInteraction} />
+          <CodeBlock setup={REGRESSION_SETUP} fromScratch={codeInteraction} withLibrary={codeInteraction} />
           <Backlinks items={[
             { label: "Polynomial & interaction terms", href: "/learn/linear-regression/polynomial-and-interaction-terms" },
             { label: "Multiple linear regression", href: "/learn/linear-regression/multiple-linear-regression" },
@@ -224,7 +223,7 @@ export default function MedicalCostsCasePage() {
             does cost smokers about ${cInter.toFixed(0)}/yr <em>more</em> than non-smokers; that
             isn&rsquo;t sampling noise.
           </p>
-          <CodeBlock fromScratch={codeInferScratch} withLibrary={codeInferLib} />
+          <CodeBlock setup={REGRESSION_SETUP} fromScratch={codeInferScratch} withLibrary={codeInferLib} />
           <Backlinks items={[
             { label: "Hypothesis tests & p-values", href: "/learn/linear-regression/hypothesis-tests-and-p-values" },
             { label: "Confidence intervals", href: "/learn/linear-regression/confidence-intervals" },
@@ -263,7 +262,7 @@ export default function MedicalCostsCasePage() {
             <Stat label="non-smoker, age 50" value={fmtk(pred50N)} />
             <Stat label="smoker, age 50" value={fmtk(pred50S)} accent />
           </div>
-          <CodeBlock fromScratch={codePred} withLibrary={codePred} />
+          <CodeBlock setup={REGRESSION_SETUP} fromScratch={codePred} withLibrary={codePred} />
           <Backlinks items={[
             { label: "Prediction intervals", href: "/learn/linear-regression/prediction-intervals" },
             { label: "Confidence intervals", href: "/learn/linear-regression/confidence-intervals" },
@@ -283,10 +282,31 @@ export default function MedicalCostsCasePage() {
           </p>
         </div>
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 40, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/linear-regression/end-to-end-worked-case/house-prices" style={navLink}>← Case B</Link>
-          <Link href="/learn" style={{ ...navLink, fontWeight: 600 }}>Return to tracks →</Link>
-        </div>
+        <Quiz
+          title="The final test — the whole track"
+          questions={[
+            {
+              q: <>Train R² 0.95, test R² 0.55. Diagnosis?</>,
+              options: ["Underfitting — add features", "Overfitting — the model memorised training noise; regularize, simplify, or get more data", "Data leakage", "The test set is broken"],
+              answer: 1,
+              explain: <>A large train–test gap is the signature of variance: the model fits patterns that don&rsquo;t generalise. Underfitting would show <em>both</em> numbers low; leakage usually shows test suspiciously <em>high</em>.</>,
+            },
+            {
+              q: <>When does linear regression genuinely beat gradient-boosted trees?</>,
+              options: ["Never — trees always win", "Big data with heavy interactions", "Small n, need for calibrated coefficients/intervals, roughly linear effects, or extrapolation beyond the training range", "Whenever the features are numeric"],
+              answer: 2,
+              explain: <>Trees can&rsquo;t extrapolate past the range they&rsquo;ve seen (their predictions are piecewise constants), can&rsquo;t give you calibrated effect sizes, and overfit small samples. The capstone made this concrete: ensemble for prediction, linear family for inference and explanation.</>,
+            },
+            {
+              q: <>One sentence, from memory: what are the three parts every supervised model on this site is built from?</>,
+              options: ["Data, code, compute", "A model form, a loss function, and an optimiser", "Training, validation, test", "Features, target, metric"],
+              answer: 1,
+              explain: <>The throughline. Linear regression = line + MSE + gradient descent (or the closed form). Change any one part and you get ridge (loss), Tobit (loss), neural nets (form), boosting (optimiser strategy) — ML stops being 50 unrelated algorithms.</>,
+            },
+          ]}
+        />
+
+        <PrevNext prev={{ href: "/learn/linear-regression/end-to-end-worked-case/house-prices", label: <>← Case B</> }} next={{ href: "/learn", label: <>Return to tracks →</> }} />
       </div>
     </article>
   );
@@ -333,14 +353,12 @@ function Stat({ label, value, accent }: { label: string; value: string; accent?:
   );
 }
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
+
 
 const pp: React.CSSProperties = { margin: "0 0 10px", fontSize: 15, color: "var(--muted)", lineHeight: 1.65 };
 const stepBadge: React.CSSProperties = { display: "inline-block", background: "var(--brand)", color: "white", fontSize: 11, fontWeight: 500, letterSpacing: "0.05em", textTransform: "uppercase", padding: "3px 9px", borderRadius: 6 };
 const resultGrid: React.CSSProperties = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 10, margin: "1.4rem 0 0.4rem" };
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
+
 const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--good) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--good) 24%, var(--border))", borderRadius: 12, padding: "16px 18px", margin: "2.2rem 0 0" };
 
 const cmpTable: React.CSSProperties = { border: "1px solid var(--border)", borderRadius: 12, overflow: "hidden", margin: "1.2rem 0 0.4rem" };

@@ -1,7 +1,9 @@
-import Link from "next/link";
 import { M, MathBlock } from "@/components/Math";
 import { CodeBlock } from "@/components/CodeBlock";
+import { REGRESSION_SETUP } from "@/lib/runtimeSetup";
 import { RidgePolyLab } from "@/components/labs/RidgePolyLab";
+import { ModelAnatomy } from "@/components/ModelAnatomy";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 export const metadata = {
   title: "Why regularize? — Manifold",
@@ -12,21 +14,26 @@ export const metadata = {
 export default function RegHubPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-regression)")}>Regression</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 7 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 44, lineHeight: 1.08, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        Why regularize?
-      </h1>
-      <p style={{ fontSize: 17.5, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 24px", maxWidth: 620 }}>
-        Linear regression fits the training data as closely as it possibly can. Regularization is the
+      <LessonHeader
+        chips={[{ label: "Regression", color: "var(--c-regression)" }]}
+        time="about 7 minutes"
+        title={<>Why regularize?</>}
+        intro={<>
+          Linear regression fits the training data as closely as it possibly can. Regularization is the
         deliberate act of stopping it from trying too hard — and it&rsquo;s one of the highest-leverage ideas
         in all of machine learning.
-      </p>
+        </>}
+        titleSize={44}
+        introSize={17.5}
+      />
 
       <div className="lesson">
+        <ModelAnatomy
+          form={<>Still a line/hyperplane: <code>ŷ = Xw</code> — the form doesn&rsquo;t change</>}
+          loss={<>MSE <em>plus</em> a penalty on coefficient size: λ‖w‖</>}
+          optimiser={<>Gradient or coordinate descent (ridge has a closed form)</>}
+        />
+
         <h2>The problem with fitting too well</h2>
         <p>
           Ordinary least squares (OLS) has one goal: make the residuals as small as possible on the{" "}
@@ -84,24 +91,16 @@ export default function RegHubPage() {
         </p>
 
         <h2>The same idea, in one line of code</h2>
-        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
+        <CodeBlock setup={REGRESSION_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-regression)", marginBottom: 4 }}>
-            Why this matters everywhere
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            Regularization isn&rsquo;t a regression-only trick. The exact same penalty-on-the-weights idea is{" "}
+        <Callout color="var(--c-regression)" title={<>Why this matters everywhere</>}>
+          Regularization isn&rsquo;t a regression-only trick. The exact same penalty-on-the-weights idea is{" "}
             weight decay in neural networks, the soft margin in SVMs, and the prior in Bayesian models. Ridge
             and Lasso are the cleanest place to understand it completely — penalty, geometry, and the
             bias–variance payoff all visible at once — so it pays off across the entire field.
-          </p>
-        </div>
+        </Callout>
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 40, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/linear-regression" style={navLink}>← Linear regression</Link>
-          <Link href="/learn/regularized-regression/overfitting-and-bias-variance" style={{ ...navLink, fontWeight: 600 }}>Next up · Overfitting &amp; the bias–variance tradeoff →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/linear-regression", label: <>← Linear regression</> }} next={{ href: "/learn/regularized-regression/overfitting-and-bias-variance", label: <>Next up · Overfitting &amp; the bias–variance tradeoff →</> }} />
       </div>
     </article>
   );
@@ -125,9 +124,7 @@ lasso = Lasso(alpha=0.1).fit(X, y)            # L1 penalty -> sparse coefficient
 enet  = ElasticNet(alpha=0.1, l1_ratio=0.5).fit(X, y)   # blend of both
 print(lasso.coef_)   # some entries are exactly 0`;
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
+
 const ul: React.CSSProperties = { margin: "0 0 10px", paddingLeft: "1.3em", fontSize: 15, color: "var(--muted)", lineHeight: 1.8 };
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-regression) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-regression) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0" };
+
+

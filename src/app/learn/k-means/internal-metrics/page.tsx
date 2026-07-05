@@ -1,6 +1,7 @@
-import Link from "next/link";
 import { M, MathBlock } from "@/components/Math";
 import { CodeBlock } from "@/components/CodeBlock";
+import { CLUSTER_SETUP } from "@/lib/runtimeSetup";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 export const metadata = {
   title: "Internal metrics — Manifold",
@@ -11,19 +12,16 @@ export const metadata = {
 export default function InternalMetricsPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-clustering)")}>Clustering</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 6 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        Internal metrics
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 24px", maxWidth: 620 }}>
-        Clustering is unsupervised — usually there&rsquo;s no ground truth to check against. Internal
+      <LessonHeader
+        chips={[{ label: "Clustering", color: "var(--c-clustering)" }]}
+        time="about 6 minutes"
+        title={<>Internal metrics</>}
+        intro={<>
+          Clustering is unsupervised — usually there&rsquo;s no ground truth to check against. Internal
         metrics judge a clustering by its own shape alone, formalising a single instinct: tight inside,
         well separated outside.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <h2>The universal trade-off</h2>
@@ -67,26 +65,18 @@ export default function InternalMetricsPage() {
           clusters. It&rsquo;s also cheap, using only centroids and spreads.
         </p>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-clustering)", marginBottom: 4 }}>
-            What they all share — and miss
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            Every one of these rewards compact, well-separated, roughly convex clusters — which is
+        <Callout color="var(--c-clustering)" title={<>What they all share — and miss</>}>
+          Every one of these rewards compact, well-separated, roughly convex clusters — which is
             exactly what k-means produces. That makes them circular if you use them to &ldquo;prove&rdquo;
             k-means did well: they share its blind spots. On rings, crescents, or wildly unequal
             densities, a high CH or low DB can still describe a clustering that&rsquo;s visibly wrong. Use
             them to compare runs and pick <em>k</em>, not to validate the method choice itself.
-          </p>
-        </div>
+        </Callout>
 
         <h2>Compute all three</h2>
-        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
+        <CodeBlock setup={CLUSTER_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 40, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/k-means/information-criteria-x-means" style={navLink}>← Information criteria (X-means)</Link>
-          <Link href="/learn/k-means/external-metrics" style={{ ...navLink, fontWeight: 600 }}>Next up · External metrics (ARI, NMI) →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/k-means/information-criteria-x-means", label: <>← Information criteria (X-means)</> }} next={{ href: "/learn/k-means/external-metrics", label: <>Next up · External metrics (ARI, NMI) →</> }} />
       </div>
     </article>
   );
@@ -117,9 +107,7 @@ print("CH (higher better): ", calinski_harabasz_score(X, lab))
 print("DB (lower  better): ", davies_bouldin_score(X, lab))
 print("silhouette         :", silhouette_score(X, lab))`;
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
+
 const ul: React.CSSProperties = { margin: "0 0 10px", paddingLeft: "1.3em", fontSize: 15, color: "var(--muted)", lineHeight: 1.8 };
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-clustering) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-clustering) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0" };
+
+

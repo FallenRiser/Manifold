@@ -1,6 +1,7 @@
-import Link from "next/link";
 import { M, MathBlock } from "@/components/Math";
 import { CodeBlock } from "@/components/CodeBlock";
+import { CLUSTER_SETUP } from "@/lib/runtimeSetup";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 export const metadata = {
   title: "External metrics (ARI, NMI) — Manifold",
@@ -11,19 +12,16 @@ export const metadata = {
 export default function ExternalMetricsPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-clustering)")}>Clustering</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 7 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        External metrics (ARI, NMI)
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 24px", maxWidth: 620 }}>
-        Sometimes you <em>do</em> have true labels — a benchmark dataset, or a held-out gold standard.
+      <LessonHeader
+        chips={[{ label: "Clustering", color: "var(--c-clustering)" }]}
+        time="about 7 minutes"
+        title={<>External metrics (ARI, NMI)</>}
+        intro={<>
+          Sometimes you <em>do</em> have true labels — a benchmark dataset, or a held-out gold standard.
         Then you can grade a clustering against them. The trick: you must compare the <em>partitions</em>,
         not the arbitrary cluster numbers.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <h2>The label-switching problem</h2>
@@ -74,26 +72,18 @@ export default function ExternalMetricsPage() {
           not.
         </p>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-clustering)", marginBottom: 4 }}>
-            ARI vs. NMI — which to reach for
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            Both are symmetric and don&rsquo;t care about label names or even the number of clusters matching
+        <Callout color="var(--c-clustering)" title={<>ARI vs. NMI — which to reach for</>}>
+          Both are symmetric and don&rsquo;t care about label names or even the number of clusters matching
             the number of classes. ARI counts pair agreements and is intuitive; NMI/AMI measure shared
             information and handle differing cluster counts gracefully. Prefer the <em>adjusted</em>
             versions (ARI, AMI) — raw RI and NMI are inflated by chance. And remember: these need ground
             truth, so they&rsquo;re for benchmarking and validation, not day-to-day unsupervised work.
-          </p>
-        </div>
+        </Callout>
 
         <h2>Score against ground truth</h2>
-        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
+        <CodeBlock setup={CLUSTER_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 40, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/k-means/internal-metrics" style={navLink}>← Internal metrics</Link>
-          <Link href="/learn/k-means/cluster-stability" style={{ ...navLink, fontWeight: 600 }}>Next up · Cluster stability →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/k-means/internal-metrics", label: <>← Internal metrics</> }} next={{ href: "/learn/k-means/cluster-stability", label: <>Next up · Cluster stability →</> }} />
       </div>
     </article>
   );
@@ -121,9 +111,7 @@ print("ARI:", adjusted_rand_score(y_true, lab))          # 1 perfect, 0 chance
 print("NMI:", normalized_mutual_info_score(y_true, lab))
 print("AMI:", adjusted_mutual_info_score(y_true, lab))   # chance-corrected NMI`;
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
+
 const ul: React.CSSProperties = { margin: "0 0 10px", paddingLeft: "1.3em", fontSize: 15, color: "var(--muted)", lineHeight: 1.8 };
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-clustering) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-clustering) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0" };
+
+

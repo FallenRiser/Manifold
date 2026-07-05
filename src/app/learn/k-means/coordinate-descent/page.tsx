@@ -1,6 +1,7 @@
-import Link from "next/link";
 import { M, MathBlock } from "@/components/Math";
 import { CodeBlock } from "@/components/CodeBlock";
+import { CLUSTER_SETUP } from "@/lib/runtimeSetup";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 export const metadata = {
   title: "Convergence as coordinate descent — Manifold",
@@ -11,20 +12,16 @@ export const metadata = {
 export default function CoordinateDescentPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-clustering)")}>Clustering</span>
-        <span style={chip("var(--c-metrics)")}>Go deeper</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 6 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        Convergence as coordinate descent
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 24px", maxWidth: 620 }}>
-        We argued informally that k-means converges. Here is the clean reason: Lloyd&rsquo;s algorithm is{" "}
+      <LessonHeader
+        chips={[{ label: "Clustering", color: "var(--c-clustering)" }, { label: "Go deeper", color: "var(--c-metrics)" }]}
+        time="about 6 minutes"
+        title={<>Convergence as coordinate descent</>}
+        intro={<>
+          We argued informally that k-means converges. Here is the clean reason: Lloyd&rsquo;s algorithm is{" "}
         <strong>block coordinate descent</strong> on the inertia objective — and coordinate descent on a
         bounded-below function that decreases each step must converge.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <h2>One objective, two sets of variables</h2>
@@ -72,28 +69,20 @@ export default function CoordinateDescentPage() {
           assignments can&rsquo;t cycle, so the algorithm reaches a fixed point in finitely many steps.
         </p>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-clustering)", marginBottom: 4 }}>
-            What it does and doesn&rsquo;t guarantee
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            Coordinate descent converges to a point where no <em>single block</em> move improves the
+        <Callout color="var(--c-clustering)" title={<>What it does and doesn&rsquo;t guarantee</>}>
+          Coordinate descent converges to a point where no <em>single block</em> move improves the
             objective — a coordinate-wise (local) minimum. That is exactly k-means&rsquo; situation: it reaches
             a configuration stable under both steps, but not necessarily the global optimum, because joint
             moves over both blocks could still help. The framing thus explains <em>both</em> facts at once —
             why it always stops, and why where it stops depends on initialisation. It also places k-means in
             a huge family (EM, ALS for matrix factorisation, many others) that share this alternating
             structure.
-          </p>
-        </div>
+        </Callout>
 
         <h2>Watch J fall, block by block</h2>
-        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
+        <CodeBlock setup={CLUSTER_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 40, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/k-means/np-hardness" style={navLink}>← NP-hardness of optimal clustering</Link>
-          <Link href="/learn/k-means/bregman-divergences" style={{ ...navLink, fontWeight: 600 }}>Next up · Bregman divergences →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/k-means/np-hardness", label: <>← NP-hardness of optimal clustering</> }} next={{ href: "/learn/k-means/bregman-divergences", label: <>Next up · Bregman divergences →</> }} />
       </div>
     </article>
   );
@@ -119,9 +108,7 @@ const codeLib = `from sklearn.cluster import KMeans
 # verbose=1 prints the objective after each block-coordinate update; it only falls.
 KMeans(n_clusters=3, n_init=1, init="random", verbose=1, random_state=0).fit(X)`;
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
+
 const ul: React.CSSProperties = { margin: "0 0 10px", paddingLeft: "1.3em", fontSize: 15, color: "var(--muted)", lineHeight: 1.8 };
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-clustering) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-clustering) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0" };
+
+

@@ -1,8 +1,9 @@
-import Link from "next/link";
 import { RSquaredLab } from "@/components/labs/RSquaredLab";
 import { MathBlock } from "@/components/Math";
 import { CodeBlock } from "@/components/CodeBlock";
+import { REGRESSION_SETUP } from "@/lib/runtimeSetup";
 import { Backlinks } from "@/components/Backlinks";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 const codeScratch = `import numpy as np
 
@@ -40,20 +41,16 @@ export const metadata = {
 export default function RSquaredAndAdjustedPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-regression)")}>Regression</span>
-        <span style={chip("var(--good)")}>Evaluation</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 5 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        R² and adjusted R²
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 8px", maxWidth: 620 }}>
-        The most famous metric in regression. It's beautiful because it's
+      <LessonHeader
+        chips={[{ label: "Regression", color: "var(--c-regression)" }, { label: "Evaluation", color: "var(--good)" }]}
+        time="about 5 minutes"
+        title={<>R² and adjusted R²</>}
+        intro={<>
+          The most famous metric in regression. It's beautiful because it's
         interpretable: a percentage from 0 to 100%. But it harbors a dangerous
         flaw that encourages you to overfit.
-      </p>
+        </>}
+      />
 
       <Backlinks label="Related" items={[
         { label: "RMSE vs MAE", href: "/learn/linear-regression/rmse-vs-mae" },
@@ -133,28 +130,20 @@ export default function RSquaredAndAdjustedPage() {
 
         <RSquaredLab />
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-fundamentals)", marginBottom: 4 }}>
-            When to use which
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            Use <strong>R²</strong> when explaining how much of the variance a
+        <Callout color="var(--c-fundamentals)" title={<>When to use which</>}>
+          Use <strong>R²</strong> when explaining how much of the variance a
             single, fixed model captures. Use <strong>Adjusted R²</strong> when
             comparing two models to decide if a new feature is worth keeping.
-          </p>
-        </div>
+        </Callout>
 
         <h2>Compute it yourself</h2>
         <p>
           R² is one subtraction once you have the two sums of squares; adjusted R²
           just adds the complexity penalty. From scratch, then with scikit-learn:
         </p>
-        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
+        <CodeBlock setup={REGRESSION_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 32, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/linear-regression/detecting-non-normality" style={navLink}>← Detecting non-normality</Link>
-          <Link href="/learn/linear-regression/rmse-vs-mae" style={navLink}>Next up · RMSE vs MAE →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/linear-regression/detecting-non-normality", label: <>← Detecting non-normality</> }} next={{ href: "/learn/linear-regression/rmse-vs-mae", label: <>Next up · RMSE vs MAE →</> }} />
       </div>
     </article>
   );
@@ -169,8 +158,6 @@ function MetricCard({ title, body, color }: { title: string; body: string; color
   );
 }
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}const cardGrid: React.CSSProperties = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 14, margin: "1.4rem 0" };
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-fundamentals) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-fundamentals) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0 0" };
+const cardGrid: React.CSSProperties = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 14, margin: "1.4rem 0" };
+
+

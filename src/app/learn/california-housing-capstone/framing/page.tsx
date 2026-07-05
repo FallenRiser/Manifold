@@ -1,6 +1,7 @@
-import Link from "next/link";
 import { CodeBlock } from "@/components/CodeBlock";
 import { CodeOutput } from "@/components/CodeOutput";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
+import { DecisionPoint } from "@/components/capstone/DecisionPoint";
 
 export const metadata = {
   title: "Capstone: framing the problem — Manifold",
@@ -11,20 +12,18 @@ export const metadata = {
 export default function FramingPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-regression)")}>Capstone</span>
-        <span style={chip("var(--c-metrics)")}>1 · The project</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 8 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 42, lineHeight: 1.08, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        Framing the problem
-      </h1>
-      <p style={{ fontSize: 17.5, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 24px", maxWidth: 620 }}>
-        The biggest difference between a junior and a senior approach is what happens <em>before</em> the first
+      <LessonHeader
+        chips={[{ label: "Capstone", color: "var(--c-regression)" }, { label: "1 · The project", color: "var(--c-metrics)" }]}
+        time="about 8 minutes"
+        title={<>Framing the problem</>}
+        intro={<>
+          The biggest difference between a junior and a senior approach is what happens <em>before</em> the first
         model. We answer four questions — and one of the answers will dictate a known limitation of every model
         we build.
-      </p>
+        </>}
+        titleSize={42}
+        introSize={17.5}
+      />
 
       <div className="lesson">
         <h2>Load and look</h2>
@@ -48,6 +47,26 @@ TargetPrice  count=16512  mean=2.07  std=1.16
         </p>
 
         <h2>2 — What metric defines success?</h2>
+        <DecisionPoint
+          question={<>The target is a price in $100k units, and a wildly wrong valuation hurts far more than a slightly wrong one. Which metric do you lead with?</>}
+          options={[
+            {
+              label: "RMSE — same units as the price, penalises large errors quadratically",
+              verdict: "best",
+              response: <>Right — the quadratic penalty encodes exactly our cost structure (big valuation misses are disproportionately bad), and reporting in $100k units keeps stakeholders in the loop. We&rsquo;ll report R² alongside it and watch MAE as a robustness cross-check.</>,
+            },
+            {
+              label: "MAE — robust to outliers, easy to explain",
+              verdict: "close",
+              response: <>Defensible — MAE is the honest &ldquo;typical miss&rdquo; and we do track it. But it treats a $300k error as only 3× worse than a $100k one; for valuations, the big miss is what gets you sued. We keep MAE as the cross-check, not the headline.</>,
+            },
+            {
+              label: "R² — scale-free, easy to compare across models",
+              verdict: "close",
+              response: <>Useful, and we report it on every leaderboard — but it&rsquo;s unitless. &ldquo;R² = 0.65&rdquo; tells a stakeholder nothing about how many dollars off a prediction is. Lead with the error in the target&rsquo;s own units; quote R² beside it.</>,
+            },
+          ]}
+        />
         <p>
           The target is in $100k units, so the error should be too. We lead with <strong>RMSE</strong> (same
           units, penalises large errors quadratically — right when a wildly wrong valuation is much worse than a
@@ -56,18 +75,13 @@ TargetPrice  count=16512  mean=2.07  std=1.16
           rationalising whichever number looks best later.
         </p>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-regression)", marginBottom: 4 }}>
-            3 — The fact that shapes everything: the target is censored
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            The output above already flagged it: the target maxes out at exactly <strong>5.0</strong>, with{" "}
+        <Callout color="var(--c-regression)" title={<>3 — The fact that shapes everything: the target is censored</>}>
+          The output above already flagged it: the target maxes out at exactly <strong>5.0</strong>, with{" "}
             <strong>808 blocks (4.9%)</strong> pinned at that ceiling. This is <strong>censoring</strong> — every
             home worth $500k or $900k was recorded as &ldquo;5.0.&rdquo; We haven&rsquo;t modeled anything yet and already know
             our models will <em>systematically under-predict</em> the most expensive areas. Upgrade 2 (Tobit) is
             this problem&rsquo;s dedicated fix, and the diagnostics page will confirm the bias exactly as predicted.
-          </p>
-        </div>
+        </Callout>
 
         <h2>4 — What are we assuming?</h2>
         <ul style={ul}>
@@ -77,10 +91,7 @@ TargetPrice  count=16512  mean=2.07  std=1.16
           <li><strong>Only these features are available at prediction time</strong> — nothing derived from the target (we audit leakage explicitly).</li>
         </ul>
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 40, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/california-housing-capstone" style={navLink}>← Overview &amp; goal</Link>
-          <Link href="/learn/california-housing-capstone/eda" style={{ ...navLink, fontWeight: 600 }}>Next up · EDA: distributions &amp; signal →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/california-housing-capstone", label: <>← Overview &amp; goal</> }} next={{ href: "/learn/california-housing-capstone/eda", label: <>Next up · EDA: distributions &amp; signal →</> }} />
       </div>
     </article>
   );
@@ -95,9 +106,4 @@ print(train.columns.tolist())
 print(train["TargetPrice"].describe())
 print("rows at cap:", (train.TargetPrice >= 4.9999).sum())`;
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
 const ul: React.CSSProperties = { margin: "0 0 10px", paddingLeft: "1.3em", fontSize: 15, color: "var(--muted)", lineHeight: 1.8 };
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-regression) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-regression) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0" };

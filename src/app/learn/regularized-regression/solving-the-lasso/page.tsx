@@ -1,6 +1,7 @@
-import Link from "next/link";
 import { M, MathBlock } from "@/components/Math";
 import { CodeBlock } from "@/components/CodeBlock";
+import { REGRESSION_SETUP } from "@/lib/runtimeSetup";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 export const metadata = {
   title: "Solving the Lasso — Manifold",
@@ -11,20 +12,16 @@ export const metadata = {
 export default function SolvingPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-regression)")}>Regression</span>
-        <span style={chip("var(--c-metrics)")}>Go deeper</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 7 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        Solving the Lasso
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 24px", maxWidth: 620 }}>
-        Ridge had a tidy formula; Lasso doesn&rsquo;t. The absolute value has a kink, so calculus alone can&rsquo;t
+      <LessonHeader
+        chips={[{ label: "Regression", color: "var(--c-regression)" }, { label: "Go deeper", color: "var(--c-metrics)" }]}
+        time="about 7 minutes"
+        title={<>Solving the Lasso</>}
+        intro={<>
+          Ridge had a tidy formula; Lasso doesn&rsquo;t. The absolute value has a kink, so calculus alone can&rsquo;t
         solve it. The fix is a beautifully simple iterative idea — optimise one coordinate at a time — that
         turns out to be the fastest method known.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <h2>Why there&rsquo;s no closed form</h2>
@@ -52,18 +49,13 @@ export default function SolvingPage() {
           coordinate by coordinate.
         </p>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-regression)", marginBottom: 4 }}>
-            Why coordinate descent wins here
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            The penalty is <strong>separable</strong> — it&rsquo;s a sum of per-coordinate terms — so optimising one
+        <Callout color="var(--c-regression)" title={<>Why coordinate descent wins here</>}>
+          The penalty is <strong>separable</strong> — it&rsquo;s a sum of per-coordinate terms — so optimising one
             coordinate at a time is exact and the kinks are handled one dimension at a time, where soft-thresholding
             dispatches them cleanly. Combined with warm starts along the λ path and the fact that most
             coefficients stay at zero (so updates are cheap), it&rsquo;s extremely fast. This is the engine inside{" "}
             <code>glmnet</code> and scikit-learn&rsquo;s Lasso.
-          </p>
-        </div>
+        </Callout>
 
         <h2>The other solvers</h2>
         <ul style={ul}>
@@ -74,12 +66,9 @@ export default function SolvingPage() {
 
         <h2>Coordinate descent, from scratch</h2>
         <p>This is the entire Lasso solver in a dozen lines — the same loop powering the lab in this chapter:</p>
-        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
+        <CodeBlock setup={REGRESSION_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 40, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/regularized-regression/lasso-for-feature-selection" style={navLink}>← Lasso for feature selection</Link>
-          <Link href="/learn/regularized-regression/when-the-lasso-struggles" style={{ ...navLink, fontWeight: 600 }}>Next up · When the Lasso struggles →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/regularized-regression/lasso-for-feature-selection", label: <>← Lasso for feature selection</> }} next={{ href: "/learn/regularized-regression/when-the-lasso-struggles", label: <>Next up · When the Lasso struggles →</> }} />
       </div>
     </article>
   );
@@ -108,9 +97,7 @@ const codeLib = `from sklearn.linear_model import Lasso
 lasso = Lasso(alpha=0.1, selection="cyclic", max_iter=10_000).fit(X, y)
 print(lasso.n_iter_, "iterations", "·", (lasso.coef_ != 0).sum(), "features kept")`;
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
+
 const ul: React.CSSProperties = { margin: "0 0 10px", paddingLeft: "1.3em", fontSize: 15, color: "var(--muted)", lineHeight: 1.8 };
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-regression) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-regression) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0" };
+
+

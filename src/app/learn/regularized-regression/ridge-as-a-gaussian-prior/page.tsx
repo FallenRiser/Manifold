@@ -1,6 +1,7 @@
-import Link from "next/link";
 import { M, MathBlock } from "@/components/Math";
 import { CodeBlock } from "@/components/CodeBlock";
+import { REGRESSION_SETUP } from "@/lib/runtimeSetup";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 export const metadata = {
   title: "Ridge as a Gaussian prior (MAP) — Manifold",
@@ -11,20 +12,16 @@ export const metadata = {
 export default function RidgePriorPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-regression)")}>Regression</span>
-        <span style={chip("var(--c-metrics)")}>Go deeper</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 7 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        Ridge as a Gaussian prior (MAP)
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 24px", maxWidth: 620 }}>
-        The penalty has felt a little arbitrary — why squared coefficients, why that exact form? The Bayesian
+      <LessonHeader
+        chips={[{ label: "Regression", color: "var(--c-regression)" }, { label: "Go deeper", color: "var(--c-metrics)" }]}
+        time="about 7 minutes"
+        title={<>Ridge as a Gaussian prior (MAP)</>}
+        intro={<>
+          The penalty has felt a little arbitrary — why squared coefficients, why that exact form? The Bayesian
         view answers it cleanly: ridge is the most probable coefficient vector under a <em>Gaussian prior</em>
         that says &ldquo;coefficients are probably small.&rdquo;
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <h2>From least squares to likelihood</h2>
@@ -63,26 +60,18 @@ export default function RidgePriorPage() {
           of noise variance to prior variance. More noise, or a tighter prior, means more shrinkage.
         </p>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-regression)", marginBottom: 4 }}>
-            Why this is more than a curiosity
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            The Bayesian lens reframes regularization as <strong>encoding prior knowledge</strong>, and unifies
+        <Callout color="var(--c-regression)" title={<>Why this is more than a curiosity</>}>
+          The Bayesian lens reframes regularization as <strong>encoding prior knowledge</strong>, and unifies
             the whole family: a different prior gives a different penalty. The Gaussian prior&rsquo;s smooth bell
             shape — most mass near zero but with light tails and no spike at zero — is exactly why ridge shrinks
             everything but zeroes nothing. Swap in a sharply-peaked prior and you get sparsity, which is the
             next page&rsquo;s Lasso story.
-          </p>
-        </div>
+        </Callout>
 
         <h2>Verify MAP equals ridge numerically</h2>
-        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
+        <CodeBlock setup={REGRESSION_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 40, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/regularized-regression/which-when" style={navLink}>← Ridge vs Lasso vs Elastic-net</Link>
-          <Link href="/learn/regularized-regression/lasso-as-a-laplace-prior" style={{ ...navLink, fontWeight: 600 }}>Next up · Lasso as a Laplace prior →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/regularized-regression/which-when", label: <>← Ridge vs Lasso vs Elastic-net</> }} next={{ href: "/learn/regularized-regression/lasso-as-a-laplace-prior", label: <>Next up · Lasso as a Laplace prior →</> }} />
       </div>
     </article>
   );
@@ -110,8 +99,6 @@ model = BayesianRidge().fit(X, y)
 print(model.coef_)                 # posterior-mean coefficients
 print(model.lambda_, model.alpha_) # estimated prior precision & noise precision`;
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-regression) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-regression) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0" };
+
+
+

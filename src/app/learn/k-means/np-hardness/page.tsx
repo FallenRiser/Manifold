@@ -1,6 +1,7 @@
-import Link from "next/link";
 import { M, MathBlock } from "@/components/Math";
 import { CodeBlock } from "@/components/CodeBlock";
+import { CLUSTER_SETUP } from "@/lib/runtimeSetup";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 export const metadata = {
   title: "NP-hardness of optimal clustering — Manifold",
@@ -11,20 +12,16 @@ export const metadata = {
 export default function NPHardnessPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-clustering)")}>Clustering</span>
-        <span style={chip("var(--c-metrics)")}>Go deeper</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 6 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        NP-hardness of optimal clustering
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 24px", maxWidth: 620 }}>
-        Lloyd&rsquo;s algorithm finds <em>a</em> good clustering, never guaranteed the best. That isn&rsquo;t
+      <LessonHeader
+        chips={[{ label: "Clustering", color: "var(--c-clustering)" }, { label: "Go deeper", color: "var(--c-metrics)" }]}
+        time="about 6 minutes"
+        title={<>NP-hardness of optimal clustering</>}
+        intro={<>
+          Lloyd&rsquo;s algorithm finds <em>a</em> good clustering, never guaranteed the best. That isn&rsquo;t
         laziness — finding the truly optimal one is computationally intractable, and knowing why reframes
         everything we&rsquo;ve done.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <h2>The problem we&rsquo;re really solving</h2>
@@ -60,18 +57,13 @@ export default function NPHardnessPage() {
           hardness.
         </p>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-clustering)", marginBottom: 4 }}>
-            This justifies the whole toolkit
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            Because optimal is out of reach, everything we built is the principled response: <strong>Lloyd&rsquo;s
+        <Callout color="var(--c-clustering)" title={<>This justifies the whole toolkit</>}>
+          Because optimal is out of reach, everything we built is the principled response: <strong>Lloyd&rsquo;s
             algorithm</strong> is a fast greedy heuristic that finds a local minimum; <strong>k-means++</strong>
             {" "}seeds it well enough to come with a provable <M>{String.raw`O(\log k)`}</M>-expected bound;{" "}
             <strong>random restarts</strong> hedge against bad basins. We trade the guarantee of optimality
             for tractability — and accept that we can never be certain we&rsquo;ve found the global best.
-          </p>
-        </div>
+        </Callout>
 
         <h2>The nuance: easy in practice, hard in theory</h2>
         <p>
@@ -84,12 +76,9 @@ export default function NPHardnessPage() {
         </p>
 
         <h2>Verify the search space explodes</h2>
-        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
+        <CodeBlock setup={CLUSTER_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 40, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/k-means/k-means-as-em" style={navLink}>← k-means as EM (link to GMM)</Link>
-          <Link href="/learn/k-means/coordinate-descent" style={{ ...navLink, fontWeight: 600 }}>Next up · Convergence as coordinate descent →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/k-means/k-means-as-em", label: <>← k-means as EM (link to GMM)</> }} next={{ href: "/learn/k-means/coordinate-descent", label: <>Next up · Convergence as coordinate descent →</> }} />
       </div>
     </article>
   );
@@ -113,9 +102,7 @@ from sklearn.cluster import KMeans
 km = KMeans(n_clusters=3, init="k-means++", n_init=20, random_state=0).fit(X)
 print(km.inertia_)   # the best LOCAL minimum found — not provably global`;
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
+
 const ul: React.CSSProperties = { margin: "0 0 10px", paddingLeft: "1.3em", fontSize: 15, color: "var(--muted)", lineHeight: 1.8 };
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-clustering) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-clustering) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0" };
+
+

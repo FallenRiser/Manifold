@@ -1,5 +1,7 @@
-import Link from "next/link";
+import { Quiz } from "@/components/Quiz";
 import { CodeBlock } from "@/components/CodeBlock";
+import { KNN_SETUP } from "@/lib/runtimeSetup";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 export const metadata = {
   title: "From 1-NN to k-NN — Manifold",
@@ -30,18 +32,15 @@ for (let gx = 0; gx <= 100; gx += STEP) for (let gy = 0; gy <= 100; gy += STEP) 
 export default function From1to_kPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-classification)")}>Classification</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 6 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        From 1-NN to k-NN
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 24px", maxWidth: 620 }}>
-        The simplest neighbour rule uses just one neighbour. Seeing exactly how it fails is the cleanest
+      <LessonHeader
+        chips={[{ label: "Classification", color: "var(--c-classification)" }]}
+        time="about 6 minutes"
+        title={<>From 1-NN to k-NN</>}
+        intro={<>
+          The simplest neighbour rule uses just one neighbour. Seeing exactly how it fails is the cleanest
         way to understand why we average over <em>k</em> — and what that <em>k</em> buys us.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <h2>1-NN: copy your single closest neighbour</h2>
@@ -96,25 +95,41 @@ export default function From1to_kPage() {
           chapter — but the core insight is right here: <strong>k buys you robustness by averaging.</strong>
         </p>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-classification)", marginBottom: 4 }}>
-            A note on even vs. odd k
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            For two-class problems, an <strong>odd</strong> <em>k</em> avoids tied votes (you can&rsquo;t split 5
+        <Callout color="var(--c-classification)" title={<>A note on even vs. odd k</>}>
+          For two-class problems, an <strong>odd</strong> <em>k</em> avoids tied votes (you can&rsquo;t split 5
             evenly). With more classes, or distance-weighted voting, ties can still happen and need a
             tie-break rule — a practical detail we&rsquo;ll return to. For now: prefer odd <em>k</em> for binary
             k-NN.
-          </p>
-        </div>
+        </Callout>
 
         <h2>1-NN and k-NN, side by side</h2>
-        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
+        <CodeBlock setup={KNN_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 40, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/k-nearest-neighbors/similarity-and-distance" style={navLink}>← Similarity &amp; distance</Link>
-          <Link href="/learn/k-nearest-neighbors/the-algorithm-end-to-end" style={{ ...navLink, fontWeight: 600 }}>Next up · The algorithm, end to end →</Link>
-        </div>
+        <Quiz
+          accent="var(--c-classification)"
+          questions={[
+            {
+              q: "What is 1-NN's error on its own training set?",
+              options: ["Exactly zero — every point's nearest neighbour is itself", "Roughly the Bayes error", "It depends on the metric"],
+              answer: 0,
+              explain: "Perfect training accuracy for free, and a warning: it says nothing about new data. 1-NN's jagged boundary is textbook overfitting.",
+            },
+            {
+              q: "Increasing k makes the decision boundary…",
+              options: ["Smoother — lower variance, higher bias", "More jagged — higher variance", "It doesn't change the boundary"],
+              answer: 0,
+              explain: "Bigger neighbourhoods average over more votes, ironing out noise-driven islands but potentially blurring genuinely fine structure. k is k-NN's bias–variance dial.",
+            },
+            {
+              q: "k is even and the vote splits 50/50. Sensible fixes include…",
+              options: ["Use odd k, or weight votes by distance", "Always predict the overall majority class", "Report both classes"],
+              answer: 0,
+              explain: "Odd k avoids binary ties outright; distance weighting breaks them naturally (closer neighbours count more) and usually helps accuracy anyway.",
+            },
+          ]}
+        />
+
+        <PrevNext prev={{ href: "/learn/k-nearest-neighbors/similarity-and-distance", label: <>← Similarity &amp; distance</> }} next={{ href: "/learn/k-nearest-neighbors/the-algorithm-end-to-end", label: <>Next up · The algorithm, end to end →</> }} />
       </div>
     </article>
   );
@@ -141,9 +156,7 @@ five_nn = KNeighborsClassifier(n_neighbors=5).fit(X_train, y_train)   # smoother
 print("1-NN train accuracy:", one_nn.score(X_train, y_train))  # 1.0 — memorised!
 print("5-NN train accuracy:", five_nn.score(X_train, y_train)) # < 1.0, but generalises better`;
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
+
 const ul: React.CSSProperties = { margin: "0 0 10px", paddingLeft: "1.3em", fontSize: 15, color: "var(--muted)", lineHeight: 1.8 };
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-classification) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-classification) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0" };
+
+

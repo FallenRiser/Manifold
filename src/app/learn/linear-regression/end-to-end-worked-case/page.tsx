@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { CaseTracker } from "@/components/CaseTracker";
+import { LessonHeader, PrevNext } from "@/components/lesson";
 
 export const metadata = {
   title: "End-to-end: Overview — Manifold",
@@ -9,19 +10,15 @@ export const metadata = {
 export default function EndToEndOverviewPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-regression)")}>Regression</span>
-        <span style={chip("var(--good)")}>In the wild</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· Overview</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        End-to-end capstone
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 24px", maxWidth: 620 }}>
-        You know the theory. You know the math. Now let's put it all together
+      <LessonHeader
+        chips={[{ label: "Regression", color: "var(--c-regression)" }, { label: "In the wild", color: "var(--good)" }]}
+        time="Overview"
+        title={<>End-to-end capstone</>}
+        intro={<>
+          You know the theory. You know the math. Now let's put it all together
         and solve real problems from start to finish.
-      </p>
+        </>}
+      />
 
       <CaseTracker />
 
@@ -87,10 +84,7 @@ export default function EndToEndOverviewPage() {
           <CRow label="The question" a="how much?" b="can I trust it?" c="is the effect real?" />
         </div>
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 48, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/linear-regression/failure-mode-gallery" style={navLink}>← Failure-mode gallery</Link>
-          <Link href="/learn/linear-regression/end-to-end-worked-case/startup-revenue" style={{...navLink, fontWeight: 600}}>Start Case A →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/linear-regression/failure-mode-gallery", label: <>← Failure-mode gallery</> }} next={{ href: "/learn/linear-regression/end-to-end-worked-case/startup-revenue", label: <>Start Case A →</> }} />
       </div>
     </article>
   );
@@ -107,9 +101,6 @@ function CRow({ label, a, b, c }: { label: string; a: string; b: string; c: stri
   );
 }
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
 
 const ctable: React.CSSProperties = { border: "1px solid var(--border)", borderRadius: 12, overflow: "hidden", margin: "1rem 0 0.4rem" };
 const crow: React.CSSProperties = { display: "grid", gridTemplateColumns: "1.1fr 1fr 1.2fr 1.4fr", borderTop: "1px solid var(--border)" };
@@ -155,4 +146,3 @@ const btnLink: React.CSSProperties = {
   fontWeight: 500,
 };
 
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };

@@ -1,5 +1,6 @@
-import Link from "next/link";
 import { CodeBlock } from "@/components/CodeBlock";
+import { CLUSTER_SETUP } from "@/lib/runtimeSetup";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 export const metadata = {
   title: "Outliers & robustness — Manifold",
@@ -24,19 +25,16 @@ const sy = (y: number) => Math.round((H - 16 - (y / 100) * (H - 32)) * 100) / 10
 export default function OutliersPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-clustering)")}>Clustering</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 5 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        Outliers & robustness
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 24px", maxWidth: 620 }}>
-        k-Means is built on two things that outliers attack directly: squared distance and the mean.
+      <LessonHeader
+        chips={[{ label: "Clustering", color: "var(--c-clustering)" }]}
+        time="about 5 minutes"
+        title={<>Outliers & robustness</>}
+        intro={<>
+          k-Means is built on two things that outliers attack directly: squared distance and the mean.
         Knowing exactly where it&rsquo;s fragile tells you when to clean, when to switch methods, and what to
         watch for.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <h2>Two compounding weaknesses</h2>
@@ -93,25 +91,17 @@ export default function OutliersPage() {
           </li>
         </ul>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-clustering)", marginBottom: 4 }}>
-            Outlier, or its own cluster?
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            k-Means has no &ldquo;noise&rdquo; category — every point <em>must</em> join a cluster, so genuine
+        <Callout color="var(--c-clustering)" title={<>Outlier, or its own cluster?</>}>
+          k-Means has no &ldquo;noise&rdquo; category — every point <em>must</em> join a cluster, so genuine
             outliers get forced in and distort it. If your data has real noise, a method that can label
             points as noise (DBSCAN) may fit better than any robustified k-means. That comparison is the
             &ldquo;when k-means fails&rdquo; chapter.
-          </p>
-        </div>
+        </Callout>
 
         <h2>Robust preprocessing</h2>
-        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
+        <CodeBlock setup={CLUSTER_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 40, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/k-means/why-scaling-matters" style={navLink}>← Why scaling matters</Link>
-          <Link href="/learn/k-means/categorical-and-mixed-data" style={{ ...navLink, fontWeight: 600 }}>Next up · Categorical &amp; mixed data →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/k-means/why-scaling-matters", label: <>← Why scaling matters</> }} next={{ href: "/learn/k-means/categorical-and-mixed-data", label: <>Next up · Categorical &amp; mixed data →</> }} />
       </div>
     </article>
   );
@@ -139,9 +129,7 @@ model = make_pipeline(RobustScaler(),
                       KMeans(n_clusters=3, n_init=10, random_state=0))
 labels = model.fit_predict(X)`;
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
+
 const ul: React.CSSProperties = { margin: "0 0 10px", paddingLeft: "1.3em", fontSize: 15, color: "var(--muted)", lineHeight: 1.8 };
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-clustering) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-clustering) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0" };
+
+

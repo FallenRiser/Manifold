@@ -1,6 +1,7 @@
-import Link from "next/link";
 import { M, MathBlock } from "@/components/Math";
 import { CodeBlock } from "@/components/CodeBlock";
+import { CLUSTER_SETUP } from "@/lib/runtimeSetup";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 export const metadata = {
   title: "k-means as EM (link to GMM) — Manifold",
@@ -11,20 +12,16 @@ export const metadata = {
 export default function KMeansAsEMPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-clustering)")}>Clustering</span>
-        <span style={chip("var(--c-metrics)")}>Go deeper</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 7 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        k-means as EM (link to GMM)
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 24px", maxWidth: 620 }}>
-        The deepest way to understand k-means is to see it as a stripped-down special case of fitting a
+      <LessonHeader
+        chips={[{ label: "Clustering", color: "var(--c-clustering)" }, { label: "Go deeper", color: "var(--c-metrics)" }]}
+        time="about 7 minutes"
+        title={<>k-means as EM (link to GMM)</>}
+        intro={<>
+          The deepest way to understand k-means is to see it as a stripped-down special case of fitting a
         Gaussian mixture with the Expectation–Maximization algorithm. This single view ties the whole
         track together.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <h2>The two loops are the same shape</h2>
@@ -65,18 +62,13 @@ export default function KMeansAsEMPage() {
         </p>
         <MathBlock>{String.raw`\lim_{\sigma^2 \to 0} \; \text{GMM-EM} \;=\; \text{k-means}`}</MathBlock>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-clustering)", marginBottom: 4 }}>
-            This explains every failure mode
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            The three restrictions <em>are</em> the assumptions that fail elsewhere in this track. Equal
+        <Callout color="var(--c-clustering)" title={<>This explains every failure mode</>}>
+          The three restrictions <em>are</em> the assumptions that fail elsewhere in this track. Equal
             spherical covariance → can&rsquo;t handle elongated or unequal-spread clusters. Equal weights →
             struggles with unequal cluster sizes. Hard assignment → no soft membership, awkward on
             overlaps. Relaxing each restriction gives back a GMM that fixes that specific weakness. k-means
             isn&rsquo;t a different algorithm from GMM — it&rsquo;s GMM with the dials turned to their simplest setting.
-          </p>
-        </div>
+        </Callout>
 
         <h2>Why ever use the hard limit?</h2>
         <p>
@@ -88,12 +80,9 @@ export default function KMeansAsEMPage() {
         </p>
 
         <h2>Hard EM vs. soft EM, side by side</h2>
-        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
+        <CodeBlock setup={CLUSTER_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 40, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/k-means/bisecting-k-means" style={navLink}>← Bisecting k-means</Link>
-          <Link href="/learn/k-means/np-hardness" style={{ ...navLink, fontWeight: 600 }}>Next up · NP-hardness of optimal clustering →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/k-means/bisecting-k-means", label: <>← Bisecting k-means</> }} next={{ href: "/learn/k-means/np-hardness", label: <>Next up · NP-hardness of optimal clustering →</> }} />
       </div>
     </article>
   );
@@ -127,9 +116,7 @@ gmm = GaussianMixture(n_components=3, covariance_type="full",
                       means_init=km.cluster_centers_, random_state=0).fit(X)
 print(gmm.predict_proba(X)[:5])   # SOFT responsibilities — k-means' E-step, un-hardened`;
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
+
 const ul: React.CSSProperties = { margin: "0 0 10px", paddingLeft: "1.3em", fontSize: 15, color: "var(--muted)", lineHeight: 1.8 };
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-clustering) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-clustering) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0" };
+
+

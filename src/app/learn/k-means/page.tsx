@@ -1,5 +1,7 @@
-import Link from "next/link";
+import { PredictPrompt } from "@/components/PredictPrompt";
 import { KMeansLab } from "@/components/labs/KMeansLab";
+import { ModelAnatomy } from "@/components/ModelAnatomy";
+import { LessonHeader, PrevNext } from "@/components/lesson";
 
 export const metadata = {
   title: "What is clustering? — Manifold",
@@ -10,22 +12,25 @@ export const metadata = {
 export default function KMeansHubPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-clustering)")}>Clustering</span>
-        <span style={chip("var(--c-metrics)")}>Unsupervised</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 6 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        What is clustering?
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 24px", maxWidth: 620 }}>
-        Linear regression had an answer key — every row came with a target to predict. Clustering
+      <LessonHeader
+        chips={[{ label: "Clustering", color: "var(--c-clustering)" }, { label: "Unsupervised", color: "var(--c-metrics)" }]}
+        time="about 6 minutes"
+        title={<>What is clustering?</>}
+        intro={<>
+          Linear regression had an answer key — every row came with a target to predict. Clustering
         works in the dark: no labels, just points. The job is to discover the groups that were
         there all along.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
+        <ModelAnatomy
+          accent="var(--c-clustering)"
+          form={<>k centroids — every point belongs to its nearest one</>}
+          loss={<>Inertia: total squared distance from points to their centroid</>}
+          optimiser={<>Lloyd&rsquo;s alternation — assign, update, repeat until still</>}
+        />
+
         <h2>Supervised vs unsupervised</h2>
         <p>
           In the regression track, every example came as a pair: features <strong>and</strong> the
@@ -52,6 +57,13 @@ export default function KMeansHubPage() {
           then shuffles them around until each one sits in the middle of a tight cluster.
         </p>
 
+        <PredictPrompt
+          accent="var(--c-clustering)"
+          prompt={<>You give k-means <em>k</em> = 3 on data that clearly has 4 blobs. What does it do?</>}
+          options={["Refuses to converge", "Converges happily — two blobs end up sharing a centroid", "Detects the 4th blob and adds a centroid"]}
+          nudge={<>Locked in. In the lab below, set k to 3, run to convergence, and see for yourself.</>}
+        />
+
         <h2>Watch it work</h2>
         <p>
           Below is the entire algorithm. Press <strong>Run to convergence</strong> and watch the
@@ -69,16 +81,9 @@ export default function KMeansHubPage() {
           and why that monotonic drop guarantees convergence.
         </p>
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 40, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/linear-regression" style={navLink}>← Linear regression</Link>
-          <Link href="/learn/k-means/the-unsupervised-landscape" style={{ ...navLink, fontWeight: 600 }}>Next up · The unsupervised landscape →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/linear-regression", label: <>← Linear regression</> }} next={{ href: "/learn/k-means/the-unsupervised-landscape", label: <>Next up · The unsupervised landscape →</> }} />
       </div>
     </article>
   );
 }
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };

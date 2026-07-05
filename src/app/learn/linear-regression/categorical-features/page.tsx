@@ -1,6 +1,7 @@
-import Link from "next/link";
 import { CategoricalFeaturesLab } from "@/components/labs/CategoricalFeaturesLab";
 import { CodeBlock } from "@/components/CodeBlock";
+import { REGRESSION_SETUP } from "@/lib/runtimeSetup";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 
 export const metadata = {
@@ -53,23 +54,16 @@ print(f"Baseline (rural) intercept: \${model.intercept_:.0f}k")`;
 
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-regression)")}>Regression</span>
-        <span style={chip("var(--c-fundamentals)")}>Core idea</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 7 minutes</span>
-      </div>
-
-      <h1
-        className="font-serif"
-        style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}
-      >
-        Categorical features
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 8px", maxWidth: 620 }}>
-        Linear regression does matrix multiplication. Categories like "Europe"
+      <LessonHeader
+        chips={[{ label: "Regression", color: "var(--c-regression)" }, { label: "Core idea", color: "var(--c-fundamentals)" }]}
+        time="about 7 minutes"
+        title={<>Categorical features</>}
+        intro={<>
+          Linear regression does matrix multiplication. Categories like "Europe"
         or "Sedan" aren't numbers — so we turn them into numbers. One-hot
         encoding is the standard tool.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <p>
@@ -158,19 +152,14 @@ print(f"Baseline (rural) intercept: \${model.intercept_:.0f}k")`;
           </li>
         </ul>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-fundamentals)", marginBottom: 4 }}>
-            The dummy variable trap
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            Always drop one category from the one-hot encoding (or equivalently,
+        <Callout color="var(--c-fundamentals)" title={<>The dummy variable trap</>}>
+          Always drop one category from the one-hot encoding (or equivalently,
             omit the intercept). If you include all k categories plus an
             intercept, the columns are linearly dependent — XᵀX is singular and
             the normal equation has no unique solution. Libraries like{" "}
             <code>pandas.get_dummies(drop_first=True)</code> handle this
             automatically.
-          </p>
-        </div>
+        </Callout>
 
         <h2>The code</h2>
         <p>
@@ -178,23 +167,18 @@ print(f"Baseline (rural) intercept: \${model.intercept_:.0f}k")`;
           shortcut that handles the dummy-variable trap automatically.
         </p>
 
-        <CodeBlock fromScratch={fromScratch} withLibrary={withLibrary} />
+        <CodeBlock setup={REGRESSION_SETUP} fromScratch={fromScratch} withLibrary={withLibrary} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 32, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/linear-regression/feature-scaling" style={navLink}>← Feature scaling</Link>
-          <Link href="/learn/linear-regression/polynomial-and-interaction-terms" style={navLink}>Next up · Polynomial &amp; interaction terms →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/linear-regression/feature-scaling", label: <>← Feature scaling</> }} next={{ href: "/learn/linear-regression/polynomial-and-interaction-terms", label: <>Next up · Polynomial &amp; interaction terms →</> }} />
       </div>
 
     </article>
   );
 }
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
+
 const oheTable: React.CSSProperties = { borderCollapse: "collapse", fontSize: 13, width: "auto" };
 const thStyle: React.CSSProperties = { padding: "5px 14px", fontWeight: 500, textAlign: "center", borderBottom: "1px solid var(--border-strong)", fontFamily: "ui-monospace, monospace" };
 const tdStyle: React.CSSProperties = { padding: "4px 14px", textAlign: "center", borderBottom: "1px solid var(--border)", fontFamily: "ui-monospace, monospace" };
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-fundamentals) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-fundamentals) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0 0" };
+
+

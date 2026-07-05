@@ -7,7 +7,7 @@ import { useMemo, useState } from "react";
 // found automatically as the point farthest from the chord joining the endpoints.
 
 const KMAX = 8;
-const CLUSTER_COLORS = ["var(--c-regression)", "var(--c-classification)", "var(--c-trees)", "var(--c-rl)", "var(--c-clustering)", "var(--c-metrics)", "#b07", "#0a8"];
+const CLUSTER_COLORS = ["var(--c-regression)", "var(--c-classification)", "var(--c-trees)", "var(--c-rl)", "var(--c-clustering)", "var(--c-metrics)", "var(--c-dimred)", "var(--c-neural)"];
 const BLOBS = [
   { cx: 26, cy: 30 }, { cx: 74, cy: 28 }, { cx: 28, cy: 74 }, { cx: 76, cy: 72 },
 ];

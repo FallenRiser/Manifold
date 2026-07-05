@@ -1,6 +1,6 @@
-import Link from "next/link";
 import { CodeBlock } from "@/components/CodeBlock";
 import { KNNBoundaryLab } from "@/components/labs/KNNBoundaryLab";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 export const metadata = {
   title: "Decision boundaries — Manifold",
@@ -11,19 +11,16 @@ export const metadata = {
 export default function DecisionBoundariesPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-classification)")}>Classification</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 6 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        Decision boundaries
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 24px", maxWidth: 620 }}>
-        Every classifier is defined by the boundary it can draw between classes. k-NN&rsquo;s is unlike any
+      <LessonHeader
+        chips={[{ label: "Classification", color: "var(--c-classification)" }]}
+        time="about 6 minutes"
+        title={<>Decision boundaries</>}
+        intro={<>
+          Every classifier is defined by the boundary it can draw between classes. k-NN&rsquo;s is unlike any
         parametric model&rsquo;s — and watching it bend with <em>k</em> is the clearest possible view of the
         bias–variance trade-off.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <h2>The boundary, made visible</h2>
@@ -64,25 +61,17 @@ export default function DecisionBoundariesPage() {
           choosing-<em>k</em> chapter does.
         </p>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-classification)", marginBottom: 4 }}>
-            The boundary is the bias–variance dial
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            Small <em>k</em> → complex boundary → low bias, high variance (overfits). Large <em>k</em> →
+        <Callout color="var(--c-classification)" title={<>The boundary is the bias–variance dial</>}>
+          Small <em>k</em> → complex boundary → low bias, high variance (overfits). Large <em>k</em> →
             simple boundary → high bias, low variance (underfits). The boundary&rsquo;s <em>complexity</em> is
             literally what <em>k</em> controls, and you can watch it happen above. That makes k-NN the best
             visual intuition pump for bias–variance there is — the very next page formalises it.
-          </p>
-        </div>
+        </Callout>
 
         <h2>Plot a boundary yourself</h2>
         <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 40, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/k-nearest-neighbors/regression-by-averaging" style={navLink}>← Regression by averaging</Link>
-          <Link href="/learn/k-nearest-neighbors/the-role-of-k" style={{ ...navLink, fontWeight: 600 }}>Next up · The role of k →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/k-nearest-neighbors/regression-by-averaging", label: <>← Regression by averaging</> }} next={{ href: "/learn/k-nearest-neighbors/the-role-of-k", label: <>Next up · The role of k →</> }} />
       </div>
     </article>
   );
@@ -111,9 +100,4 @@ for k in xx_k:
     DecisionBoundaryDisplay.from_estimator(knn, X_train, alpha=0.3)
     plt.scatter(*X_train.T, c=y_train); plt.title(f"k={k}"); plt.show()`;
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
 const ul: React.CSSProperties = { margin: "0 0 10px", paddingLeft: "1.3em", fontSize: 15, color: "var(--muted)", lineHeight: 1.8 };
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-classification) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-classification) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0" };

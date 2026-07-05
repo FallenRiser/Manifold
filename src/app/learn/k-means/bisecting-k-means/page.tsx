@@ -1,5 +1,6 @@
-import Link from "next/link";
 import { CodeBlock } from "@/components/CodeBlock";
+import { CLUSTER_SETUP } from "@/lib/runtimeSetup";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 export const metadata = {
   title: "Bisecting k-means — Manifold",
@@ -10,19 +11,15 @@ export const metadata = {
 export default function BisectingPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-clustering)")}>Clustering</span>
-        <span style={chip("var(--c-metrics)")}>Variants</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 5 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        Bisecting k-means
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 24px", maxWidth: 620 }}>
-        Instead of placing all <em>k</em> centroids at once, build the clustering one split at a time. The
+      <LessonHeader
+        chips={[{ label: "Clustering", color: "var(--c-clustering)" }, { label: "Variants", color: "var(--c-metrics)" }]}
+        time="about 5 minutes"
+        title={<>Bisecting k-means</>}
+        intro={<>
+          Instead of placing all <em>k</em> centroids at once, build the clustering one split at a time. The
         result is a method that&rsquo;s often faster, more stable, and gives you a hierarchy for free.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <h2>Top-down, one split at a time</h2>
@@ -60,26 +57,18 @@ export default function BisectingPage() {
           </li>
         </ul>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-clustering)", marginBottom: 4 }}>
-            Where it sits
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            Bisecting k-means is a sweet spot between flat k-means and full hierarchical clustering: it
+        <Callout color="var(--c-clustering)" title={<>Where it sits</>}>
+          Bisecting k-means is a sweet spot between flat k-means and full hierarchical clustering: it
             keeps k-means&rsquo; linear-time character while giving you a tree and better stability. It still
             inherits the spherical-cluster assumption (every split is a straight 2-means cut), so it
             doesn&rsquo;t rescue non-convex shapes — but for large, roughly-blobby data where you want hierarchy
             cheaply, it&rsquo;s an excellent default. scikit-learn ships it as <code>BisectingKMeans</code>.
-          </p>
-        </div>
+        </Callout>
 
         <h2>The split loop</h2>
-        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
+        <CodeBlock setup={CLUSTER_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 40, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/k-means/kernel-and-spherical" style={navLink}>← Kernel &amp; spherical k-means</Link>
-          <Link href="/learn/k-means/k-means-as-em" style={{ ...navLink, fontWeight: 600 }}>Next up · k-means as EM (link to GMM) →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/k-means/kernel-and-spherical", label: <>← Kernel &amp; spherical k-means</> }} next={{ href: "/learn/k-means/k-means-as-em", label: <>Next up · k-means as EM (link to GMM) →</> }} />
       </div>
     </article>
   );
@@ -107,10 +96,8 @@ bk = BisectingKMeans(n_clusters=8, bisecting_strategy="biggest_inertia",
                      random_state=0).fit(X)
 print(bk.labels_)`;
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
+
 const ul: React.CSSProperties = { margin: "0 0 10px", paddingLeft: "1.3em", fontSize: 15, color: "var(--muted)", lineHeight: 1.8 };
 const ol: React.CSSProperties = { margin: "0 0 10px", paddingLeft: "1.3em", fontSize: 15, color: "var(--muted)", lineHeight: 1.8 };
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-clustering) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-clustering) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0" };
+
+

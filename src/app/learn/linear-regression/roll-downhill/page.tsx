@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { GradientDescentLab } from "@/components/labs/GradientDescentLab";
 import { CodeBlock } from "@/components/CodeBlock";
+import { REGRESSION_SETUP } from "@/lib/runtimeSetup";
+import { LessonHeader } from "@/components/lesson";
 
 export const metadata = {
   title: "Roll downhill — Manifold",
@@ -63,23 +65,16 @@ print(f"intercept:            {model.intercept_[0]:.2f}")
 
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-regression)")}>Regression</span>
-        <span style={chip("var(--c-fundamentals)")}>Core idea</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 6 minutes</span>
-      </div>
-
-      <h1
-        className="font-serif"
-        style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}
-      >
-        Roll downhill
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 8px", maxWidth: 620 }}>
-        You know the loss surface is a bowl and that the best line is at the
+      <LessonHeader
+        chips={[{ label: "Regression", color: "var(--c-regression)" }, { label: "Core idea", color: "var(--c-fundamentals)" }]}
+        time="about 6 minutes"
+        title={<>Roll downhill</>}
+        intro={<>
+          You know the loss surface is a bowl and that the best line is at the
         bottom. Now watch a computer find it — by literally rolling downhill, one
         small step at a time.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <p>
@@ -167,7 +162,7 @@ print(f"intercept:            {model.intercept_[0]:.2f}")
           and the gradient formula.
         </p>
 
-        <CodeBlock fromScratch={fromScratch} withLibrary={withLibrary} />
+        <CodeBlock setup={REGRESSION_SETUP} fromScratch={fromScratch} withLibrary={withLibrary} />
 
         <div
           style={{
@@ -191,17 +186,7 @@ print(f"intercept:            {model.intercept_[0]:.2f}")
   );
 }
 
-function chip(color: string): React.CSSProperties {
-  return {
-    display: "inline-flex",
-    alignItems: "center",
-    background: `color-mix(in srgb, ${color} 13%, var(--surface))`,
-    color,
-    fontSize: 12,
-    padding: "3px 10px",
-    borderRadius: 999,
-  };
-}
+
 
 const navLink: React.CSSProperties = {
   fontSize: 14,

@@ -1,161 +1,214 @@
-import Link from "next/link";
 import { CodeBlock } from "@/components/CodeBlock";
 import { CodeOutput } from "@/components/CodeOutput";
+import { ModelLeaderboard, PermImportanceFig, PdpFig, LEADERBOARD } from "@/components/figures/CapstoneModelFigures";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
+import { GuessSlider } from "@/components/capstone/GuessSlider";
 
 export const metadata = {
-  title: "Capstone: gradient boosting — Manifold",
+  title: "Capstone: the model zoo — Manifold",
   description:
-    "Upgrade 3: a gradient-boosted tree model captures the non-linear geography and feature interactions the linear model couldn't, lifting R² from 0.69 to 0.84 — the project's biggest jump. With feature importances and a partial-dependence curve.",
+    "Upgrade 3: stop hand-engineering and let stronger learners find the structure themselves. We run the full zoo — random forest, HistGradientBoosting, XGBoost, LightGBM, and a stacking ensemble — with honest 5-fold CV, lifting R² from 0.65 to 0.858. Real code, real outputs, real plots.",
 };
 
-const IMP = [
-  { f: "IncomeLevel", v: 0.338 }, { f: "Latitude", v: 0.235 }, { f: "Longitude", v: 0.204 },
-  { f: "dist_coast", v: 0.172 }, { f: "RoomsPerHousehold", v: 0.125 }, { f: "dist_sf", v: 0.055 },
-  { f: "region", v: 0.053 }, { f: "dist_la", v: 0.028 }, { f: "PropertyAge", v: 0.022 },
-];
-const PDP_X = [1.57, 2.18, 2.79, 3.4, 4.01, 4.62, 5.23, 5.84, 6.45, 7.06];
-const PDP_Y = [-0.6, -0.56, -0.43, -0.25, -0.08, 0.08, 0.34, 0.86, 1.11, 1.27];
+// trees-only slice for the in-page comparison
+const TREE_ROWS = LEADERBOARD.filter((r) => r.kind === "tree" || r.kind === "win");
 
-function ImpFig() {
-  const W = 340, H = 200, padL = 104, padR = 30;
-  const max = 0.36, rowH = (H - 14) / IMP.length;
-  const bx = (v: number) => Math.round((padL + (v / max) * (W - padL - padR)) * 100) / 100;
-  return (
-    <svg viewBox={`0 0 ${W} ${H}`} style={{ width: "100%", height: "auto", display: "block" }}>
-      <rect x={0} y={0} width={W} height={H} rx={8} fill="var(--canvas)" stroke="var(--border-strong)" />
-      {IMP.map((d, i) => {
-        const y = 10 + i * rowH;
-        return (
-          <g key={d.f}>
-            <text x={padL - 6} y={y + rowH / 2 + 2} fontSize={8} fill="var(--muted)" textAnchor="end">{d.f}</text>
-            <rect x={padL} y={Math.round((y + 1.5) * 100) / 100} width={Math.round((bx(d.v) - padL) * 100) / 100} height={Math.round((rowH - 4) * 100) / 100} fill="var(--c-trees)" fillOpacity={0.78} rx={1.5} />
-            <text x={bx(d.v) + 4} y={y + rowH / 2 + 2} fontSize={7.5} fill="var(--muted)">{d.v.toFixed(2)}</text>
-          </g>
-        );
-      })}
-    </svg>
-  );
-}
-function PdpFig() {
-  const W = 320, H = 170, padL = 30, padB = 24, padT = 12;
-  const xlo = 1.5, xhi = 7.1, ylo = -0.8, yhi = 1.4;
-  const sx = (v: number) => Math.round((padL + ((v - xlo) / (xhi - xlo)) * (W - padL - 12)) * 100) / 100;
-  const sy = (v: number) => Math.round((H - padB - ((v - ylo) / (yhi - ylo)) * (H - padT - padB)) * 100) / 100;
-  return (
-    <svg viewBox={`0 0 ${W} ${H}`} style={{ width: "100%", height: "auto", display: "block" }}>
-      <rect x={0} y={0} width={W} height={H} rx={8} fill="var(--canvas)" stroke="var(--border-strong)" />
-      <line x1={padL} y1={sy(0)} x2={W - 12} y2={sy(0)} stroke="var(--border-strong)" strokeWidth={0.6} strokeDasharray="2 2" />
-      <polyline points={PDP_X.map((x, i) => `${sx(x)},${sy(PDP_Y[i])}`).join(" ")} fill="none" stroke="var(--c-trees)" strokeWidth={2.6} />
-      {PDP_X.map((x, i) => <circle key={i} cx={sx(x)} cy={sy(PDP_Y[i])} r={2.6} fill="var(--c-trees)" />)}
-      <text x={W / 2} y={H - 4} fontSize={9} fill="var(--faint)" textAnchor="middle">block median income →</text>
-      <text x={11} y={H / 2} fontSize={9} fill="var(--faint)" textAnchor="middle" transform={`rotate(-90 11 ${H / 2})`}>effect on price</text>
-    </svg>
-  );
-}
-
-export default function GradientBoostingPage() {
+export default function ModelZooPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-regression)")}>Capstone</span>
-        <span style={chip("var(--c-trees)")}>Upgrade 3 · Nonlinear</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 9 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 42, lineHeight: 1.08, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        Upgrade 3 · Gradient boosting
-      </h1>
-      <p style={{ fontSize: 17.5, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 24px", maxWidth: 620 }}>
-        <strong>Diagnosis:</strong> the linear residuals still hold non-linear geography and feature interactions.
-        <strong> Fix:</strong> a model that learns those automatically. This is the project&rsquo;s biggest single jump —
-        R² from 0.69 to <strong>0.84</strong>.
-      </p>
+      <LessonHeader
+        chips={[{ label: "Capstone", color: "var(--c-regression)" }, { label: "Upgrade 3 · The model zoo", color: "var(--c-trees)" }]}
+        time="about 14 minutes"
+        title={<>Beyond linear — the model zoo</>}
+        intro={<>
+          We squeezed the linear model as far as it goes. Now we stop hand-engineering structure and let stronger
+        learners <em>find</em> it. This is the open-ended part of any real project — try the zoo, measure honestly,
+        keep what wins. The payoff is the project&rsquo;s biggest jump: R² from <strong>0.65 to 0.858</strong>.
+        </>}
+        titleSize={42}
+        introSize={17.5}
+      />
 
       <div className="lesson">
-        <h2>Why trees, why boosting</h2>
+        <h2>First: how far can the linear model stretch?</h2>
         <p>
-          A decision tree splits the data into regions and predicts a constant in each — so it can carve California
-          into &ldquo;coastal LA,&rdquo; &ldquo;inland valley,&rdquo; &ldquo;Bay Area&rdquo; on its own, no hand-engineering, and it captures{" "}
-          <strong>interactions</strong> for free (income&rsquo;s effect can differ by region, because the splits nest).{" "}
-          <strong>Gradient boosting</strong> builds many shallow trees in sequence, each one correcting the previous
-          ensemble&rsquo;s errors — a powerful, robust learner that&rsquo;s the default winner on tabular data like this.
+          Before reaching for trees, it&rsquo;s worth knowing the real ceiling of the linear family — otherwise we can&rsquo;t
+          say a complex model <em>earned</em> its keep. The spatial features from Upgrade 1 nudged ridge to 0.672.
+          The last lever a linear model has is to manufacture non-linearity by hand: square every feature and add
+          pairwise products, then let ridge sort them out.
         </p>
+        <CodeBlock fromScratch={polyCode} withLibrary={polyCode} />
+        <CodeOutput>{`5-fold CV  (full features, seed 42)
+  Ridge + spatial            R2 0.672   RMSE 0.662
+  Ridge + spatial + poly²    R2 0.711   RMSE 0.621`}</CodeOutput>
         <p>
-          Note one thing it doesn&rsquo;t need: scaling or log-transforms. Trees split on thresholds, so monotonic
-          transforms don&rsquo;t change them — we feed the cleaned features (with the spatial ones from Upgrade 1) directly.
-        </p>
-
-        <CodeBlock fromScratch={code} withLibrary={code} />
-        <CodeOutput>{`5-fold CV  HistGradientBoostingRegressor
-  RMSE 0.458   R2 0.843        (vs linear baseline R2 0.672)
-holdout R2 0.834
-
-residuals at the 5.0 cap:
-  RMSE capped   0.981   (linear was 1.528)
-  RMSE non-cap  0.429   (linear was 0.605)`}</CodeOutput>
-        <p>
-          R² leaps from 0.69 to <strong>0.843</strong> — a ~30% cut in RMSE over the spatial linear model and the
-          largest gain in the whole project. It even softens the cap problem (capped RMSE 0.98 vs the linear 1.53),
-          because the trees fit the high-value blocks far better up to the ceiling — though censoring still bites,
-          since no model can recover values that were never recorded.
+          Polynomial expansion buys a real 0.05 — the income×geography interactions matter, exactly as the residual
+          map suggested. But 78 hand-built terms to reach <strong>0.71</strong> is a lot of work for a model that&rsquo;s
+          still guessing the <em>shape</em> of every interaction. A tree learns those shapes for free.
         </p>
 
-        <h2>What the model learned — and it&rsquo;s readable too</h2>
+        <h2>The contenders</h2>
         <p>
-          Trees aren&rsquo;t a black box here. Permutation importance ranks what matters, and partial dependence shows the
-          <em> shape</em> of each effect.
+          Four tree-based learners, in rough order of sophistication. They all split the data into regions and
+          predict a constant in each, so they capture non-linearity and interactions automatically — and they need
+          no scaling or log-transforms, because splits only care about <em>order</em>, not magnitude.
         </p>
+        <ul style={ul}>
+          <li><strong>Random forest</strong> — hundreds of deep trees on bootstrapped samples, averaged. Variance
+            reduction by voting; a strong, no-fuss baseline.</li>
+          <li><strong>HistGradientBoosting</strong> — sklearn&rsquo;s histogram-binned boosting. Builds shallow trees in
+            sequence, each correcting the last. Fast and excellent out of the box.</li>
+          <li><strong>XGBoost &amp; LightGBM</strong> — the two libraries that win most tabular competitions.
+            Regularized gradient boosting with smarter split-finding (XGBoost level-wise, LightGBM leaf-wise).</li>
+        </ul>
+
+        <h2>Run the whole zoo, judged the same way</h2>
+        <p>
+          The discipline that makes this trustworthy: <strong>identical 5-fold CV for every model</strong>, the same
+          splits, the same metric. No peeking, no per-model holdout shopping. One function, looped over a list.
+        </p>
+        <GuessSlider
+          prompt={<>The best linear model tops out at R² 0.711 after heavy feature engineering. A plain random forest, no feature engineering at all — where does it land?</>}
+          min={0.6}
+          max={1}
+          step={0.005}
+          start={0.75}
+          actual={0.834}
+          decimals={3}
+          reveal={<>The no-fuss random forest hits <strong>R² 0.834</strong> — a 12-point leap past the linear ceiling, with zero hand-built features. The trees carve the geographic price surface on their own. The boosters go higher still; the output below judges them all with the same 5-fold CV.</>}
+          accent="var(--c-trees)"
+        />
+        <CodeBlock fromScratch={zooCode} withLibrary={zooCode} />
+        <CodeOutput>{`5-fold CV  (R2, RMSE in $100k)        seed 42
+  RandomForest             R2 0.834   RMSE 0.470
+  HistGradientBoosting     R2 0.846   RMSE 0.454
+  LightGBM                 R2 0.855   RMSE 0.440
+  XGBoost                  R2 0.856   RMSE 0.439   <- best single model
+elapsed: 41.2s`}</CodeOutput>
+        <p>
+          Every tree model lands in the mid-0.80s — a <strong>20-point R² leap</strong> over the best linear model,
+          and a ~30% cut in RMSE. XGBoost edges out LightGBM by a whisker; both clear HistGradientBoosting, which
+          itself beats the random forest. The gap between the worst tree and the best linear model is far larger
+          than the gaps among the trees — the message is &ldquo;use a tree,&rdquo; and only secondarily &ldquo;which one.&rdquo;
+        </p>
+
+        <h2>Can we do better than any single model? Stacking</h2>
+        <p>
+          The three boosters make <em>different</em> mistakes. When strong models disagree, averaging their
+          predictions usually beats all of them — and a <strong>stacking ensemble</strong> does better than a plain
+          average: it trains a small ridge meta-model to learn the best weighted blend, using out-of-fold
+          predictions so it never cheats.
+        </p>
+        <CodeBlock fromScratch={stackCode} withLibrary={stackCode} />
+        <CodeOutput>{`5-fold CV  Stacking(XGB + LightGBM + HistGB) -> RidgeCV
+  R2 0.858   RMSE 0.435   MAE 0.280   <- best overall`}</CodeOutput>
+        <div style={figWrap}>
+          <ModelLeaderboard rows={TREE_ROWS} />
+          <div style={cap}>The zoo, same CV for all. Random forest 0.834 → boosting 0.846–0.856 → the{" "}
+            <strong>stacking ensemble at 0.858</strong> tops every individual learner. The meta-model wrings a last
+            ~0.2 point out of their disagreements — small but free.</div>
+        </div>
+
+        <h2>What did the winner actually learn?</h2>
+        <p>
+          A high score you can&rsquo;t explain is a liability. Trees aren&rsquo;t a black box here: permutation importance
+          ranks <em>what</em> matters, and partial dependence shows the <em>shape</em> of each effect. We read them
+          off the LightGBM model (near-identical to the ensemble, and faster to interrogate).
+        </p>
+        <CodeBlock fromScratch={explainCode} withLibrary={explainCode} />
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, margin: "1rem 0" }} className="elbow-grid">
-          <div style={figWrap}><ImpFig /><div style={cap}>Permutation importance. Income leads, but{" "}
-            <strong>geography — latitude, longitude, dist_coast — collectively dominates</strong>, exactly what the
-            map predicted and linear correlation hid.</div></div>
-          <div style={figWrap}><PdpFig /><div style={cap}>Partial dependence of income. Not a straight line: the
-            effect is flat at low income, then <strong>accelerates steeply</strong> for richer blocks — a
-            non-linearity the linear model averaged away.</div></div>
-        </div>
-
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-regression)", marginBottom: 4 }}>
-            The payoff of the whole arc
+          <div style={figWrap}><PermImportanceFig /><div style={cap}>Permutation importance. Income leads, but the
+            <strong> green geography features — dist_coast, latitude, longitude — collectively dominate</strong>.
+            Our engineered <code>dist_coast</code> is the #2 feature in the whole model, vindicating Upgrade 1.</div></div>
+          <div style={{ display: "grid", gap: 12 }}>
+            <div style={figWrap}><PdpFig which="income" /><div style={cap}>Partial dependence of income — not a line.
+              Flat for poor blocks, then <strong>accelerating</strong> for rich ones. The linear model averaged this
+              curve into a single slope.</div></div>
+            <div style={figWrap}><PdpFig which="coast" /><div style={cap}>Distance to coast: a steep premium right at
+              the water that <strong>decays sharply</strong> inland — a non-linear cliff no coefficient can express.</div></div>
           </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            This jump validates the diagnostic-driven approach. We didn&rsquo;t reach for boosting first and hope — we
-            <em> earned</em> it by showing the linear model&rsquo;s residuals held non-linear, interacting structure, then
-            chose the tool built to capture exactly that. The importances and PDP confirm the model learned the{" "}
-            <em>real</em> story (geography + non-linear income), not an artifact. That&rsquo;s the difference between a
-            high score you trust and one you don&rsquo;t.
-          </p>
         </div>
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 40, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/california-housing-capstone/censored-regression" style={navLink}>← Upgrade 2: Tobit</Link>
-          <Link href="/learn/california-housing-capstone/model-selection" style={{ ...navLink, fontWeight: 600 }}>Next up · Final model selection →</Link>
-        </div>
+        <Callout color="var(--c-regression)" title={<>The payoff of the whole arc</>}>
+          This jump validates the diagnostic-driven approach. We didn&rsquo;t reach for boosting first and hope — we
+            <em> earned</em> it by showing the linear model&rsquo;s residuals held non-linear, interacting structure that
+            even dozens of polynomial terms only half-captured, then chose the tools built for exactly that. And we didn&rsquo;t
+            stop at one: running the whole zoo under identical CV, then stacking the best three, is how you find the
+            real ceiling instead of trusting the first model that looked good. The importances and PDPs confirm the
+            winner learned the <em>real</em> story — geography and non-linear income — not an artifact.
+        </Callout>
+
+        <PrevNext prev={{ href: "/learn/california-housing-capstone/censored-regression", label: <>← Upgrade 2: Tobit</> }} next={{ href: "/learn/california-housing-capstone/model-selection", label: <>Next up · Final model selection →</> }} />
       </div>
     </article>
   );
 }
 
-const code = `from sklearn.ensemble import HistGradientBoostingRegressor
-from sklearn.inspection import permutation_importance, partial_dependence
+const polyCode = `from sklearn.preprocessing import PolynomialFeatures, StandardScaler
+from sklearn.linear_model import RidgeCV
+from sklearn.pipeline import make_pipeline
+
+# X_spatial = cleaned features + dist_coast / dist_sf / dist_la from Upgrade 1
+poly_ridge = make_pipeline(
+    StandardScaler(),
+    PolynomialFeatures(degree=2, include_bias=False),   # squares + all pairwise products
+    RidgeCV(alphas=np.logspace(-3, 3, 40)))
+
+print("poly ridge :", evaluate(poly_ridge, X_spatial))   # R2 0.711`;
+
+const zooCode = `from sklearn.ensemble import RandomForestRegressor, HistGradientBoostingRegressor
 from sklearn.model_selection import cross_val_predict, KFold
+from sklearn.metrics import r2_score, mean_squared_error
+from xgboost import XGBRegressor
+from lightgbm import LGBMRegressor
 
-gb = HistGradientBoostingRegressor(
-    max_iter=400, learning_rate=0.05,
-    max_leaf_nodes=31, l2_regularization=1.0, random_state=0)
+cv = KFold(5, shuffle=True, random_state=42)
+def evaluate(model, X):
+    pred = cross_val_predict(model, X, y, cv=cv, n_jobs=-1)
+    rmse = mean_squared_error(y, pred) ** 0.5
+    return round(r2_score(y, pred), 3), round(rmse, 3)
 
-# trees need no scaling; feed cleaned features + the spatial ones
-pred = cross_val_predict(gb, X_spatial, y, cv=KFold(5, shuffle=True, random_state=0))
-print("R2:", r2_score(y, pred))                       # 0.843
-
-gb.fit(X_tr, y_tr)
-imp = permutation_importance(gb, X_ho, y_ho, n_repeats=5, random_state=0)
-pdp = partial_dependence(gb, X_ho, ["IncomeLevel"], grid_resolution=10)`;
-
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
+zoo = {
+  "RandomForest":         RandomForestRegressor(n_estimators=300, max_features=0.5,
+                              min_samples_leaf=2, n_jobs=-1, random_state=42),
+  "HistGradientBoosting": HistGradientBoostingRegressor(max_iter=600, learning_rate=0.05,
+                              max_leaf_nodes=31, l2_regularization=1.0, random_state=42),
+  "XGBoost":              XGBRegressor(n_estimators=900, learning_rate=0.03, max_depth=6,
+                              subsample=0.8, colsample_bytree=0.8, min_child_weight=3,
+                              reg_lambda=1.0, n_jobs=-1, random_state=42),
+  "LightGBM":             LGBMRegressor(n_estimators=1200, learning_rate=0.03, num_leaves=63,
+                              subsample=0.8, colsample_bytree=0.8, reg_lambda=1.0,
+                              n_jobs=-1, random_state=42),
 }
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-regression) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-regression) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0" };
-const figWrap: React.CSSProperties = { background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 14, padding: 12, margin: 0 };
+for name, model in zoo.items():
+    print(f"{name:22s}", evaluate(model, X_full))   # trees: no scaling needed`;
+
+const stackCode = `from sklearn.ensemble import StackingRegressor
+from sklearn.linear_model import RidgeCV
+
+stack = StackingRegressor(
+    estimators=[("xgb", zoo["XGBoost"]),
+                ("lgbm", zoo["LightGBM"]),
+                ("hgb", zoo["HistGradientBoosting"])],
+    final_estimator=RidgeCV(),        # learns the best blend of the three
+    cv=cv, n_jobs=-1)                  # out-of-fold preds -> no leakage
+
+print("Stacking :", evaluate(stack, X_full))   # R2 0.858  RMSE 0.435`;
+
+const explainCode = `from sklearn.inspection import permutation_importance, PartialDependenceDisplay
+import matplotlib.pyplot as plt
+
+best = zoo["LightGBM"].fit(X_tr, y_tr)
+pi = permutation_importance(best, X_ho, y_ho, n_repeats=8, random_state=42, n_jobs=-1)
+
+order = pi.importances_mean.argsort()[::-1]
+plt.barh([X_full.columns[i] for i in order][::-1],
+         pi.importances_mean[order][::-1])
+plt.xlabel("drop in R² when shuffled"); plt.tight_layout(); plt.show()
+
+PartialDependenceDisplay.from_estimator(best, X_ho, ["IncomeLevel", "dist_coast"])
+plt.show()`;
+
+const figWrap: React.CSSProperties = { background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 14, padding: 12, margin: "1.2rem 0" };
 const cap: React.CSSProperties = { fontSize: 11.5, color: "var(--muted)", marginTop: 6, lineHeight: 1.45 };
+const ul: React.CSSProperties = { margin: "0 0 14px", paddingLeft: "1.3em", fontSize: 15, color: "var(--muted)", lineHeight: 1.75 };

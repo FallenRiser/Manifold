@@ -1,7 +1,8 @@
-import Link from "next/link";
 import { FeatureScalingLab } from "@/components/labs/FeatureScalingLab";
 import { CodeBlock } from "@/components/CodeBlock";
+import { REGRESSION_SETUP } from "@/lib/runtimeSetup";
 import { MathBlock } from "@/components/Math";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 
 export const metadata = {
@@ -60,23 +61,16 @@ print(f"Learned stds:  {pipe['scaler'].scale_.round(1)}")`;
 
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-regression)")}>Regression</span>
-        <span style={chip("var(--c-fundamentals)")}>Core idea</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 7 minutes</span>
-      </div>
-
-      <h1
-        className="font-serif"
-        style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}
-      >
-        Feature scaling
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 8px", maxWidth: 620 }}>
-        Square footage runs from 500 to 5,000. Bedroom count runs from 1 to 8.
+      <LessonHeader
+        chips={[{ label: "Regression", color: "var(--c-regression)" }, { label: "Core idea", color: "var(--c-fundamentals)" }]}
+        time="about 7 minutes"
+        title={<>Feature scaling</>}
+        intro={<>
+          Square footage runs from 500 to 5,000. Bedroom count runs from 1 to 8.
         When gradient descent has to navigate both at once, one dimension
         dominates — and training grinds to a crawl.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <p>
@@ -138,17 +132,12 @@ print(f"Learned stds:  {pipe['scaler'].scale_.round(1)}")`;
           <RuleCard color="var(--warn)" title="Usually not needed" items={["Decision trees and random forests", "The normal equation (exact result)", "Models using only binary features"]} />
         </div>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-fundamentals)", marginBottom: 4 }}>
-            Practical note
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            Always fit the scaler on <strong>training data only</strong>, then
+        <Callout color="var(--c-fundamentals)" title={<>Practical note</>}>
+          Always fit the scaler on <strong>training data only</strong>, then
             apply the same mean/std to validation and test data. Scaling with
             test statistics would leak information about the test set into
             training — a subtle but real form of data leakage.
-          </p>
-        </div>
+        </Callout>
 
         <h2>The code</h2>
         <p>
@@ -157,12 +146,9 @@ print(f"Learned stds:  {pipe['scaler'].scale_.round(1)}")`;
           without leaking information.
         </p>
 
-        <CodeBlock fromScratch={fromScratch} withLibrary={withLibrary} />
+        <CodeBlock setup={REGRESSION_SETUP} fromScratch={fromScratch} withLibrary={withLibrary} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 32, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/linear-regression/multiple-linear-regression" style={navLink}>← Multiple linear regression</Link>
-          <Link href="/learn/linear-regression/categorical-features" style={navLink}>Next up · Categorical features →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/linear-regression/multiple-linear-regression", label: <>← Multiple linear regression</> }} next={{ href: "/learn/linear-regression/categorical-features", label: <>Next up · Categorical features →</> }} />
       </div>
 
     </article>
@@ -180,8 +166,6 @@ function RuleCard({ color, title, items }: { color: string; title: string; items
   );
 }
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}const rulesGrid: React.CSSProperties = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 12, margin: "1.4rem 0" };
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-fundamentals) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-fundamentals) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0 0" };
+const rulesGrid: React.CSSProperties = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 12, margin: "1.4rem 0" };
+
+

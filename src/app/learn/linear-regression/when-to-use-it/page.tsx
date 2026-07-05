@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 export const metadata = {
   title: "When to use it (vs trees, GLMs) — Manifold",
@@ -9,20 +9,16 @@ export const metadata = {
 export default function WhenToUseItPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-regression)")}>Regression</span>
-        <span style={chip("var(--good)")}>In the wild</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 4 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        When to use it
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 8px", maxWidth: 620 }}>
-        In the age of Deep Learning and gradient boosted trees, why would anyone
+      <LessonHeader
+        chips={[{ label: "Regression", color: "var(--c-regression)" }, { label: "In the wild", color: "var(--good)" }]}
+        time="about 4 minutes"
+        title={<>When to use it</>}
+        intro={<>
+          In the age of Deep Learning and gradient boosted trees, why would anyone
         still use a 200-year-old algorithm? Because inference often beats
         prediction.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <h2>Inference vs Prediction</h2>
@@ -63,23 +59,15 @@ export default function WhenToUseItPage() {
           <li><strong style={{ color: "var(--warn)" }}>Time-to-event (Survival):</strong> Predicting how long until a machine breaks. Data is often right-censored (the machine hasn't broken yet). Use <strong>Cox Proportional Hazards</strong>.</li>
         </ul>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--good)", marginBottom: 4 }}>
-            The Occam's Razor baseline
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            Even if you plan to build a massive Deep Neural Network, 
+        <Callout color="var(--good)" title={<>The Occam's Razor baseline</>}>
+          Even if you plan to build a massive Deep Neural Network, 
             <strong> you must always build a Linear Regression model first.</strong>
             {" "}It provides a strict baseline. If your billion-parameter Neural
             Network cannot beat a simple OLS model with 5 features, you have a
             problem.
-          </p>
-        </div>
+        </Callout>
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 32, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/linear-regression/prediction-intervals" style={navLink}>← Prediction intervals</Link>
-          <Link href="/learn/linear-regression/failure-mode-gallery" style={navLink}>Next up · Failure-mode gallery →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/linear-regression/prediction-intervals", label: <>← Prediction intervals</> }} next={{ href: "/learn/linear-regression/failure-mode-gallery", label: <>Next up · Failure-mode gallery →</> }} />
       </div>
     </article>
   );
@@ -94,9 +82,4 @@ function CompareCard({ title, body, color }: { title: string; body: string; colo
   );
 }
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
 const grid2: React.CSSProperties = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 14, margin: "1.4rem 0" };
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--good) 10%, var(--surface))", border: "1px solid color-mix(in srgb, var(--good) 25%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0 0" };

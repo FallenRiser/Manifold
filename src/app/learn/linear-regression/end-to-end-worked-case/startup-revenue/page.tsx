@@ -1,7 +1,8 @@
-import Link from "next/link";
 import { CaseTracker } from "@/components/CaseTracker";
 import { CodeBlock } from "@/components/CodeBlock";
+import { REGRESSION_SETUP } from "@/lib/runtimeSetup";
 import { Backlinks } from "@/components/Backlinks";
+import { LessonHeader, PrevNext } from "@/components/lesson";
 
 export const metadata = {
   title: "Case A: Startup Revenue — Manifold",
@@ -108,19 +109,15 @@ print("forecast:", model.predict([[4500, 110]]).round(0))`;
 export default function StartupRevenueCasePage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-regression)")}>Regression</span>
-        <span style={chip("var(--good)")}>In the wild</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· Case A · ~10 min</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        Case A: Startup revenue
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 24px", maxWidth: 620 }}>
-        We start clean and simple — so the <em>shape</em> of the whole workflow is easy to see.
+      <LessonHeader
+        chips={[{ label: "Regression", color: "var(--c-regression)" }, { label: "In the wild", color: "var(--good)" }]}
+        time="Case A · ~10 min"
+        title={<>Case A: Startup revenue</>}
+        intro={<>
+          We start clean and simple — so the <em>shape</em> of the whole workflow is easy to see.
         Frame it, look at it, fit it, check it, explain it. Cases B and C bring the mess.
-      </p>
+        </>}
+      />
 
       <CaseTracker />
 
@@ -166,7 +163,7 @@ export default function StartupRevenueCasePage() {
           ]} />
         </Phase>
 
-        <CodeBlock fromScratch={codeData} withLibrary={codeData} />
+        <CodeBlock setup={REGRESSION_SETUP} fromScratch={codeData} withLibrary={codeData} />
 
         <Phase n="2" title="Prepare the data">
           <p style={pp}>
@@ -202,7 +199,7 @@ export default function StartupRevenueCasePage() {
           </p>
         </Phase>
 
-        <CodeBlock fromScratch={codeFitScratch} withLibrary={codeFitLib} />
+        <CodeBlock setup={REGRESSION_SETUP} fromScratch={codeFitScratch} withLibrary={codeFitLib} />
 
         <div style={resultGrid}>
           <Stat label="base revenue (intercept)" value={`$${Math.round(theta[0]).toLocaleString()}`} />
@@ -265,10 +262,7 @@ export default function StartupRevenueCasePage() {
           </p>
         </div>
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 40, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/linear-regression/end-to-end-worked-case" style={navLink}>← Overview</Link>
-          <Link href="/learn/linear-regression/end-to-end-worked-case/house-prices" style={{ ...navLink, fontWeight: 600 }}>Case B: House prices →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/linear-regression/end-to-end-worked-case", label: <>← Overview</> }} next={{ href: "/learn/linear-regression/end-to-end-worked-case/house-prices", label: <>Case B: House prices →</> }} />
       </div>
     </article>
   );
@@ -304,13 +298,11 @@ function Stat({ label, value, accent }: { label: string; value: string; accent?:
   );
 }
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
+
 
 const pp: React.CSSProperties = { margin: "0 0 10px", fontSize: 15, color: "var(--muted)", lineHeight: 1.65 };
 const ul: React.CSSProperties = { margin: "0 0 4px", paddingLeft: "1.3em", fontSize: 15, color: "var(--muted)", lineHeight: 1.8 };
 const stepBadge: React.CSSProperties = { display: "inline-block", background: "var(--brand)", color: "white", fontSize: 11, fontWeight: 500, letterSpacing: "0.05em", textTransform: "uppercase", padding: "3px 9px", borderRadius: 6 };
 const resultGrid: React.CSSProperties = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 10, margin: "1.4rem 0 0.4rem" };
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
+
 const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--good) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--good) 24%, var(--border))", borderRadius: 12, padding: "16px 18px", margin: "2.2rem 0 0" };

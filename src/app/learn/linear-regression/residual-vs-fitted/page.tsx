@@ -1,7 +1,8 @@
-import Link from "next/link";
 import { ResidualPatternLab } from "@/components/labs/ResidualPatternLab";
 import { CodeBlock } from "@/components/CodeBlock";
+import { REGRESSION_SETUP } from "@/lib/runtimeSetup";
 import { Backlinks } from "@/components/Backlinks";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 const codeScratch = `import numpy as np
 
@@ -41,20 +42,16 @@ export const metadata = {
 export default function ResidualVsFittedPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-regression)")}>Regression</span>
-        <span style={chip("var(--brand)")}>Diagnostics</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 4 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        Residual-vs-fitted
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 8px", maxWidth: 620 }}>
-        If you only ever look at one plot after fitting a linear model, make it
+      <LessonHeader
+        chips={[{ label: "Regression", color: "var(--c-regression)" }, { label: "Diagnostics", color: "var(--brand)" }]}
+        time="about 4 minutes"
+        title={<>Residual-vs-fitted</>}
+        intro={<>
+          If you only ever look at one plot after fitting a linear model, make it
         this one. It compresses three critical assumption checks into a single
         visualisation.
-      </p>
+        </>}
+      />
 
       <Backlinks label="Related" items={[
         { label: "Linearity", href: "/learn/linear-regression/linearity" },
@@ -100,19 +97,14 @@ export default function ResidualVsFittedPage() {
             body="The ideal state. No patterns, constant vertical spread, roughly symmetric around zero." />
         </div>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-fundamentals)", marginBottom: 4 }}>
-            The Scale-Location variant
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            Sometimes it's hard to see if the spread is changing just by
+        <Callout color="var(--c-fundamentals)" title={<>The Scale-Location variant</>}>
+          Sometimes it's hard to see if the spread is changing just by
             eyeballing a cloud of points. The <strong>Scale-Location plot</strong>
             {" "}plots the square root of the absolute standardized residuals
             against fitted values. This folds the negative residuals up, so a
             flat trend line means homoscedasticity, and an upward sloping trend
             line screams heteroscedasticity.
-          </p>
-        </div>
+        </Callout>
 
         <h2>Compute it yourself</h2>
         <p>
@@ -120,12 +112,9 @@ export default function ResidualVsFittedPage() {
           values. The from-scratch version makes the OLS guarantee visible: fitted
           and residual are uncorrelated.
         </p>
-        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
+        <CodeBlock setup={REGRESSION_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 32, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/linear-regression/multicollinearity" style={navLink}>← Multicollinearity</Link>
-          <Link href="/learn/linear-regression/heteroscedasticity-in-depth" style={navLink}>Next up · Heteroscedasticity in depth →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/linear-regression/multicollinearity", label: <>← Multicollinearity</> }} next={{ href: "/learn/linear-regression/heteroscedasticity-in-depth", label: <>Next up · Heteroscedasticity in depth →</> }} />
       </div>
     </article>
   );
@@ -140,9 +129,7 @@ function PatternCard({ label, body, color }: { label: string; body: string; colo
   );
 }
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
+
 const plotGrid: React.CSSProperties = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 12, margin: "1.4rem 0" };
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-fundamentals) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-fundamentals) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0 0" };
+
+

@@ -1,5 +1,6 @@
-import Link from "next/link";
 import { CodeBlock } from "@/components/CodeBlock";
+import { CLUSTER_SETUP } from "@/lib/runtimeSetup";
+import { LessonHeader, PrevNext } from "@/components/lesson";
 
 export const metadata = {
   title: "Empty clusters & edge cases — Manifold",
@@ -10,18 +11,15 @@ export const metadata = {
 export default function EdgeCasesPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-clustering)")}>Clustering</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 6 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        Empty clusters & edge cases
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 24px", maxWidth: 620 }}>
-        The clean two-step loop hides a few awkward situations. None are fatal, but each forces a
+      <LessonHeader
+        chips={[{ label: "Clustering", color: "var(--c-clustering)" }]}
+        time="about 6 minutes"
+        title={<>Empty clusters & edge cases</>}
+        intro={<>
+          The clean two-step loop hides a few awkward situations. None are fatal, but each forces a
         small decision — and knowing them explains some otherwise baffling results.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <h2>The empty-cluster problem</h2>
@@ -84,12 +82,9 @@ export default function EdgeCasesPage() {
         </ul>
 
         <h2>Handle an empty cluster from scratch</h2>
-        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
+        <CodeBlock setup={CLUSTER_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 40, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/k-means/computational-complexity" style={navLink}>← Computational complexity</Link>
-          <Link href="/learn/k-means" style={navLink}>Back to overview →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/k-means/computational-complexity", label: <>← Computational complexity</> }} next={{ href: "/learn/k-means", label: <>Back to overview →</> }} />
       </div>
     </article>
   );
@@ -115,8 +110,6 @@ const codeLib = `from sklearn.cluster import KMeans
 # Set random_state for reproducible label assignments across runs.
 km = KMeans(n_clusters=5, n_init=10, random_state=0)`;
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
+
 const ul: React.CSSProperties = { margin: "0 0 10px", paddingLeft: "1.3em", fontSize: 15, color: "var(--muted)", lineHeight: 1.8 };
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
+

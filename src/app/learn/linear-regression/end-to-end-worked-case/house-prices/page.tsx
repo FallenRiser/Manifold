@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { CaseTracker } from "@/components/CaseTracker";
 import { CodeBlock } from "@/components/CodeBlock";
+import { REGRESSION_SETUP } from "@/lib/runtimeSetup";
 import { Backlinks } from "@/components/Backlinks";
+import { LessonHeader, PrevNext } from "@/components/lesson";
 
 export const metadata = {
   title: "Case B: House Prices — Manifold",
@@ -193,20 +195,16 @@ print(f"MAE: \${mean_absolute_error(true, pred)*100_000:,.0f}")`;
 export default function HousePricesCasePage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-regression)")}>Regression</span>
-        <span style={chip("var(--warn)")}>Messy data</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· Case B · ~15 min</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        Case B: House prices
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 24px", maxWidth: 620 }}>
-        Same skeleton as Case A — but now the data fights back. 20,640 real California houses with a
+      <LessonHeader
+        chips={[{ label: "Regression", color: "var(--c-regression)" }, { label: "Messy data", color: "var(--warn)" }]}
+        time="Case B · ~15 min"
+        title={<>Case B: House prices</>}
+        intro={<>
+          Same skeleton as Case A — but now the data fights back. 20,640 real California houses with a
         skewed, capped target and features on clashing scales. We run the workflow, watch the
         diagnostics <em>fail</em>, and fix them.
-      </p>
+        </>}
+      />
 
       <CaseTracker />
 
@@ -256,7 +254,7 @@ export default function HousePricesCasePage() {
           ]} />
         </Phase>
 
-        <CodeBlock fromScratch={codeData} withLibrary={codeData} />
+        <CodeBlock setup={REGRESSION_SETUP} fromScratch={codeData} withLibrary={codeData} />
 
         <Phase n="2" title="Fit the naive model — and split honestly">
           <p style={pp}>
@@ -265,7 +263,7 @@ export default function HousePricesCasePage() {
             rows we hold out a <strong>test set</strong> so the number we report is honest. Below,
             the same fit from scratch (normal equation) and via scikit-learn.
           </p>
-          <CodeBlock fromScratch={codeFitScratch} withLibrary={codeFitLib} />
+          <CodeBlock setup={REGRESSION_SETUP} fromScratch={codeFitScratch} withLibrary={codeFitLib} />
           <div style={resultGrid}>
             <Stat label="R² (test)" value="0.58" />
             <Stat label="MAE" value="~$53k" />
@@ -307,7 +305,7 @@ export default function HousePricesCasePage() {
             <code>AveRooms</code> and <code>AveBedrms</code> are nearly collinear — they carry
             overlapping information.
           </p>
-          <CodeBlock fromScratch={codeDiag} withLibrary={codeDiag} />
+          <CodeBlock setup={REGRESSION_SETUP} fromScratch={codeDiag} withLibrary={codeDiag} />
           <Backlinks items={[
             { label: "Residual-vs-fitted", href: "/learn/linear-regression/residual-vs-fitted" },
             { label: "Heteroscedasticity in depth", href: "/learn/linear-regression/heteroscedasticity-in-depth" },
@@ -335,7 +333,7 @@ export default function HousePricesCasePage() {
               <text x={13} y={93} fontSize={11} fill="var(--faint)" textAnchor="middle" transform="rotate(-90 13 93)">residual</text>
             </svg>
           </Figure>
-          <CodeBlock fromScratch={codeFixScratch} withLibrary={codeFixLib} />
+          <CodeBlock setup={REGRESSION_SETUP} fromScratch={codeFixScratch} withLibrary={codeFixLib} />
           <Backlinks items={[
             { label: "Feature scaling", href: "/learn/linear-regression/feature-scaling" },
             { label: "Regularization", href: "/learn/linear-regression/regularization" },
@@ -376,10 +374,7 @@ export default function HousePricesCasePage() {
           </p>
         </div>
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 40, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/linear-regression/end-to-end-worked-case/startup-revenue" style={navLink}>← Case A</Link>
-          <Link href="/learn/linear-regression/end-to-end-worked-case/medical-costs" style={{ ...navLink, fontWeight: 600 }}>Case C: Medical costs →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/linear-regression/end-to-end-worked-case/startup-revenue", label: <>← Case A</> }} next={{ href: "/learn/linear-regression/end-to-end-worked-case/medical-costs", label: <>Case C: Medical costs →</> }} />
       </div>
     </article>
   );
@@ -415,15 +410,13 @@ function Stat({ label, value, accent }: { label: string; value: string; accent?:
   );
 }
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
+
 
 const pp: React.CSSProperties = { margin: "0 0 10px", fontSize: 15, color: "var(--muted)", lineHeight: 1.65 };
 const ul: React.CSSProperties = { margin: "0 0 4px", paddingLeft: "1.3em", fontSize: 15, color: "var(--muted)", lineHeight: 1.8 };
 const stepBadge: React.CSSProperties = { display: "inline-block", background: "var(--brand)", color: "white", fontSize: 11, fontWeight: 500, letterSpacing: "0.05em", textTransform: "uppercase", padding: "3px 9px", borderRadius: 6 };
 const resultGrid: React.CSSProperties = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 10, margin: "1.4rem 0 0.4rem" };
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
+
 const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--warn) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--warn) 24%, var(--border))", borderRadius: 12, padding: "16px 18px", margin: "2.2rem 0 0" };
 
 const cmpTable: React.CSSProperties = { border: "1px solid var(--border)", borderRadius: 12, overflow: "hidden", margin: "1.2rem 0 0.4rem" };

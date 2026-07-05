@@ -1,6 +1,8 @@
-import Link from "next/link";
 import { M, MathBlock } from "@/components/Math";
 import { CodeBlock } from "@/components/CodeBlock";
+import { RidgeShrinkageLab } from "@/components/labs/RidgeShrinkageLab";
+import { REGRESSION_SETUP } from "@/lib/runtimeSetup";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 export const metadata = {
   title: "Ridge regression — Manifold",
@@ -11,19 +13,16 @@ export const metadata = {
 export default function RidgePage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-regression)")}>Regression</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 6 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        Ridge regression
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 24px", maxWidth: 620 }}>
-        Ridge is the first and gentlest regularizer: penalise the <em>squared</em> size of the coefficients.
+      <LessonHeader
+        chips={[{ label: "Regression", color: "var(--c-regression)" }]}
+        time="about 6 minutes"
+        title={<>Ridge regression</>}
+        intro={<>
+          Ridge is the first and gentlest regularizer: penalise the <em>squared</em> size of the coefficients.
         It shrinks them all smoothly toward zero, never to zero — the workhorse fix for unstable,
         correlated, or high-variance least-squares fits.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <h2>The objective</h2>
@@ -38,17 +37,12 @@ export default function RidgePage() {
           on the biggest, most extreme weights — exactly the ones that signal overfitting.
         </p>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-regression)", marginBottom: 4 }}>
-            Don&rsquo;t penalise the intercept
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            The sum runs over the <em>slopes</em> <M>{String.raw`\beta_1 \dots \beta_p`}</M>, not the intercept{" "}
+        <Callout color="var(--c-regression)" title={<>Don&rsquo;t penalise the intercept</>}>
+          The sum runs over the <em>slopes</em> <M>{String.raw`\beta_1 \dots \beta_p`}</M>, not the intercept{" "}
             <M>{String.raw`\beta_0`}</M>. Shrinking the intercept would just bias the predictions toward zero for
             no good reason — the intercept only sets the overall level. Every library handles this for you, but
             it&rsquo;s worth knowing the penalty is on the relationships, not the baseline.
-          </p>
-        </div>
+        </Callout>
 
         <h2>Smooth, proportional shrinkage</h2>
         <p>
@@ -59,6 +53,8 @@ export default function RidgePage() {
           up, which is precisely what you want when features are correlated or you have nearly as many features
           as data points.
         </p>
+
+        <RidgeShrinkageLab />
 
         <h2>When ridge is the right call</h2>
         <ul style={ul}>
@@ -73,12 +69,9 @@ export default function RidgePage() {
           Ridge keeps least-squares&rsquo; biggest advantage — a clean closed-form solution — which the next page
           derives. In code it&rsquo;s a single parameter:
         </p>
-        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
+        <CodeBlock setup={REGRESSION_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 40, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/regularized-regression/penalty-vs-constraint" style={navLink}>← Penalty vs constraint</Link>
-          <Link href="/learn/regularized-regression/the-closed-form-solution" style={{ ...navLink, fontWeight: 600 }}>Next up · The closed-form solution →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/regularized-regression/penalty-vs-constraint", label: <>← Penalty vs constraint</> }} next={{ href: "/learn/regularized-regression/the-closed-form-solution", label: <>Next up · The closed-form solution →</> }} />
       </div>
     </article>
   );
@@ -101,9 +94,7 @@ const codeLib = `from sklearn.linear_model import Ridge
 ridge = Ridge(alpha=1.0).fit(X, y)
 print(ridge.coef_, ridge.intercept_)`;
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
+
 const ul: React.CSSProperties = { margin: "0 0 10px", paddingLeft: "1.3em", fontSize: 15, color: "var(--muted)", lineHeight: 1.8 };
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-regression) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-regression) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0" };
+
+

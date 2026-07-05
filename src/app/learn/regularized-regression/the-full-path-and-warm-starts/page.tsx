@@ -1,5 +1,6 @@
-import Link from "next/link";
 import { CodeBlock } from "@/components/CodeBlock";
+import { REGRESSION_SETUP } from "@/lib/runtimeSetup";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 export const metadata = {
   title: "The full path & warm starts — Manifold",
@@ -10,19 +11,15 @@ export const metadata = {
 export default function FullPathPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-regression)")}>Regression</span>
-        <span style={chip("var(--c-metrics)")}>Go deeper</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 5 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        The full path & warm starts
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 24px", maxWidth: 620 }}>
-        Cross-validating over a hundred values of λ sounds expensive. It isn&rsquo;t — the trick is to never solve
+      <LessonHeader
+        chips={[{ label: "Regression", color: "var(--c-regression)" }, { label: "Go deeper", color: "var(--c-metrics)" }]}
+        time="about 5 minutes"
+        title={<>The full path & warm starts</>}
+        intro={<>
+          Cross-validating over a hundred values of λ sounds expensive. It isn&rsquo;t — the trick is to never solve
         any of them from scratch. Two ideas make computing the entire path nearly as cheap as one fit.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <h2>Warm starts: reuse the last solution</h2>
@@ -55,25 +52,17 @@ export default function FullPathPage() {
           </li>
         </ul>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-regression)", marginBottom: 4 }}>
-            Why this matters for you
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            Path efficiency is the quiet reason the whole workflow is practical. Because the full path is nearly
+        <Callout color="var(--c-regression)" title={<>Why this matters for you</>}>
+          Path efficiency is the quiet reason the whole workflow is practical. Because the full path is nearly
             free, the <code>...CV</code> estimators can score a fine λ grid inside every fold without you
             thinking about cost, and you get the coefficient-path plot — the best diagnostic in this track — as
             a by-product. When you call <code>LassoCV</code>, this machinery is what&rsquo;s running underneath.
-          </p>
-        </div>
+        </Callout>
 
         <h2>Compute the path efficiently</h2>
-        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
+        <CodeBlock setup={REGRESSION_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 40, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/regularized-regression/cross-validating-the-penalty" style={navLink}>← Cross-validating the penalty</Link>
-          <Link href="/learn/regularized-regression/which-when" style={{ ...navLink, fontWeight: 600 }}>Next up · Ridge vs Lasso vs Elastic-net: which when →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/regularized-regression/cross-validating-the-penalty", label: <>← Cross-validating the penalty</> }} next={{ href: "/learn/regularized-regression/which-when", label: <>Next up · Ridge vs Lasso vs Elastic-net: which when →</> }} />
       </div>
     </article>
   );
@@ -106,9 +95,7 @@ alphas, coefs, _ = lasso_path(X, y, n_alphas=100)
 # OR the exact piecewise-linear path via LARS (one OLS-cost pass)
 alphas2, _, coefs2 = lars_path(X, y, method="lasso")`;
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
+
 const ul: React.CSSProperties = { margin: "0 0 10px", paddingLeft: "1.3em", fontSize: 15, color: "var(--muted)", lineHeight: 1.8 };
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-regression) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-regression) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0" };
+
+

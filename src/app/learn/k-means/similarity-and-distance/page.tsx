@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { M, MathBlock } from "@/components/Math";
+import { LessonHeader, PrevNext } from "@/components/lesson";
 
 export const metadata = {
   title: "Similarity & distance — Manifold",
@@ -12,18 +13,15 @@ export default function SimilarityAndDistancePage() {
   const ax = 70, ay = 150, bx = 250, by = 60;
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-clustering)")}>Clustering</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 6 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        Similarity &amp; distance
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 24px", maxWidth: 620 }}>
-        Every clustering algorithm needs to answer one question: how far apart are these two points?
+      <LessonHeader
+        chips={[{ label: "Clustering", color: "var(--c-clustering)" }]}
+        time="about 6 minutes"
+        title={<>Similarity &amp; distance</>}
+        intro={<>
+          Every clustering algorithm needs to answer one question: how far apart are these two points?
         Get the distance wrong and every group that follows is wrong too.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <h2>Distance is the whole game</h2>
@@ -77,16 +75,9 @@ export default function SimilarityAndDistancePage() {
           each contributes fairly. We give this its own page later in the track.
         </p>
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 40, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/k-means/the-unsupervised-landscape" style={navLink}>← The unsupervised landscape</Link>
-          <Link href="/learn/k-means/distance-metrics-in-depth" style={{ ...navLink, fontWeight: 600 }}>Next up · Distance metrics in depth →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/k-means/the-unsupervised-landscape", label: <>← The unsupervised landscape</> }} next={{ href: "/learn/k-means/distance-metrics-in-depth", label: <>Next up · Distance metrics in depth →</> }} />
       </div>
     </article>
   );
 }
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };

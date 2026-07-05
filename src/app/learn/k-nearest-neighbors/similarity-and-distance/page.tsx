@@ -1,6 +1,7 @@
-import Link from "next/link";
 import { M, MathBlock } from "@/components/Math";
 import { CodeBlock } from "@/components/CodeBlock";
+import { KNN_SETUP } from "@/lib/runtimeSetup";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 export const metadata = {
   title: "Similarity & distance — Manifold",
@@ -11,19 +12,16 @@ export const metadata = {
 export default function SimilarityPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-classification)")}>Classification</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 6 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        Similarity & distance
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 24px", maxWidth: 620 }}>
-        Most algorithms have a model and use distance as a helper. k-NN has <em>no</em> model — so the
+      <LessonHeader
+        chips={[{ label: "Classification", color: "var(--c-classification)" }]}
+        time="about 6 minutes"
+        title={<>Similarity & distance</>}
+        intro={<>
+          Most algorithms have a model and use distance as a helper. k-NN has <em>no</em> model — so the
         distance function carries the entire weight of the method. Choose it well and k-NN sings; choose it
         badly and nothing else can save it.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <h2>Distance defines &ldquo;similar&rdquo;</h2>
@@ -59,18 +57,13 @@ export default function SimilarityPage() {
           points are &ldquo;nearest&rdquo; and therefore what k-NN predicts.
         </p>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-classification)", marginBottom: 4 }}>
-            The two traps that follow from this
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            Because distance is everything, two issues become make-or-break for k-NN.{" "}
+        <Callout color="var(--c-classification)" title={<>The two traps that follow from this</>}>
+          Because distance is everything, two issues become make-or-break for k-NN.{" "}
             <strong>Feature scaling</strong>: a feature measured in large units dominates the distance and
             silently drowns out the others (its own page). <strong>The curse of dimensionality</strong>: with
             many features, all distances bunch together and &ldquo;nearest&rdquo; stops being meaningful. Both are
             symptoms of the same fact — k-NN lives or dies by its distance function.
-          </p>
-        </div>
+        </Callout>
 
         <p>
           If you read the k-Means track, this will feel familiar — clustering leans on distance too. The
@@ -79,12 +72,9 @@ export default function SimilarityPage() {
         </p>
 
         <h2>Distance, three ways</h2>
-        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
+        <CodeBlock setup={KNN_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 40, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/k-nearest-neighbors/the-classification-landscape" style={navLink}>← The classification landscape</Link>
-          <Link href="/learn/k-nearest-neighbors/from-1-nn-to-k-nn" style={{ ...navLink, fontWeight: 600 }}>Next up · From 1-NN to k-NN →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/k-nearest-neighbors/the-classification-landscape", label: <>← The classification landscape</> }} next={{ href: "/learn/k-nearest-neighbors/from-1-nn-to-k-nn", label: <>Next up · From 1-NN to k-NN →</> }} />
       </div>
     </article>
   );
@@ -107,9 +97,7 @@ knn_euclid = KNeighborsClassifier(n_neighbors=5, metric="euclidean")
 knn_manhat = KNeighborsClassifier(n_neighbors=5, metric="manhattan")
 knn_cosine = KNeighborsClassifier(n_neighbors=5, metric="cosine")`;
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
+
 const ul: React.CSSProperties = { margin: "0 0 10px", paddingLeft: "1.3em", fontSize: 15, color: "var(--muted)", lineHeight: 1.8 };
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-classification) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-classification) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0" };
+
+

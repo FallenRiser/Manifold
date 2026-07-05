@@ -1,7 +1,8 @@
-import Link from "next/link";
 import { CodeBlock } from "@/components/CodeBlock";
 import { CodeOutput } from "@/components/CodeOutput";
 import { HousingGeoMap } from "@/components/figures/HousingGeoMap";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
+import { GuessSlider } from "@/components/capstone/GuessSlider";
 
 export const metadata = {
   title: "Capstone: EDA — distributions & signal — Manifold",
@@ -46,19 +47,17 @@ function IncomeFig() {
 export default function EDAPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-regression)")}>Capstone</span>
-        <span style={chip("var(--c-metrics)")}>2 · Understand the data</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 8 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 42, lineHeight: 1.08, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        EDA: distributions & signal
-      </h1>
-      <p style={{ fontSize: 17.5, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 24px", maxWidth: 620 }}>
-        Exploration has two jobs: find the signal, and find what&rsquo;s broken. This page is the signal; the next is
+      <LessonHeader
+        chips={[{ label: "Capstone", color: "var(--c-regression)" }, { label: "2 · Understand the data", color: "var(--c-metrics)" }]}
+        time="about 8 minutes"
+        title={<>EDA: distributions & signal</>}
+        intro={<>
+          Exploration has two jobs: find the signal, and find what&rsquo;s broken. This page is the signal; the next is
         the damage. Three pictures tell us most of what a model can hope to learn.
-      </p>
+        </>}
+        titleSize={42}
+        introSize={17.5}
+      />
 
       <div className="lesson">
         <h2>The target: skewed and censored</h2>
@@ -86,6 +85,14 @@ export default function EDAPage() {
         </div>
 
         <h2>Correlation ranking</h2>
+        <GuessSlider
+          prompt={<>Before running it: how strongly do you think <code>IncomeLevel</code> correlates with block price? (Pearson correlation, 0 = none, 1 = perfect)</>}
+          min={0}
+          max={1}
+          step={0.01}
+          actual={0.691}
+          reveal={<>Income lands at <strong>0.69</strong> — a strong, clean, nearly linear backbone, and the single best feature in the dataset. Hold that number: the more surprising story is what the <em>weak</em> correlations below are hiding.</>}
+        />
         <p>A quick numeric scan of each feature&rsquo;s linear correlation with price:</p>
         <CodeBlock fromScratch={code} withLibrary={code} />
         <CodeOutput>{`correlation of each feature with TargetPrice
@@ -107,22 +114,14 @@ export default function EDAPage() {
           correlation buries it.
         </p>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-regression)", marginBottom: 4 }}>
-            What EDA already told us about modeling
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            Before fitting anything: income gives a clean linear backbone, the target is censored at the top,
+        <Callout color="var(--c-regression)" title={<>What EDA already told us about modeling</>}>
+          Before fitting anything: income gives a clean linear backbone, the target is censored at the top,
             and geography is the biggest signal but is non-linear and only weakly <em>linearly</em> correlated.
             That single paragraph predicts the entire shape of this project — a decent linear baseline, a known
             cap bias, and large gains waiting from spatial features and a non-linear model.
-          </p>
-        </div>
+        </Callout>
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 40, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/california-housing-capstone/framing" style={navLink}>← Framing the problem</Link>
-          <Link href="/learn/california-housing-capstone/data-quality" style={{ ...navLink, fontWeight: 600 }}>Next up · Data quality &amp; cleaning →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/california-housing-capstone/framing", label: <>← Framing the problem</> }} next={{ href: "/learn/california-housing-capstone/data-quality", label: <>Next up · Data quality &amp; cleaning →</> }} />
       </div>
     </article>
   );
@@ -131,10 +130,5 @@ export default function EDAPage() {
 const code = `num = train.select_dtypes("number").drop(columns=["TargetPrice"])
 print(num.corrwith(train["TargetPrice"]).sort_values(ascending=False))`;
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-regression) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-regression) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0" };
 const figWrap: React.CSSProperties = { background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 14, padding: 12, margin: 0 };
 const cap: React.CSSProperties = { fontSize: 11.5, color: "var(--muted)", marginTop: 6, lineHeight: 1.45 };

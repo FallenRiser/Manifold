@@ -1,8 +1,9 @@
-import Link from "next/link";
 import { HomoscedasticityLab } from "@/components/labs/HomoscedasticityLab";
 import { MathBlock } from "@/components/Math";
 import { CodeBlock } from "@/components/CodeBlock";
+import { REGRESSION_SETUP } from "@/lib/runtimeSetup";
 import { Backlinks } from "@/components/Backlinks";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 const codeScratch = `import numpy as np
 
@@ -42,21 +43,17 @@ export const metadata = {
 export default function HomoscedasticityPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-regression)")}>Regression</span>
-        <span style={chip("var(--warn)")}>Assumptions</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 7 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        Homoscedasticity
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 8px", maxWidth: 620 }}>
-        <em>Homos</em> = same, <em>skedasticity</em> = scatter. The variance of
+      <LessonHeader
+        chips={[{ label: "Regression", color: "var(--c-regression)" }, { label: "Assumptions", color: "var(--warn)" }]}
+        time="about 7 minutes"
+        title={<>Homoscedasticity</>}
+        intro={<>
+          <em>Homos</em> = same, <em>skedasticity</em> = scatter. The variance of
         the errors should be the same everywhere along the fitted line. When it
         isn't — when errors fan out — every standard error in your output is
         wrong.
-      </p>
+        </>}
+      />
 
       <Backlinks label="Related" items={[
         { label: "Heteroscedasticity in depth", href: "/learn/linear-regression/heteroscedasticity-in-depth" },
@@ -121,19 +118,14 @@ export default function HomoscedasticityPage() {
           <FixItem title="Box-Cox transformation" body="Generalises the log transform. Finds the power λ that best symmetrises the residuals. Useful when log isn't quite right." color="var(--c-regression)" />
         </div>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-fundamentals)", marginBottom: 4 }}>
-            First fix: always try log(y)
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            If your outcome is a price, income, count, or any strictly positive
+        <Callout color="var(--c-fundamentals)" title={<>First fix: always try log(y)</>}>
+          If your outcome is a price, income, count, or any strictly positive
             value with a right-skewed distribution — try log(y) first. It often
             simultaneously fixes heteroscedasticity, non-normality of residuals,
             and mild non-linearity. If that works, you also get a convenient
             interpretation: coefficients become multiplicative effects (e.g.,
             "a 1-unit increase in x is associated with a 5% increase in y").
-          </p>
-        </div>
+        </Callout>
 
         <h2>Test for it yourself</h2>
         <p>
@@ -141,12 +133,9 @@ export default function HomoscedasticityPage() {
           on your predictors and see if they explain anything. From scratch, then
           via statsmodels:
         </p>
-        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
+        <CodeBlock setup={REGRESSION_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 32, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/linear-regression/independence-of-errors" style={navLink}>← Independence of errors</Link>
-          <Link href="/learn/linear-regression/normality-of-residuals" style={navLink}>Next up · Normality of residuals →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/linear-regression/independence-of-errors", label: <>← Independence of errors</> }} next={{ href: "/learn/linear-regression/normality-of-residuals", label: <>Next up · Normality of residuals →</> }} />
       </div>
     </article>
   );
@@ -195,9 +184,7 @@ function FixItem({ title, body, color }: { title: string; body: string; color: s
   );
 }
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}const causeGrid: React.CSSProperties = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 10, margin: "1.4rem 0" };
+const causeGrid: React.CSSProperties = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 10, margin: "1.4rem 0" };
 const fixGrid: React.CSSProperties = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 10, margin: "1.4rem 0" };
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-fundamentals) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-fundamentals) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0 0" };
+
+

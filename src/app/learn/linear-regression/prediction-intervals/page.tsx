@@ -1,7 +1,9 @@
-import Link from "next/link";
 import { IntervalsLab } from "@/components/labs/IntervalsLab";
 import { CodeBlock } from "@/components/CodeBlock";
+import { REGRESSION_SETUP } from "@/lib/runtimeSetup";
 import { Backlinks } from "@/components/Backlinks";
+import { LessonHeader, PrevNext } from "@/components/lesson";
+import { Quiz } from "@/components/Quiz";
 
 const codeScratch = `import numpy as np
 from scipy import stats
@@ -47,20 +49,16 @@ export const metadata = {
 export default function PredictionIntervalsPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-regression)")}>Regression</span>
-        <span style={chip("var(--brand)")}>Inference</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 5 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        Prediction intervals
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 8px", maxWidth: 620 }}>
-        When someone asks "What will this house sell for?", giving them a
+      <LessonHeader
+        chips={[{ label: "Regression", color: "var(--c-regression)" }, { label: "Inference", color: "var(--brand)" }]}
+        time="about 5 minutes"
+        title={<>Prediction intervals</>}
+        intro={<>
+          When someone asks "What will this house sell for?", giving them a
         Confidence Interval is answering the wrong question. You need a Prediction
         Interval.
-      </p>
+        </>}
+      />
 
       <Backlinks label="Related" items={[
         { label: "Confidence intervals", href: "/learn/linear-regression/confidence-intervals" },
@@ -142,12 +140,33 @@ export default function PredictionIntervalsPage() {
           interval carries the extra noise of a single new observation. statsmodels
           returns both as <code>mean_ci</code> and <code>obs_ci</code>.
         </p>
-        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
+        <CodeBlock setup={REGRESSION_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 32, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/linear-regression/hypothesis-tests-and-p-values" style={navLink}>← Hypothesis tests & p-values</Link>
-          <Link href="/learn/linear-regression/when-to-use-it" style={navLink}>Next up · When to use it →</Link>
-        </div>
+        <Quiz
+          title="Checkpoint · Inference"
+          questions={[
+            {
+              q: <>For the same x, which is wider: the confidence interval for the mean response, or the prediction interval for one new observation?</>,
+              options: ["The confidence interval", "The prediction interval — it must also cover the irreducible noise in a single point", "They're equal", "Depends on the coefficient's p-value"],
+              answer: 1,
+              explain: <>The CI covers uncertainty about the <em>average</em> at x; a single new point additionally scatters around that average by σ. That extra noise never averages away, so the PI is always wider — often much wider.</>,
+            },
+            {
+              q: <>A slope's p-value is 0.003. What does that number mean?</>,
+              options: ["There's a 0.3% chance the true slope is zero", "If the true slope were zero, data showing a slope this large would occur only ~0.3% of the time", "The model explains 99.7% of the variance", "The coefficient is large"],
+              answer: 1,
+              explain: <>A p-value is the probability of the <em>data</em> (or more extreme) assuming the null — not the probability of the null itself. And statistical significance says nothing about practical size: with enough rows, a microscopic effect gets a tiny p-value.</>,
+            },
+            {
+              q: <>Your residuals show a strong fan (heteroscedasticity). Which of the chapter's outputs should you now distrust most?</>,
+              options: ["The coefficient point estimates", "The R²", "The standard errors — and every interval and p-value built on them", "The predictions themselves"],
+              answer: 2,
+              explain: <>OLS coefficients stay unbiased under heteroscedasticity — but the standard-error formula assumes constant variance, so CIs, PIs and p-values inherit the damage. That&rsquo;s why the diagnostics chapter comes before this one.</>,
+            },
+          ]}
+        />
+
+        <PrevNext prev={{ href: "/learn/linear-regression/hypothesis-tests-and-p-values", label: <>← Hypothesis tests & p-values</> }} next={{ href: "/learn/linear-regression/when-to-use-it", label: <>Next up · When to use it →</> }} />
       </div>
     </article>
   );
@@ -162,8 +181,6 @@ function IntervalCard({ title, body, color }: { title: string; body: string; col
   );
 }
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
+
 const grid2: React.CSSProperties = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 14, margin: "1.4rem 0" };
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
+

@@ -1,8 +1,9 @@
-import Link from "next/link";
 import { ErrorMetricsLab } from "@/components/labs/ErrorMetricsLab";
 import { MathBlock } from "@/components/Math";
 import { CodeBlock } from "@/components/CodeBlock";
+import { REGRESSION_SETUP } from "@/lib/runtimeSetup";
 import { Backlinks } from "@/components/Backlinks";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 const codeScratch = `import numpy as np
 
@@ -36,20 +37,16 @@ export const metadata = {
 export default function RmseVsMaePage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-regression)")}>Regression</span>
-        <span style={chip("var(--good)")}>Evaluation</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 6 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        RMSE vs MAE
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 8px", maxWidth: 620 }}>
-        R² tells you how much variance you explained. But if you want to know
+      <LessonHeader
+        chips={[{ label: "Regression", color: "var(--c-regression)" }, { label: "Evaluation", color: "var(--good)" }]}
+        time="about 6 minutes"
+        title={<>RMSE vs MAE</>}
+        intro={<>
+          R² tells you how much variance you explained. But if you want to know
         "how many dollars am I off by, on average?", you need error metrics in
         the original units.
-      </p>
+        </>}
+      />
 
       <Backlinks label="Related" items={[
         { label: "R² and adjusted R²", href: "/learn/linear-regression/r-squared-and-adjusted" },
@@ -109,29 +106,21 @@ export default function RmseVsMaePage() {
             body="All errors cost you linearly. If being off by $100k is exactly ten times as bad as being off by $10k, use MAE. It is also more robust to unavoidable outliers in your dataset." />
         </div>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-fundamentals)", marginBottom: 4 }}>
-            The persistent gap
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            Because of the math, RMSE will always be greater than or equal to
+        <Callout color="var(--c-fundamentals)" title={<>The persistent gap</>}>
+          Because of the math, RMSE will always be greater than or equal to
             MAE. They are only equal if every single error is exactly the same
             size. The larger the gap between your RMSE and MAE, the more variance
             there is in the sizes of your errors (i.e., you have some huge outliers).
-          </p>
-        </div>
+        </Callout>
 
         <h2>Compute it yourself</h2>
         <p>
           Both metrics are a few lines from the error vector — and one call each in
           scikit-learn. Run it and watch RMSE sit above MAE.
         </p>
-        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
+        <CodeBlock setup={REGRESSION_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 32, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/linear-regression/r-squared-and-adjusted" style={navLink}>← R² and adjusted R²</Link>
-          <Link href="/learn/linear-regression/cross-validation-bias-variance" style={navLink}>Next up · Cross-validation & bias–variance →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/linear-regression/r-squared-and-adjusted", label: <>← R² and adjusted R²</> }} next={{ href: "/learn/linear-regression/cross-validation-bias-variance", label: <>Next up · Cross-validation & bias–variance →</> }} />
       </div>
     </article>
   );
@@ -146,8 +135,6 @@ function ChoiceCard({ title, body, color }: { title: string; body: string; color
   );
 }
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}const grid2: React.CSSProperties = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 14, margin: "1.4rem 0" };
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-fundamentals) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-fundamentals) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0 0" };
+const grid2: React.CSSProperties = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 14, margin: "1.4rem 0" };
+
+

@@ -1,6 +1,7 @@
-import Link from "next/link";
 import { M, MathBlock } from "@/components/Math";
 import { CodeBlock } from "@/components/CodeBlock";
+import { REGRESSION_SETUP } from "@/lib/runtimeSetup";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 export const metadata = {
   title: "The closed-form solution — Manifold",
@@ -11,20 +12,16 @@ export const metadata = {
 export default function ClosedFormPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-regression)")}>Regression</span>
-        <span style={chip("var(--c-metrics)")}>Go deeper</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 6 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        The closed-form solution
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 24px", maxWidth: 620 }}>
-        Unlike Lasso, ridge has an exact algebraic solution — and it&rsquo;s almost identical to ordinary least
+      <LessonHeader
+        chips={[{ label: "Regression", color: "var(--c-regression)" }, { label: "Go deeper", color: "var(--c-metrics)" }]}
+        time="about 6 minutes"
+        title={<>The closed-form solution</>}
+        intro={<>
+          Unlike Lasso, ridge has an exact algebraic solution — and it&rsquo;s almost identical to ordinary least
         squares. One small change to the OLS formula buys guaranteed solvability and a clear view of the
         shrinkage.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <h2>Deriving it</h2>
@@ -42,18 +39,13 @@ export default function ClosedFormPage() {
           the &ldquo;ridge&rdquo; the method is named after: a ridge added along the diagonal.
         </p>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-regression)", marginBottom: 4 }}>
-            Why ridge always has a solution
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            OLS breaks when <M>{String.raw`X^\top X`}</M> is singular — perfectly correlated features, or more
+        <Callout color="var(--c-regression)" title={<>Why ridge always has a solution</>}>
+          OLS breaks when <M>{String.raw`X^\top X`}</M> is singular — perfectly correlated features, or more
             features than data points (<M>{String.raw`p > n`}</M>) — because you can&rsquo;t invert it. Adding{" "}
             <M>{String.raw`\lambda I`}</M> with any <M>{String.raw`\lambda > 0`}</M> makes the matrix strictly
             positive-definite, hence <strong>always invertible</strong>. Ridge gives a unique answer in exactly
             the situations where OLS has none — one of its quietly important superpowers.
-          </p>
-        </div>
+        </Callout>
 
         <h2>How the formula reveals shrinkage</h2>
         <p>
@@ -75,12 +67,9 @@ export default function ClosedFormPage() {
           The closed form is exact, but for large or ill-conditioned problems the SVD route is more
           numerically stable — which is what libraries use under the hood.
         </p>
-        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
+        <CodeBlock setup={REGRESSION_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 40, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/regularized-regression/ridge-regression" style={navLink}>← Ridge regression</Link>
-          <Link href="/learn/regularized-regression/shrinkage-effect-and-paths" style={{ ...navLink, fontWeight: 600 }}>Next up · The shrinkage effect &amp; coefficient paths →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/regularized-regression/ridge-regression", label: <>← Ridge regression</> }} next={{ href: "/learn/regularized-regression/shrinkage-effect-and-paths", label: <>Next up · The shrinkage effect &amp; coefficient paths →</> }} />
       </div>
     </article>
   );
@@ -107,8 +96,6 @@ const codeLib = `from sklearn.linear_model import Ridge
 Ridge(alpha=1.0, solver="svd").fit(X, y)
 Ridge(alpha=1.0, solver="cholesky").fit(X, y)   # (XᵀX + λI) solve`;
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-regression) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-regression) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0" };
+
+
+

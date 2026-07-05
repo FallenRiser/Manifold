@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { CodeBlock } from "@/components/CodeBlock";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 export const metadata = {
   title: "Case C: clustering embeddings — Manifold",
@@ -10,20 +11,16 @@ export const metadata = {
 export default function CaseEmbeddingsPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-clustering)")}>Clustering</span>
-        <span style={chip("var(--c-metrics)")}>In the wild · Case C</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 9 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        Case C: clustering embeddings
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 24px", maxWidth: 620 }}>
-        The final case is how k-means shows up in modern ML: take text, images, or users, turn each into
+      <LessonHeader
+        chips={[{ label: "Clustering", color: "var(--c-clustering)" }, { label: "In the wild · Case C", color: "var(--c-metrics)" }]}
+        time="about 9 minutes"
+        title={<>Case C: clustering embeddings</>}
+        intro={<>
+          The final case is how k-means shows up in modern ML: take text, images, or users, turn each into
         an <strong>embedding</strong> vector, and cluster those. It pulls together scaling, cosine
         geometry, dimensionality, and evaluation — every thread of this track at once.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <h2>Why embeddings change the game</h2>
@@ -68,19 +65,14 @@ export default function CaseEmbeddingsPage() {
           </li>
         </ol>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-clustering)", marginBottom: 4 }}>
-            Why k-means specifically, in 2026
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            With millions of high-dimensional vectors, k-means&rsquo; linear <code>O(nkd)</code> cost is exactly
+        <Callout color="var(--c-clustering)" title={<>Why k-means specifically, in 2026</>}>
+          With millions of high-dimensional vectors, k-means&rsquo; linear <code>O(nkd)</code> cost is exactly
             why it&rsquo;s the workhorse for embedding clustering — hierarchical and spectral methods don&rsquo;t scale
             there. Embedding spaces also tend to be more k-means-friendly than raw data: a good encoder
             already pulls semantically similar items into compact, roughly-convex neighbourhoods, so the
             spherical-cluster assumption holds far better than it would on the original pixels or tokens.
             The representation does the hard work; k-means does the cheap, scalable grouping.
-          </p>
-        </div>
+        </Callout>
 
         <h2>When to step beyond k-means here</h2>
         <p>
@@ -104,10 +96,7 @@ export default function CaseEmbeddingsPage() {
           </p>
         </div>
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 40, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/k-means/case-customer-segmentation" style={navLink}>← Case B: customer segmentation</Link>
-          <Link href="/learn/k-means" style={navLink}>Back to overview →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/k-means/case-customer-segmentation", label: <>← Case B: customer segmentation</> }} next={{ href: "/learn/k-means", label: <>Back to overview →</> }} />
       </div>
     </article>
   );
@@ -145,10 +134,5 @@ for j in range(20):
     idx = np.argsort(np.linalg.norm(Xr - km.cluster_centers_[j], axis=1))[:5]
     print(j, [docs[i][:60] for i in idx])`;
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
 const ol: React.CSSProperties = { margin: "0 0 10px", paddingLeft: "1.3em", fontSize: 15, color: "var(--muted)", lineHeight: 1.85 };
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
 const inlineLink: React.CSSProperties = { color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-clustering) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-clustering) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0" };

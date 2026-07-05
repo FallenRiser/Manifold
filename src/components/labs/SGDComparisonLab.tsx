@@ -236,5 +236,5 @@ function Stat({ label, value }: { label: string; value: string }) {
   );
 }
 
-const btnPrimary: React.CSSProperties = { background: "var(--cta)", color: "#fff", border: "none", fontSize: 13, fontWeight: 500, padding: "8px 16px", borderRadius: 10, cursor: "pointer" };
+const btnPrimary: React.CSSProperties = { background: "var(--cta)", color: "var(--cta-text)", border: "none", fontSize: 13, fontWeight: 500, padding: "8px 16px", borderRadius: 10, cursor: "pointer" };
 const btnGhost: React.CSSProperties = { background: "transparent", color: "var(--muted)", border: "1px solid var(--border-strong)", fontSize: 13, padding: "8px 13px", borderRadius: 10, cursor: "pointer" };

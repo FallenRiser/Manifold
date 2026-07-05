@@ -96,12 +96,14 @@ export function OutlierLab() {
         ))}
 
         {/* draggable outlier */}
-        <circle cx={xToPx(DRAG_X)} cy={yToPx(dragY)} r={9} fill="var(--surface)" stroke="var(--c-fundamentals)" strokeWidth={2.5} style={{ cursor: "ns-resize" }}
+        <circle cx={xToPx(DRAG_X)} cy={yToPx(dragY)} r={9} fill="var(--surface)" stroke="var(--c-fundamentals)" strokeWidth={2.5} pointerEvents="none" />
+        <circle cx={xToPx(DRAG_X)} cy={yToPx(dragY)} r={3} fill="var(--c-fundamentals)" pointerEvents="none" />
+        {/* oversized invisible hit area so the point is draggable by touch */}
+        <circle cx={xToPx(DRAG_X)} cy={yToPx(dragY)} r={22} fill="transparent" style={{ cursor: "ns-resize" }}
           tabIndex={0} role="slider" aria-label="Outlier point" aria-valuenow={Math.round(dragY * 10) / 10}
           onPointerDown={(e) => { e.preventDefault(); setDragging(true); }}
           onKeyDown={(e) => { if (e.key === "ArrowUp") { e.preventDefault(); setDragY((v) => Math.min(10, v + 0.3)); } if (e.key === "ArrowDown") { e.preventDefault(); setDragY((v) => Math.max(0, v - 0.3)); } }}
         />
-        <circle cx={xToPx(DRAG_X)} cy={yToPx(dragY)} r={3} fill="var(--c-fundamentals)" />
       </svg>
 
       <div style={{ display: "flex", flexWrap: "wrap", gap: 14, marginTop: 12, fontSize: 12.5 }}>

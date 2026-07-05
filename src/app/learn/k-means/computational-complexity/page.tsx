@@ -1,6 +1,7 @@
-import Link from "next/link";
 import { M, MathBlock } from "@/components/Math";
 import { CodeBlock } from "@/components/CodeBlock";
+import { CLUSTER_SETUP } from "@/lib/runtimeSetup";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 export const metadata = {
   title: "Computational complexity — Manifold",
@@ -11,19 +12,15 @@ export const metadata = {
 export default function ComplexityPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-clustering)")}>Clustering</span>
-        <span style={chip("var(--c-metrics)")}>Go deeper</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 6 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        Computational complexity
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 24px", maxWidth: 620 }}>
-        k-Means earns its popularity on speed. Knowing exactly where the cost lives tells you when
+      <LessonHeader
+        chips={[{ label: "Clustering", color: "var(--c-clustering)" }, { label: "Go deeper", color: "var(--c-metrics)" }]}
+        time="about 6 minutes"
+        title={<>Computational complexity</>}
+        intro={<>
+          k-Means earns its popularity on speed. Knowing exactly where the cost lives tells you when
         it will fly through millions of points — and the one factor that can quietly blow up.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <h2>The cost of one iteration</h2>
@@ -41,17 +38,12 @@ export default function ComplexityPage() {
           no worse. That is rare and precious among clustering algorithms.
         </p>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-clustering)", marginBottom: 4 }}>
-            Why this beats the alternatives
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            Hierarchical (agglomerative) clustering is <M>{String.raw`O(n^2 \log n)`}</M> in time and{" "}
+        <Callout color="var(--c-clustering)" title={<>Why this beats the alternatives</>}>
+          Hierarchical (agglomerative) clustering is <M>{String.raw`O(n^2 \log n)`}</M> in time and{" "}
             <M>{String.raw`O(n^2)`}</M> in memory — it must hold a pairwise distance matrix.
             At <M>{String.raw`n = 10^6`}</M> that matrix alone is a trillion entries. k-Means never
             forms one; it only ever compares points to <M>{String.raw`k`}</M> centroids.
-          </p>
-        </div>
+        </Callout>
 
         <h2>What about the number of iterations?</h2>
         <p>
@@ -83,12 +75,9 @@ export default function ComplexityPage() {
         <p>
           Time k-means as you scale <M>{String.raw`n`}</M> and watch the (roughly) straight line:
         </p>
-        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
+        <CodeBlock setup={CLUSTER_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 40, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/k-means/why-it-converges" style={navLink}>← Why it converges</Link>
-          <Link href="/learn/k-means/empty-clusters-and-edge-cases" style={{ ...navLink, fontWeight: 600 }}>Next up · Empty clusters &amp; edge cases →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/k-means/why-it-converges", label: <>← Why it converges</> }} next={{ href: "/learn/k-means/empty-clusters-and-edge-cases", label: <>Next up · Empty clusters &amp; edge cases →</> }} />
       </div>
     </article>
   );
@@ -125,8 +114,6 @@ for name, model in [
     model.fit(X)
     print(f"{name}: {time.perf_counter() - t:.2f}s   inertia {model.inertia_:.0f}")`;
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-clustering) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-clustering) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0" };
+
+
+

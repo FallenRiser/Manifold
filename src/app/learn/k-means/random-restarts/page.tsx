@@ -1,6 +1,7 @@
-import Link from "next/link";
 import { M } from "@/components/Math";
 import { CodeBlock } from "@/components/CodeBlock";
+import { CLUSTER_SETUP } from "@/lib/runtimeSetup";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 export const metadata = {
   title: "Random restarts — Manifold",
@@ -11,18 +12,15 @@ export const metadata = {
 export default function RandomRestartsPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-clustering)")}>Clustering</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 4 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        Random restarts
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 24px", maxWidth: 620 }}>
-        If one run can fall into a bad local minimum, run it several times and keep the best. It&rsquo;s
+      <LessonHeader
+        chips={[{ label: "Clustering", color: "var(--c-clustering)" }]}
+        time="about 4 minutes"
+        title={<>Random restarts</>}
+        intro={<>
+          If one run can fall into a bad local minimum, run it several times and keep the best. It&rsquo;s
         almost embarrassingly simple — and it works, because inertia gives you an honest scorecard.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <h2>The recipe</h2>
@@ -46,17 +44,12 @@ export default function RandomRestartsPage() {
           keeping the winner.
         </p>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-clustering)", marginBottom: 4 }}>
-            This is what n_init is
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            scikit-learn&rsquo;s <code>n_init</code> parameter <em>is</em> the number of random restarts; it
+        <Callout color="var(--c-clustering)" title={<>This is what n_init is</>}>
+          scikit-learn&rsquo;s <code>n_init</code> parameter <em>is</em> the number of random restarts; it
             silently returns the best of them. The cost is linear — <code>n_init=10</code> means ten
             times the work — which is the whole motivation for the next page: a smarter seed that needs
             far fewer restarts.
-          </p>
-        </div>
+        </Callout>
 
         <h2>Restarts vs. better seeding</h2>
         <p>
@@ -67,12 +60,9 @@ export default function RandomRestartsPage() {
         </p>
 
         <h2>Best-of-m, by hand and by library</h2>
-        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
+        <CodeBlock setup={CLUSTER_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 40, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/k-means/the-initialization-problem" style={navLink}>← The initialization problem</Link>
-          <Link href="/learn/k-means/k-means-plus-plus" style={{ ...navLink, fontWeight: 600 }}>Next up · k-means++ →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/k-means/the-initialization-problem", label: <>← The initialization problem</> }} next={{ href: "/learn/k-means/k-means-plus-plus", label: <>Next up · k-means++ →</> }} />
       </div>
     </article>
   );
@@ -104,9 +94,7 @@ const codeLib = `from sklearn.cluster import KMeans
 km = KMeans(n_clusters=3, init="random", n_init=10, random_state=0).fit(X)
 print(km.inertia_)   # already the minimum over the 10 restarts`;
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
+
 const ul: React.CSSProperties = { margin: "0 0 10px", paddingLeft: "1.3em", fontSize: 15, color: "var(--muted)", lineHeight: 1.8 };
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-clustering) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-clustering) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0" };
+
+

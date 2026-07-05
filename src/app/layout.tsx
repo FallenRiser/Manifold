@@ -5,6 +5,7 @@ import { GeistMono } from "geist/font/mono";
 import "./globals.css";
 import "katex/dist/katex.min.css";
 import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
 
 const instrumentSerif = Instrument_Serif({
   weight: "400",
@@ -41,6 +42,7 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
         <Header />
         {children}
+        <Footer />
       </body>
     </html>
   );

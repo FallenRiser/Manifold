@@ -1,7 +1,9 @@
-import Link from "next/link";
 import { PolynomialLab } from "@/components/labs/PolynomialLab";
 import { CodeBlock } from "@/components/CodeBlock";
+import { REGRESSION_SETUP } from "@/lib/runtimeSetup";
 import { MathBlock } from "@/components/Math";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
+import { Quiz } from "@/components/Quiz";
 
 
 export const metadata = {
@@ -54,23 +56,16 @@ for degree in [1, 2, 3, 7]:
 
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-regression)")}>Regression</span>
-        <span style={chip("var(--c-fundamentals)")}>Core idea</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 9 minutes</span>
-      </div>
-
-      <h1
-        className="font-serif"
-        style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}
-      >
-        Polynomial &amp; interaction terms
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 8px", maxWidth: 620 }}>
-        Real relationships bend. Study time improves grades — but only up to a
+      <LessonHeader
+        chips={[{ label: "Regression", color: "var(--c-regression)" }, { label: "Core idea", color: "var(--c-fundamentals)" }]}
+        time="about 9 minutes"
+        title={<>Polynomial &amp; interaction terms</>}
+        intro={<>
+          Real relationships bend. Study time improves grades — but only up to a
         point. The trick: add x² as a new feature. The model is still linear;
         the fit is not.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <p>
@@ -126,7 +121,7 @@ for degree in [1, 2, 3, 7]:
           area is worth more than the same space in a cheap suburb. Capture
           this with a product term:
         </p>
-        <MathBlock>{String.raw`\hat y = \theta_0 + \theta_1\cdot\text{sqft} + \theta_2\cdot\text{location} + \textcolor{#7c3aed}{\theta_3\cdot(\text{sqft} \times \text{location})}`}</MathBlock>
+        <MathBlock>{String.raw`\hat y = \theta_0 + \theta_1\cdot\text{sqft} + \theta_2\cdot\text{location} + \textcolor{#5872cc}{\theta_3\cdot(\text{sqft} \times \text{location})}`}</MathBlock>
         <p>
           Again, the model sees only columns — the product column is just
           another feature. A positive θ₃ means the slope on sqft increases
@@ -145,18 +140,13 @@ for degree in [1, 2, 3, 7]:
           that's where domain knowledge and model validation come in.
         </p>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-fundamentals)", marginBottom: 4 }}>
-            The key insight
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            "Linear" in linear regression doesn't mean a straight line in
+        <Callout color="var(--c-fundamentals)" title={<>The key insight</>}>
+          "Linear" in linear regression doesn't mean a straight line in
             input space. It means linear in the parameters. By engineering
             features — powers, products, logs — you get the flexibility to fit
             complex patterns while keeping all the analytical machinery
             (gradient descent, normal equation, closed-form inference) intact.
-          </p>
-        </div>
+        </Callout>
 
         <h2>The code</h2>
         <p>
@@ -165,12 +155,32 @@ for degree in [1, 2, 3, 7]:
           <code>PolynomialFeatures</code> does this automatically.
         </p>
 
-        <CodeBlock fromScratch={fromScratch} withLibrary={withLibrary} />
+        <CodeBlock setup={REGRESSION_SETUP} fromScratch={fromScratch} withLibrary={withLibrary} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 32, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/linear-regression/categorical-features" style={navLink}>← Categorical features</Link>
-          <Link href="/learn/linear-regression/the-five-assumptions" style={navLink}>Next up · The five assumptions →</Link>
-        </div>
+        <Quiz
+          questions={[
+            {
+              q: <>You add x² and x³ as features and fit with OLS. Is the model still &ldquo;linear regression&rdquo;?</>,
+              options: ["No — the curve is visibly non-linear", "Yes — it's linear in the coefficients, which is all OLS needs", "Only if the coefficients are small", "Only after standardizing"],
+              answer: 1,
+              explain: <>&ldquo;Linear&rdquo; refers to the <em>parameters</em>, not the shape: ŷ = w₁x + w₂x² + w₃x³ + b is a plain weighted sum of (engineered) features, so every OLS tool still applies. The non-linearity was moved into the features.</>,
+            },
+            {
+              q: <>Gradient descent zig-zags badly on a dataset where one feature spans 0–1 and another spans 0–10,000. Why does scaling fix it?</>,
+              options: ["Scaling removes outliers", "Wildly different scales make the loss contours long and thin; scaling rounds them so the gradient points at the minimum", "Scaling increases the learning rate automatically", "It doesn't — scaling only matters for trees"],
+              answer: 1,
+              explain: <>Elongated elliptical contours send the negative gradient nearly perpendicular to the minimum → zig-zag. Standardized features give near-circular contours and a nearly straight descent path — the contour lab from the feature-scaling page.</>,
+            },
+            {
+              q: <>Encoding a 4-category feature for a model with an intercept, you use one-hot dummies. How many columns?</>,
+              options: ["4 — one per category", "3 — one category becomes the baseline absorbed by the intercept", "2 — log₂(4)", "1 — encode categories as 0, 1, 2, 3"],
+              answer: 1,
+              explain: <>All 4 dummies always sum to 1 — an exact copy of the intercept column, which makes X′X singular (the dummy trap). Drop one; its category becomes the baseline and the other coefficients are offsets from it. And 0/1/2/3 label-encoding invents a fake ordering.</>,
+            },
+          ]}
+        />
+
+        <PrevNext prev={{ href: "/learn/linear-regression/categorical-features", label: <>← Categorical features</> }} next={{ href: "/learn/linear-regression/the-five-assumptions", label: <>Next up · The five assumptions →</> }} />
       </div>
     </article>
 
@@ -189,8 +199,4 @@ function FeatureCard({ icon, title, body }: { icon: string; title: string; body:
   );
 }
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}const grid3: React.CSSProperties = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 12, margin: "1.4rem 0" };
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-fundamentals) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-fundamentals) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0 0" };
+const grid3: React.CSSProperties = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 12, margin: "1.4rem 0" };

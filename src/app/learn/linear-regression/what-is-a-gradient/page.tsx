@@ -1,6 +1,7 @@
-import Link from "next/link";
 import { GradientTangentLab } from "@/components/labs/GradientTangentLab";
 import { CodeBlock } from "@/components/CodeBlock";
+import { REGRESSION_SETUP } from "@/lib/runtimeSetup";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 const codeScratch = `import numpy as np
 
@@ -50,20 +51,16 @@ export const metadata = {
 export default function WhatIsAGradientPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-regression)")}>Regression</span>
-        <span style={chip("var(--c-fundamentals)")}>Core idea</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 7 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        What is a gradient?
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 8px", maxWidth: 620 }}>
-        Last page we said the ball &ldquo;rolls downhill&rdquo; following the gradient. But what{" "}
+      <LessonHeader
+        chips={[{ label: "Regression", color: "var(--c-regression)" }, { label: "Core idea", color: "var(--c-fundamentals)" }]}
+        time="about 7 minutes"
+        title={<>What is a gradient?</>}
+        intro={<>
+          Last page we said the ball &ldquo;rolls downhill&rdquo; following the gradient. But what{" "}
         <em>is</em> a gradient, really? It&rsquo;s a simpler idea than the name suggests: it&rsquo;s
         just a slope.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <p>
@@ -112,16 +109,11 @@ export default function WhatIsAGradientPage() {
           derivatives in that arrow; the idea doesn&rsquo;t change at all.
         </p>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-fundamentals)", marginBottom: 4 }}>
-            The one-line definition
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            The <strong>gradient</strong> is the vector of partial derivatives — one slope per
+        <Callout color="var(--c-fundamentals)" title={<>The one-line definition</>}>
+          The <strong>gradient</strong> is the vector of partial derivatives — one slope per
             parameter. It points uphill, its length is the steepness, and gradient descent simply
             walks the other way. Everything else in training is detail on top of this.
-          </p>
-        </div>
+        </Callout>
 
         <h2>Compute it yourself</h2>
         <p>
@@ -129,35 +121,16 @@ export default function WhatIsAGradientPage() {
           decimals — proof the formula is just the slope in each direction. SciPy
           can estimate it numerically with one call.
         </p>
-        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
+        <CodeBlock setup={REGRESSION_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 32, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/linear-regression/roll-downhill" style={navLink}>← Roll downhill</Link>
-          <Link href="/learn/linear-regression/the-update-rule" style={navLink}>Next up · The update rule →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/linear-regression/roll-downhill", label: <>← Roll downhill</> }} next={{ href: "/learn/linear-regression/the-update-rule", label: <>Next up · The update rule →</> }} />
       </div>
     </article>
   );
 }
 
-function chip(color: string): React.CSSProperties {
-  return {
-    display: "inline-flex",
-    alignItems: "center",
-    background: `color-mix(in srgb, ${color} 13%, var(--surface))`,
-    color,
-    fontSize: 12,
-    padding: "3px 10px",
-    borderRadius: 999,
-  };
-}
 
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
 
-const callout: React.CSSProperties = {
-  background: "color-mix(in srgb, var(--c-fundamentals) 9%, var(--surface))",
-  border: "1px solid color-mix(in srgb, var(--c-fundamentals) 22%, var(--border))",
-  borderRadius: 12,
-  padding: "13px 15px",
-  margin: "1.8rem 0 0",
-};
+
+
+

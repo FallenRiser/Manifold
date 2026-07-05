@@ -1,5 +1,6 @@
-import Link from "next/link";
 import { CodeBlock } from "@/components/CodeBlock";
+import { CLUSTER_SETUP } from "@/lib/runtimeSetup";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 export const metadata = {
   title: "Categorical & mixed data — Manifold",
@@ -10,18 +11,15 @@ export const metadata = {
 export default function CategoricalPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-clustering)")}>Clustering</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 6 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        Categorical & mixed data
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 24px", maxWidth: 620 }}>
-        k-Means assumes two things categories simply don&rsquo;t have: a meaningful mean, and a Euclidean
+      <LessonHeader
+        chips={[{ label: "Clustering", color: "var(--c-clustering)" }]}
+        time="about 6 minutes"
+        title={<>Categorical & mixed data</>}
+        intro={<>
+          k-Means assumes two things categories simply don&rsquo;t have: a meaningful mean, and a Euclidean
         distance. Force it anyway and the results quietly lie. Here&rsquo;s why — and what to use instead.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <h2>Why categories break k-means</h2>
@@ -73,26 +71,18 @@ export default function CategoricalPage() {
           </li>
         </ul>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-clustering)", marginBottom: 4 }}>
-            The general lesson
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            k-Means is one instance of a family: <em>assign to nearest center, recompute centers</em>. Swap
+        <Callout color="var(--c-clustering)" title={<>The general lesson</>}>
+          k-Means is one instance of a family: <em>assign to nearest center, recompute centers</em>. Swap
             the distance and the center definition and you get a method suited to your data type — k-modes,
             k-medians, k-medoids. Don&rsquo;t bend your data to fit Euclidean k-means; pick the family member
             whose distance already matches your data. That&rsquo;s the whole &ldquo;variants&rdquo; chapter in one
             sentence.
-          </p>
-        </div>
+        </Callout>
 
         <h2>k-prototypes on mixed data</h2>
-        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
+        <CodeBlock setup={CLUSTER_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 40, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/k-means/outliers-and-robustness" style={navLink}>← Outliers &amp; robustness</Link>
-          <Link href="/learn/k-means/clustering-after-dimensionality-reduction" style={{ ...navLink, fontWeight: 600 }}>Next up · Clustering after dimensionality reduction →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/k-means/outliers-and-robustness", label: <>← Outliers &amp; robustness</> }} next={{ href: "/learn/k-means/clustering-after-dimensionality-reduction", label: <>Next up · Clustering after dimensionality reduction →</> }} />
       </div>
     </article>
   );
@@ -118,9 +108,7 @@ kp = KPrototypes(n_clusters=4, init="Huang", random_state=0)
 labels = kp.fit_predict(X, categorical=[2, 5, 6])   # columns 2,5,6 are categorical
 print(kp.cluster_centroids_)`;
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
+
 const ul: React.CSSProperties = { margin: "0 0 10px", paddingLeft: "1.3em", fontSize: 15, color: "var(--muted)", lineHeight: 1.8 };
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-clustering) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-clustering) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0" };
+
+

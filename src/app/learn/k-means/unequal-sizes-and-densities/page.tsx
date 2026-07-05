@@ -1,5 +1,5 @@
-import Link from "next/link";
 import { CodeBlock } from "@/components/CodeBlock";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 export const metadata = {
   title: "Unequal sizes & densities — Manifold",
@@ -16,19 +16,16 @@ const sy = (y: number) => Math.round((H - 16 - (y / 100) * (H - 32)) * 100) / 10
 export default function UnequalPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-clustering)")}>Clustering</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 5 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        Unequal sizes & densities
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 24px", maxWidth: 620 }}>
-        Make the clusters perfectly round and k-means can <em>still</em> get them wrong — if they differ
+      <LessonHeader
+        chips={[{ label: "Clustering", color: "var(--c-clustering)" }]}
+        time="about 5 minutes"
+        title={<>Unequal sizes & densities</>}
+        intro={<>
+          Make the clusters perfectly round and k-means can <em>still</em> get them wrong — if they differ
         in how many points they hold or how spread out they are. The cause is subtle and lives inside the
         objective itself.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <h2>Inertia secretly prefers equal blobs</h2>
@@ -76,26 +73,18 @@ export default function UnequalPage() {
           because it weighs only distance to a center, not the cluster&rsquo;s density or population.
         </p>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-clustering)", marginBottom: 4 }}>
-            The principled fix: Gaussian mixtures
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            A Gaussian mixture model gives each cluster its own <em>covariance</em> (spread) and{" "}
+        <Callout color="var(--c-clustering)" title={<>The principled fix: Gaussian mixtures</>}>
+          A Gaussian mixture model gives each cluster its own <em>covariance</em> (spread) and{" "}
             <em>weight</em> (size), so the boundary shifts toward the smaller, tighter cluster
             automatically. k-Means is the special case of a GMM where every cluster is forced to be the
             same size and a unit sphere — which is exactly the assumption that fails here. That link gets
             its own page in the variants chapter.
-          </p>
-        </div>
+        </Callout>
 
         <h2>See the effect</h2>
         <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 40, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/k-means/non-spherical-clusters" style={navLink}>← Non-spherical clusters</Link>
-          <Link href="/learn/k-means/the-failure-mode-gallery" style={{ ...navLink, fontWeight: 600 }}>Next up · The failure-mode gallery →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/k-means/non-spherical-clusters", label: <>← Non-spherical clusters</> }} next={{ href: "/learn/k-means/the-failure-mode-gallery", label: <>Next up · The failure-mode gallery →</> }} />
       </div>
     </article>
   );
@@ -121,12 +110,7 @@ km = KMeans(n_clusters=2, n_init=10, random_state=0).fit_predict(X)   # mis-cuts
 gmm = GaussianMixture(n_components=2, covariance_type="full",
                       random_state=0).fit_predict(X)                  # recovers them`;
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
 const ul: React.CSSProperties = { margin: "0 0 10px", paddingLeft: "1.3em", fontSize: 15, color: "var(--muted)", lineHeight: 1.8 };
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-clustering) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-clustering) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0" };
 
 // figure data (deterministic, hand-placed)
 const DIFFUSE = [

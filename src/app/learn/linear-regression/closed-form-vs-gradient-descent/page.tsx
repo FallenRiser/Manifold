@@ -1,6 +1,9 @@
 import Link from "next/link";
 import { ClosedFormVsGDLab } from "@/components/labs/ClosedFormVsGDLab";
 import { CodeBlock } from "@/components/CodeBlock";
+import { REGRESSION_SETUP } from "@/lib/runtimeSetup";
+import { LessonHeader } from "@/components/lesson";
+import { Quiz } from "@/components/Quiz";
 
 const codeScratch = `import numpy as np
 
@@ -43,23 +46,16 @@ export const metadata = {
 export default function ClosedFormVsGDPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-regression)")}>Regression</span>
-        <span style={chip("var(--c-fundamentals)")}>Core idea</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 8 minutes</span>
-      </div>
-
-      <h1
-        className="font-serif"
-        style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}
-      >
-        Closed-form vs gradient descent
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 8px", maxWidth: 620 }}>
-        You now know both roads to the best-fit line. One finds the answer in a
+      <LessonHeader
+        chips={[{ label: "Regression", color: "var(--c-regression)" }, { label: "Core idea", color: "var(--c-fundamentals)" }]}
+        time="about 8 minutes"
+        title={<>Closed-form vs gradient descent</>}
+        intro={<>
+          You now know both roads to the best-fit line. One finds the answer in a
         single step; the other wanders toward it iteratively. They reach the same
         destination — but in very different ways.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <p>
@@ -191,7 +187,30 @@ export default function ClosedFormVsGDPage() {
           with gradient descent. The library mirrors the split: <code>LinearRegression</code>
           {" "}is closed-form, <code>SGDRegressor</code> is iterative.
         </p>
-        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
+        <CodeBlock setup={REGRESSION_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
+
+        <Quiz
+          questions={[
+            {
+              q: <>What does the normal equation actually compute?</>,
+              options: ["An approximation that improves with more iterations", "The exact parameters where the loss gradient is zero, in one shot", "The gradient at a random starting point", "A regularized version of gradient descent"],
+              answer: 1,
+              explain: <>For a convex quadratic bowl there&rsquo;s exactly one point with zero gradient — the floor. The normal equation solves for it algebraically: no iterations, no learning rate, exact up to floating point.</>,
+            },
+            {
+              q: <>When does gradient descent become the only practical choice?</>,
+              options: ["Whenever the data has noise", "Small datasets with few features", "Huge N or p, streaming data, or any non-linear model", "When you need exact coefficients"],
+              answer: 2,
+              explain: <>The O(p³) inversion and the need to hold all data in RAM kill the closed form at scale — and non-linear models (neural nets) have no closed form at all. Gradient descent survives everywhere.</>,
+            },
+            {
+              q: <>Why do the two methods land on the same line here?</>,
+              options: ["Coincidence of this dataset", "The MSE surface is a convex bowl with a single minimum — all roads lead to its floor", "Because both use the same learning rate", "They don't — gradient descent is always slightly off"],
+              answer: 1,
+              explain: <>Convexity is the guarantee: one minimum, no local traps. GD converges to the same floor the formula solves for (to within convergence tolerance). Lose convexity and the agreement is gone — which is life in deep learning.</>,
+            },
+          ]}
+        />
 
         <div
           style={{
@@ -271,17 +290,7 @@ function DecisionBranch({ condition, action, color }: { condition: string; actio
   );
 }
 
-function chip(color: string): React.CSSProperties {
-  return {
-    display: "inline-flex",
-    alignItems: "center",
-    background: `color-mix(in srgb, ${color} 13%, var(--surface))`,
-    color,
-    fontSize: 12,
-    padding: "3px 10px",
-    borderRadius: 999,
-  };
-}
+
 
 const compGrid: React.CSSProperties = { display: "grid", gridTemplateColumns: "1fr", gap: 10, margin: "1.4rem 0" };
 const decisionBox: React.CSSProperties = { background: "var(--canvas)", border: "1px solid var(--border-strong)", borderRadius: 12, padding: "4px 14px", margin: "1.4rem 0" };

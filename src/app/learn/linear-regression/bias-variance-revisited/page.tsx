@@ -1,7 +1,9 @@
-import Link from "next/link";
 import { BiasVarianceLab } from "@/components/labs/BiasVarianceLab";
 import { CodeBlock } from "@/components/CodeBlock";
+import { REGRESSION_SETUP } from "@/lib/runtimeSetup";
 import { Backlinks } from "@/components/Backlinks";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
+import { Quiz } from "@/components/Quiz";
 
 const codeScratch = `import numpy as np
 
@@ -57,20 +59,16 @@ export const metadata = {
 export default function BiasVarianceRevisitedPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-regression)")}>Regression</span>
-        <span style={chip("var(--brand)")}>Fixing</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 3 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        Bias-variance, revisited
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 8px", maxWidth: 620 }}>
-        Every decision you make in building a regression model moves you along
+      <LessonHeader
+        chips={[{ label: "Regression", color: "var(--c-regression)" }, { label: "Fixing", color: "var(--brand)" }]}
+        time="about 3 minutes"
+        title={<>Bias-variance, revisited</>}
+        intro={<>
+          Every decision you make in building a regression model moves you along
         the bias-variance spectrum. Let's map everything we've learned back to
         the fundamental tradeoff.
-      </p>
+        </>}
+      />
 
       <Backlinks label="Related" items={[
         { label: "Cross-validation", href: "/learn/linear-regression/cross-validation-bias-variance" },
@@ -113,18 +111,13 @@ export default function BiasVarianceRevisitedPage() {
           <li><strong style={{ color: "var(--ink)" }}>Getting more data.</strong> This is the only "free lunch". Quadrupling your sample size allows you to support a complex model without increasing its variance.</li>
         </ul>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-fundamentals)", marginBottom: 4 }}>
-            The art of modeling
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            Modern machine learning practice often follows a simple recipe: start
+        <Callout color="var(--c-fundamentals)" title={<>The art of modeling</>}>
+          Modern machine learning practice often follows a simple recipe: start
             by building a model so complex that it achieves near-zero bias
             (massively overfits the training set). Then, apply heavy
             regularization (like Ridge, Lasso, or Dropout in neural networks) to
             squeeze the variance out until test error is minimized.
-          </p>
-        </div>
+        </Callout>
 
         <h2>Measure the decomposition yourself</h2>
         <p>
@@ -132,19 +125,38 @@ export default function BiasVarianceRevisitedPage() {
           predictions <em>is</em> the variance, their average miss <em>is</em> the bias.
           Degree 1 is all bias, degree 9 is all variance.
         </p>
-        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
+        <CodeBlock setup={REGRESSION_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 32, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/linear-regression/regularization" style={navLink}>← Regularization</Link>
-          <Link href="/learn/linear-regression/confidence-intervals" style={navLink}>Next up · Confidence intervals →</Link>
-        </div>
+        <Quiz
+          title="Checkpoint · Fixing & optimizing"
+          questions={[
+            {
+              q: <>You turn the ridge penalty λ up. What happens to bias and variance?</>,
+              options: ["Both go down — that's why we regularize", "Bias up, variance down — you're buying stability with a little systematic error", "Bias down, variance up", "Neither moves; only the coefficients shrink"],
+              answer: 1,
+              explain: <>Shrinking coefficients toward zero makes the model less able to chase the data (higher bias) but far less sensitive to which sample you drew (lower variance). The sweet spot in the middle is what the λ-CV curve finds.</>,
+            },
+            {
+              q: <>You need a model that automatically drops useless features. Ridge or lasso?</>,
+              options: ["Ridge — it shrinks harder", "Lasso — its corner-shaped penalty can set coefficients exactly to zero", "Either works the same", "Neither; only trees select features"],
+              answer: 1,
+              explain: <>Ridge&rsquo;s circular penalty shrinks coefficients toward zero but essentially never <em>to</em> zero; lasso&rsquo;s diamond has corners on the axes, so solutions land there and features drop out entirely — built-in selection.</>,
+            },
+            {
+              q: <>Residual spread grows with the fitted value and the target is right-skewed. The classic first fix:</>,
+              options: ["Add more features", "Log-transform the target", "Increase the learning rate", "Drop the largest residuals"],
+              answer: 1,
+              explain: <>A log target turns multiplicative, percentage-style errors into additive, roughly constant ones — often fixing the fan and the skew at once. (Weighted least squares is the alternative when you&rsquo;d rather model the variance than transform it.)</>,
+            },
+          ]}
+        />
+
+        <PrevNext prev={{ href: "/learn/linear-regression/regularization", label: <>← Regularization</> }} next={{ href: "/learn/linear-regression/confidence-intervals", label: <>Next up · Confidence intervals →</> }} />
       </div>
     </article>
   );
 }
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-fundamentals) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-fundamentals) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0 0" };
+
+
+

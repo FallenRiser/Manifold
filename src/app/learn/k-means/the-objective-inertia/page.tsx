@@ -1,6 +1,7 @@
-import Link from "next/link";
 import { MathBlock } from "@/components/Math";
 import { CodeBlock } from "@/components/CodeBlock";
+import { CLUSTER_SETUP } from "@/lib/runtimeSetup";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 export const metadata = {
   title: "The objective: inertia — Manifold",
@@ -45,18 +46,15 @@ print(f"inertia: {km.inertia_:.1f}")   # sklearn stores it on the fitted model`;
 export default function ObjectiveInertiaPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-clustering)")}>Clustering</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 5 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        The objective: inertia
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 24px", maxWidth: 620 }}>
-        Every optimisation needs a number to push down. For k-means that number is inertia — and
+      <LessonHeader
+        chips={[{ label: "Clustering", color: "var(--c-clustering)" }]}
+        time="about 5 minutes"
+        title={<>The objective: inertia</>}
+        intro={<>
+          Every optimisation needs a number to push down. For k-means that number is inertia — and
         once you see it, the whole algorithm is just &ldquo;make this smaller.&rdquo;
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <h2>One number for a whole clustering</h2>
@@ -103,31 +101,21 @@ export default function ObjectiveInertiaPage() {
           From scratch it&rsquo;s one assignment plus a sum of squares; scikit-learn stores it on the
           fitted model as <code>.inertia_</code>.
         </p>
-        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
+        <CodeBlock setup={CLUSTER_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-clustering)", marginBottom: 4 }}>
-            A trap to remember
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            Inertia <em>always</em> drops as you add clusters — with <em>k</em> = <em>n</em> it hits
+        <Callout color="var(--c-clustering)" title={<>A trap to remember</>}>
+          Inertia <em>always</em> drops as you add clusters — with <em>k</em> = <em>n</em> it hits
             zero (every point is its own centroid). So you can never pick <em>k</em> by minimising
             inertia alone. That&rsquo;s exactly the problem the &ldquo;choosing k&rdquo; chapter
             solves.
-          </p>
-        </div>
+        </Callout>
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 40, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/k-means/the-k-means-idea" style={navLink}>← The k-means idea</Link>
-          <Link href="/learn/k-means/hard-assignment-and-voronoi" style={{ ...navLink, fontWeight: 600 }}>Next up · Hard assignment &amp; Voronoi cells →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/k-means/the-k-means-idea", label: <>← The k-means idea</> }} next={{ href: "/learn/k-means/hard-assignment-and-voronoi", label: <>Next up · Hard assignment &amp; Voronoi cells →</> }} />
       </div>
     </article>
   );
 }
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-clustering) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-clustering) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0" };
+
+
+

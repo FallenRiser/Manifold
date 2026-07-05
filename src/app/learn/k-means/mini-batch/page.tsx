@@ -1,5 +1,8 @@
+import { Quiz } from "@/components/Quiz";
 import Link from "next/link";
 import { CodeBlock } from "@/components/CodeBlock";
+import { CLUSTER_SETUP } from "@/lib/runtimeSetup";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 export const metadata = {
   title: "Mini-batch k-means — Manifold",
@@ -10,19 +13,16 @@ export const metadata = {
 export default function MiniBatchPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-clustering)")}>Clustering</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 5 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        Mini-batch k-means
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 24px", maxWidth: 620 }}>
-        When the full assign step over millions of points is too slow, don&rsquo;t use all the points.
+      <LessonHeader
+        chips={[{ label: "Clustering", color: "var(--c-clustering)" }]}
+        time="about 5 minutes"
+        title={<>Mini-batch k-means</>}
+        intro={<>
+          When the full assign step over millions of points is too slow, don&rsquo;t use all the points.
         Update the centroids from small random samples instead — the same trade stochastic gradient
         descent makes against batch gradient descent.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <h2>The idea: sample, don&rsquo;t scan</h2>
@@ -42,16 +42,11 @@ export default function MiniBatchPage() {
           points its per-batch moves get smaller, so it settles rather than jittering forever.
         </p>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-clustering)", marginBottom: 4 }}>
-            The trade in one line
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            Mini-batch reaches a typically <strong>slightly higher inertia</strong> than full k-means
+        <Callout color="var(--c-clustering)" title={<>The trade in one line</>}>
+          Mini-batch reaches a typically <strong>slightly higher inertia</strong> than full k-means
             (worse clusters), but often runs <strong>an order of magnitude faster</strong> and streams
             data that never has to fit in memory at once. At large <em>n</em> that&rsquo;s usually a bargain.
-          </p>
-        </div>
+        </Callout>
 
         <h2>When to reach for it</h2>
         <ul style={ul}>
@@ -66,12 +61,33 @@ export default function MiniBatchPage() {
         </p>
 
         <h2>From a running-mean update to the library</h2>
-        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
+        <CodeBlock setup={CLUSTER_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 40, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/k-means/accelerated-elkan" style={navLink}>← Accelerated k-means (Elkan)</Link>
-          <Link href="/learn/k-means" style={navLink}>Back to overview →</Link>
-        </div>
+        <Quiz
+          accent="var(--c-clustering)"
+          questions={[
+            {
+              q: "Why is Lloyd's algorithm guaranteed to stop?",
+              options: ["Each assign and update step can only lower (or keep) inertia, and there are finitely many partitions", "The learning rate decays to zero", "Centroids are constrained to the data's bounding box"],
+              answer: 0,
+              explain: "Monotone descent over a finite set of possible assignments means no cycling and eventual convergence — no learning rate involved anywhere.",
+            },
+            {
+              q: "What Lloyd's converges TO is…",
+              options: ["The global minimum of inertia", "A local minimum that depends on where the centroids started", "The same clustering on every run"],
+              answer: 1,
+              explain: "Convergence is guaranteed; quality isn't. That gap is the entire reason the next chapter — initialization, restarts, k-means++ — exists.",
+            },
+            {
+              q: "Mini-batch k-means trades…",
+              options: ["A small amount of final inertia for a large speedup on big datasets", "Convergence guarantees for exactness", "Memory for accuracy"],
+              answer: 0,
+              explain: "Updating from small random batches adds noise, so it lands slightly above full-batch inertia — typically within a few percent, at a fraction of the cost. The batch-vs-SGD trade, wearing clustering clothes.",
+            },
+          ]}
+        />
+
+        <PrevNext prev={{ href: "/learn/k-means/accelerated-elkan", label: <>← Accelerated k-means (Elkan)</> }} next={{ href: "/learn/k-means", label: <>Back to overview →</> }} />
       </div>
     </article>
   );
@@ -106,10 +122,8 @@ mbk = MiniBatchKMeans(n_clusters=8, batch_size=1024, random_state=0)
 for batch in stream_of_batches:
     mbk.partial_fit(batch)`;
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
+
 const ul: React.CSSProperties = { margin: "0 0 10px", paddingLeft: "1.3em", fontSize: 15, color: "var(--muted)", lineHeight: 1.8 };
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
+
 const inlineLink: React.CSSProperties = { color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-clustering) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-clustering) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0" };
+

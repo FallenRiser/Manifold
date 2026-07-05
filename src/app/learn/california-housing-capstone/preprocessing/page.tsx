@@ -1,6 +1,6 @@
-import Link from "next/link";
 import { CodeBlock } from "@/components/CodeBlock";
 import { CodeOutput } from "@/components/CodeOutput";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 export const metadata = {
   title: "Capstone: preprocessing pipeline — Manifold",
@@ -11,19 +11,17 @@ export const metadata = {
 export default function PreprocessingPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-regression)")}>Capstone</span>
-        <span style={chip("var(--c-metrics)")}>3 · The linear baseline</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 8 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 42, lineHeight: 1.08, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        Preprocessing pipeline
-      </h1>
-      <p style={{ fontSize: 17.5, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 24px", maxWidth: 620 }}>
-        Five decisions, each with a reason, assembled into one function applied identically to train and test.
+      <LessonHeader
+        chips={[{ label: "Capstone", color: "var(--c-regression)" }, { label: "3 · The linear baseline", color: "var(--c-metrics)" }]}
+        time="about 8 minutes"
+        title={<>Preprocessing pipeline</>}
+        intro={<>
+          Five decisions, each with a reason, assembled into one function applied identically to train and test.
         The reasons matter more than the code.
-      </p>
+        </>}
+        titleSize={42}
+        introSize={17.5}
+      />
 
       <div className="lesson">
         <h2>The decisions</h2>
@@ -47,23 +45,15 @@ design matrix: (16512, 10)  -> ready for modeling`}</CodeOutput>
           data is now honest and model-ready.
         </p>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-regression)", marginBottom: 4 }}>
-            The one rule that prevents most disasters: fit on train, apply to test
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            Every statistic the pipeline learns — the medians, the scaler&rsquo;s means and standard deviations — is
+        <Callout color="var(--c-regression)" title={<>The one rule that prevents most disasters: fit on train, apply to test</>}>
+          Every statistic the pipeline learns — the medians, the scaler&rsquo;s means and standard deviations — is
             computed on the <em>training</em> data and reused on the test data, never re-fit. Re-fitting per split
             leaks information and inflates your scores. Wrapping the scaler in a scikit-learn <code>Pipeline</code>
             makes this automatic inside cross-validation, which is why the modeling page uses pipelines
             everywhere rather than transforming the data up front.
-          </p>
-        </div>
+        </Callout>
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 40, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/california-housing-capstone/data-quality" style={navLink}>← Data quality &amp; cleaning</Link>
-          <Link href="/learn/california-housing-capstone/linear-models" style={{ ...navLink, fontWeight: 600 }}>Next up · Baseline &amp; regularized models →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/california-housing-capstone/data-quality", label: <>← Data quality &amp; cleaning</> }} next={{ href: "/learn/california-housing-capstone/linear-models", label: <>Next up · Baseline &amp; regularized models →</> }} />
       </div>
     </article>
   );
@@ -95,9 +85,4 @@ from sklearn.linear_model import RidgeCV
 model = make_pipeline(StandardScaler(), RidgeCV())
 model.fit(train_df[FEAT], train_df['TargetPrice'])`;
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
 const ul: React.CSSProperties = { margin: "0 0 10px", paddingLeft: "1.3em", fontSize: 15, color: "var(--muted)", lineHeight: 1.8 };
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-regression) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-regression) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0" };

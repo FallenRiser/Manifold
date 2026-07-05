@@ -1,5 +1,7 @@
-import Link from "next/link";
+import { Quiz } from "@/components/Quiz";
 import { CodeBlock } from "@/components/CodeBlock";
+import { CLUSTER_SETUP } from "@/lib/runtimeSetup";
+import { LessonHeader, PrevNext } from "@/components/lesson";
 
 export const metadata = {
   title: "Hard assignment & Voronoi cells — Manifold",
@@ -35,18 +37,15 @@ for (let gx = 0; gx <= 100; gx += STEP) {
 export default function VoronoiPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-clustering)")}>Clustering</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 5 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        Hard assignment & Voronoi cells
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 24px", maxWidth: 620 }}>
-        k-Means makes a clean, all-or-nothing choice for every point. That single rule has a
+      <LessonHeader
+        chips={[{ label: "Clustering", color: "var(--c-clustering)" }]}
+        time="about 5 minutes"
+        title={<>Hard assignment & Voronoi cells</>}
+        intro={<>
+          k-Means makes a clean, all-or-nothing choice for every point. That single rule has a
         beautiful geometric shadow: it tiles the whole space into straight-edged regions.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <h2>One point, one cluster</h2>
@@ -110,12 +109,33 @@ export default function VoronoiPage() {
           Classifying a brand-new point is the same operation: find the nearest centroid, done. No
           retraining — which is why k-means doubles as a fast vector quantizer.
         </p>
-        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
+        <CodeBlock setup={CLUSTER_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 40, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/k-means/the-objective-inertia" style={navLink}>← The objective: inertia</Link>
-          <Link href="/learn/k-means/assign-and-update" style={{ ...navLink, fontWeight: 600 }}>Next up · Assign &amp; update →</Link>
-        </div>
+        <Quiz
+          accent="var(--c-clustering)"
+          questions={[
+            {
+              q: "k-means' objective — inertia — is the sum of…",
+              options: ["Squared distances from each point to its own cluster's centroid", "Distances between all pairs of centroids", "Squared distances from every point to the global mean"],
+              answer: 0,
+              explain: "Each point is charged only against its assigned centroid, squared. Both halves of Lloyd's algorithm are just moves that lower this one number.",
+            },
+            {
+              q: "“Hard assignment” means…",
+              options: ["Every point belongs 100% to exactly one cluster — no fractions, no in-between", "Some points are hard to assign", "Assignments are fixed after initialization"],
+              answer: 0,
+              explain: "k-means never hedges — a point one inch from the boundary counts fully for its side. Fuzzy c-means and Gaussian mixtures relax exactly this, later in the track.",
+            },
+            {
+              q: "With centroids fixed, the regions assigned to each centroid have boundaries that are…",
+              options: ["Straight lines — the perpendicular bisectors between centroid pairs", "Circles centred on each centroid", "Curves of constant inertia"],
+              answer: 0,
+              explain: "That's the Voronoi picture: k-means can only ever draw convex, straight-edged cells — the geometric root of every failure mode on curved or nested clusters.",
+            },
+          ]}
+        />
+
+        <PrevNext prev={{ href: "/learn/k-means/the-objective-inertia", label: <>← The objective: inertia</> }} next={{ href: "/learn/k-means/assign-and-update", label: <>Next up · Assign &amp; update →</> }} />
       </div>
     </article>
   );
@@ -145,7 +165,5 @@ km = KMeans(n_clusters=3, n_init=10, random_state=0).fit(X)
 new = np.array([[3.5, 3.0], [7.0, 0.5], [0.2, -0.3]])
 print(km.predict(new))`;
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
+
+

@@ -1,7 +1,7 @@
-import Link from "next/link";
 import { M, MathBlock } from "@/components/Math";
 import { CodeBlock } from "@/components/CodeBlock";
 import { SilhouetteLab } from "@/components/labs/SilhouetteLab";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 export const metadata = {
   title: "Silhouette analysis — Manifold",
@@ -12,19 +12,16 @@ export const metadata = {
 export default function SilhouettePage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-clustering)")}>Clustering</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 7 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        Silhouette analysis
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 24px", maxWidth: 620 }}>
-        The elbow reads one global number off a curve. Silhouette analysis goes finer — it scores{" "}
+      <LessonHeader
+        chips={[{ label: "Clustering", color: "var(--c-clustering)" }]}
+        time="about 7 minutes"
+        title={<>Silhouette analysis</>}
+        intro={<>
+          The elbow reads one global number off a curve. Silhouette analysis goes finer — it scores{" "}
         <em>every single point</em> on how well it belongs, then lets you judge both the clustering and
         the choice of <em>k</em>.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <h2>One score per point</h2>
@@ -62,26 +59,18 @@ export default function SilhouettePage() {
         </p>
         <SilhouetteLab />
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-clustering)", marginBottom: 4 }}>
-            Silhouette vs. elbow
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            Silhouette gives a sharper, less subjective answer and a per-cluster diagnostic the elbow
+        <Callout color="var(--c-clustering)" title={<>Silhouette vs. elbow</>}>
+          Silhouette gives a sharper, less subjective answer and a per-cluster diagnostic the elbow
             can&rsquo;t. The cost: it needs pairwise distances within and between clusters, so the exact
             score is <M>{String.raw`O(n^2)`}</M> — pricey on huge datasets (sample, or use a cheaper index
             like Calinski–Harabasz). And like every distance-based measure it still assumes roughly
             convex, comparable clusters.
-          </p>
-        </div>
+        </Callout>
 
         <h2>Compute it both ways</h2>
         <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 40, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/k-means/the-elbow-method" style={navLink}>← The elbow method</Link>
-          <Link href="/learn/k-means/the-gap-statistic" style={{ ...navLink, fontWeight: 600 }}>Next up · The gap statistic →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/k-means/the-elbow-method", label: <>← The elbow method</> }} next={{ href: "/learn/k-means/the-gap-statistic", label: <>Next up · The gap statistic →</> }} />
       </div>
     </article>
   );
@@ -116,9 +105,4 @@ for k in range(2, 7):
 best = KMeans(n_clusters=4, n_init=10, random_state=0).fit_predict(X)
 per_point = silhouette_samples(X, best)`;
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
 const ul: React.CSSProperties = { margin: "0 0 10px", paddingLeft: "1.3em", fontSize: 15, color: "var(--muted)", lineHeight: 1.8 };
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-clustering) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-clustering) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0" };

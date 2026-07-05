@@ -7,6 +7,7 @@ import type { TrackChapter } from "@/lib/linearRegressionTrack";
 export const KM_TRACK: TrackChapter[] = [
   {
     title: "The problem & the intuition",
+    tier: 1,
     pages: [
       { title: "What is clustering?", href: "/learn/k-means" },
       { title: "The unsupervised landscape", href: "/learn/k-means/the-unsupervised-landscape" },
@@ -17,6 +18,7 @@ export const KM_TRACK: TrackChapter[] = [
   },
   {
     title: "The k-means idea",
+    tier: 1,
     pages: [
       { title: "The k-means idea", href: "/learn/k-means/the-k-means-idea" },
       { title: "The objective: inertia", href: "/learn/k-means/the-objective-inertia" },
@@ -25,6 +27,7 @@ export const KM_TRACK: TrackChapter[] = [
   },
   {
     title: "The algorithm",
+    tier: 1,
     pages: [
       { title: "Assign & update (Lloyd's)", href: "/learn/k-means/assign-and-update" },
       { title: "Why it converges", href: "/learn/k-means/why-it-converges" },
@@ -36,6 +39,7 @@ export const KM_TRACK: TrackChapter[] = [
   },
   {
     title: "Initialization",
+    tier: 2,
     pages: [
       { title: "The initialization problem", href: "/learn/k-means/the-initialization-problem" },
       { title: "Random restarts", href: "/learn/k-means/random-restarts" },
@@ -44,6 +48,7 @@ export const KM_TRACK: TrackChapter[] = [
   },
   {
     title: "Choosing k",
+    tier: 2,
     pages: [
       { title: "The elbow method", href: "/learn/k-means/the-elbow-method" },
       { title: "Silhouette analysis", href: "/learn/k-means/silhouette-analysis" },
@@ -53,6 +58,7 @@ export const KM_TRACK: TrackChapter[] = [
   },
   {
     title: "Evaluating clusters",
+    tier: 2,
     pages: [
       { title: "Internal metrics", href: "/learn/k-means/internal-metrics" },
       { title: "External metrics (ARI, NMI)", href: "/learn/k-means/external-metrics" },
@@ -61,6 +67,7 @@ export const KM_TRACK: TrackChapter[] = [
   },
   {
     title: "Preprocessing & practicalities",
+    tier: 2,
     pages: [
       { title: "Why scaling matters", href: "/learn/k-means/why-scaling-matters" },
       { title: "Outliers & robustness", href: "/learn/k-means/outliers-and-robustness" },
@@ -70,6 +77,7 @@ export const KM_TRACK: TrackChapter[] = [
   },
   {
     title: "When k-means fails",
+    tier: 2,
     pages: [
       { title: "Non-spherical clusters", href: "/learn/k-means/non-spherical-clusters" },
       { title: "Unequal sizes & densities", href: "/learn/k-means/unequal-sizes-and-densities" },
@@ -79,6 +87,7 @@ export const KM_TRACK: TrackChapter[] = [
   },
   {
     title: "Variants & the bigger family",
+    tier: 2,
     pages: [
       { title: "k-medoids (PAM)", href: "/learn/k-means/k-medoids" },
       { title: "k-medians & k-modes", href: "/learn/k-means/k-medians-and-k-modes" },
@@ -90,6 +99,7 @@ export const KM_TRACK: TrackChapter[] = [
   },
   {
     title: "Theory · go deeper",
+    tier: 3,
     pages: [
       { title: "NP-hardness of optimal clustering", href: "/learn/k-means/np-hardness" },
       { title: "Convergence as coordinate descent", href: "/learn/k-means/coordinate-descent" },
@@ -98,6 +108,7 @@ export const KM_TRACK: TrackChapter[] = [
   },
   {
     title: "In the wild",
+    tier: 2,
     pages: [
       { title: "When to use k-means", href: "/learn/k-means/when-to-use-k-means" },
       { title: "Case A: image colour quantization", href: "/learn/k-means/case-image-quantization" },

@@ -1,6 +1,7 @@
-import Link from "next/link";
 import { M, MathBlock } from "@/components/Math";
 import { CodeBlock } from "@/components/CodeBlock";
+import { REGRESSION_SETUP } from "@/lib/runtimeSetup";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 export const metadata = {
   title: "Degrees of freedom & effective complexity — Manifold",
@@ -11,20 +12,16 @@ export const metadata = {
 export default function DOFPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-regression)")}>Regression</span>
-        <span style={chip("var(--c-metrics)")}>Go deeper</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 6 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        Degrees of freedom & effective complexity
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 24px", maxWidth: 620 }}>
-        A regularized model uses all its features but is &ldquo;less complex&rdquo; than OLS. <strong>Effective degrees
+      <LessonHeader
+        chips={[{ label: "Regression", color: "var(--c-regression)" }, { label: "Go deeper", color: "var(--c-metrics)" }]}
+        time="about 6 minutes"
+        title={<>Degrees of freedom & effective complexity</>}
+        intro={<>
+          A regularized model uses all its features but is &ldquo;less complex&rdquo; than OLS. <strong>Effective degrees
         of freedom</strong> makes that precise — a continuous measure of model complexity that the penalty turns
         down as λ rises.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <h2>The problem with counting parameters</h2>
@@ -63,27 +60,19 @@ export default function DOFPage() {
           genuinely <em>is</em> as simple as it looks — its degrees of freedom is its sparsity.
         </p>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-regression)", marginBottom: 4 }}>
-            Why you&rsquo;d want this number
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            Effective df plugs straight into model-selection criteria. <strong>AIC</strong> and{" "}
+        <Callout color="var(--c-regression)" title={<>Why you&rsquo;d want this number</>}>
+          Effective df plugs straight into model-selection criteria. <strong>AIC</strong> and{" "}
             <strong>BIC</strong> need a complexity penalty — use df(λ) instead of a raw parameter count, and you
             can select λ without cross-validation. It also gives the honest x-axis for comparing models of
             different λ on equal footing: not &ldquo;how many features&rdquo; but &ldquo;how much effective freedom.&rdquo; And it
             quantifies the bias–variance dial in concrete units — fewer effective df means lower variance, more
             bias.
-          </p>
-        </div>
+        </Callout>
 
         <h2>Compute effective df</h2>
-        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
+        <CodeBlock setup={REGRESSION_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 40, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/regularized-regression/lasso-as-a-laplace-prior" style={navLink}>← Lasso as a Laplace prior</Link>
-          <Link href="/learn/regularized-regression/why-shrinkage-beats-ols" style={{ ...navLink, fontWeight: 600 }}>Next up · Why shrinkage beats OLS (James–Stein) →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/regularized-regression/lasso-as-a-laplace-prior", label: <>← Lasso as a Laplace prior</> }} next={{ href: "/learn/regularized-regression/why-shrinkage-beats-ols", label: <>Next up · Why shrinkage beats OLS (James–Stein) →</> }} />
       </div>
     </article>
   );
@@ -118,8 +107,6 @@ def aic(X, y, lam):
 best = min(np.logspace(-2, 3, 50), key=lambda lam: aic(X, y, lam))
 print("AIC-chosen λ:", best)`;
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-regression) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-regression) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0" };
+
+
+

@@ -1,7 +1,9 @@
-import Link from "next/link";
+import { M } from "@/components/Math";
 import { NormalityLab } from "@/components/labs/NormalityLab";
 import { CodeBlock } from "@/components/CodeBlock";
+import { REGRESSION_SETUP } from "@/lib/runtimeSetup";
 import { Backlinks } from "@/components/Backlinks";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 const codeScratch = `import numpy as np
 
@@ -39,20 +41,16 @@ export const metadata = {
 export default function NormalityOfResidualsPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-regression)")}>Regression</span>
-        <span style={chip("var(--warn)")}>Assumptions</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 5 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        Normality of residuals
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 8px", maxWidth: 620 }}>
-        The most misunderstood assumption. Your predictors don't need to be
+      <LessonHeader
+        chips={[{ label: "Regression", color: "var(--c-regression)" }, { label: "Assumptions", color: "var(--warn)" }]}
+        time="about 5 minutes"
+        title={<>Normality of residuals</>}
+        intro={<>
+          The most misunderstood assumption. Your predictors don't need to be
         normal. Your outcome doesn't need to be normal. Only the <em>residuals</em>
         {" "}need to be normal — and even then, only sometimes.
-      </p>
+        </>}
+      />
 
       <Backlinks label="Related" items={[
         { label: "Detecting non-normality", href: "/learn/linear-regression/detecting-non-normality" },
@@ -64,7 +62,7 @@ export default function NormalityOfResidualsPage() {
         <h2>What it says</h2>
         <p>
           The assumption is that the true error term ε follows a normal
-          (Gaussian) distribution: <code>ε ~ N(0, σ²)</code>.
+          (Gaussian) distribution: <M>{String.raw`\varepsilon \sim \mathcal{N}(0, \sigma^2)`}</M>.
         </p>
         <p>
           Let's clear up the biggest misconception first: linear regression does{" "}
@@ -91,19 +89,14 @@ export default function NormalityOfResidualsPage() {
           are exact.
         </p>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-fundamentals)", marginBottom: 4 }}>
-            The Central Limit Theorem rescue
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            Here is the secret: as your sample size grows, the sampling
+        <Callout color="var(--c-fundamentals)" title={<>The Central Limit Theorem rescue</>}>
+          Here is the secret: as your sample size grows, the sampling
             distribution of the coefficients approaches normality <em>regardless
             of the distribution of the errors</em>. If you have a few hundred
             observations, mild non-normality in the residuals simply doesn't
             matter. Your p-values will still be valid. Normality is only a strict
             requirement for <strong>small samples</strong> (N &lt; 30-50).
-          </p>
-        </div>
+        </Callout>
 
         <h2>Prediction intervals are different</h2>
         <p>
@@ -152,12 +145,9 @@ export default function NormalityOfResidualsPage() {
           Standardise the residuals and the third and fourth moments give skew and
           kurtosis; SciPy adds the formal Shapiro-Wilk test.
         </p>
-        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
+        <CodeBlock setup={REGRESSION_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 32, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/linear-regression/homoscedasticity" style={navLink}>← Homoscedasticity</Link>
-          <Link href="/learn/linear-regression/multicollinearity" style={navLink}>Next up · Multicollinearity →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/linear-regression/homoscedasticity", label: <>← Homoscedasticity</> }} next={{ href: "/learn/linear-regression/multicollinearity", label: <>Next up · Multicollinearity →</> }} />
       </div>
     </article>
   );
@@ -207,8 +197,6 @@ function QQPlot({ type, label, caption }: { type: "normal" | "heavy" | "skewed";
   );
 }
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-fundamentals) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-fundamentals) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0 0" };
+
+
+

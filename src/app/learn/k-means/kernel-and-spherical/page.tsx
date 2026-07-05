@@ -1,6 +1,7 @@
-import Link from "next/link";
 import { M, MathBlock } from "@/components/Math";
 import { CodeBlock } from "@/components/CodeBlock";
+import { CLUSTER_SETUP } from "@/lib/runtimeSetup";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 export const metadata = {
   title: "Kernel & spherical k-means — Manifold",
@@ -11,19 +12,15 @@ export const metadata = {
 export default function KernelSphericalPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-clustering)")}>Clustering</span>
-        <span style={chip("var(--c-metrics)")}>Variants</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 6 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        Kernel & spherical k-means
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 24px", maxWidth: 620 }}>
-        The previous variants changed the <em>center</em>. These two change the <em>space</em> — letting
+      <LessonHeader
+        chips={[{ label: "Clustering", color: "var(--c-clustering)" }, { label: "Variants", color: "var(--c-metrics)" }]}
+        time="about 6 minutes"
+        title={<>Kernel & spherical k-means</>}
+        intro={<>
+          The previous variants changed the <em>center</em>. These two change the <em>space</em> — letting
         k-means find non-linear clusters, or cluster by direction instead of magnitude.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <h2>Kernel k-means: cluster in feature space</h2>
@@ -61,25 +58,17 @@ export default function KernelSphericalPage() {
           and it&rsquo;s the standard for high-dimensional, sparse, direction-dominated data.
         </p>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-clustering)", marginBottom: 4 }}>
-            Which to use
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            Non-linear, non-convex clusters in modest <em>n</em> → kernel k-means or spectral clustering.
+        <Callout color="var(--c-clustering)" title={<>Which to use</>}>
+          Non-linear, non-convex clusters in modest <em>n</em> → kernel k-means or spectral clustering.
             Text, TF-IDF, or embeddings where magnitude is noise → spherical k-means (or just L2-normalise
             and run ordinary k-means with cosine). Both keep the familiar alternating loop; they only swap
             in a different geometry. The embedding capstone uses the spherical idea directly.
-          </p>
-        </div>
+        </Callout>
 
         <h2>Both, in practice</h2>
-        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
+        <CodeBlock setup={CLUSTER_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 40, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/k-means/fuzzy-c-means" style={navLink}>← Fuzzy c-means</Link>
-          <Link href="/learn/k-means/bisecting-k-means" style={{ ...navLink, fontWeight: 600 }}>Next up · Bisecting k-means →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/k-means/fuzzy-c-means", label: <>← Fuzzy c-means</> }} next={{ href: "/learn/k-means/bisecting-k-means", label: <>Next up · Bisecting k-means →</> }} />
       </div>
     </article>
   );
@@ -109,9 +98,7 @@ labels = KMeans(n_clusters=8, n_init=10, random_state=0).fit_predict(normalize(X
 sc = SpectralClustering(n_clusters=2, affinity="rbf", gamma=2.0,
                         random_state=0).fit_predict(X_rings)`;
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
+
 const ul: React.CSSProperties = { margin: "0 0 10px", paddingLeft: "1.3em", fontSize: 15, color: "var(--muted)", lineHeight: 1.8 };
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-clustering) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-clustering) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0" };
+
+

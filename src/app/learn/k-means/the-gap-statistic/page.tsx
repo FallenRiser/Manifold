@@ -1,6 +1,7 @@
-import Link from "next/link";
 import { M, MathBlock } from "@/components/Math";
 import { CodeBlock } from "@/components/CodeBlock";
+import { CLUSTER_SETUP } from "@/lib/runtimeSetup";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 export const metadata = {
   title: "The gap statistic — Manifold",
@@ -22,20 +23,16 @@ const gy = (v: number) => Math.round((padT + (1 - (v - lo) / (hi - lo)) * (H - p
 export default function GapStatisticPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-clustering)")}>Clustering</span>
-        <span style={chip("var(--c-metrics)")}>Go deeper</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 7 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        The gap statistic
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 24px", maxWidth: 620 }}>
-        Elbow and silhouette both assume there <em>are</em> clusters. The gap statistic asks a deeper
+      <LessonHeader
+        chips={[{ label: "Clustering", color: "var(--c-clustering)" }, { label: "Go deeper", color: "var(--c-metrics)" }]}
+        time="about 7 minutes"
+        title={<>The gap statistic</>}
+        intro={<>
+          Elbow and silhouette both assume there <em>are</em> clusters. The gap statistic asks a deeper
         question first: is your data more clustered than pure random noise — and if so, by how much, at
         each <em>k</em>?
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <h2>Compare against a null of &ldquo;no structure&rdquo;</h2>
@@ -87,26 +84,18 @@ export default function GapStatisticPage() {
           accounting for noise. This parsimony bias is what gives the gap statistic its best feature.
         </p>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-clustering)", marginBottom: 4 }}>
-            It can answer k = 1
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            Uniquely among these methods, the gap statistic can conclude there are <strong>no</strong>{" "}
+        <Callout color="var(--c-clustering)" title={<>It can answer k = 1</>}>
+          Uniquely among these methods, the gap statistic can conclude there are <strong>no</strong>{" "}
             clusters — if your data&rsquo;s curve never pulls meaningfully ahead of the random null, the rule
             returns <em>k</em> = 1. The elbow and silhouette can&rsquo;t even express that; silhouette isn&rsquo;t
             defined at <em>k</em> = 1. The price is compute: you refit k-means on many random reference
             datasets for every <em>k</em>.
-          </p>
-        </div>
+        </Callout>
 
         <h2>Compute the gap</h2>
-        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
+        <CodeBlock setup={CLUSTER_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 40, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/k-means/silhouette-analysis" style={navLink}>← Silhouette analysis</Link>
-          <Link href="/learn/k-means/information-criteria-x-means" style={{ ...navLink, fontWeight: 600 }}>Next up · Information criteria (X-means) →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/k-means/silhouette-analysis", label: <>← Silhouette analysis</> }} next={{ href: "/learn/k-means/information-criteria-x-means", label: <>Next up · Information criteria (X-means) →</> }} />
       </div>
     </article>
   );
@@ -143,8 +132,6 @@ def fit_kmeans(X, k):
 
 # then apply Tibshirani's rule: smallest k with Gap(k) >= Gap(k+1) - s_{k+1}`;
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-clustering) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-clustering) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0" };
+
+
+

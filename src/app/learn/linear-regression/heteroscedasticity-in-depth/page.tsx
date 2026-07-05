@@ -1,8 +1,9 @@
-import Link from "next/link";
 import { HeteroImpactLab } from "@/components/labs/HeteroImpactLab";
 import { MathBlock } from "@/components/Math";
 import { CodeBlock } from "@/components/CodeBlock";
+import { REGRESSION_SETUP } from "@/lib/runtimeSetup";
 import { Backlinks } from "@/components/Backlinks";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 const codeScratch = `import numpy as np
 
@@ -50,19 +51,15 @@ export const metadata = {
 export default function HeteroscedasticityInDepthPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-regression)")}>Regression</span>
-        <span style={chip("var(--brand)")}>Diagnostics</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 6 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        Heteroscedasticity in depth
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 8px", maxWidth: 620 }}>
-        Visual checks are great, but sometimes you need formal proof. And when
+      <LessonHeader
+        chips={[{ label: "Regression", color: "var(--c-regression)" }, { label: "Diagnostics", color: "var(--brand)" }]}
+        time="about 6 minutes"
+        title={<>Heteroscedasticity in depth</>}
+        intro={<>
+          Visual checks are great, but sometimes you need formal proof. And when
         you find heteroscedasticity, you need to fix your covariance matrix.
-      </p>
+        </>}
+      />
 
       <Backlinks label="Related" items={[
         { label: "Homoscedasticity", href: "/learn/linear-regression/homoscedasticity" },
@@ -130,19 +127,14 @@ export default function HeteroscedasticityInDepthPage() {
           corrections, with HC3 being the modern recommendation.
         </p>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-fundamentals)", marginBottom: 4 }}>
-            Why not always use robust SEs?
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            If robust standard errors protect against heteroscedasticity, why
+        <Callout color="var(--c-fundamentals)" title={<>Why not always use robust SEs?</>}>
+          If robust standard errors protect against heteroscedasticity, why
             does OLS still default to the old ones? Because if the errors{" "}
             <em>are</em> actually homoscedastic, the classic standard errors are
             more efficient (tighter) in small samples. However, in many fields
             (like economics), researchers just use robust SEs by default for
             everything.
-          </p>
-        </div>
+        </Callout>
 
         <h2>Compute the sandwich yourself</h2>
         <p>
@@ -150,12 +142,9 @@ export default function HeteroscedasticityInDepthPage() {
           formula from the panel above, in NumPy. statsmodels exposes it as a single
           <code>cov_type=&quot;HC0&quot;</code> argument.
         </p>
-        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
+        <CodeBlock setup={REGRESSION_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 32, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/linear-regression/residual-vs-fitted" style={navLink}>← Residual-vs-fitted</Link>
-          <Link href="/learn/linear-regression/outliers-leverage-influence" style={navLink}>Next up · Outliers, leverage & influence →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/linear-regression/residual-vs-fitted", label: <>← Residual-vs-fitted</> }} next={{ href: "/learn/linear-regression/outliers-leverage-influence", label: <>Next up · Outliers, leverage & influence →</> }} />
       </div>
     </article>
   );
@@ -171,7 +160,5 @@ function TestCard({ title, formula, body }: { title: string; formula: string; bo
   );
 }
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-fundamentals) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-fundamentals) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0 0" };
+
+

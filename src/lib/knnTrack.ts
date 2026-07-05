@@ -7,6 +7,7 @@ import type { TrackChapter } from "@/lib/linearRegressionTrack";
 export const KNN_TRACK: TrackChapter[] = [
   {
     title: "The problem & the intuition",
+    tier: 1,
     pages: [
       { title: "What is k-NN?", href: "/learn/k-nearest-neighbors" },
       { title: "The classification landscape", href: "/learn/k-nearest-neighbors/the-classification-landscape" },
@@ -16,6 +17,7 @@ export const KNN_TRACK: TrackChapter[] = [
   },
   {
     title: "How k-NN predicts",
+    tier: 1,
     pages: [
       { title: "The algorithm, end to end", href: "/learn/k-nearest-neighbors/the-algorithm-end-to-end" },
       { title: "Classification by majority vote", href: "/learn/k-nearest-neighbors/classification-by-majority-vote" },
@@ -25,6 +27,7 @@ export const KNN_TRACK: TrackChapter[] = [
   },
   {
     title: "Choosing k",
+    tier: 2,
     pages: [
       { title: "The role of k" },
       { title: "Bias & variance in k-NN" },
@@ -33,6 +36,7 @@ export const KNN_TRACK: TrackChapter[] = [
   },
   {
     title: "Distance & weighting",
+    tier: 2,
     pages: [
       { title: "Distance metrics for k-NN" },
       { title: "Why feature scaling matters" },
@@ -42,6 +46,7 @@ export const KNN_TRACK: TrackChapter[] = [
   },
   {
     title: "Making it work in practice",
+    tier: 2,
     pages: [
       { title: "Preprocessing & encoding" },
       { title: "Ties & class imbalance" },
@@ -51,6 +56,7 @@ export const KNN_TRACK: TrackChapter[] = [
   },
   {
     title: "Scaling k-NN: the search problem",
+    tier: 2,
     pages: [
       { title: "The brute-force cost" },
       { title: "k-d trees" },
@@ -60,6 +66,7 @@ export const KNN_TRACK: TrackChapter[] = [
   },
   {
     title: "Regression & other uses",
+    tier: 2,
     pages: [
       { title: "k-NN regression in depth" },
       { title: "Local weighted regression" },
@@ -68,6 +75,7 @@ export const KNN_TRACK: TrackChapter[] = [
   },
   {
     title: "Theory · go deeper",
+    tier: 3,
     pages: [
       { title: "The Bayes classifier & Bayes error" },
       { title: "The 1-NN error bound (Cover & Hart)" },
@@ -77,6 +85,7 @@ export const KNN_TRACK: TrackChapter[] = [
   },
   {
     title: "Strengths, weaknesses & kin",
+    tier: 2,
     pages: [
       { title: "When to use k-NN" },
       { title: "k-NN vs logistic regression, SVM, trees" },
@@ -85,6 +94,7 @@ export const KNN_TRACK: TrackChapter[] = [
   },
   {
     title: "In the wild",
+    tier: 2,
     pages: [
       { title: "Case A: handwritten digit recognition" },
       { title: "Case B: recommendation & collaborative filtering" },

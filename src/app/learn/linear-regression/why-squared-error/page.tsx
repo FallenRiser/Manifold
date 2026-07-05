@@ -1,6 +1,8 @@
-import Link from "next/link";
 import { PenaltyCurves } from "@/components/labs/PenaltyCurves";
 import { OutlierLab } from "@/components/labs/OutlierLab";
+import { PredictPrompt } from "@/components/PredictPrompt";
+import { LabFrame } from "@/components/LabFrame";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 export const metadata = {
   title: "Why squared error? — Manifold",
@@ -10,19 +12,15 @@ export const metadata = {
 export default function WhySquaredErrorPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-regression)")}>Regression</span>
-        <span style={chip("var(--c-fundamentals)")}>Beginner</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 9 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        Why squared error?
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 8px", maxWidth: 620 }}>
-        We&rsquo;ve been squaring our mistakes without really asking why. It turns out that one
+      <LessonHeader
+        chips={[{ label: "Regression", color: "var(--c-regression)" }, { label: "Beginner", color: "var(--c-fundamentals)" }]}
+        time="about 9 minutes"
+        title={<>Why squared error?</>}
+        intro={<>
+          We&rsquo;ve been squaring our mistakes without really asking why. It turns out that one
         small choice quietly shapes how your model behaves — for better <em>and</em> for worse.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <p>
@@ -65,6 +63,12 @@ export default function WhySquaredErrorPage() {
           error pairs so naturally with <strong>gradient descent</strong>, coming up next.
         </p>
 
+        <PredictPrompt
+          prompt={<>You drag one point far away from the trend. Which fitted line moves more to meet it — the squared-error one or the absolute-error one?</>}
+          options={["The squared-error line", "The absolute-error line", "Both move equally"]}
+          nudge={<>Locked in. Make the orange point an outlier in the lab below and watch both lines react.</>}
+        />
+
         <h2>The cost — squared error is fragile to outliers</h2>
         <p>
           That same eagerness to crush big errors is also squared error&rsquo;s weakness. Because
@@ -73,7 +77,14 @@ export default function WhySquaredErrorPage() {
           point below into an outlier and watch it happen.
         </p>
 
-        <OutlierLab />
+        <LabFrame
+          tryThis={<>Drag the orange point far above the trend, then bring it slowly back. Watch both fitted lines the whole way.</>}
+          insight={<>The solid squared-error line lurched toward the outlier while the dashed absolute-error line barely
+            flinched — one squared term outweighed every well-behaved point. That&rsquo;s the trade in one picture: MSE&rsquo;s
+            urgency about big misses is exactly what makes it fragile to bad data.</>}
+        >
+          <OutlierLab />
+        </LabFrame>
 
         <p>
           The squared-error line (solid) lurches toward the outlier; the absolute-error line
@@ -91,45 +102,17 @@ export default function WhySquaredErrorPage() {
           everything, or any sensor data prone to occasional wild readings.
         </p>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-fundamentals)", marginBottom: 4 }}>
-            In an interview
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            &ldquo;Why MSE over MAE?&rdquo; → <em>MSE is differentiable everywhere and convex, so it
+        <Callout color="var(--c-fundamentals)" title={<>In an interview</>}>
+          &ldquo;Why MSE over MAE?&rdquo; → <em>MSE is differentiable everywhere and convex, so it
             has a closed-form solution and plays nicely with gradient descent; it also penalises
             large errors more heavily. The catch is sensitivity to outliers — when that matters, MAE
             (or a robust loss like Huber, which blends the two) is the better choice.</em>
-          </p>
-        </div>
+        </Callout>
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 32, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/linear-regression/the-cost-function" style={navLink}>← The cost function</Link>
-          <Link href="/learn/linear-regression/the-loss-surface" style={navLink}>Next up · The loss surface →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/linear-regression/the-cost-function", label: <>← The cost function</> }} next={{ href: "/learn/linear-regression/the-loss-surface", label: <>Next up · The loss surface →</> }} />
       </div>
     </article>
   );
 }
 
-function chip(color: string): React.CSSProperties {
-  return {
-    display: "inline-flex",
-    alignItems: "center",
-    background: `color-mix(in srgb, ${color} 13%, var(--surface))`,
-    color,
-    fontSize: 12,
-    padding: "3px 10px",
-    borderRadius: 999,
-  };
-}
 
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-
-const callout: React.CSSProperties = {
-  background: "color-mix(in srgb, var(--c-fundamentals) 9%, var(--surface))",
-  border: "1px solid color-mix(in srgb, var(--c-fundamentals) 22%, var(--border))",
-  borderRadius: 12,
-  padding: "13px 15px",
-  margin: "1.8rem 0 0",
-};

@@ -1,6 +1,8 @@
-import Link from "next/link";
 import { M, MathBlock } from "@/components/Math";
 import { CodeBlock } from "@/components/CodeBlock";
+import { CoefPathLab } from "@/components/labs/CoefPathLab";
+import { REGRESSION_SETUP } from "@/lib/runtimeSetup";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 export const metadata = {
   title: "The Lasso — Manifold",
@@ -11,19 +13,16 @@ export const metadata = {
 export default function LassoPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-regression)")}>Regression</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 6 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        The Lasso
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 24px", maxWidth: 620 }}>
-        The Lasso makes one small-looking change to ridge — penalise the absolute value of the coefficients
+      <LessonHeader
+        chips={[{ label: "Regression", color: "var(--c-regression)" }]}
+        time="about 6 minutes"
+        title={<>The Lasso</>}
+        intro={<>
+          The Lasso makes one small-looking change to ridge — penalise the absolute value of the coefficients
         instead of the square — and gains a remarkable new power: it sets coefficients to <em>exactly</em>{" "}
         zero, doing feature selection for free.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <h2>The objective</h2>
@@ -47,18 +46,15 @@ export default function LassoPage() {
           and an automatic answer to &ldquo;which features matter?&rdquo;
         </p>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-regression)", marginBottom: 4 }}>
-            Why sparsity is so valuable
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            A model that uses 8 of 10,000 features is <strong>interpretable</strong> (you can read the eight),
+        <Callout color="var(--c-regression)" title={<>Why sparsity is so valuable</>}>
+          A model that uses 8 of 10,000 features is <strong>interpretable</strong> (you can read the eight),
             <strong> cheap</strong> (you only need to collect and compute those eight), and often{" "}
             <strong>more accurate</strong> when most features are truly irrelevant noise. In genomics, text,
             and sensor data — where features vastly outnumber samples — this automatic pruning is exactly what
             you need, and it&rsquo;s why Lasso is everywhere in high-dimensional statistics.
-          </p>
-        </div>
+        </Callout>
+
+        <CoefPathLab />
 
         <h2>The trade-offs vs ridge</h2>
         <ul style={ul}>
@@ -74,12 +70,9 @@ export default function LassoPage() {
         </p>
 
         <h2>One parameter change in code</h2>
-        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
+        <CodeBlock setup={REGRESSION_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 40, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/regularized-regression/choosing-lambda" style={navLink}>← Choosing λ</Link>
-          <Link href="/learn/regularized-regression/why-l1-creates-sparsity" style={{ ...navLink, fontWeight: 600 }}>Next up · Why L1 creates sparsity →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/regularized-regression/choosing-lambda", label: <>← Choosing λ</> }} next={{ href: "/learn/regularized-regression/why-l1-creates-sparsity", label: <>Next up · Why L1 creates sparsity →</> }} />
       </div>
     </article>
   );
@@ -101,9 +94,7 @@ lasso = Lasso(alpha=0.1).fit(X, y)        # alpha is λ
 print(lasso.coef_)                        # several entries are exactly 0.0
 print("features used:", (lasso.coef_ != 0).sum(), "of", X.shape[1])`;
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
+
 const ul: React.CSSProperties = { margin: "0 0 10px", paddingLeft: "1.3em", fontSize: 15, color: "var(--muted)", lineHeight: 1.8 };
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-regression) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-regression) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0" };
+
+

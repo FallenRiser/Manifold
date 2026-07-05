@@ -1,6 +1,10 @@
-import Link from "next/link";
 import { LineOfBestFitLab } from "@/components/labs/LineOfBestFitLab";
+import { ModelAnatomy } from "@/components/ModelAnatomy";
+import { PredictPrompt } from "@/components/PredictPrompt";
+import { LabFrame } from "@/components/LabFrame";
 import { CodeBlock } from "@/components/CodeBlock";
+import { REGRESSION_SETUP } from "@/lib/runtimeSetup";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 export default function LineOfBestFitPage() {
   const fromScratch = `import numpy as np
@@ -44,19 +48,15 @@ print(f"R²:  {r2_score(y, y_hat):.3f}")`;
 
     <article>
       {/* page header */}
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-regression)")}>Regression</span>
-        <span style={chip("var(--c-fundamentals)")}>Beginner</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 8 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        The line of best fit
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 8px", maxWidth: 620 }}>
-        You already do this in your head all the time. Today we&rsquo;ll just slow it down and
+      <LessonHeader
+        chips={[{ label: "Regression", color: "var(--c-regression)" }, { label: "Beginner", color: "var(--c-fundamentals)" }]}
+        time="about 8 minutes"
+        title={<>The line of best fit</>}
+        intro={<>
+          You already do this in your head all the time. Today we&rsquo;ll just slow it down and
         watch it happen — and by the end, you&rsquo;ll understand exactly what &ldquo;best&rdquo; means.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <p>
@@ -72,6 +72,12 @@ print(f"R²:  {r2_score(y, y_hat):.3f}")`;
           important idea in all of machine learning, and we&rsquo;ll meet it in a minute.
         </p>
 
+        <ModelAnatomy
+          form={<>A straight line: <code>ŷ = m·x + b</code></>}
+          loss={<>Mean squared error — the average of the squared misses</>}
+          optimiser={<>Gradient descent (or the normal equation, exactly)</>}
+        />
+
         <h2>First, what is a &ldquo;model&rdquo;?</h2>
         <p>
           A model is just a <strong>rule that turns an input into a prediction</strong>. For a
@@ -85,7 +91,19 @@ print(f"R²:  {r2_score(y, y_hat):.3f}")`;
           Grab either end of the line below and tilt it around until it feels right.
         </p>
 
-        <LineOfBestFitLab />
+        <PredictPrompt
+          prompt={<>When you&rsquo;ve tuned the line as well as it can possibly be — how many data points will it actually pass through?</>}
+          options={["Most of them", "All of them", "Often none at all"]}
+          nudge={<>Locked in. Now drag the line until the error is as low as you can get it — then count.</>}
+        />
+        <LabFrame
+          tryThis={<>Grab either end of the line, tilt it until the error readout is as small as you can make it, then hit snap-to-OLS and see how close you got.</>}
+          insight={<>Notice where the best line ends up: through the <em>middle</em> of the cloud, often touching no
+            point at all. It isn&rsquo;t trying to hit points — it&rsquo;s balancing the misses so the squared errors, and the
+            residuals above and below, cancel as a whole.</>}
+        >
+          <LineOfBestFitLab />
+        </LabFrame>
 
         <h2>Those little red lines are the whole game</h2>
         <p>
@@ -135,17 +153,12 @@ print(f"R²:  {r2_score(y, y_hat):.3f}")`;
           engine under almost every model you&rsquo;ll ever train. That&rsquo;s where we go next.
         </p>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-fundamentals)", marginBottom: 4 }}>
-            Why this matters later
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            Every supervised model is really three choices: a <strong>shape</strong> to fit (here,
+        <Callout color="var(--c-fundamentals)" title={<>Why this matters later</>}>
+          Every supervised model is really three choices: a <strong>shape</strong> to fit (here,
             a line), a way to measure <strong>wrongness</strong> (here, MSE), and a method to{" "}
             <strong>minimise</strong> it (coming up next). Once you see that pattern, half of
             machine learning stops looking like a list of random algorithms.
-          </p>
-        </div>
+        </Callout>
 
         <h2>The code</h2>
         <p>
@@ -154,38 +167,15 @@ print(f"R²:  {r2_score(y, y_hat):.3f}")`;
           scikit-learn. Both produce the same slope and intercept.
         </p>
 
-        <CodeBlock fromScratch={fromScratch} withLibrary={withLibrary} />
+        <CodeBlock setup={REGRESSION_SETUP} fromScratch={fromScratch} withLibrary={withLibrary} />
 
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 32, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/linear-regression/what-a-model-really-is" style={{ fontSize: 14, color: "var(--brand)", textDecoration: "none" }}>
-            ← What a model really is
-          </Link>
-          <Link href="/learn/linear-regression/what-is-error" style={{ fontSize: 14, color: "var(--brand)", textDecoration: "none" }}>
-            Next up · What is error? →
-          </Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/linear-regression/what-a-model-really-is", label: <>← What a model really is</> }} next={{ href: "/learn/linear-regression/what-is-error", label: <>Next up · What is error? →</> }} />
       </div>
     </article>
   );
 }
 
-function chip(color: string): React.CSSProperties {
-  return {
-    display: "inline-flex",
-    alignItems: "center",
-    background: `color-mix(in srgb, ${color} 13%, var(--surface))`,
-    color,
-    fontSize: 12,
-    padding: "3px 10px",
-    borderRadius: 999,
-  };
-}
 
-const callout: React.CSSProperties = {
-  background: "color-mix(in srgb, var(--c-fundamentals) 9%, var(--surface))",
-  border: "1px solid color-mix(in srgb, var(--c-fundamentals) 22%, var(--border))",
-  borderRadius: 12,
-  padding: "13px 15px",
-  margin: "1.8rem 0 0",
-};
+
+

@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { M, MathBlock } from "@/components/Math";
 import { CodeBlock } from "@/components/CodeBlock";
+import { KNN_SETUP } from "@/lib/runtimeSetup";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 export const metadata = {
   title: "Regression by averaging — Manifold",
@@ -29,19 +31,15 @@ const sy = (y: number) => Math.round((H - 16 - (y / 100) * (H - 30)) * 100) / 10
 export default function RegressionPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-classification)")}>Classification</span>
-        <span style={chip("var(--c-regression)")}>Regression</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 6 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        Regression by averaging
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 24px", maxWidth: 620 }}>
-        k-NN isn&rsquo;t only a classifier. Replace the vote with an average and the exact same &ldquo;find the
+      <LessonHeader
+        chips={[{ label: "Classification", color: "var(--c-classification)" }, { label: "Regression", color: "var(--c-regression)" }]}
+        time="about 6 minutes"
+        title={<>Regression by averaging</>}
+        intro={<>
+          k-NN isn&rsquo;t only a classifier. Replace the vote with an average and the exact same &ldquo;find the
         neighbours&rdquo; machinery predicts continuous numbers — with a distinctive staircase shape.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <h2>From vote to average</h2>
@@ -96,27 +94,19 @@ export default function RegressionPage() {
           biased) curve.
         </p>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-classification)", marginBottom: 4 }}>
-            k-NN regression vs. linear regression
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            Linear regression assumes a global straight-line relationship and extrapolates confidently;
+        <Callout color="var(--c-classification)" title={<>k-NN regression vs. linear regression</>}>
+          Linear regression assumes a global straight-line relationship and extrapolates confidently;
             k-NN regression assumes nothing about the global shape and adapts locally, but produces a blocky
             curve and refuses to extrapolate. k-NN wins when the relationship is complex and non-linear and
             you have dense data; linear regression wins when the trend is roughly linear or you need to
             predict beyond the observed range. <Link href="/learn/k-nearest-neighbors/local-weighted-regression" style={inlineLink}>Distance-weighting
             the average</Link> smooths the staircase into something far nicer.
-          </p>
-        </div>
+        </Callout>
 
         <h2>k-NN regression in code</h2>
-        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
+        <CodeBlock setup={KNN_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 40, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/k-nearest-neighbors/classification-by-majority-vote" style={navLink}>← Classification by majority vote</Link>
-          <Link href="/learn/k-nearest-neighbors/decision-boundaries" style={{ ...navLink, fontWeight: 600 }}>Next up · Decision boundaries →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/k-nearest-neighbors/classification-by-majority-vote", label: <>← Classification by majority vote</> }} next={{ href: "/learn/k-nearest-neighbors/decision-boundaries", label: <>Next up · Decision boundaries →</> }} />
       </div>
     </article>
   );
@@ -140,10 +130,8 @@ y_pred = reg.predict(X_test)          # piecewise-constant predictions
 # 'distance' weighting smooths the staircase (closer neighbours count more)
 reg_w = KNeighborsRegressor(n_neighbors=10, weights="distance").fit(X_train, y_train)`;
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
+
 const ul: React.CSSProperties = { margin: "0 0 10px", paddingLeft: "1.3em", fontSize: 15, color: "var(--muted)", lineHeight: 1.8 };
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
+
 const inlineLink: React.CSSProperties = { color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-classification) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-classification) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0" };
+

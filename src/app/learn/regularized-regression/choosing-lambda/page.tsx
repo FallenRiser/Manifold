@@ -1,6 +1,9 @@
-import Link from "next/link";
+import { Quiz } from "@/components/Quiz";
 import { M } from "@/components/Math";
 import { CodeBlock } from "@/components/CodeBlock";
+import { LambdaCVLab } from "@/components/labs/LambdaCVLab";
+import { REGRESSION_SETUP } from "@/lib/runtimeSetup";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 export const metadata = {
   title: "Choosing λ — Manifold",
@@ -11,19 +14,16 @@ export const metadata = {
 export default function ChoosingLambdaPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-regression)")}>Regression</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 6 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        Choosing λ
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 24px", maxWidth: 620 }}>
-        Ridge has exactly one hyperparameter, and everything rides on it. The catch: you can&rsquo;t pick it from
+      <LessonHeader
+        chips={[{ label: "Regression", color: "var(--c-regression)" }]}
+        time="about 6 minutes"
+        title={<>Choosing λ</>}
+        intro={<>
+          Ridge has exactly one hyperparameter, and everything rides on it. The catch: you can&rsquo;t pick it from
         the training data, because the training error only ever gets <em>worse</em> as λ grows. You need an
         estimate of <em>generalization</em>.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <h2>Why training error can&rsquo;t choose λ</h2>
@@ -51,18 +51,15 @@ export default function ChoosingLambdaPage() {
           than a single fit.
         </p>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-regression)", marginBottom: 4 }}>
-            Practical tips
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            Search λ on a <strong>log scale</strong> (e.g. <M>{String.raw`10^{-3}`}</M> to <M>{String.raw`10^{3}`}</M>) —
+        <LambdaCVLab />
+
+        <Callout color="var(--c-regression)" title={<>Practical tips</>}>
+          Search λ on a <strong>log scale</strong> (e.g. <M>{String.raw`10^{-3}`}</M> to <M>{String.raw`10^{3}`}</M>) —
             it spans orders of magnitude. Always <strong>standardize features first</strong>, or the penalty
             hits large-scale features unfairly (its own page). And consider the <strong>one-standard-error
             rule</strong>: rather than the exact CV minimum, pick the simplest model (largest λ) within one
             standard error of it, for a more robust, slightly more regularized choice.
-          </p>
-        </div>
+        </Callout>
 
         <h2>Other selection criteria</h2>
         <ul style={ul}>
@@ -73,12 +70,33 @@ export default function ChoosingLambdaPage() {
         <p>Cross-validation remains the default: it makes the fewest assumptions and directly estimates what you care about.</p>
 
         <h2>Let the library sweep λ for you</h2>
-        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
+        <CodeBlock setup={REGRESSION_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 40, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/regularized-regression/ridge-and-multicollinearity" style={navLink}>← Ridge &amp; multicollinearity</Link>
-          <Link href="/learn/regularized-regression/the-lasso" style={{ ...navLink, fontWeight: 600 }}>Next up · The Lasso →</Link>
-        </div>
+        <Quiz
+          accent="var(--c-regression)"
+          questions={[
+            {
+              q: "You choose λ by…",
+              options: ["Cross-validated held-out error across a grid of λ values", "Whichever λ minimises training error", "Theory alone — λ = 1 is standard"],
+              answer: 0,
+              explain: "Training error always votes for λ = 0 (less restraint always fits the training set better). Only held-out error can reveal the sweet spot where shrinkage starts paying.",
+            },
+            {
+              q: "With strongly correlated features, ridge characteristically…",
+              options: ["Spreads similar weight across the correlated group", "Picks one feature and zeroes the rest", "Fails to converge"],
+              answer: 0,
+              explain: "The L2 penalty hates any single large coefficient, so it splits credit among correlated twins: stable, but no feature selection. That's the Lasso's department.",
+            },
+            {
+              q: "Skipping standardization before ridge means…",
+              options: ["The penalty punishes coefficients unevenly, based on each feature's units", "Nothing — ridge is scale-invariant", "The closed form stops existing"],
+              answer: 0,
+              explain: "A coefficient's size depends on its feature's scale, and the penalty only sees size. Measured in millimetres vs kilometres, the same real effect gets penalised a million times harder.",
+            },
+          ]}
+        />
+
+        <PrevNext prev={{ href: "/learn/regularized-regression/ridge-and-multicollinearity", label: <>← Ridge &amp; multicollinearity</> }} next={{ href: "/learn/regularized-regression/the-lasso", label: <>Next up · The Lasso →</> }} />
       </div>
     </article>
   );
@@ -108,10 +126,8 @@ from sklearn.linear_model import RidgeCV
 model = RidgeCV(alphas=np.logspace(-3, 3, 100)).fit(X, y)
 print("chosen λ:", model.alpha_)`;
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
+
 const ul: React.CSSProperties = { margin: "0 0 10px", paddingLeft: "1.3em", fontSize: 15, color: "var(--muted)", lineHeight: 1.8 };
 const ol: React.CSSProperties = { margin: "0 0 10px", paddingLeft: "1.3em", fontSize: 15, color: "var(--muted)", lineHeight: 1.85 };
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-regression) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-regression) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0" };
+
+

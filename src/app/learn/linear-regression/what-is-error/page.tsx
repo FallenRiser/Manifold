@@ -1,5 +1,6 @@
-import Link from "next/link";
 import { ResidualsLab } from "@/components/labs/ResidualsLab";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
+import { Quiz } from "@/components/Quiz";
 
 export const metadata = {
   title: "What is error? — Manifold",
@@ -9,20 +10,16 @@ export const metadata = {
 export default function WhatIsErrorPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-regression)")}>Regression</span>
-        <span style={chip("var(--c-fundamentals)")}>Beginner</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 6 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        What is error?
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 8px", maxWidth: 620 }}>
-        Every prediction misses by a little. The gap between what the model says and what
+      <LessonHeader
+        chips={[{ label: "Regression", color: "var(--c-regression)" }, { label: "Beginner", color: "var(--c-fundamentals)" }]}
+        time="about 6 minutes"
+        title={<>What is error?</>}
+        intro={<>
+          Every prediction misses by a little. The gap between what the model says and what
         actually happened is called the <em>residual</em> — and it&rsquo;s the most important
         number in all of model fitting.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <p>
@@ -98,39 +95,40 @@ export default function WhatIsErrorPage() {
           why we compute it the way we do — is what&rsquo;s next.
         </p>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-fundamentals)", marginBottom: 4 }}>
-            What to remember
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            The <strong>residual</strong> eᵢ = yᵢ − ŷᵢ is the signed vertical distance from a
+        <Callout color="var(--c-fundamentals)" title={<>What to remember</>}>
+          The <strong>residual</strong> eᵢ = yᵢ − ŷᵢ is the signed vertical distance from a
             data point to the model&rsquo;s prediction. Positive means under-predicted, negative
             means over-predicted. The sum of all residuals on the best-fit line is exactly zero —
             which is why we can&rsquo;t use the sum to judge how good a line is.
-          </p>
-        </div>
+        </Callout>
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 32, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/linear-regression" style={navLink}>← The line of best fit</Link>
-          <Link href="/learn/linear-regression/the-cost-function" style={navLink}>Next up · The cost function →</Link>
-        </div>
+        <Quiz
+          questions={[
+            {
+              q: <>A data point sits at y = 30 and your line predicts ŷ = 34 there. The residual is:</>,
+              options: ["+4 — the model was 4 too high", "−4 — actual minus predicted", "4 — residuals are always positive", "0.88 — the ratio of actual to predicted"],
+              answer: 1,
+              explain: <>The residual is e = y − ŷ = 30 − 34 = −4: the <em>signed</em> vertical gap, and negative means the model predicted too high.</>,
+            },
+            {
+              q: <>On the OLS best-fit line, the residuals sum to exactly zero. Why can&rsquo;t we use &ldquo;sum of residuals&rdquo; to judge how good a line is?</>,
+              options: ["Because it's too slow to compute", "Because positives and negatives cancel — a terrible line can also sum to zero", "Because residuals are unitless", "We can — that's exactly what OLS minimizes"],
+              answer: 1,
+              explain: <>A line that misses wildly high on half the points and wildly low on the other half sums to zero too. That cancellation is the whole motivation for squaring, which is where the next chapter starts.</>,
+            },
+            {
+              q: <>What&rsquo;s the &ldquo;model&rdquo; that linear regression learns?</>,
+              options: ["The training dataset itself", "A line — a slope and intercept chosen from the data", "The residuals", "The loss function"],
+              answer: 1,
+              explain: <>The model is the parameterised form (ŷ = wx + b) with specific values of w and b learned from data. The loss measures it, the optimiser tunes it — form + loss + optimiser, the pattern behind every model on this site.</>,
+            },
+          ]}
+        />
+
+        <PrevNext prev={{ href: "/learn/linear-regression", label: <>← The line of best fit</> }} next={{ href: "/learn/linear-regression/the-cost-function", label: <>Next up · The cost function →</> }} />
       </div>
     </article>
   );
 }
 
-function chip(color: string): React.CSSProperties {
-  return {
-    display: "inline-flex", alignItems: "center",
-    background: `color-mix(in srgb, ${color} 13%, var(--surface))`,
-    color, fontSize: 12, padding: "3px 10px", borderRadius: 999,
-  };
-}
 
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-
-const callout: React.CSSProperties = {
-  background: "color-mix(in srgb, var(--c-fundamentals) 9%, var(--surface))",
-  border: "1px solid color-mix(in srgb, var(--c-fundamentals) 22%, var(--border))",
-  borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0 0",
-};

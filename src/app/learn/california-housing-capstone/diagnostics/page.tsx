@@ -1,5 +1,6 @@
-import Link from "next/link";
 import { CodeOutput } from "@/components/CodeOutput";
+import { LessonHeader, PrevNext } from "@/components/lesson";
+import { DecisionPoint } from "@/components/capstone/DecisionPoint";
 
 export const metadata = {
   title: "Capstone: diagnostics — what the linear model misses — Manifold",
@@ -40,19 +41,17 @@ function CoefFig() {
 export default function DiagnosticsPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-regression)")}>Capstone</span>
-        <span style={chip("var(--c-metrics)")}>3 · The linear baseline</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 9 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 42, lineHeight: 1.08, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        Diagnostics: what it misses
-      </h1>
-      <p style={{ fontSize: 17.5, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 24px", maxWidth: 620 }}>
-        A score is not understanding. Reading the coefficients and dissecting the residuals turns the baseline
+      <LessonHeader
+        chips={[{ label: "Capstone", color: "var(--c-regression)" }, { label: "3 · The linear baseline", color: "var(--c-metrics)" }]}
+        time="about 9 minutes"
+        title={<>Diagnostics: what it misses</>}
+        intro={<>
+          A score is not understanding. Reading the coefficients and dissecting the residuals turns the baseline
         into a to-do list: three specific weaknesses, each of which becomes one of the next three pages.
-      </p>
+        </>}
+        titleSize={42}
+        introSize={17.5}
+      />
 
       <div className="lesson">
         <h2>What the model learned</h2>
@@ -102,20 +101,34 @@ residuals split by the 5.0 cap:
           higher, and here&rsquo;s the specific fix for each.&rdquo; The rest of the capstone executes that plan.
         </p>
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 40, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/california-housing-capstone/linear-models" style={navLink}>← Baseline &amp; regularized models</Link>
-          <Link href="/learn/california-housing-capstone/spatial-features" style={{ ...navLink, fontWeight: 600 }}>Next up · Upgrade 1: spatial feature engineering →</Link>
-        </div>
+        <DecisionPoint
+          question={<>Three diagnosed weaknesses, limited time. Which fix do you attempt first?</>}
+          options={[
+            {
+              label: "Spatial features — engineer distance-to-coast, metros, regions",
+              verdict: "best",
+              response: <>It attacks the largest diagnosed structure (geography dominates the coefficients <em>and</em> the residuals), it&rsquo;s cheap to build, and it keeps the model linear and interpretable — which framing said the stakeholders need. Fix the biggest named problem first, with the smallest tool that can fix it.</>,
+            },
+            {
+              label: "Skip ahead — throw gradient boosting at it now",
+              verdict: "close",
+              response: <>It would win on score immediately (we&rsquo;ll see it hits mid-0.80s). But you&rsquo;d never learn <em>which</em> problem the trees solved, you&rsquo;d abandon the interpretability requirement without testing the linear ceiling, and you couldn&rsquo;t justify the complexity to stakeholders. The ladder is the argument.</>,
+            },
+            {
+              label: "Fix the censoring first — it biases every coefficient",
+              verdict: "close",
+              response: <>Principled — the cap bias is real and measured (+1.04 mean residual). But it directly affects 4.9% of rows, while the geographic non-linearity distorts the fit <em>everywhere</em>. We do fix it (Upgrade 2), right after the bigger win.</>,
+            },
+          ]}
+        />
+
+        <PrevNext prev={{ href: "/learn/california-housing-capstone/linear-models", label: <>← Baseline &amp; regularized models</> }} next={{ href: "/learn/california-housing-capstone/spatial-features", label: <>Next up · Upgrade 1: spatial feature engineering →</> }} />
       </div>
     </article>
   );
 }
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
 const ul: React.CSSProperties = { margin: "0 0 10px", paddingLeft: "1.3em", fontSize: 15, color: "var(--muted)", lineHeight: 1.8 };
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
 const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-regression) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-regression) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0" };
 const figWrap: React.CSSProperties = { background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 14, padding: 14, margin: "1.2rem 0" };
 const cap: React.CSSProperties = { fontSize: 12, color: "var(--muted)", marginTop: 8, lineHeight: 1.5 };

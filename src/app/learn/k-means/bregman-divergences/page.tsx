@@ -1,6 +1,7 @@
-import Link from "next/link";
 import { M, MathBlock } from "@/components/Math";
 import { CodeBlock } from "@/components/CodeBlock";
+import { CLUSTER_SETUP } from "@/lib/runtimeSetup";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 export const metadata = {
   title: "Bregman divergences — Manifold",
@@ -11,20 +12,16 @@ export const metadata = {
 export default function BregmanPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-clustering)")}>Clustering</span>
-        <span style={chip("var(--c-metrics)")}>Go deeper</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 7 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        Bregman divergences
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 24px", maxWidth: 620 }}>
-        One question has hovered over the whole track: why <em>the mean</em>? The deepest answer is that
+      <LessonHeader
+        chips={[{ label: "Clustering", color: "var(--c-clustering)" }, { label: "Go deeper", color: "var(--c-metrics)" }]}
+        time="about 7 minutes"
+        title={<>Bregman divergences</>}
+        intro={<>
+          One question has hovered over the whole track: why <em>the mean</em>? The deepest answer is that
         squared Euclidean distance belongs to a family — Bregman divergences — and the mean is the
         minimiser for <em>every</em> member of it. That&rsquo;s the real reason k-means works.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <h2>The mean isn&rsquo;t a coincidence</h2>
@@ -71,27 +68,19 @@ export default function BregmanPage() {
           That generalisation is <strong>Bregman clustering</strong>.
         </p>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-clustering)", marginBottom: 4 }}>
-            Why this is the satisfying ending
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            It answers the &ldquo;why the mean?&rdquo; question at the root, and it converts the choice of distance
+        <Callout color="var(--c-clustering)" title={<>Why this is the satisfying ending</>}>
+          It answers the &ldquo;why the mean?&rdquo; question at the root, and it converts the choice of distance
             into a modelling decision: pick the divergence that matches your data&rsquo;s noise, and the mean is
             automatically the right center. Clustering histograms or distributions? Use KL — that&rsquo;s
             Bregman clustering with the entropy <M>{String.raw`\phi`}</M>, and the centroid is still just the
             average. k-Means was a special case of EM; here it&rsquo;s also a special case of Bregman clustering.
             Same algorithm, one rung more general.
-          </p>
-        </div>
+        </Callout>
 
         <h2>Same loop, swappable divergence</h2>
-        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
+        <CodeBlock setup={CLUSTER_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 40, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/k-means/coordinate-descent" style={navLink}>← Convergence as coordinate descent</Link>
-          <Link href="/learn/k-means/when-to-use-k-means" style={{ ...navLink, fontWeight: 600 }}>Next up · When to use k-means →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/k-means/coordinate-descent", label: <>← Convergence as coordinate descent</> }} next={{ href: "/learn/k-means/when-to-use-k-means", label: <>Next up · When to use k-means →</> }} />
       </div>
     </article>
   );
@@ -122,9 +111,7 @@ const codeLib = `# scikit-learn's KMeans is the squared-Euclidean (default) Breg
 from sklearn.cluster import KMeans
 labels = KMeans(n_clusters=4, n_init=10, random_state=0).fit_predict(X)  # phi = ||x||^2`;
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
+
 const ul: React.CSSProperties = { margin: "0 0 10px", paddingLeft: "1.3em", fontSize: 15, color: "var(--muted)", lineHeight: 1.8 };
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-clustering) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-clustering) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0" };
+
+

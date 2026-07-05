@@ -1,8 +1,9 @@
-import Link from "next/link";
 import { HypothesisTestLab } from "@/components/labs/HypothesisTestLab";
 import { MathBlock } from "@/components/Math";
 import { CodeBlock } from "@/components/CodeBlock";
+import { REGRESSION_SETUP } from "@/lib/runtimeSetup";
 import { Backlinks } from "@/components/Backlinks";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 const codeScratch = `import numpy as np
 from scipy import stats
@@ -41,20 +42,16 @@ export const metadata = {
 export default function HypothesisTestsPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-regression)")}>Regression</span>
-        <span style={chip("var(--brand)")}>Inference</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 6 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        Hypothesis tests &amp; p-values
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 8px", maxWidth: 620 }}>
-        Every time you run a regression, the software spits out a column of
+      <LessonHeader
+        chips={[{ label: "Regression", color: "var(--c-regression)" }, { label: "Inference", color: "var(--brand)" }]}
+        time="about 6 minutes"
+        title={<>Hypothesis tests &amp; p-values</>}
+        intro={<>
+          Every time you run a regression, the software spits out a column of
         p-values. They determine what gets published and what gets ignored. What
         are they actually doing?
-      </p>
+        </>}
+      />
 
       <Backlinks label="Related" items={[
         { label: "Confidence intervals", href: "/learn/linear-regression/confidence-intervals" },
@@ -98,16 +95,11 @@ export default function HypothesisTestsPage() {
           The <em>t</em>-statistic gets converted into a probability: the p-value.
         </p>
         
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--bad)", marginBottom: 4 }}>
-            The strict definition
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            "Assuming the null hypothesis is true (the feature has zero effect),
+        <Callout color="var(--bad)" title={<>The strict definition</>}>
+          "Assuming the null hypothesis is true (the feature has zero effect),
             the p-value is the probability of seeing a coefficient as extreme as
             yours, or more extreme, purely by random chance."
-          </p>
-        </div>
+        </Callout>
 
         <p>
           If your p-value is <strong>0.01</strong>, it means: "If this feature
@@ -146,12 +138,9 @@ export default function HypothesisTestsPage() {
           probability. From scratch with SciPy&rsquo;s t-distribution, then straight off the
           statsmodels fit.
         </p>
-        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
+        <CodeBlock setup={REGRESSION_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 32, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/linear-regression/confidence-intervals" style={navLink}>← Confidence intervals</Link>
-          <Link href="/learn/linear-regression/prediction-intervals" style={navLink}>Next up · Prediction intervals →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/linear-regression/confidence-intervals", label: <>← Confidence intervals</> }} next={{ href: "/learn/linear-regression/prediction-intervals", label: <>Next up · Prediction intervals →</> }} />
       </div>
     </article>
   );
@@ -166,7 +155,5 @@ function MisconceptionCard({ myth, truth }: { myth: string; truth: string }) {
   );
 }
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--bad) 6%, var(--surface))", border: "1px solid color-mix(in srgb, var(--bad) 20%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0 0" };
+
+

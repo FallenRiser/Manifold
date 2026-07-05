@@ -1,8 +1,9 @@
-import Link from "next/link";
 import { TransformationLab } from "@/components/labs/TransformationLab";
 import { MathBlock } from "@/components/Math";
 import { CodeBlock } from "@/components/CodeBlock";
+import { REGRESSION_SETUP } from "@/lib/runtimeSetup";
 import { Backlinks } from "@/components/Backlinks";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 const codeScratch = `import numpy as np
 
@@ -38,19 +39,15 @@ export const metadata = {
 export default function TransformationsPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-regression)")}>Regression</span>
-        <span style={chip("var(--brand)")}>Fixing</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 5 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        Transformations
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 8px", maxWidth: 620 }}>
-        You don't always have to switch to a complex non-linear model. Sometimes,
+      <LessonHeader
+        chips={[{ label: "Regression", color: "var(--c-regression)" }, { label: "Fixing", color: "var(--brand)" }]}
+        time="about 5 minutes"
+        title={<>Transformations</>}
+        intro={<>
+          You don't always have to switch to a complex non-linear model. Sometimes,
         you just need to look at your data through a different lens.
-      </p>
+        </>}
+      />
 
       <Backlinks label="Related" items={[
         { label: "Normality of residuals", href: "/learn/linear-regression/normality-of-residuals" },
@@ -108,31 +105,23 @@ export default function TransformationsPage() {
           <li>If λ = -1: Inverse transformation (1/y) (good for rates, like converting hours to speed).</li>
         </ul>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-fundamentals)", marginBottom: 4 }}>
-            The catch with transforming y
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            When you transform the outcome (e.g., predicting log(y)), your model
+        <Callout color="var(--c-fundamentals)" title={<>The catch with transforming y</>}>
+          When you transform the outcome (e.g., predicting log(y)), your model
             is minimising the squared errors of the <em>logarithms</em>, not the
             raw values. When you exponentiate the predictions to get back to the
             original scale, you are predicting the <strong>median</strong>, not
             the <strong>mean</strong>. To get the true mean, you must apply
             Duan's smearing estimator (a correction factor).
-          </p>
-        </div>
+        </Callout>
 
         <h2>Compute it yourself</h2>
         <p>
           Fitting raw exponential data gives a poor R²; logging it first makes the
           relationship linear. SciPy&rsquo;s Box-Cox even picks the optimal power for you.
         </p>
-        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
+        <CodeBlock setup={REGRESSION_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 32, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/linear-regression/cross-validation-bias-variance" style={navLink}>← Cross-validation & bias–variance</Link>
-          <Link href="/learn/linear-regression/weighted-least-squares" style={navLink}>Next up · Weighted least squares →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/linear-regression/cross-validation-bias-variance", label: <>← Cross-validation & bias–variance</> }} next={{ href: "/learn/linear-regression/weighted-least-squares", label: <>Next up · Weighted least squares →</> }} />
       </div>
     </article>
   );
@@ -150,7 +139,5 @@ function InterpCard({ title, formula, body, color }: { title: string; formula: s
   );
 }
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-fundamentals) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-fundamentals) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0 0" };
+
+

@@ -540,7 +540,7 @@ function NumRow({
 
 const btnPrimary: React.CSSProperties = {
   background: "var(--cta)",
-  color: "#fff",
+  color: "var(--cta-text)",
   border: "none",
   fontSize: 13,
   fontWeight: 500,

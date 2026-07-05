@@ -1,6 +1,7 @@
-import Link from "next/link";
 import { M, MathBlock } from "@/components/Math";
 import { CodeBlock } from "@/components/CodeBlock";
+import { REGRESSION_SETUP } from "@/lib/runtimeSetup";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 export const metadata = {
   title: "Why L1 creates sparsity — Manifold",
@@ -20,20 +21,16 @@ const rs = Array.from({ length: 81 }, (_, i) => -10 + i * 0.25);
 export default function WhyL1Page() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-regression)")}>Regression</span>
-        <span style={chip("var(--c-metrics)")}>Go deeper</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 7 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        Why L1 creates sparsity
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 24px", maxWidth: 620 }}>
-        This is the conceptual centre of the whole track. Two explanations — one geometric, one algebraic —
+      <LessonHeader
+        chips={[{ label: "Regression", color: "var(--c-regression)" }, { label: "Go deeper", color: "var(--c-metrics)" }]}
+        time="about 7 minutes"
+        title={<>Why L1 creates sparsity</>}
+        intro={<>
+          This is the conceptual centre of the whole track. Two explanations — one geometric, one algebraic —
         both show the same thing: the L1 penalty makes exact zeros inevitable, and the L2 penalty makes them
         impossible.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <h2>Explanation 1 — the geometry of the corner</h2>
@@ -89,26 +86,18 @@ export default function WhyL1Page() {
           </div>
         </div>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-regression)", marginBottom: 4 }}>
-            The unifying idea: the penalty&rsquo;s slope at zero
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            Both explanations come down to one fact. The L1 penalty <M>{String.raw`|\beta|`}</M> has a{" "}
+        <Callout color="var(--c-regression)" title={<>The unifying idea: the penalty&rsquo;s slope at zero</>}>
+          Both explanations come down to one fact. The L1 penalty <M>{String.raw`|\beta|`}</M> has a{" "}
             <strong>kink</strong> at zero — a nonzero slope (a corner) — so there&rsquo;s a finite force holding a
             coefficient at exactly zero until the data pushes hard enough to overcome it. The L2 penalty{" "}
             <M>{String.raw`\beta^2`}</M> is smooth with <em>zero</em> slope at the origin, so the slightest data
             signal nudges the coefficient off zero. Sparsity is precisely the signature of a non-smooth penalty.
-          </p>
-        </div>
+        </Callout>
 
         <h2>Soft-thresholding in code</h2>
-        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
+        <CodeBlock setup={REGRESSION_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 40, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/regularized-regression/the-lasso" style={navLink}>← The Lasso</Link>
-          <Link href="/learn/regularized-regression/the-regularization-path" style={{ ...navLink, fontWeight: 600 }}>Next up · The regularization path →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/regularized-regression/the-lasso", label: <>← The Lasso</> }} next={{ href: "/learn/regularized-regression/the-regularization-path", label: <>Next up · The regularization path →</> }} />
       </div>
     </article>
   );
@@ -131,8 +120,6 @@ ridge = Ridge(alpha=0.3).fit(X, y)
 print("lasso zeros:", (lasso.coef_ == 0).sum())   # > 0
 print("ridge zeros:", (ridge.coef_ == 0).sum())   # 0`;
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-regression) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-regression) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0" };
+
+
+

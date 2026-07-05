@@ -1,6 +1,7 @@
-import Link from "next/link";
 import { CodeBlock } from "@/components/CodeBlock";
 import { CodeOutput } from "@/components/CodeOutput";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
+import { GuessSlider } from "@/components/capstone/GuessSlider";
 
 export const metadata = {
   title: "Capstone: baseline & regularized models — Manifold",
@@ -10,10 +11,10 @@ export const metadata = {
 
 const MODELS = [
   { name: "Baseline (mean)", rmse: 1.156 },
-  { name: "OLS", rmse: 0.662 },
-  { name: "Ridge", rmse: 0.662 },
-  { name: "Lasso", rmse: 0.662 },
-  { name: "Elastic-net", rmse: 0.662 },
+  { name: "OLS", rmse: 0.681 },
+  { name: "Ridge", rmse: 0.681 },
+  { name: "Lasso", rmse: 0.681 },
+  { name: "Elastic-net", rmse: 0.681 },
 ];
 
 function BarFig() {
@@ -40,49 +41,52 @@ function BarFig() {
 export default function LinearModelsPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-regression)")}>Capstone</span>
-        <span style={chip("var(--c-metrics)")}>3 · The linear baseline</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 9 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 42, lineHeight: 1.08, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        Baseline & regularized models
-      </h1>
-      <p style={{ fontSize: 17.5, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 24px", maxWidth: 620 }}>
-        Now we model — from the bottom up, with honest validation. The result is more instructive than a
+      <LessonHeader
+        chips={[{ label: "Capstone", color: "var(--c-regression)" }, { label: "3 · The linear baseline", color: "var(--c-metrics)" }]}
+        time="about 9 minutes"
+        title={<>Baseline & regularized models</>}
+        intro={<>
+          Now we model — from the bottom up, with honest validation. The result is more instructive than a
         triumphant one would be: on this data, regularization <em>ties</em> plain OLS, and understanding why is
         the real lesson.
-      </p>
+        </>}
+        titleSize={42}
+        introSize={17.5}
+      />
 
       <div className="lesson">
         <h2>Always start with a baseline</h2>
         <p>
           Before any real model, the dumbest one: predict the mean price for every block. Its RMSE equals the
           target&rsquo;s standard deviation, <strong>1.156</strong> — the number every later model must beat, and the
-          thing that turns &ldquo;R² = 0.67&rdquo; into the concrete &ldquo;we cut baseline error by ~43%.&rdquo;
+          thing that turns &ldquo;R² = 0.65&rdquo; into the concrete &ldquo;we cut baseline error by ~41%.&rdquo;
         </p>
 
         <h2>The comparison</h2>
+        <GuessSlider
+          prompt={<>Ten cleaned features, 16,512 rows, an honest 5-fold CV. What R² do you expect from the linear family on this data?</>}
+          min={0}
+          max={1}
+          step={0.005}
+          actual={0.653}
+          decimals={3}
+          reveal={<>The whole linear family lands at <strong>R² 0.653</strong> — RMSE 0.681, a ~41% cut in baseline error from ten interpretable coefficients. If you guessed higher: the missing 35% is exactly what the diagnostics page dissects (non-linear geography, the cap, interactions).</>}
+        />
         <CodeBlock fromScratch={code} withLibrary={code} />
-        <CodeOutput>{`5-fold CV  (RMSE in $100k, R2)
+        <CodeOutput>{`5-fold CV  (RMSE in $100k, R2)        seed 42
   Baseline (mean)    RMSE 1.156   R2 0.000
-  OLS                RMSE 0.662   R2 0.672
-  Ridge   (λ≈10)     RMSE 0.662   R2 0.672
-  Lasso   (λ≈0.001)  RMSE 0.662   R2 0.672   kept 10/10 features
-  ElasticNet (α=0.9) RMSE 0.662   R2 0.672`}</CodeOutput>
+  OLS                RMSE 0.681   R2 0.653
+  Ridge   (λ≈10)     RMSE 0.681   R2 0.653
+  Lasso   (λ≈0.001)  RMSE 0.681   R2 0.653   kept 10/10 features
+  ElasticNet (α=0.9) RMSE 0.681   R2 0.653`}</CodeOutput>
         <div style={figWrap}>
           <BarFig />
-          <div style={cap}>OLS crushes the mean baseline (1.156 → 0.662, R² 0.672) — but ridge, lasso, and
-            elastic-net all land at the same 0.662. Regularization neither helps nor hurts the score here.</div>
+          <div style={cap}>OLS crushes the mean baseline (1.156 → 0.681, R² 0.653) — but ridge, lasso, and
+            elastic-net all land at the same 0.681. Regularization neither helps nor hurts the score here.</div>
         </div>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-regression)", marginBottom: 4 }}>
-            Why regularization didn&rsquo;t boost accuracy — and why that&rsquo;s the right outcome
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            Regularization fights overfitting, and here there&rsquo;s almost none to fight:{" "}
+        <Callout color="var(--c-regression)" title={<>Why regularization didn&rsquo;t boost accuracy — and why that&rsquo;s the right outcome</>}>
+          Regularization fights overfitting, and here there&rsquo;s almost none to fight:{" "}
             <strong>16,512 rows, only 10 features</strong> (n ≫ p). OLS has ample data to pin down ten
             coefficients, so its variance is already low and a penalty has little to remove. The tells confirm
             it: lasso chose a near-zero λ and kept all 10 features (nothing is redundant enough to drop), and
@@ -90,8 +94,7 @@ export default function LinearModelsPage() {
             <strong>regularization is insurance, not a free accuracy boost</strong>. Its premium is still worth
             paying here for what it does deliver: stable, interpretable coefficients despite the multicollinearity
             (VIF up to 13.9 from the engineered features).
-          </p>
-        </div>
+        </Callout>
 
         <h2>Which linear model do we keep?</h2>
         <p>
@@ -102,10 +105,7 @@ export default function LinearModelsPage() {
           and where it falls short.
         </p>
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 40, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/california-housing-capstone/preprocessing" style={navLink}>← Preprocessing pipeline</Link>
-          <Link href="/learn/california-housing-capstone/diagnostics" style={{ ...navLink, fontWeight: 600 }}>Next up · Diagnostics: what it misses →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/california-housing-capstone/preprocessing", label: <>← Preprocessing pipeline</> }} next={{ href: "/learn/california-housing-capstone/diagnostics", label: <>Next up · Diagnostics: what it misses →</> }} />
       </div>
     </article>
   );
@@ -131,10 +131,5 @@ for name, est in [("Baseline", DummyRegressor(strategy="mean")),
                   ("ENet",  ElasticNetCV(l1_ratio=[.2,.5,.9,1]))]:
     print(name, evaluate(est))`;
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-regression) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-regression) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0" };
 const figWrap: React.CSSProperties = { background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 14, padding: 14, margin: "1.2rem 0" };
 const cap: React.CSSProperties = { fontSize: 12, color: "var(--muted)", marginTop: 8, lineHeight: 1.5 };

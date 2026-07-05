@@ -1,8 +1,9 @@
-import Link from "next/link";
 import { WLSLab } from "@/components/labs/WLSLab";
 import { MathBlock } from "@/components/Math";
 import { CodeBlock } from "@/components/CodeBlock";
+import { REGRESSION_SETUP } from "@/lib/runtimeSetup";
 import { Backlinks } from "@/components/Backlinks";
+import { LessonHeader, PrevNext } from "@/components/lesson";
 
 const codeScratch = `import numpy as np
 
@@ -40,20 +41,16 @@ export const metadata = {
 export default function WeightedLeastSquaresPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-regression)")}>Regression</span>
-        <span style={chip("var(--brand)")}>Fixing</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 4 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        Weighted least squares
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 8px", maxWidth: 620 }}>
-        Ordinary Least Squares is an egalitarian algorithm: every data point gets
+      <LessonHeader
+        chips={[{ label: "Regression", color: "var(--c-regression)" }, { label: "Fixing", color: "var(--brand)" }]}
+        time="about 4 minutes"
+        title={<>Weighted least squares</>}
+        intro={<>
+          Ordinary Least Squares is an egalitarian algorithm: every data point gets
         exactly one vote. But what if you know certain data points are highly
         unreliable?
-      </p>
+        </>}
+      />
 
       <Backlinks label="Related" items={[
         { label: "Homoscedasticity", href: "/learn/linear-regression/homoscedasticity" },
@@ -132,12 +129,9 @@ export default function WeightedLeastSquaresPage() {
           WLS is the normal equation with a weight matrix wedged in. From scratch
           it&rsquo;s one extra <code>W</code>; statsmodels takes a <code>weights</code> argument.
         </p>
-        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
+        <CodeBlock setup={REGRESSION_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 32, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/linear-regression/transformations" style={navLink}>← Transformations</Link>
-          <Link href="/learn/linear-regression/regularization" style={navLink}>Next up · Regularization →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/linear-regression/transformations", label: <>← Transformations</> }} next={{ href: "/learn/linear-regression/regularization", label: <>Next up · Regularization →</> }} />
       </div>
     </article>
   );
@@ -152,7 +146,5 @@ function SourceCard({ title, body, color }: { title: string; body: string; color
   );
 }
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}const grid2: React.CSSProperties = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 14, margin: "1.4rem 0" };
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
+const grid2: React.CSSProperties = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 14, margin: "1.4rem 0" };
+

@@ -1,6 +1,6 @@
-import Link from "next/link";
 import { CodeBlock } from "@/components/CodeBlock";
 import { KMeansFailureLab } from "@/components/labs/KMeansFailureLab";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 export const metadata = {
   title: "Non-spherical clusters — Manifold",
@@ -11,19 +11,16 @@ export const metadata = {
 export default function NonSphericalPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-clustering)")}>Clustering</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 6 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        Non-spherical clusters
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 24px", maxWidth: 620 }}>
-        Every assumption k-means makes is now going to bite. The first and most visual: it assumes
+      <LessonHeader
+        chips={[{ label: "Clustering", color: "var(--c-clustering)" }]}
+        time="about 6 minutes"
+        title={<>Non-spherical clusters</>}
+        intro={<>
+          Every assumption k-means makes is now going to bite. The first and most visual: it assumes
         clusters are round and separable by straight lines. When they aren&rsquo;t, it fails — and not because
         you tuned it wrong.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <h2>The built-in shape bias</h2>
@@ -60,27 +57,19 @@ export default function NonSphericalPage() {
           </li>
         </ul>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-clustering)", marginBottom: 4 }}>
-            What actually works here
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            These shapes call for a different notion of &ldquo;cluster.&rdquo; <strong>DBSCAN</strong> groups by
+        <Callout color="var(--c-clustering)" title={<>What actually works here</>}>
+          These shapes call for a different notion of &ldquo;cluster.&rdquo; <strong>DBSCAN</strong> groups by
             density and follows arbitrary shapes (great for rings and moons). <strong>Spectral
             clustering</strong> reshapes the data via a similarity graph so the groups become
             line-separable, then runs k-means there. <strong>Gaussian mixtures</strong> allow stretched,
             tilted ellipses. The full comparison is two pages ahead — the point here is that the failure is
             structural, not a tuning problem.
-          </p>
-        </div>
+        </Callout>
 
         <h2>Reproduce the failure</h2>
         <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 40, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/k-means/clustering-after-dimensionality-reduction" style={navLink}>← Clustering after dimensionality reduction</Link>
-          <Link href="/learn/k-means/unequal-sizes-and-densities" style={{ ...navLink, fontWeight: 600 }}>Next up · Unequal sizes &amp; densities →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/k-means/clustering-after-dimensionality-reduction", label: <>← Clustering after dimensionality reduction</> }} next={{ href: "/learn/k-means/unequal-sizes-and-densities", label: <>Next up · Unequal sizes &amp; densities →</> }} />
       </div>
     </article>
   );
@@ -108,9 +97,4 @@ db = DBSCAN(eps=0.2, min_samples=5).fit_predict(X)                    # follows 
 sp = SpectralClustering(n_clusters=2, affinity="nearest_neighbors",
                         random_state=0).fit_predict(X)                # also works`;
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
 const ul: React.CSSProperties = { margin: "0 0 10px", paddingLeft: "1.3em", fontSize: 15, color: "var(--muted)", lineHeight: 1.8 };
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-clustering) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-clustering) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0" };

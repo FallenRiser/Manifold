@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { LessonHeader, PrevNext } from "@/components/lesson";
 
 export const metadata = {
   title: "Failure-mode gallery — Manifold",
@@ -9,19 +9,15 @@ export const metadata = {
 export default function FailureModeGalleryPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-regression)")}>Regression</span>
-        <span style={chip("var(--good)")}>In the wild</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 3 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        Failure-mode gallery
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 8px", maxWidth: 620 }}>
-        Congratulations. You've made it to the end. Before you go out and build
+      <LessonHeader
+        chips={[{ label: "Regression", color: "var(--c-regression)" }, { label: "In the wild", color: "var(--good)" }]}
+        time="about 3 minutes"
+        title={<>Failure-mode gallery</>}
+        intro={<>
+          Congratulations. You've made it to the end. Before you go out and build
         models in the real world, review these common traps.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <div style={{ display: "grid", gap: 16, margin: "2rem 0" }}>
@@ -43,10 +39,7 @@ export default function FailureModeGalleryPage() {
             
         </div>
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 32, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/linear-regression/when-to-use-it" style={navLink}>← When to use it</Link>
-          <Link href="/learn/linear-regression/end-to-end-worked-case" style={navLink}>Next up · End-to-end worked case →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/linear-regression/when-to-use-it", label: <>← When to use it</> }} next={{ href: "/learn/linear-regression/end-to-end-worked-case", label: <>Next up · End-to-end worked case →</> }} />
       </div>
     </article>
   );
@@ -61,7 +54,3 @@ function FailureCard({ title, body, color }: { title: string; body: string; colo
   );
 }
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };

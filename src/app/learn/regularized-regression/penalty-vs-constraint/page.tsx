@@ -1,5 +1,6 @@
-import Link from "next/link";
+import { Quiz } from "@/components/Quiz";
 import { M, MathBlock } from "@/components/Math";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 export const metadata = {
   title: "Penalty vs constraint: two views — Manifold",
@@ -52,19 +53,16 @@ function Panel({ kind }: { kind: "ridge" | "lasso" }) {
 export default function PenaltyConstraintPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-regression)")}>Regression</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 7 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        Penalty vs constraint: two views
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 24px", maxWidth: 620 }}>
-        There are two equivalent ways to write regularization — as a penalty you add, or a budget you must
+      <LessonHeader
+        chips={[{ label: "Regression", color: "var(--c-regression)" }]}
+        time="about 7 minutes"
+        title={<>Penalty vs constraint: two views</>}
+        intro={<>
+          There are two equivalent ways to write regularization — as a penalty you add, or a budget you must
         stay inside. They give identical answers, but the budget view is the one that finally explains why
         Lasso zeroes coefficients and Ridge doesn&rsquo;t.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <h2>The two formulations</h2>
@@ -111,30 +109,41 @@ export default function PenaltyConstraintPage() {
           feature selection and Ridge only shrinks.
         </p>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-regression)", marginBottom: 4 }}>
-            The pattern generalises
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            The &ldquo;pointiness&rdquo; of the L1 ball is what creates sparsity, and it scales: in higher dimensions
+        <Callout color="var(--c-regression)" title={<>The pattern generalises</>}>
+          The &ldquo;pointiness&rdquo; of the L1 ball is what creates sparsity, and it scales: in higher dimensions
             the L1 ball has edges and faces lying on coordinate subspaces, so Lasso can zero out many
             coefficients at once. Norms between L1 and L2 (used by elastic-net) round the corners partway,
             trading some sparsity for stability. Keep this picture in mind — it&rsquo;s the geometric heart of the
             whole track.
-          </p>
-        </div>
+        </Callout>
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 40, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/regularized-regression/shrinkage-the-core-idea" style={navLink}>← Shrinkage: the core idea</Link>
-          <Link href="/learn/regularized-regression/ridge-regression" style={{ ...navLink, fontWeight: 600 }}>Next up · Ridge regression →</Link>
-        </div>
+        <Quiz
+          accent="var(--c-regression)"
+          questions={[
+            {
+              q: "The penalty form (min MSE + λ‖w‖²) and the constraint form (min MSE subject to ‖w‖² ≤ t) are…",
+              options: ["Equivalent — every λ corresponds to some budget t", "Two genuinely different models", "Equal only for the Lasso"],
+              answer: 0,
+              explain: "They're Lagrangian duals: dialling λ traces out the same solutions as dialling t. The penalty view is how you compute; the constraint view is how you should picture it.",
+            },
+            {
+              q: "As λ → 0, the regularized solution approaches…",
+              options: ["Ordinary least squares", "The all-zero model", "It diverges"],
+              answer: 0,
+              explain: "Zero penalty means nothing restrains the fit — you recover OLS exactly. At the other extreme, λ → ∞ crushes every coefficient toward zero.",
+            },
+            {
+              q: "The reason shrinking coefficients helps at all is that it trades…",
+              options: ["A little bias for a large reduction in variance", "Training speed for test accuracy", "Interpretability for flexibility"],
+              answer: 0,
+              explain: "Slightly-too-small coefficients are systematically wrong (bias) but far less sensitive to which sample you drew (variance), and on new data the variance term is usually what's killing you.",
+            },
+          ]}
+        />
+
+        <PrevNext prev={{ href: "/learn/regularized-regression/shrinkage-the-core-idea", label: <>← Shrinkage: the core idea</> }} next={{ href: "/learn/regularized-regression/ridge-regression", label: <>Next up · Ridge regression →</> }} />
       </div>
     </article>
   );
 }
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-regression) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-regression) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0" };

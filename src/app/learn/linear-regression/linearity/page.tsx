@@ -1,5 +1,5 @@
-import Link from "next/link";
 import { MathBlock } from "@/components/Math";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 export const metadata = {
   title: "Linearity — Manifold",
@@ -10,20 +10,16 @@ export const metadata = {
 export default function LinearityPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-regression)")}>Regression</span>
-        <span style={chip("var(--warn)")}>Assumptions</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 6 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        Linearity
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 8px", maxWidth: 620 }}>
-        The most foundational assumption: the expected value of y changes
+      <LessonHeader
+        chips={[{ label: "Regression", color: "var(--c-regression)" }, { label: "Assumptions", color: "var(--warn)" }]}
+        time="about 6 minutes"
+        title={<>Linearity</>}
+        intro={<>
+          The most foundational assumption: the expected value of y changes
         proportionally with each feature. Violate it, and your model is fitting
         the wrong shape — and every prediction is systematically wrong.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <h2>What it actually says</h2>
@@ -77,22 +73,14 @@ export default function LinearityPage() {
           extrapolates a lie.
         </p>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-fundamentals)", marginBottom: 4 }}>
-            Quick check sequence
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            1. Scatter each predictor against y — spot obvious curves.{" "}
+        <Callout color="var(--c-fundamentals)" title={<>Quick check sequence</>}>
+          1. Scatter each predictor against y — spot obvious curves.{" "}
             2. Fit the model and plot residuals vs fitted — look for an arch.{" "}
             3. If an arch exists, add a squared term for the offending predictor and recheck.{" "}
             4. Repeat until residuals look random.
-          </p>
-        </div>
+        </Callout>
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 32, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/linear-regression/the-five-assumptions" style={navLink}>← The five assumptions</Link>
-          <Link href="/learn/linear-regression/independence-of-errors" style={navLink}>Next up · Independence of errors →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/linear-regression/the-five-assumptions", label: <>← The five assumptions</> }} next={{ href: "/learn/linear-regression/independence-of-errors", label: <>Next up · Independence of errors →</> }} />
       </div>
     </article>
   );
@@ -136,8 +124,4 @@ function ResidPlot({ good, label, caption }: { good: boolean; label: string; cap
   );
 }
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}const methodsGrid: React.CSSProperties = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 10, margin: "1.4rem 0" };
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-fundamentals) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-fundamentals) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0 0" };
+const methodsGrid: React.CSSProperties = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 10, margin: "1.4rem 0" };

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { AssumptionsDiagnosticLab } from "@/components/labs/AssumptionsDiagnosticLab";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 export const metadata = {
   title: "The five assumptions — Manifold",
@@ -10,20 +11,16 @@ export const metadata = {
 export default function TheFiveAssumptionsPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-regression)")}>Regression</span>
-        <span style={chip("var(--warn)")}>Assumptions</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 8 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        The five assumptions
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 8px", maxWidth: 620 }}>
-        The math of linear regression doesn't care about your data. But the
+      <LessonHeader
+        chips={[{ label: "Regression", color: "var(--c-regression)" }, { label: "Assumptions", color: "var(--warn)" }]}
+        time="about 8 minutes"
+        title={<>The five assumptions</>}
+        intro={<>
+          The math of linear regression doesn't care about your data. But the
         <em> guarantees</em> — unbiased coefficients, valid p-values, reliable
         predictions — only hold when five conditions are met.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <p>
@@ -97,23 +94,15 @@ export default function TheFiveAssumptionsPage() {
             fix="Drop one correlated predictor, use PCA, or apply Ridge regularisation." />
         </div>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-fundamentals)", marginBottom: 4 }}>
-            A practical perspective
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            In practice, assumptions are rarely perfectly satisfied. The goal
+        <Callout color="var(--c-fundamentals)" title={<>A practical perspective</>}>
+          In practice, assumptions are rarely perfectly satisfied. The goal
             isn't perfection — it's assessing whether violations are severe
             enough to materially affect your conclusions. A mild non-normality
             in a large dataset? Essentially harmless. Severe heteroscedasticity?
             Fix it before reporting standard errors.
-          </p>
-        </div>
+        </Callout>
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 32, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/linear-regression/polynomial-and-interaction-terms" style={navLink}>← Polynomial &amp; interaction terms</Link>
-          <Link href="/learn/linear-regression/linearity" style={navLink}>Next up · Linearity →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/linear-regression/polynomial-and-interaction-terms", label: <>← Polynomial &amp; interaction terms</> }} next={{ href: "/learn/linear-regression/linearity", label: <>Next up · Linearity →</> }} />
       </div>
     </article>
   );
@@ -160,10 +149,5 @@ function PriorityRow({ n, title, color, impact, fix }: { n: number; title: strin
   );
 }
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
 const fiveGrid: React.CSSProperties = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))", gap: 10, margin: "1.4rem 0" };
 const priorityList: React.CSSProperties = { margin: "1.4rem 0" };
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-fundamentals) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-fundamentals) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0 0" };

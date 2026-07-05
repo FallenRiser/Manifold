@@ -376,5 +376,5 @@ const prose: React.CSSProperties = { margin: "0 0 10px", fontSize: 13.5, color: 
 const matBox: React.CSSProperties = { display: "flex", alignItems: "center", gap: 10, marginTop: 8 };
 const matLabel: React.CSSProperties = { fontSize: 13, color: "var(--faint)", fontFamily: "ui-monospace, monospace" };
 
-const btnPrimary: React.CSSProperties = { background: "var(--cta)", color: "#fff", border: "none", fontSize: 13, fontWeight: 500, padding: "8px 18px", borderRadius: 10, cursor: "pointer" };
+const btnPrimary: React.CSSProperties = { background: "var(--cta)", color: "var(--cta-text)", border: "none", fontSize: 13, fontWeight: 500, padding: "8px 18px", borderRadius: 10, cursor: "pointer" };
 const btnGhost: React.CSSProperties = { background: "transparent", color: "var(--muted)", border: "1px solid var(--border-strong)", fontSize: 13, padding: "8px 14px", borderRadius: 10, cursor: "pointer" };

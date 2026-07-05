@@ -1,6 +1,10 @@
-import Link from "next/link";
+import { M } from "@/components/Math";
 import { SGDComparisonLab } from "@/components/labs/SGDComparisonLab";
+import { PredictPrompt } from "@/components/PredictPrompt";
+import { LabFrame } from "@/components/LabFrame";
 import { CodeBlock } from "@/components/CodeBlock";
+import { REGRESSION_SETUP } from "@/lib/runtimeSetup";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 const codeScratch = `import numpy as np
 
@@ -44,19 +48,15 @@ export const metadata = {
 export default function BatchVsSGDPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-regression)")}>Regression</span>
-        <span style={chip("var(--c-fundamentals)")}>Core idea</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 8 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        Batch, stochastic, and mini-batch
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 8px", maxWidth: 620 }}>
-        Every gradient descent variant is the same algorithm. The only question is: how many
+      <LessonHeader
+        chips={[{ label: "Regression", color: "var(--c-regression)" }, { label: "Core idea", color: "var(--c-fundamentals)" }]}
+        time="about 8 minutes"
+        title={<>Batch, stochastic, and mini-batch</>}
+        intro={<>
+          Every gradient descent variant is the same algorithm. The only question is: how many
         examples do you look at before taking a step?
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <p>
@@ -99,6 +99,12 @@ export default function BatchVsSGDPage() {
           gradient.
         </p>
 
+        <PredictPrompt
+          prompt={<>Three optimisers race down the same loss surface: batch, mini-batch, and pure SGD. Which one reaches the <em>neighbourhood</em> of the minimum first?</>}
+          options={["Batch — smooth and direct", "SGD — noisy but takes many cheap steps", "They arrive together"]}
+          nudge={<>Locked in. Watch all three paths in the lab below — both who gets close first, and who settles cleanest.</>}
+        />
+
         <h2>See the paths diverge</h2>
         <p>
           All three start from the same point on the loss surface. Watch how differently they move.
@@ -107,7 +113,14 @@ export default function BatchVsSGDPage() {
           neighbourhood of the answer fast but keeps bouncing once it arrives.
         </p>
 
-        <SGDComparisonLab />
+        <LabFrame
+          tryThis={<>Run all three from the same start. Watch who gets <em>near</em> the minimum first — and who actually settles on it.</>}
+          insight={<>SGD reached the neighbourhood first on dirt-cheap steps but never stops twitching; batch arrives
+            late but lands clean; mini-batch splits the difference — which is why it&rsquo;s the production default.
+            &ldquo;Fast to almost-there&rdquo; and &ldquo;precise at the end&rdquo; are different virtues, and you can trade between them.</>}
+        >
+          <SGDComparisonLab />
+        </LabFrame>
 
         <p>
           Notice that after enough steps, all three have reached roughly the same error. SGD got
@@ -154,20 +167,15 @@ export default function BatchVsSGDPage() {
           </li>
         </ul>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-fundamentals)", marginBottom: 4 }}>
-            Interview-grade answer
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            &ldquo;What&rsquo;s the difference between batch GD, SGD, and mini-batch SGD?&rdquo;
+        <Callout color="var(--c-fundamentals)" title={<>Interview-grade answer</>}>
+          &ldquo;What&rsquo;s the difference between batch GD, SGD, and mini-batch SGD?&rdquo;
             — They all follow the same update rule:{" "}
-            <code>θ ← θ − η · ∇L</code>. The only difference is what goes into ∇L:{" "}
+            <M>{String.raw`\theta \leftarrow \theta - \eta \,\nabla L`}</M>. The only difference is what goes into the gradient:{" "}
             all N examples (batch), one example (SGD), or B examples (mini-batch). Mini-batch
             dominates in practice because it balances compute efficiency with gradient accuracy,
             and the noise acts as implicit regularisation — especially important for neural networks
             where wider loss basins generalise better.
-          </p>
-        </div>
+        </Callout>
 
         <h2>Both loops, side by side</h2>
         <p>
@@ -175,24 +183,15 @@ export default function BatchVsSGDPage() {
           Both land near <code>[3, 2]</code> — SGD just gets there with many more,
           much cheaper steps.
         </p>
-        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
+        <CodeBlock setup={REGRESSION_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 32, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/linear-regression/descent-on-the-surface" style={navLink}>← Descent on the surface</Link>
-          <Link href="/learn/linear-regression/when-do-we-stop" style={navLink}>Next up · When do we stop? →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/linear-regression/descent-on-the-surface", label: <>← Descent on the surface</> }} next={{ href: "/learn/linear-regression/when-do-we-stop", label: <>Next up · When do we stop? →</> }} />
       </div>
     </article>
   );
 }
 
-function chip(color: string): React.CSSProperties {
-  return {
-    display: "inline-flex", alignItems: "center",
-    background: `color-mix(in srgb, ${color} 13%, var(--surface))`,
-    color, fontSize: 12, padding: "3px 10px", borderRadius: 999,
-  };
-}
+
 
 function FlavorCard({ color, name, badge, body }: { color: string; name: string; badge: string; body: string }) {
   return (
@@ -217,10 +216,6 @@ const threeCol: React.CSSProperties = {
   margin: "1.4rem 0 0",
 };
 
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
 
-const callout: React.CSSProperties = {
-  background: "color-mix(in srgb, var(--c-fundamentals) 9%, var(--surface))",
-  border: "1px solid color-mix(in srgb, var(--c-fundamentals) 22%, var(--border))",
-  borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0 0",
-};
+
+

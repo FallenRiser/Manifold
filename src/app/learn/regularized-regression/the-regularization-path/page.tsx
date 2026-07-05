@@ -1,6 +1,7 @@
-import Link from "next/link";
 import { CodeBlock } from "@/components/CodeBlock";
+import { REGRESSION_SETUP } from "@/lib/runtimeSetup";
 import { CoefPathLab } from "@/components/labs/CoefPathLab";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 export const metadata = {
   title: "The regularization path — Manifold",
@@ -11,18 +12,15 @@ export const metadata = {
 export default function PathPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-regression)")}>Regression</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 6 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        The regularization path
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 24px", maxWidth: 620 }}>
-        For Lasso the coefficient path isn&rsquo;t just a diagnostic — it&rsquo;s a story. As the penalty relaxes,
+      <LessonHeader
+        chips={[{ label: "Regression", color: "var(--c-regression)" }]}
+        time="about 6 minutes"
+        title={<>The regularization path</>}
+        intro={<>
+          For Lasso the coefficient path isn&rsquo;t just a diagnostic — it&rsquo;s a story. As the penalty relaxes,
         features switch on one at a time, and the order they appear is a free ranking of their importance.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <h2>Features enter one at a time</h2>
@@ -64,25 +62,17 @@ export default function PathPage() {
           </li>
         </ul>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-regression)", marginBottom: 4 }}>
-            The path is how you choose λ
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            Overlay cross-validation error along the path and the best λ is the point with lowest CV error —
+        <Callout color="var(--c-regression)" title={<>The path is how you choose λ</>}>
+          Overlay cross-validation error along the path and the best λ is the point with lowest CV error —
             which also tells you exactly which features that model keeps. The path turns &ldquo;pick λ&rdquo; and &ldquo;pick
             features&rdquo; into a single, visual decision. The one-standard-error rule often nudges you to a
             slightly larger λ — a sparser, more robust model just inside the noise of the minimum.
-          </p>
-        </div>
+        </Callout>
 
         <h2>Compute the full path</h2>
-        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
+        <CodeBlock setup={REGRESSION_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 40, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/regularized-regression/why-l1-creates-sparsity" style={navLink}>← Why L1 creates sparsity</Link>
-          <Link href="/learn/regularized-regression/lasso-for-feature-selection" style={{ ...navLink, fontWeight: 600 }}>Next up · Lasso for feature selection →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/regularized-regression/why-l1-creates-sparsity", label: <>← Why L1 creates sparsity</> }} next={{ href: "/learn/regularized-regression/lasso-for-feature-selection", label: <>Next up · Lasso for feature selection →</> }} />
       </div>
     </article>
   );
@@ -112,9 +102,7 @@ plt.plot(np.log10(alphas), coefs.T)
 plt.xlabel("log10(λ)"); plt.ylabel("coefficient")   # the path figure
 plt.show()`;
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
+
 const ul: React.CSSProperties = { margin: "0 0 10px", paddingLeft: "1.3em", fontSize: 15, color: "var(--muted)", lineHeight: 1.8 };
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-regression) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-regression) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0" };
+
+

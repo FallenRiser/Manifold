@@ -1,6 +1,8 @@
-import Link from "next/link";
 import { CodeBlock } from "@/components/CodeBlock";
 import { KNNLab } from "@/components/labs/KNNLab";
+import { ModelAnatomy } from "@/components/ModelAnatomy";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
+import { KNN_DONE, KNN_TOTAL } from "@/lib/knnTrack";
 
 export const metadata = {
   title: "What is k-NN? — Manifold",
@@ -11,21 +13,27 @@ export const metadata = {
 export default function KNNHubPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-classification)")}>Classification</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 6 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 44, lineHeight: 1.08, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        What is k-NN?
-      </h1>
-      <p style={{ fontSize: 17.5, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 24px", maxWidth: 620 }}>
-        k-Nearest Neighbors is the most intuitive algorithm in all of machine learning, and a perfect
+      <LessonHeader
+        chips={[{ label: "Classification", color: "var(--c-classification)" }, { label: `In progress · ${KNN_DONE} of ${KNN_TOTAL} pages`, color: "var(--c-fundamentals)" }]}
+        time="about 6 minutes"
+        title={<>What is k-NN?</>}
+        intro={<>
+          k-Nearest Neighbors is the most intuitive algorithm in all of machine learning, and a perfect
         entry to classification: to decide what something is, look at the things most similar to it and
         let them vote. That&rsquo;s the whole idea.
-      </p>
+        </>}
+        titleSize={44}
+        introSize={17.5}
+      />
 
       <div className="lesson">
+        <ModelAnatomy
+          accent="var(--c-classification)"
+          form={<>The training set itself — no fitted equation at all</>}
+          loss={<>None at training time — wrongness only exists at prediction</>}
+          optimiser={<>None — &ldquo;training&rdquo; is just memorising the data</>}
+        />
+
         <h2>You are who your neighbors are</h2>
         <p>
           Want to guess whether a fruit is a lemon or a lime? Find the few fruits in your basket most
@@ -56,18 +64,13 @@ export default function KNNHubPage() {
           instantly. k-NN flips that: trivial training, expensive prediction.
         </p>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-classification)", marginBottom: 4 }}>
-            Three consequences of being lazy
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            Because k-NN memorises rather than generalises, it is <strong>non-parametric</strong> (it makes
+        <Callout color="var(--c-classification)" title={<>Three consequences of being lazy</>}>
+          Because k-NN memorises rather than generalises, it is <strong>non-parametric</strong> (it makes
             no assumption about the shape of the decision boundary — it can fit any shape), it adapts
             instantly when you add data (no retraining), but it&rsquo;s <strong>slow and memory-hungry at
             prediction time</strong> and leans entirely on having a good notion of &ldquo;distance.&rdquo; Every
             chapter of this track unpacks one of those consequences.
-          </p>
-        </div>
+        </Callout>
 
         <h2>The whole algorithm, in code</h2>
         <p>
@@ -86,10 +89,7 @@ export default function KNNHubPage() {
           three real cases. Onward.
         </p>
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 40, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/k-means" style={navLink}>← k-Means clustering</Link>
-          <Link href="/learn/k-nearest-neighbors/the-classification-landscape" style={{ ...navLink, fontWeight: 600 }}>Next up · The classification landscape →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/k-means", label: <>← k-Means clustering</> }} next={{ href: "/learn/k-nearest-neighbors/the-classification-landscape", label: <>Next up · The classification landscape →</> }} />
       </div>
     </article>
   );
@@ -116,8 +116,3 @@ knn.fit(X_train, y_train)
 print(knn.predict(X_new))
 print(knn.predict_proba(X_new))   # vote fractions across classes`;
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-classification) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-classification) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0" };

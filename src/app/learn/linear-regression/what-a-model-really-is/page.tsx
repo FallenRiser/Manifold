@@ -1,6 +1,7 @@
-import Link from "next/link";
 import { ModelSliderLab } from "@/components/labs/ModelSliderLab";
 import { CodeBlock } from "@/components/CodeBlock";
+import { REGRESSION_SETUP } from "@/lib/runtimeSetup";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 export const metadata = {
   title: "What a model really is — Manifold",
@@ -45,19 +46,15 @@ print(f"Prediction for 3.2k sqft: \${model.predict([[3.2]])[0]:.0f}k")`;
 
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-regression)")}>Regression</span>
-        <span style={chip("var(--c-fundamentals)")}>Beginner</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 6 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        What a model really is
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 8px", maxWidth: 620 }}>
-        A model is just a function — a rule that turns inputs into a number. The &ldquo;machine
+      <LessonHeader
+        chips={[{ label: "Regression", color: "var(--c-regression)" }, { label: "Beginner", color: "var(--c-fundamentals)" }]}
+        time="about 6 minutes"
+        title={<>What a model really is</>}
+        intro={<>
+          A model is just a function — a rule that turns inputs into a number. The &ldquo;machine
         learning&rdquo; part is choosing the right rule automatically.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <p>
@@ -131,16 +128,11 @@ print(f"Prediction for 3.2k sqft: \${model.predict([[3.2]])[0]:.0f}k")`;
           is building that picture up from scratch.
         </p>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-fundamentals)", marginBottom: 4 }}>
-            The one thing to take away
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            A model is a function with parameters. Training is the process of finding the parameter
+        <Callout color="var(--c-fundamentals)" title={<>The one thing to take away</>}>
+          A model is a function with parameters. Training is the process of finding the parameter
             values that make the function&rsquo;s output match the data as closely as possible.
             The &ldquo;learning&rdquo; in machine learning is just finding those numbers.
-          </p>
-        </div>
+        </Callout>
 
         <h2>The code</h2>
         <p>
@@ -148,29 +140,16 @@ print(f"Prediction for 3.2k sqft: \${model.predict([[3.2]])[0]:.0f}k")`;
           written explicitly first, then handed off to scikit-learn.
         </p>
 
-        <CodeBlock fromScratch={fromScratch} withLibrary={withLibrary} />
+        <CodeBlock setup={REGRESSION_SETUP} fromScratch={fromScratch} withLibrary={withLibrary} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 32, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/linear-regression/why-predict-at-all" style={navLink}>← Why predict at all?</Link>
-          <Link href="/learn/linear-regression" style={navLink}>Next up · The line of best fit →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/linear-regression/why-predict-at-all", label: <>← Why predict at all?</> }} next={{ href: "/learn/linear-regression", label: <>Next up · The line of best fit →</> }} />
       </div>
     </article>
   );
 }
 
-function chip(color: string): React.CSSProperties {
-  return {
-    display: "inline-flex", alignItems: "center",
-    background: `color-mix(in srgb, ${color} 13%, var(--surface))`,
-    color, fontSize: 12, padding: "3px 10px", borderRadius: 999,
-  };
-}
 
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
 
-const callout: React.CSSProperties = {
-  background: "color-mix(in srgb, var(--c-fundamentals) 9%, var(--surface))",
-  border: "1px solid color-mix(in srgb, var(--c-fundamentals) 22%, var(--border))",
-  borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0 0",
-};
+
+
+

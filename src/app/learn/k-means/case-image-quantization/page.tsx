@@ -1,6 +1,6 @@
-import Link from "next/link";
 import { CodeBlock } from "@/components/CodeBlock";
 import { ColorQuantizeLab } from "@/components/labs/ColorQuantizeLab";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 export const metadata = {
   title: "Case A: image colour quantization — Manifold",
@@ -11,20 +11,16 @@ export const metadata = {
 export default function CaseImagePage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-clustering)")}>Clustering</span>
-        <span style={chip("var(--c-metrics)")}>In the wild · Case A</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 8 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        Case A: image colour quantization
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 24px", maxWidth: 620 }}>
-        Our first real case is the cleanest possible use of k-means — no labels, no choosing-k agony, just
+      <LessonHeader
+        chips={[{ label: "Clustering", color: "var(--c-clustering)" }, { label: "In the wild · Case A", color: "var(--c-metrics)" }]}
+        time="about 8 minutes"
+        title={<>Case A: image colour quantization</>}
+        intro={<>
+          Our first real case is the cleanest possible use of k-means — no labels, no choosing-k agony, just
         the algorithm doing exactly what its objective says. Reduce an image to <em>k</em> colours by
         clustering its pixels.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <h2>The problem, framed as clustering</h2>
@@ -79,25 +75,17 @@ export default function CaseImagePage() {
           </li>
         </ul>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-clustering)", marginBottom: 4 }}>
-            The takeaway
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            This is k-means with the training wheels on, and it&rsquo;s a perfect mental model: <em>centroids
+        <Callout color="var(--c-clustering)" title={<>The takeaway</>}>
+          This is k-means with the training wheels on, and it&rsquo;s a perfect mental model: <em>centroids
             are representatives</em>. Compression, codebook learning, and quantizing neural-network weights
             all use exactly this &ldquo;cluster, then replace each point with its centroid&rdquo; move. When the
             geometry fits and you just need representative points, k-means is unbeatable for the effort.
-          </p>
-        </div>
+        </Callout>
 
         <h2>The whole thing in scikit-learn</h2>
         <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 40, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/k-means/when-to-use-k-means" style={navLink}>← When to use k-means</Link>
-          <Link href="/learn/k-means/case-customer-segmentation" style={{ ...navLink, fontWeight: 600 }}>Next up · Case B: customer segmentation →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/k-means/when-to-use-k-means", label: <>← When to use k-means</> }} next={{ href: "/learn/k-means/case-customer-segmentation", label: <>Next up · Case B: customer segmentation →</> }} />
       </div>
     </article>
   );
@@ -131,9 +119,4 @@ labels = km.predict(pixels)
 quantized = km.cluster_centers_[labels].reshape(h, w, 3)
 Image.fromarray((quantized * 255).astype("uint8")).save("photo_16.png")`;
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
 const ul: React.CSSProperties = { margin: "0 0 10px", paddingLeft: "1.3em", fontSize: 15, color: "var(--muted)", lineHeight: 1.8 };
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-clustering) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-clustering) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0" };

@@ -1,6 +1,7 @@
-import Link from "next/link";
 import { M, MathBlock } from "@/components/Math";
 import { CodeBlock } from "@/components/CodeBlock";
+import { REGRESSION_SETUP } from "@/lib/runtimeSetup";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 export const metadata = {
   title: "Why shrinkage beats OLS (James–Stein) — Manifold",
@@ -11,20 +12,16 @@ export const metadata = {
 export default function JamesSteinPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-regression)")}>Regression</span>
-        <span style={chip("var(--c-metrics)")}>Go deeper</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 7 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        Why shrinkage beats OLS (James–Stein)
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 24px", maxWidth: 620 }}>
-        The deepest justification for regularization is a result so counterintuitive it&rsquo;s called a paradox.
+      <LessonHeader
+        chips={[{ label: "Regression", color: "var(--c-regression)" }, { label: "Go deeper", color: "var(--c-metrics)" }]}
+        time="about 7 minutes"
+        title={<>Why shrinkage beats OLS (James–Stein)</>}
+        intro={<>
+          The deepest justification for regularization is a result so counterintuitive it&rsquo;s called a paradox.
         Shrinkage isn&rsquo;t just a useful heuristic — for estimating several things at once, it is provably,
         unavoidably better than not shrinking.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <h2>The setup</h2>
@@ -51,19 +48,14 @@ export default function JamesSteinPage() {
           a baseball average, and more). Shrinking unrelated estimates toward each other still lowers total error.
         </p>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-regression)", marginBottom: 4 }}>
-            How can shrinking unrelated things help?
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            The key is that we&rsquo;re judged on <strong>total</strong> error across all <M>{String.raw`p`}</M>
+        <Callout color="var(--c-regression)" title={<>How can shrinking unrelated things help?</>}>
+          The key is that we&rsquo;re judged on <strong>total</strong> error across all <M>{String.raw`p`}</M>
             estimates, not each one separately. Pure noise inflates the observations&rsquo; overall magnitude, so
             pulling them inward removes more variance than the bias it adds — on average, across the whole batch.
             Any single estimate might get slightly worse, but the <em>sum</em> reliably improves. It&rsquo;s the
             bias–variance trade from the very first page, now as a theorem: a little bias, a lot less variance,
             lower total error.
-          </p>
-        </div>
+        </Callout>
 
         <h2>The connection to ridge</h2>
         <p>
@@ -83,12 +75,9 @@ export default function JamesSteinPage() {
         </ul>
 
         <h2>See the paradox in a simulation</h2>
-        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
+        <CodeBlock setup={REGRESSION_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 40, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/regularized-regression/degrees-of-freedom" style={navLink}>← Degrees of freedom &amp; effective complexity</Link>
-          <Link href="/learn/california-housing-capstone" style={{ ...navLink, fontWeight: 600 }}>Next up · Capstone: California housing →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/regularized-regression/degrees-of-freedom", label: <>← Degrees of freedom &amp; effective complexity</> }} next={{ href: "/learn/california-housing-capstone", label: <>Next up · Capstone: California housing →</> }} />
       </div>
     </article>
   );
@@ -119,9 +108,7 @@ ridge = -cross_val_score(Ridge(alpha=10),   X, y, cv=5,
                          scoring="neg_mean_squared_error").mean()
 print("OLS MSE:", round(ols, 3), " Ridge MSE:", round(ridge, 3))`;
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
+
 const ul: React.CSSProperties = { margin: "0 0 10px", paddingLeft: "1.3em", fontSize: 15, color: "var(--muted)", lineHeight: 1.8 };
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-regression) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-regression) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0" };
+
+

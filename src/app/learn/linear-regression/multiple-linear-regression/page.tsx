@@ -1,6 +1,9 @@
 import Link from "next/link";
+import { M, MathBlock } from "@/components/Math";
 import { MultipleRegressionLab } from "@/components/labs/MultipleRegressionLab";
 import { CodeBlock } from "@/components/CodeBlock";
+import { REGRESSION_SETUP } from "@/lib/runtimeSetup";
+import { LessonHeader } from "@/components/lesson";
 
 export const metadata = {
   title: "Multiple linear regression — Manifold",
@@ -56,68 +59,42 @@ print(f"Predicted price: \${model.predict(new_house)[0]:.0f}k")`;
 
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-regression)")}>Regression</span>
-        <span style={chip("var(--c-fundamentals)")}>Core idea</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 8 minutes</span>
-      </div>
-
-      <h1
-        className="font-serif"
-        style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}
-      >
-        Multiple linear regression
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 8px", maxWidth: 620 }}>
-        So far every model has had one input. Real predictions depend on dozens
+      <LessonHeader
+        chips={[{ label: "Regression", color: "var(--c-regression)" }, { label: "Core idea", color: "var(--c-fundamentals)" }]}
+        time="about 8 minutes"
+        title={<>Multiple linear regression</>}
+        intro={<>
+          So far every model has had one input. Real predictions depend on dozens
         of things at once. The leap to multiple features is smaller than it
         looks — the equation just gets a few extra terms.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <p>
           With one feature the model is a line:{" "}
-          <code>ŷ = θ₀ + θ₁x</code>. With two features it becomes a{" "}
+          <M>{String.raw`\hat{y} = \theta_0 + \theta_1 x`}</M>. With two features it becomes a{" "}
           <strong>plane</strong> slicing through 3D space. With ten features
           it's a <strong>hyperplane</strong> in 11 dimensions — impossible to
           visualise, but governed by exactly the same equations.
         </p>
 
-        <div
-          style={{
-            fontFamily: "ui-monospace, monospace",
-            fontSize: 16,
-            background: "var(--canvas)",
-            border: "1px solid var(--border-strong)",
-            borderRadius: 12,
-            padding: "14px 20px",
-            margin: "1.2rem 0",
-            textAlign: "center",
-            color: "var(--ink)",
-          }}
-        >
-          ŷ ={" "}
-          <span style={{ color: "var(--brand)" }}>θ₀</span> +{" "}
-          <span style={{ color: "var(--c-regression)" }}>θ₁</span>x₁ +{" "}
-          <span style={{ color: "var(--c-regression)" }}>θ₂</span>x₂ +{" "}
-          <span style={{ color: "var(--c-regression)" }}>θ₃</span>x₃ + … +{" "}
-          <span style={{ color: "var(--c-regression)" }}>θₚ</span>xₚ
-        </div>
+        <MathBlock>{String.raw`\hat{y} = \theta_0 + \theta_1 x_1 + \theta_2 x_2 + \theta_3 x_3 + \dots + \theta_p x_p`}</MathBlock>
 
         <p>
           In matrix notation this collapses to{" "}
-          <code>ŷ = Xθ</code> — one dot product. The gradient, the update
+          <M>{String.raw`\hat{\mathbf{y}} = \mathbf{X}\boldsymbol{\theta}`}</M> — one dot product. The gradient, the update
           rule, and the normal equation are all <em>identical</em> to the
           single-feature case; only the dimensions of X and θ change.
         </p>
 
         <h2>What each coefficient means</h2>
         <p>
-          <strong>θ₀ (intercept)</strong> — the predicted value when every
+          <strong><M>{String.raw`\theta_0`}</M> (intercept)</strong> — the predicted value when every
           feature is zero (or, practically, the baseline level). The
-          others — <strong>θ₁, θ₂, …</strong> — each say: "holding all
-          other features fixed, a one-unit increase in xⱼ shifts the
-          prediction by θⱼ." That phrase, <em>holding all other features
+          others — <strong><M>{String.raw`\theta_1, \theta_2, \dots`}</M></strong> — each say: "holding all
+          other features fixed, a one-unit increase in <M>{String.raw`x_j`}</M> shifts the
+          prediction by <M>{String.raw`\theta_j`}</M>." That phrase, <em>holding all other features
           fixed</em>, is the key. A coefficient doesn't tell you the raw
           correlation; it tells you the <em>partial</em> effect after the
           other features have already been accounted for.
@@ -138,9 +115,9 @@ print(f"Predicted price: \${model.predict(new_house)[0]:.0f}k")`;
           In matrix notation, every training example is a row in a matrix
           X (the design matrix), with a leading column of 1s for the
           intercept. The prediction for all examples at once is just{" "}
-          <code>ŷ = Xθ</code> — one matrix–vector multiply. The loss is{" "}
-          <code>‖Xθ − y‖² / N</code> and the gradient is{" "}
-          <code>2Xᵀ(Xθ − y) / N</code>. One formula, any number of
+          <M>{String.raw`\hat{\mathbf{y}} = \mathbf{X}\boldsymbol{\theta}`}</M> — one matrix–vector multiply. The loss is{" "}
+          <M>{String.raw`\lVert \mathbf{X}\boldsymbol{\theta} - \mathbf{y}\rVert^2 / N`}</M> and the gradient is{" "}
+          <M>{String.raw`2\mathbf{X}^\top(\mathbf{X}\boldsymbol{\theta} - \mathbf{y}) / N`}</M>. One formula, any number of
           features.
         </p>
 
@@ -183,7 +160,7 @@ print(f"Predicted price: \${model.predict(new_house)[0]:.0f}k")`;
           single-feature case — only the dimensions change.
         </p>
 
-        <CodeBlock fromScratch={fromScratch} withLibrary={withLibrary} />
+        <CodeBlock setup={REGRESSION_SETUP} fromScratch={fromScratch} withLibrary={withLibrary} />
 
         <div
           style={{
@@ -223,9 +200,7 @@ function DiffCard({ title, children }: { title: string; children: React.ReactNod
   );
 }
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
+
 const diffGrid: React.CSSProperties = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 12, margin: "1.4rem 0" };
 const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
 const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-fundamentals) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-fundamentals) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0 0" };

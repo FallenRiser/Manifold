@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ManifoldMark } from "./ManifoldMark";
 import { ThemeToggle } from "./ThemeToggle";
+import { SearchPalette } from "./SearchPalette";
 
 export function Header() {
   return (
@@ -38,11 +39,16 @@ export function Header() {
         </Link>
 
         <nav style={{ display: "flex", alignItems: "center", gap: 22 }}>
+          <Link href="/learn/start-here" style={navLink}>
+            Start here
+          </Link>
           <Link href="/map" style={navLink}>
             Algorithms
           </Link>
-          <span style={{ ...navLink, opacity: 0.55 }}>Workflow</span>
-          <span style={{ ...navLink, opacity: 0.55 }}>Metrics</span>
+          <Link href="/learn/california-housing-capstone" style={navLink}>
+            Capstone
+          </Link>
+          <SearchPalette />
           <ThemeToggle />
         </nav>
       </div>

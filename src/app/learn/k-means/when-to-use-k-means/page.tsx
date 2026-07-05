@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 export const metadata = {
   title: "When to use k-means — Manifold",
@@ -9,20 +10,16 @@ export const metadata = {
 export default function WhenToUsePage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-clustering)")}>Clustering</span>
-        <span style={chip("var(--c-metrics)")}>In the wild</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 6 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        When to use k-means
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 24px", maxWidth: 620 }}>
-        You now know how k-means works, why it converges, and every way it breaks. This page distils all
+      <LessonHeader
+        chips={[{ label: "Clustering", color: "var(--c-clustering)" }, { label: "In the wild", color: "var(--c-metrics)" }]}
+        time="about 6 minutes"
+        title={<>When to use k-means</>}
+        intro={<>
+          You now know how k-means works, why it converges, and every way it breaks. This page distils all
         of it into a decision: <em>should you reach for k-means on this problem, and how do you run it
         well?</em>
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <h2>Green lights — k-means is a great fit</h2>
@@ -55,17 +52,12 @@ export default function WhenToUsePage() {
           <li><strong>Profile &amp; act.</strong> Describe each cluster in domain terms; that interpretation is the actual deliverable.</li>
         </ol>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-clustering)", marginBottom: 4 }}>
-            The mindset
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            Clustering is <em>unsupervised</em> — there&rsquo;s no answer key, so a result that looks clean can
+        <Callout color="var(--c-clustering)" title={<>The mindset</>}>
+          Clustering is <em>unsupervised</em> — there&rsquo;s no answer key, so a result that looks clean can
             still be meaningless. k-Means will <em>always</em> return <em>k</em> clusters, even on
             structureless noise. Treat its output as a hypothesis to be validated and interpreted, never a
             fact. The judgement of whether a clustering is <em>useful</em> is yours, not the algorithm&rsquo;s.
-          </p>
-        </div>
+        </Callout>
 
         <h2>Three real cases, end to end</h2>
         <p>
@@ -78,20 +70,12 @@ export default function WhenToUsePage() {
           <li><Link href="/learn/k-means/case-clustering-embeddings" style={inlineLink}>Case C — clustering embeddings</Link>: high-dimensional vectors, cosine geometry, and the modern workflow.</li>
         </ul>
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 40, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/k-means/bregman-divergences" style={navLink}>← Bregman divergences</Link>
-          <Link href="/learn/k-means/case-image-quantization" style={{ ...navLink, fontWeight: 600 }}>Next up · Case A: image colour quantization →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/k-means/bregman-divergences", label: <>← Bregman divergences</> }} next={{ href: "/learn/k-means/case-image-quantization", label: <>Next up · Case A: image colour quantization →</> }} />
       </div>
     </article>
   );
 }
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
 const ul: React.CSSProperties = { margin: "0 0 10px", paddingLeft: "1.3em", fontSize: 15, color: "var(--muted)", lineHeight: 1.8 };
 const ol: React.CSSProperties = { margin: "0 0 10px", paddingLeft: "1.3em", fontSize: 15, color: "var(--muted)", lineHeight: 1.85 };
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
 const inlineLink: React.CSSProperties = { color: "var(--brand)", textDecoration: "none", fontWeight: 500 };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-clustering) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-clustering) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0" };

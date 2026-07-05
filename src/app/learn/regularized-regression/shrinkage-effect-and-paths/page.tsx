@@ -1,6 +1,7 @@
-import Link from "next/link";
 import { CodeBlock } from "@/components/CodeBlock";
+import { REGRESSION_SETUP } from "@/lib/runtimeSetup";
 import { CoefPathLab } from "@/components/labs/CoefPathLab";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 export const metadata = {
   title: "The shrinkage effect & coefficient paths — Manifold",
@@ -11,19 +12,16 @@ export const metadata = {
 export default function ShrinkagePathsPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-regression)")}>Regression</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 6 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        The shrinkage effect & coefficient paths
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 24px", maxWidth: 620 }}>
-        The single most useful diagnostic for any regularizer is the <strong>coefficient path</strong>:
+      <LessonHeader
+        chips={[{ label: "Regression", color: "var(--c-regression)" }]}
+        time="about 6 minutes"
+        title={<>The shrinkage effect & coefficient paths</>}
+        intro={<>
+          The single most useful diagnostic for any regularizer is the <strong>coefficient path</strong>:
         every coefficient traced as a function of λ. For ridge, that picture tells the whole story at a
         glance — and sets up the dramatic contrast with Lasso.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <h2>Reading a coefficient path</h2>
@@ -59,25 +57,17 @@ export default function ShrinkagePathsPage() {
           </li>
         </ul>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-regression)", marginBottom: 4 }}>
-            Paths are how you choose λ visually
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            The path plot isn&rsquo;t just pretty — it&rsquo;s a practical tool. Overlay the cross-validation error and
+        <Callout color="var(--c-regression)" title={<>Paths are how you choose λ visually</>}>
+          The path plot isn&rsquo;t just pretty — it&rsquo;s a practical tool. Overlay the cross-validation error and
             you can see which coefficients are stable across a sensible range of λ and which collapse quickly.
             For Lasso especially, the path shows the <em>order</em> in which features enter the model, a free
             ranking of their importance. Libraries compute the entire path efficiently in one shot.
-          </p>
-        </div>
+        </Callout>
 
         <h2>Compute the path</h2>
-        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
+        <CodeBlock setup={REGRESSION_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 40, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/regularized-regression/the-closed-form-solution" style={navLink}>← The closed-form solution</Link>
-          <Link href="/learn/regularized-regression/ridge-and-multicollinearity" style={{ ...navLink, fontWeight: 600 }}>Next up · Ridge &amp; multicollinearity →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/regularized-regression/the-closed-form-solution", label: <>← The closed-form solution</> }} next={{ href: "/learn/regularized-regression/ridge-and-multicollinearity", label: <>Next up · Ridge &amp; multicollinearity →</> }} />
       </div>
     </article>
   );
@@ -104,9 +94,7 @@ import matplotlib.pyplot as plt
 plt.plot(np.log10(lambdas), coefs)
 plt.xlabel("log10(λ)"); plt.ylabel("coefficient"); plt.show()`;
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
+
 const ul: React.CSSProperties = { margin: "0 0 10px", paddingLeft: "1.3em", fontSize: 15, color: "var(--muted)", lineHeight: 1.8 };
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-regression) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-regression) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0" };
+
+

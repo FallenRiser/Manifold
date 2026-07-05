@@ -1,5 +1,7 @@
+import { Quiz } from "@/components/Quiz";
 import Link from "next/link";
 import { CodeBlock } from "@/components/CodeBlock";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 export const metadata = {
   title: "Cluster stability — Manifold",
@@ -10,20 +12,16 @@ export const metadata = {
 export default function StabilityPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-clustering)")}>Clustering</span>
-        <span style={chip("var(--c-metrics)")}>Go deeper</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 6 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        Cluster stability
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 24px", maxWidth: 620 }}>
-        Internal and external metrics score one fixed clustering. Stability asks a different, sturdier
+      <LessonHeader
+        chips={[{ label: "Clustering", color: "var(--c-clustering)" }, { label: "Go deeper", color: "var(--c-metrics)" }]}
+        time="about 6 minutes"
+        title={<>Cluster stability</>}
+        intro={<>
+          Internal and external metrics score one fixed clustering. Stability asks a different, sturdier
         question: if you nudge the data, do you keep getting <em>the same</em> clustering? Real structure
         is reproducible; artefacts aren&rsquo;t.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <h2>The core idea</h2>
@@ -53,19 +51,14 @@ export default function StabilityPage() {
           choose <em>k</em> that doesn&rsquo;t rely on the inertia curve at all.
         </p>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-clustering)", marginBottom: 4 }}>
-            Why it complements the others
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            Elbow, silhouette, and the rest read a single snapshot. Stability tests the clustering&rsquo;s{" "}
+        <Callout color="var(--c-clustering)" title={<>Why it complements the others</>}>
+          Elbow, silhouette, and the rest read a single snapshot. Stability tests the clustering&rsquo;s{" "}
             <em>robustness</em> — and it&rsquo;s especially good at exposing an over-large <em>k</em>, whose
             surplus boundaries are exactly what jitters. The cost is obvious: you refit k-means dozens of
             times per candidate <em>k</em>. The standard caution: a degenerate solution (e.g. one giant
             cluster) can be perfectly stable yet useless, so pair stability with a quality metric, never
             use it alone.
-          </p>
-        </div>
+        </Callout>
 
         <h2>A note on consensus clustering</h2>
         <p>
@@ -78,10 +71,31 @@ export default function StabilityPage() {
         <h2>Measure stability across k</h2>
         <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 40, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/k-means/external-metrics" style={navLink}>← External metrics (ARI, NMI)</Link>
-          <Link href="/learn/k-means" style={navLink}>Back to overview →</Link>
-        </div>
+        <Quiz
+          accent="var(--c-clustering)"
+          questions={[
+            {
+              q: "An Adjusted Rand Index (ARI) of 0 means…",
+              options: ["Agreement no better than random chance", "Zero agreement — every pair disagrees", "The two clusterings used different k"],
+              answer: 0,
+              explain: "ARI is chance-corrected: 1 is identical clusterings, 0 is what random labelling would score, negative is worse than chance. Raw agreement can look high purely by luck.",
+            },
+            {
+              q: "A clustering is called STABLE when…",
+              options: ["Re-running on resampled or perturbed data keeps producing similar clusters", "Inertia is low", "Lloyd's converges in few iterations"],
+              answer: 0,
+              explain: "Stability is the unsupervised stand-in for generalization: structure that survives resampling is probably real; structure that reshuffles every run is probably noise.",
+            },
+            {
+              q: "Why can't you choose k by evaluating inertia on held-out data, like supervised cross-validation?",
+              options: ["Inertia keeps decreasing with k on any dataset — held-out or not — so it still always votes for bigger k", "Held-out data can't be assigned to clusters", "Inertia is undefined off the training set"],
+              answer: 0,
+              explain: "More centroids are always closer to any data. Without labels there's no error to go UP when you overfit — which is why stability and reference-comparison methods fill the gap.",
+            },
+          ]}
+        />
+
+        <PrevNext prev={{ href: "/learn/k-means/external-metrics", label: <>← External metrics (ARI, NMI)</> }} next={{ href: "/learn/k-means", label: <>Back to overview →</> }} />
       </div>
     </article>
   );
@@ -114,10 +128,5 @@ def fit_kmeans(X, k):
 
 # then run the stability() loop above; pick the k with the highest mean ARI.`;
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
 const ol: React.CSSProperties = { margin: "0 0 10px", paddingLeft: "1.3em", fontSize: 15, color: "var(--muted)", lineHeight: 1.8 };
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
 const inlineLink: React.CSSProperties = { color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-clustering) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-clustering) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0" };

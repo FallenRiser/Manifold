@@ -1,6 +1,8 @@
-import Link from "next/link";
 import { LossSurface3D } from "@/components/labs/LossSurface3D";
 import { GradientDescentLab } from "@/components/labs/GradientDescentLab";
+import { PredictPrompt } from "@/components/PredictPrompt";
+import { LabFrame } from "@/components/LabFrame";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 export const metadata = {
   title: "The loss surface — Manifold",
@@ -10,19 +12,15 @@ export const metadata = {
 export default function LossSurfacePage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-regression)")}>Regression</span>
-        <span style={chip("var(--c-fundamentals)")}>Core idea</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 10 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        The loss surface
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 8px", maxWidth: 620 }}>
-        This is the big one — the idea that powers almost every model you&rsquo;ll ever train.
+      <LessonHeader
+        chips={[{ label: "Regression", color: "var(--c-regression)" }, { label: "Core idea", color: "var(--c-fundamentals)" }]}
+        time="about 10 minutes"
+        title={<>The loss surface</>}
+        intro={<>
+          This is the big one — the idea that powers almost every model you&rsquo;ll ever train.
         Once you see it, gradient descent stops being a mystery and starts being obvious.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <p>
@@ -67,7 +65,19 @@ export default function LossSurfacePage() {
           quietly snaps into the perfect fit. They&rsquo;re two views of the <em>same</em> moment.
         </p>
 
-        <GradientDescentLab />
+        <PredictPrompt
+          prompt={<>Before you run it: what happens to the ball if you push the learning rate above 1.0?</>}
+          options={["Converges faster", "Bounces outward and blows up", "Same path, bigger steps"]}
+          nudge={<>Locked in. Run the descent at the default rate first, then crank the slider past 1.0 and run it again.</>}
+        />
+        <LabFrame
+          tryThis={<>Run the descent at the default rate, then again at 0.05 and again past 1.0 — watch both the ball and the line on the right.</>}
+          insight={<>Two things worth noticing: the path always crosses the contour rings at right angles — that&rsquo;s
+            what &ldquo;steepest descent&rdquo; means geometrically — and past α ≈ 1.0 each step overshoots the valley and lands
+            higher than it started. Same algorithm, one dial, three completely different fates.</>}
+        >
+          <GradientDescentLab />
+        </LabFrame>
 
         <h2>The learning rate is everything</h2>
         <p>
@@ -82,45 +92,17 @@ export default function LossSurfacePage() {
           slider past about <code>1.0</code> and watch it diverge.
         </p>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-fundamentals)", marginBottom: 4 }}>
-            Why this matters everywhere
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            This exact loop — compute the gradient, step downhill, repeat — is how neural networks,
+        <Callout color="var(--c-fundamentals)" title={<>Why this matters everywhere</>}>
+          This exact loop — compute the gradient, step downhill, repeat — is how neural networks,
             logistic regression, and most of modern ML are trained. The surfaces get vastly more
             complicated (millions of dimensions, bumpy valleys), but the move never changes. Master
             it here on a simple bowl and you&rsquo;ve met the engine under all of it.
-          </p>
-        </div>
+        </Callout>
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 32, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/linear-regression/why-squared-error" style={navLink}>← Why squared error?</Link>
-          <Link href="/learn/linear-regression/what-is-a-gradient" style={navLink}>Next up · What is a gradient? →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/linear-regression/why-squared-error", label: <>← Why squared error?</> }} next={{ href: "/learn/linear-regression/what-is-a-gradient", label: <>Next up · What is a gradient? →</> }} />
       </div>
     </article>
   );
 }
 
-function chip(color: string): React.CSSProperties {
-  return {
-    display: "inline-flex",
-    alignItems: "center",
-    background: `color-mix(in srgb, ${color} 13%, var(--surface))`,
-    color,
-    fontSize: 12,
-    padding: "3px 10px",
-    borderRadius: 999,
-  };
-}
 
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-
-const callout: React.CSSProperties = {
-  background: "color-mix(in srgb, var(--c-fundamentals) 9%, var(--surface))",
-  border: "1px solid color-mix(in srgb, var(--c-fundamentals) 22%, var(--border))",
-  borderRadius: 12,
-  padding: "13px 15px",
-  margin: "1.8rem 0 0",
-};

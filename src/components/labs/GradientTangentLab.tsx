@@ -66,12 +66,14 @@ export function GradientTangentLab() {
         {/* tangent */}
         <line x1={xToPx(tx1)} y1={yToPx(f(w) + s * (tx1 - w))} x2={xToPx(tx2)} y2={yToPx(f(w) + s * (tx2 - w))} stroke="var(--brand)" strokeWidth={2.5} strokeLinecap="round" />
         {/* ball */}
-        <circle cx={xToPx(w)} cy={yToPx(f(w))} r={8} fill="var(--surface)" stroke="var(--brand-2)" strokeWidth={2.5} style={{ cursor: "ew-resize" }}
+        <circle cx={xToPx(w)} cy={yToPx(f(w))} r={8} fill="var(--surface)" stroke="var(--brand-2)" strokeWidth={2.5} pointerEvents="none" />
+        <circle cx={xToPx(w)} cy={yToPx(f(w))} r={3} fill="var(--brand-2)" pointerEvents="none" />
+        {/* oversized invisible hit area so the ball is draggable by touch */}
+        <circle cx={xToPx(w)} cy={yToPx(f(w))} r={22} fill="transparent" style={{ cursor: "ew-resize" }}
           tabIndex={0} role="slider" aria-label="Position on the curve" aria-valuenow={Math.round(w * 10) / 10}
           onPointerDown={(e) => { e.preventDefault(); setDrag(true); }}
           onKeyDown={(e) => { if (e.key === "ArrowRight") { setW((v) => Math.min(10, v + 0.3)); setSteps(0); } if (e.key === "ArrowLeft") { setW((v) => Math.max(0, v - 0.3)); setSteps(0); } }}
         />
-        <circle cx={xToPx(w)} cy={yToPx(f(w))} r={3} fill="var(--brand-2)" />
         {/* downhill direction arrow on the floor */}
         {Math.abs(s) >= 0.05 && (
           <g stroke="var(--good)" strokeWidth={2} fill="none">
@@ -102,5 +104,5 @@ export function GradientTangentLab() {
   );
 }
 
-const btnPrimary: React.CSSProperties = { background: "var(--cta)", color: "#fff", border: "none", fontSize: 13, fontWeight: 500, padding: "8px 14px", borderRadius: 10, cursor: "pointer" };
+const btnPrimary: React.CSSProperties = { background: "var(--cta)", color: "var(--cta-text)", border: "none", fontSize: 13, fontWeight: 500, padding: "8px 14px", borderRadius: 10, cursor: "pointer" };
 const btnGhost: React.CSSProperties = { background: "transparent", color: "var(--muted)", border: "1px solid var(--border-strong)", fontSize: 13, padding: "8px 12px", borderRadius: 10, cursor: "pointer" };

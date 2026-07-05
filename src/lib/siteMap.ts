@@ -1,4 +1,6 @@
-export type Track = { title: string; href?: string };
+// `partial` = the track is live but its outline is not fully built yet; /map
+// must say so rather than present it like a finished track (PROJECT.md §10.5).
+export type Track = { title: string; href?: string; partial?: boolean };
 export type Group = { name: string; color: string; blurb: string; tracks: Track[] };
 
 export const TIERS = [
@@ -16,7 +18,7 @@ export const FAMILIES: Group[] = [
     tracks: [
       { title: "Linear regression", href: "/learn/linear-regression" },
       { title: "Ridge, Lasso & Elastic-net", href: "/learn/regularized-regression" },
-      { title: "Polynomial & basis-function regression" },
+      { title: "Polynomial & basis-function regression", href: "/learn/polynomial-regression", partial: true },
       { title: "Kernel ridge regression" },
       { title: "Support vector regression" },
     ],
@@ -26,8 +28,8 @@ export const FAMILIES: Group[] = [
     color: "var(--c-classification)",
     blurb: "Predict a category, and learn where the boundary goes.",
     tracks: [
-      { title: "Logistic regression" },
-      { title: "k-Nearest Neighbors" },
+      { title: "Logistic regression", href: "/learn/logistic-regression", partial: true },
+      { title: "k-Nearest Neighbors", href: "/learn/k-nearest-neighbors", partial: true },
       { title: "Naive Bayes" },
       { title: "Support Vector Machines" },
       { title: "Kernel methods" },
@@ -47,11 +49,11 @@ export const FAMILIES: Group[] = [
     ],
   },
   {
-    name: "Clustering & unsupervised",
+    name: "Clustering",
     color: "var(--c-clustering)",
-    blurb: "Find structure when there are no labels at all.",
+    blurb: "Unsupervised learning — find structure when there are no labels at all.",
     tracks: [
-      { title: "k-Means (& k-Means++)" },
+      { title: "k-Means (& k-Means++)", href: "/learn/k-means" },
       { title: "Hierarchical clustering" },
       { title: "DBSCAN & density-based" },
       { title: "Gaussian mixtures & EM" },

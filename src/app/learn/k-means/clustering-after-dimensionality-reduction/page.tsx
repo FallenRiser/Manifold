@@ -1,5 +1,6 @@
-import Link from "next/link";
 import { CodeBlock } from "@/components/CodeBlock";
+import { CLUSTER_SETUP } from "@/lib/runtimeSetup";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 export const metadata = {
   title: "Clustering after dimensionality reduction — Manifold",
@@ -10,19 +11,16 @@ export const metadata = {
 export default function DimReductionPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-clustering)")}>Clustering</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 6 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        Clustering after dimensionality reduction
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 24px", maxWidth: 620 }}>
-        k-Means leans entirely on Euclidean distance, and Euclidean distance quietly stops being useful
+      <LessonHeader
+        chips={[{ label: "Clustering", color: "var(--c-clustering)" }]}
+        time="about 6 minutes"
+        title={<>Clustering after dimensionality reduction</>}
+        intro={<>
+          k-Means leans entirely on Euclidean distance, and Euclidean distance quietly stops being useful
         as dimensions pile up. The standard remedy is to reduce dimensions first — and it does more than
         speed things up.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <h2>Why high dimensions hurt</h2>
@@ -57,28 +55,20 @@ export default function DimReductionPage() {
           <li><strong>Denoising.</strong> Dropping low-variance directions discards features that were only adding distance noise.</li>
         </ul>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-clustering)", marginBottom: 4 }}>
-            Cautions worth keeping
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            Reduction can also <em>destroy</em> the very structure you wanted if you cut too aggressively —
+        <Callout color="var(--c-clustering)" title={<>Cautions worth keeping</>}>
+          Reduction can also <em>destroy</em> the very structure you wanted if you cut too aggressively —
             a cluster separated only along a low-variance direction can vanish under PCA. And clustering
             inside a t-SNE/UMAP plot then reading off cluster sizes is a classic mistake: those embeddings
             preserve neighbourhoods, not distances. Use non-linear embeddings to <em>find</em> structure,
             then validate it back in a faithful space. For text and images, clustering learned embeddings
             (PCA&rsquo;d if needed) is the standard pipeline — the capstone&rsquo;s embedding case shows it end to
             end.
-          </p>
-        </div>
+        </Callout>
 
         <h2>PCA → k-means pipeline</h2>
-        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
+        <CodeBlock setup={CLUSTER_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 40, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/k-means/categorical-and-mixed-data" style={navLink}>← Categorical &amp; mixed data</Link>
-          <Link href="/learn/k-means" style={navLink}>Back to overview →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/k-means/categorical-and-mixed-data", label: <>← Categorical &amp; mixed data</> }} next={{ href: "/learn/k-means", label: <>Back to overview →</> }} />
       </div>
     </article>
   );
@@ -108,9 +98,7 @@ model = make_pipeline(
 )
 labels = model.fit_predict(X)`;
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
+
 const ul: React.CSSProperties = { margin: "0 0 10px", paddingLeft: "1.3em", fontSize: 15, color: "var(--muted)", lineHeight: 1.8 };
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-clustering) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-clustering) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0" };
+
+

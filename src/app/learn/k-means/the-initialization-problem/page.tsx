@@ -1,5 +1,6 @@
-import Link from "next/link";
 import { CodeBlock } from "@/components/CodeBlock";
+import { CLUSTER_SETUP } from "@/lib/runtimeSetup";
+import { LessonHeader, PrevNext } from "@/components/lesson";
 
 export const metadata = {
   title: "The initialization problem — Manifold",
@@ -43,19 +44,16 @@ function Panel({ title, centroids, tone }: { title: string; centroids: { x: numb
 export default function InitProblemPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-clustering)")}>Clustering</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 5 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        The initialization problem
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 24px", maxWidth: 620 }}>
-        We proved k-means always converges — but only to a <em>local</em> minimum. The single biggest
+      <LessonHeader
+        chips={[{ label: "Clustering", color: "var(--c-clustering)" }]}
+        time="about 5 minutes"
+        title={<>The initialization problem</>}
+        intro={<>
+          We proved k-means always converges — but only to a <em>local</em> minimum. The single biggest
         lever on which one you land in isn&rsquo;t the data or the algorithm. It&rsquo;s where the centroids
         start.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <h2>Same data, same algorithm, different answer</h2>
@@ -99,12 +97,9 @@ export default function InitProblemPage() {
           </li>
         </ul>
         <p>Both are next. First, see the symptom directly:</p>
-        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
+        <CodeBlock setup={CLUSTER_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 40, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/k-means/mini-batch" style={navLink}>← Mini-batch k-means</Link>
-          <Link href="/learn/k-means/random-restarts" style={{ ...navLink, fontWeight: 600 }}>Next up · Random restarts →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/k-means/mini-batch", label: <>← Mini-batch k-means</> }} next={{ href: "/learn/k-means/random-restarts", label: <>Next up · Random restarts →</> }} />
       </div>
     </article>
   );
@@ -142,8 +137,6 @@ for s in range(6):
     km = KMeans(n_clusters=3, init="random", n_init=1, random_state=s).fit(X)
     print(f"seed {s}: inertia {km.inertia_:.1f}")`;
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
+
 const ul: React.CSSProperties = { margin: "0 0 10px", paddingLeft: "1.3em", fontSize: 15, color: "var(--muted)", lineHeight: 1.8 };
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
+

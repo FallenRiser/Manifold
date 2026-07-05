@@ -1,5 +1,7 @@
-import Link from "next/link";
 import { CodeBlock } from "@/components/CodeBlock";
+import { CoefPathLab } from "@/components/labs/CoefPathLab";
+import { REGRESSION_SETUP } from "@/lib/runtimeSetup";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 export const metadata = {
   title: "Lasso for feature selection — Manifold",
@@ -10,19 +12,16 @@ export const metadata = {
 export default function FeatureSelectionPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-regression)")}>Regression</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 6 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        Lasso for feature selection
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 24px", maxWidth: 620 }}>
-        Lasso&rsquo;s sparsity makes it the default tool for picking features — selection happens <em>inside</em>{" "}
+      <LessonHeader
+        chips={[{ label: "Regression", color: "var(--c-regression)" }]}
+        time="about 6 minutes"
+        title={<>Lasso for feature selection</>}
+        intro={<>
+          Lasso&rsquo;s sparsity makes it the default tool for picking features — selection happens <em>inside</em>{" "}
         the fit, not as a separate step. That&rsquo;s powerful and convenient, but the selections are not gospel,
         and knowing the caveats keeps you honest.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <h2>Embedded selection</h2>
@@ -34,6 +33,8 @@ export default function FeatureSelectionPage() {
           fit, and the nonzero coefficients are your chosen features — no separate search, and selection and
           estimation use the same criterion.
         </p>
+
+        <CoefPathLab />
 
         <h2>Why it&rsquo;s so widely used</h2>
         <ul style={ul}>
@@ -65,25 +66,17 @@ export default function FeatureSelectionPage() {
           </li>
         </ul>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-regression)", marginBottom: 4 }}>
-            Make selections more trustworthy: stability selection
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            Run Lasso on many bootstrap resamples and keep the features that are selected <em>frequently</em>
+        <Callout color="var(--c-regression)" title={<>Make selections more trustworthy: stability selection</>}>
+          Run Lasso on many bootstrap resamples and keep the features that are selected <em>frequently</em>
             across runs. This <strong>stability selection</strong> turns a jittery single-run list into a robust
             one with error control, and is the right move when the selected set itself — not just predictions —
             is the deliverable (as in genomics or biomarker discovery).
-          </p>
-        </div>
+        </Callout>
 
         <h2>Select, then optionally debias</h2>
-        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
+        <CodeBlock setup={REGRESSION_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 40, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/regularized-regression/the-regularization-path" style={navLink}>← The regularization path</Link>
-          <Link href="/learn/regularized-regression/solving-the-lasso" style={{ ...navLink, fontWeight: 600 }}>Next up · Solving the Lasso →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/regularized-regression/the-regularization-path", label: <>← The regularization path</> }} next={{ href: "/learn/regularized-regression/solving-the-lasso", label: <>Next up · Solving the Lasso →</> }} />
       </div>
     </article>
   );
@@ -109,9 +102,7 @@ selector = SelectFromModel(Lasso(alpha=0.05)).fit(X, y)
 X_reduced = selector.transform(X)
 print("kept", X_reduced.shape[1], "of", X.shape[1], "features")`;
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
+
 const ul: React.CSSProperties = { margin: "0 0 10px", paddingLeft: "1.3em", fontSize: 15, color: "var(--muted)", lineHeight: 1.8 };
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-regression) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-regression) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0" };
+
+

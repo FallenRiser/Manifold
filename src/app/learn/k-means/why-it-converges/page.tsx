@@ -1,5 +1,6 @@
-import Link from "next/link";
 import { CodeBlock } from "@/components/CodeBlock";
+import { CLUSTER_SETUP } from "@/lib/runtimeSetup";
+import { LessonHeader, PrevNext } from "@/components/lesson";
 
 export const metadata = {
   title: "Why it converges — Manifold",
@@ -16,19 +17,15 @@ const py = (v: number) => H - 26 - (v / 60) * (H - 46);
 export default function WhyItConvergesPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-clustering)")}>Clustering</span>
-        <span style={chip("var(--c-metrics)")}>Go deeper</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 6 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        Why it converges
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 24px", maxWidth: 620 }}>
-        k-Means has no learning rate, no stopping tolerance to tune — yet it always halts. Two short
+      <LessonHeader
+        chips={[{ label: "Clustering", color: "var(--c-clustering)" }, { label: "Go deeper", color: "var(--c-metrics)" }]}
+        time="about 6 minutes"
+        title={<>Why it converges</>}
+        intro={<>
+          k-Means has no learning rate, no stopping tolerance to tune — yet it always halts. Two short
         facts explain why, and one important caveat explains what it halts <em>at</em>.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <h2>Each step can only lower inertia</h2>
@@ -89,12 +86,9 @@ export default function WhyItConvergesPage() {
         <p>
           Print the inertia after each iteration and you&rsquo;ll never see it rise:
         </p>
-        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
+        <CodeBlock setup={CLUSTER_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 40, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/k-means/assign-and-update" style={navLink}>← Assign &amp; update</Link>
-          <Link href="/learn/k-means/computational-complexity" style={{ ...navLink, fontWeight: 600 }}>Next up · Computational complexity →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/k-means/assign-and-update", label: <>← Assign &amp; update</> }} next={{ href: "/learn/k-means/computational-complexity", label: <>Next up · Computational complexity →</> }} />
       </div>
     </article>
   );
@@ -129,8 +123,6 @@ X = np.vstack([rng.normal(c, 0.6, (40, 2)) for c in [(0, 0), (4, 4), (8, 0)]])
 # verbose=1 prints the objective each iteration; it decreases monotonically
 KMeans(n_clusters=3, n_init=1, init="random", verbose=1, random_state=1).fit(X)`;
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
+
 const ul: React.CSSProperties = { margin: "0 0 10px", paddingLeft: "1.3em", fontSize: 15, color: "var(--muted)", lineHeight: 1.8 };
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
+

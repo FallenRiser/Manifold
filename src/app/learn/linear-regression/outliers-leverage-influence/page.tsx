@@ -1,7 +1,8 @@
-import Link from "next/link";
 import { InfluenceLab } from "@/components/labs/InfluenceLab";
 import { MathBlock } from "@/components/Math";
 import { CodeBlock } from "@/components/CodeBlock";
+import { REGRESSION_SETUP } from "@/lib/runtimeSetup";
+import { LessonHeader, PrevNext } from "@/components/lesson";
 
 const codeScratch = `import numpy as np
 
@@ -44,20 +45,16 @@ export const metadata = {
 export default function OutliersLeverageInfluencePage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-regression)")}>Regression</span>
-        <span style={chip("var(--brand)")}>Diagnostics</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 8 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        Outliers, leverage & influence
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 8px", maxWidth: 620 }}>
-        An outlier in the y-direction just increases your error. An outlier in
+      <LessonHeader
+        chips={[{ label: "Regression", color: "var(--c-regression)" }, { label: "Diagnostics", color: "var(--brand)" }]}
+        time="about 8 minutes"
+        title={<>Outliers, leverage & influence</>}
+        intro={<>
+          An outlier in the y-direction just increases your error. An outlier in
         the x-direction acts like a wrench, twisting the entire regression line
         to meet it.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <h2>The triad of unusual points</h2>
@@ -135,12 +132,9 @@ export default function OutliersLeverageInfluencePage() {
           it with the residual to flag the one point that&rsquo;s actually moving the
           line. statsmodels reports it in a single call.
         </p>
-        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
+        <CodeBlock setup={REGRESSION_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 32, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/linear-regression/heteroscedasticity-in-depth" style={navLink}>← Heteroscedasticity in depth</Link>
-          <Link href="/learn/linear-regression/detecting-non-normality" style={navLink}>Next up · Detecting non-normality →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/linear-regression/heteroscedasticity-in-depth", label: <>← Heteroscedasticity in depth</> }} next={{ href: "/learn/linear-regression/detecting-non-normality", label: <>Next up · Detecting non-normality →</> }} />
       </div>
     </article>
   );
@@ -158,7 +152,6 @@ function TriadCard({ title, icon, body }: { title: string; icon: string; body: s
   );
 }
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
-const grid3: React.CSSProperties = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 10, margin: "1.4rem 0" };const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
+
+const grid3: React.CSSProperties = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 10, margin: "1.4rem 0" };
+

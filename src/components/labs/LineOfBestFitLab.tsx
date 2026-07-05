@@ -147,25 +147,34 @@ export function LineOfBestFitLab() {
 
         {/* drag handles */}
         {([["L", 0, yL], ["R", 10, yR]] as const).map(([id, x, yv]) => (
-          <circle
-            key={id}
-            cx={xToPx(x)}
-            cy={yToPx(yv)}
-            r={8}
-            fill="var(--surface)"
-            stroke="var(--brand)"
-            strokeWidth={2.5}
-            style={{ cursor: "ns-resize" }}
-            tabIndex={0}
-            role="slider"
-            aria-label={id === "L" ? "Left end of line" : "Right end of line"}
-            aria-valuenow={Math.round(yv * 10) / 10}
-            onPointerDown={(e) => { e.preventDefault(); setDrag(id); }}
-            onKeyDown={(e) => {
-              if (e.key === "ArrowUp") { e.preventDefault(); nudge(id, 0.3); }
-              if (e.key === "ArrowDown") { e.preventDefault(); nudge(id, -0.3); }
-            }}
-          />
+          <g key={id}>
+            <circle
+              cx={xToPx(x)}
+              cy={yToPx(yv)}
+              r={8}
+              fill="var(--surface)"
+              stroke="var(--brand)"
+              strokeWidth={2.5}
+              pointerEvents="none"
+            />
+            {/* oversized invisible hit area so the handle is draggable by touch */}
+            <circle
+              cx={xToPx(x)}
+              cy={yToPx(yv)}
+              r={22}
+              fill="transparent"
+              style={{ cursor: "ns-resize" }}
+              tabIndex={0}
+              role="slider"
+              aria-label={id === "L" ? "Left end of line" : "Right end of line"}
+              aria-valuenow={Math.round(yv * 10) / 10}
+              onPointerDown={(e) => { e.preventDefault(); setDrag(id); }}
+              onKeyDown={(e) => {
+                if (e.key === "ArrowUp") { e.preventDefault(); nudge(id, 0.3); }
+                if (e.key === "ArrowDown") { e.preventDefault(); nudge(id, -0.3); }
+              }}
+            />
+          </g>
         ))}
       </svg>
 
@@ -196,7 +205,7 @@ function Metric({ label, value, mono }: { label: string; value: string; mono?: b
 
 const btnPrimary: React.CSSProperties = {
   background: "var(--cta)",
-  color: "#fff",
+  color: "var(--cta-text)",
   border: "none",
   fontSize: 13,
   fontWeight: 500,

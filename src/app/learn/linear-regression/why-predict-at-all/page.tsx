@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { LessonHeader, Callout } from "@/components/lesson";
 
 export const metadata = {
   title: "Why predict at all? — Manifold",
@@ -8,19 +9,15 @@ export const metadata = {
 export default function WhyPredictPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-regression)")}>Regression</span>
-        <span style={chip("var(--c-fundamentals)")}>Beginner</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 5 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        Why predict at all?
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 8px", maxWidth: 620 }}>
-        Before any algorithm, there&rsquo;s a question worth sitting with: what does it actually
+      <LessonHeader
+        chips={[{ label: "Regression", color: "var(--c-regression)" }, { label: "Beginner", color: "var(--c-fundamentals)" }]}
+        time="about 5 minutes"
+        title={<>Why predict at all?</>}
+        intro={<>
+          Before any algorithm, there&rsquo;s a question worth sitting with: what does it actually
         mean to <em>predict</em> something from data?
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <p>
@@ -102,17 +99,12 @@ export default function WhyPredictPage() {
           up piece by piece over the next few pages.
         </p>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-fundamentals)", marginBottom: 4 }}>
-            The pattern that repeats
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            Every supervised learning model is the same three-part recipe: a <strong>shape</strong>{" "}
+        <Callout color="var(--c-fundamentals)" title={<>The pattern that repeats</>}>
+          Every supervised learning model is the same three-part recipe: a <strong>shape</strong>{" "}
             to fit (a line, a tree, a neural network…), a way to measure <strong>wrongness</strong>,
             and a method to <strong>minimise</strong> that wrongness. Linear regression is the
             simplest case of each, which is exactly why it&rsquo;s the right place to start.
-          </p>
-        </div>
+        </Callout>
 
         <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 32, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
           <Link href="/learn/linear-regression/what-a-model-really-is" style={navLink}>
@@ -124,18 +116,6 @@ export default function WhyPredictPage() {
   );
 }
 
-function chip(color: string): React.CSSProperties {
-  return {
-    display: "inline-flex", alignItems: "center",
-    background: `color-mix(in srgb, ${color} 13%, var(--surface))`,
-    color, fontSize: 12, padding: "3px 10px", borderRadius: 999,
-  };
-}
 
 const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
 
-const callout: React.CSSProperties = {
-  background: "color-mix(in srgb, var(--c-fundamentals) 9%, var(--surface))",
-  border: "1px solid color-mix(in srgb, var(--c-fundamentals) 22%, var(--border))",
-  borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0 0",
-};

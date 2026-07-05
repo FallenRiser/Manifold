@@ -1,6 +1,7 @@
-import Link from "next/link";
 import { M, MathBlock } from "@/components/Math";
 import { CodeBlock } from "@/components/CodeBlock";
+import { REGRESSION_SETUP } from "@/lib/runtimeSetup";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 export const metadata = {
   title: "Lasso as a Laplace prior (MAP) — Manifold",
@@ -19,19 +20,15 @@ const bs = Array.from({ length: 101 }, (_, i) => -5 + i * 0.1);
 export default function LassoPriorPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-regression)")}>Regression</span>
-        <span style={chip("var(--c-metrics)")}>Go deeper</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 6 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        Lasso as a Laplace prior (MAP)
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 24px", maxWidth: 620 }}>
-        Ridge was MAP under a Gaussian prior. Change the prior to a <strong>Laplace</strong> distribution and
+      <LessonHeader
+        chips={[{ label: "Regression", color: "var(--c-regression)" }, { label: "Go deeper", color: "var(--c-metrics)" }]}
+        time="about 6 minutes"
+        title={<>Lasso as a Laplace prior (MAP)</>}
+        intro={<>
+          Ridge was MAP under a Gaussian prior. Change the prior to a <strong>Laplace</strong> distribution and
         MAP becomes Lasso — and the prior&rsquo;s sharp spike at zero is the probabilistic source of sparsity.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <h2>The Laplace prior</h2>
@@ -72,18 +69,13 @@ export default function LassoPriorPage() {
           </div>
         </div>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-regression)", marginBottom: 4 }}>
-            One caveat: MAP ≠ the full Bayesian answer
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            Lasso is the <em>mode</em> (MAP) of the Laplace-prior posterior, not the posterior mean. The full
+        <Callout color="var(--c-regression)" title={<>One caveat: MAP ≠ the full Bayesian answer</>}>
+          Lasso is the <em>mode</em> (MAP) of the Laplace-prior posterior, not the posterior mean. The full
             Bayesian Lasso posterior actually puts zero probability on exact zeros — the sparsity is an artifact
             of taking the mode, where the cusp pins the optimum at zero. This is a subtle but important point:
             &ldquo;Lasso = Bayesian&rdquo; is true for the MAP estimate specifically. It still gives the right intuition
             for <em>why</em> L1 is sparse: the prior believes in zeros.
-          </p>
-        </div>
+        </Callout>
 
         <h2>The pattern: prior ⟷ penalty</h2>
         <p>
@@ -94,12 +86,9 @@ export default function LassoPriorPage() {
         </p>
 
         <h2>MAP equals Lasso</h2>
-        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
+        <CodeBlock setup={REGRESSION_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 40, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/regularized-regression/ridge-as-a-gaussian-prior" style={navLink}>← Ridge as a Gaussian prior</Link>
-          <Link href="/learn/regularized-regression/degrees-of-freedom" style={{ ...navLink, fontWeight: 600 }}>Next up · Degrees of freedom &amp; effective complexity →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/regularized-regression/ridge-as-a-gaussian-prior", label: <>← Ridge as a Gaussian prior</> }} next={{ href: "/learn/regularized-regression/degrees-of-freedom", label: <>Next up · Degrees of freedom &amp; effective complexity →</> }} />
       </div>
     </article>
   );
@@ -126,8 +115,6 @@ from sklearn.linear_model import Ridge, Lasso
 print("ridge zeros:", (Ridge(alpha=1).fit(X, y).coef_ == 0).sum())   # 0
 print("lasso zeros:", (Lasso(alpha=0.1).fit(X, y).coef_ == 0).sum()) # > 0`;
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-regression) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-regression) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0" };
+
+
+

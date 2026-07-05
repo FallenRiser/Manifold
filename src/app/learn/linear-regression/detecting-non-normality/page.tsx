@@ -1,7 +1,9 @@
-import Link from "next/link";
 import { QQPlotLab } from "@/components/labs/QQPlotLab";
 import { CodeBlock } from "@/components/CodeBlock";
+import { REGRESSION_SETUP } from "@/lib/runtimeSetup";
 import { Backlinks } from "@/components/Backlinks";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
+import { Quiz } from "@/components/Quiz";
 
 const codeScratch = `import numpy as np
 
@@ -34,19 +36,15 @@ export const metadata = {
 export default function DetectingNonNormalityPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-regression)")}>Regression</span>
-        <span style={chip("var(--brand)")}>Diagnostics</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 4 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        Detecting non-normality
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 8px", maxWidth: 620 }}>
-        Histograms are blocky and misleading in small samples. To definitively
+      <LessonHeader
+        chips={[{ label: "Regression", color: "var(--c-regression)" }, { label: "Diagnostics", color: "var(--brand)" }]}
+        time="about 4 minutes"
+        title={<>Detecting non-normality</>}
+        intro={<>
+          Histograms are blocky and misleading in small samples. To definitively
         diagnose the distribution of your residuals, you need a Quantile-Quantile (Q-Q) plot.
-      </p>
+        </>}
+      />
 
       <Backlinks label="Related" items={[
         { label: "Normality of residuals", href: "/learn/linear-regression/normality-of-residuals" },
@@ -96,30 +94,46 @@ export default function DetectingNonNormalityPage() {
           in large samples, non-normality doesn't matter anyway!
         </p>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-fundamentals)", marginBottom: 4 }}>
-            The golden rule of normality testing
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            When N is small (where normality matters), Shapiro-Wilk is weak and
+        <Callout color="var(--c-fundamentals)" title={<>The golden rule of normality testing</>}>
+          When N is small (where normality matters), Shapiro-Wilk is weak and
             might fail to detect issues. When N is large (where normality doesn't
             matter), it is too sensitive and will trigger false alarms. Always
             rely on the Q-Q plot and your knowledge of the sample size over the
             p-value of a formal test.
-          </p>
-        </div>
+        </Callout>
 
         <h2>Test it yourself</h2>
         <p>
           The Jarque-Bera statistic rolls skew and kurtosis into one number; from
           scratch it&rsquo;s three lines. SciPy adds Shapiro-Wilk as a second opinion.
         </p>
-        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
+        <CodeBlock setup={REGRESSION_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 32, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/linear-regression/outliers-leverage-influence" style={navLink}>← Outliers, leverage & influence</Link>
-          <Link href="/learn/linear-regression/r-squared-and-adjusted" style={navLink}>Next up · R² and adjusted R² →</Link>
-        </div>
+        <Quiz
+          title="Checkpoint · Diagnostics"
+          questions={[
+            {
+              q: <>Which plot do you reach for first after fitting any regression?</>,
+              options: ["Q–Q plot of the residuals", "Residuals vs fitted values", "Histogram of the target", "Coefficients bar chart"],
+              answer: 1,
+              explain: <>Residual-vs-fitted is the one plot that exposes the big three at a glance: curvature (non-linearity), a fan (heteroscedasticity), and stray extreme points (outliers). The other plots are follow-ups to what it shows you.</>,
+            },
+            {
+              q: <>A point far from the others in x, but sitting exactly on the fitted line. It has:</>,
+              options: ["High leverage, low influence — potential to move the line, unexercised", "High influence — it's dragging the line", "A large residual", "Nothing notable"],
+              answer: 0,
+              explain: <>Leverage is about being extreme in <em>x</em> (potential); influence = leverage actually exercised (Cook&rsquo;s distance ≈ leverage × residual). A high-leverage point that agrees with the trend moves nothing — but watch it: if its y drifts, the line follows.</>,
+            },
+            {
+              q: <>On a Q–Q plot the points track the diagonal in the middle but bend away at both ends. That means:</>,
+              options: ["Residuals are perfectly normal", "Heavy tails — extreme residuals are more common than the normal distribution predicts", "The model is non-linear", "Heteroscedasticity"],
+              answer: 1,
+              explain: <>Tail deviations on the Q–Q plot are heavy tails. Point estimates survive, but tail-sensitive claims — prediction intervals, small p-values — become optimistic. With big samples the CLT rescues coefficient inference; the intervals it doesn&rsquo;t.</>,
+            },
+          ]}
+        />
+
+        <PrevNext prev={{ href: "/learn/linear-regression/outliers-leverage-influence", label: <>← Outliers, leverage & influence</> }} next={{ href: "/learn/linear-regression/r-squared-and-adjusted", label: <>Next up · R² and adjusted R² →</> }} />
       </div>
     </article>
   );
@@ -134,9 +148,7 @@ function DevCard({ title, body }: { title: string; body: string }) {
   );
 }
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
+
 const readGrid: React.CSSProperties = { display: "grid", gap: 10, margin: "1.4rem 0" };
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-fundamentals) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-fundamentals) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0 0" };
+
+

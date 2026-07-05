@@ -1,6 +1,8 @@
-import Link from "next/link";
 import { StoppingRulesLab } from "@/components/labs/StoppingRulesLab";
 import { CodeBlock } from "@/components/CodeBlock";
+import { REGRESSION_SETUP } from "@/lib/runtimeSetup";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
+import { Quiz } from "@/components/Quiz";
 
 const codeScratch = `import numpy as np
 
@@ -40,20 +42,16 @@ export const metadata = {
 export default function WhenDoWeStopPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-regression)")}>Regression</span>
-        <span style={chip("var(--c-fundamentals)")}>Core idea</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>&middot; about 7 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        When do we stop?
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 8px", maxWidth: 620 }}>
-        Gradient descent does not hand you a single dramatic finish line. It quietly gets less
-        wrong, then less wrong, then barely less wrong. The art is knowing when the next step is
-        no longer worth taking.
-      </p>
+      <LessonHeader
+        chips={[{ label: "Regression", color: "var(--c-regression)" }, { label: "Core idea", color: "var(--c-fundamentals)" }]}
+        time="about 7 minutes"
+        title={<>When do we stop?</>}
+        intro={<>
+          Gradient descent does not hand you a single dramatic finish line. It quietly gets less
+          wrong, then less wrong, then barely less wrong. The art is knowing when the next step is
+          no longer worth taking.
+        </>}
+      />
 
       <div className="lesson">
         <p>
@@ -140,18 +138,13 @@ export default function WhenDoWeStopPage() {
           together.
         </p>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-fundamentals)", marginBottom: 4 }}>
-            Interview-grade answer
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            "How do you decide when gradient descent has converged?" - Use a hard maximum number
+        <Callout color="var(--c-fundamentals)" title={<>Interview-grade answer</>}>
+          "How do you decide when gradient descent has converged?" - Use a hard maximum number
             of iterations as a safety cap, then stop when the gradient norm or loss improvement is
             below a tolerance. In predictive modelling, monitor validation performance too; early
             stopping with patience halts training when validation no longer improves, which can
             reduce overfitting.
-          </p>
-        </div>
+        </Callout>
 
         <h2>Code the stopping rule</h2>
         <p>
@@ -159,27 +152,35 @@ export default function WhenDoWeStopPage() {
           improving by more than a tolerance. scikit-learn calls that tolerance
           <code>tol</code> and reports the iteration it stopped at.
         </p>
-        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
+        <CodeBlock setup={REGRESSION_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 32, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/linear-regression/batch-vs-sgd" style={navLink}>{"<-"} Batch, stochastic, mini-batch</Link>
-          <Link href="/learn/linear-regression/the-normal-equation" style={navLink}>Next up · The normal equation →</Link>
-        </div>
+        <Quiz
+          questions={[
+            {
+              q: <>The gradient at your current (slope, intercept) points north-east. Which way does gradient descent step?</>,
+              options: ["North-east — follow the gradient", "South-west — opposite the gradient", "It depends on the learning rate", "Toward the origin"],
+              answer: 1,
+              explain: <>The gradient points <em>uphill</em> — the direction of steepest increase in loss. Descent steps the opposite way. The learning rate only sets how <em>far</em>, never which direction.</>,
+            },
+            {
+              q: <>You crank the learning rate way up and the loss starts growing every step. What&rsquo;s happening?</>,
+              options: ["The model is exploring — it will settle down", "Each step overshoots the minimum and lands higher up the other side", "The data has too much noise", "The gradient is pointing the wrong way"],
+              answer: 1,
+              explain: <>Too large a step jumps past the bowl&rsquo;s floor and lands higher on the far wall; the next (even bigger) gradient overshoots further. That&rsquo;s divergence — the zig-zag blow-up you saw on the loss-surface lab around α &gt; 1.</>,
+            },
+            {
+              q: <>Compared with batch gradient descent, stochastic (one-example) steps are:</>,
+              options: ["Noisier per step, but far cheaper to compute", "Smoother and cheaper", "Noisier and more expensive", "Identical in direction, just smaller"],
+              answer: 0,
+              explain: <>One example gives a rough, noisy estimate of the true gradient — but at 1/N the cost. Mini-batches are the practical compromise: mostly-right direction, still cheap per step.</>,
+            },
+          ]}
+        />
+
+        <PrevNext prev={{ href: "/learn/linear-regression/batch-vs-sgd", label: <>{"<-"} Batch, stochastic, mini-batch</> }} next={{ href: "/learn/linear-regression/the-normal-equation", label: <>Next up · The normal equation →</> }} />
       </div>
     </article>
   );
-}
-
-function chip(color: string): React.CSSProperties {
-  return {
-    display: "inline-flex",
-    alignItems: "center",
-    background: `color-mix(in srgb, ${color} 13%, var(--surface))`,
-    color,
-    fontSize: 12,
-    padding: "3px 10px",
-    borderRadius: 999,
-  };
 }
 
 function RuleCard({ color, title, code, body }: { color: string; title: string; code: string; body: string }) {
@@ -204,12 +205,6 @@ const rulesGrid: React.CSSProperties = {
   margin: "1.4rem 0",
 };
 
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
 
-const callout: React.CSSProperties = {
-  background: "color-mix(in srgb, var(--c-fundamentals) 9%, var(--surface))",
-  border: "1px solid color-mix(in srgb, var(--c-fundamentals) 22%, var(--border))",
-  borderRadius: 12,
-  padding: "13px 15px",
-  margin: "1.8rem 0 0",
-};
+
+

@@ -1,4 +1,5 @@
-import Link from "next/link";
+import { Quiz } from "@/components/Quiz";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 export const metadata = {
   title: "Ridge vs Lasso vs Elastic-net: which when — Manifold",
@@ -20,19 +21,15 @@ const ROWS: Row[] = [
 export default function WhichWhenPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-regression)")}>Regression</span>
-        <span style={chip("var(--c-metrics)")}>Reference</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 6 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        Ridge vs Lasso vs Elastic-net: which when
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 24px", maxWidth: 620 }}>
-        Three penalties, one decision. This page distils the whole track into a practical guide: what each
+      <LessonHeader
+        chips={[{ label: "Regression", color: "var(--c-regression)" }, { label: "Reference", color: "var(--c-metrics)" }]}
+        time="about 6 minutes"
+        title={<>Ridge vs Lasso vs Elastic-net: which when</>}
+        intro={<>
+          Three penalties, one decision. This page distils the whole track into a practical guide: what each
         does, and how to pick on a real problem without agonising.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <h2>Side by side</h2>
@@ -81,18 +78,13 @@ export default function WhichWhenPage() {
           </li>
         </ol>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-regression)", marginBottom: 4 }}>
-            The honest default
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            For a strong, low-effort baseline on most tabular regression: <strong>standardize, then
+        <Callout color="var(--c-regression)" title={<>The honest default</>}>
+          For a strong, low-effort baseline on most tabular regression: <strong>standardize, then
             cross-validated elastic-net</strong>. It subsumes ridge and lasso, handles correlation gracefully,
             gives you sparsity when the data supports it, and rarely loses to either pure penalty. Reach for
             plain ridge when you specifically want to keep every feature, and plain lasso when you specifically
             want the most aggressive, interpretable selection.
-          </p>
-        </div>
+        </Callout>
 
         <p>
           That&rsquo;s the toolkit. Next, the theory chapter explains <em>why</em> shrinkage works at a deeper level —
@@ -100,20 +92,36 @@ export default function WhichWhenPage() {
           before we put everything to work on a real dataset in the capstone.
         </p>
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 40, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/regularized-regression/the-full-path-and-warm-starts" style={navLink}>← The full path &amp; warm starts</Link>
-          <Link href="/learn/regularized-regression/ridge-as-a-gaussian-prior" style={{ ...navLink, fontWeight: 600 }}>Next up · Ridge as a Gaussian prior →</Link>
-        </div>
+        <Quiz
+          accent="var(--c-regression)"
+          questions={[
+            {
+              q: "10,000 features, you believe only a few dozen matter, and you need an interpretable shortlist. Reach for…",
+              options: ["The Lasso", "Ridge", "OLS with more data"],
+              answer: 0,
+              explain: "L1's sparsity zeroes out the irrelevant thousands and hands you the shortlist. Ridge keeps every feature nonzero: stable, but no selection.",
+            },
+            {
+              q: "Groups of strongly correlated features, and you want selections that don't flip arbitrarily between correlated twins. Reach for…",
+              options: ["Elastic-net", "Pure Lasso", "No penalty at all"],
+              answer: 0,
+              explain: "Pure Lasso picks one member of a correlated group essentially at random, and the pick changes with the sample. The L2 component in elastic-net pulls groups in together.",
+            },
+            {
+              q: "Plenty of data, modest feature count, everything plausibly relevant — you just want tamer coefficients. Reach for…",
+              options: ["Ridge", "The Lasso", "Elastic-net with α = 1"],
+              answer: 0,
+              explain: "Nothing needs deleting — you want stability, not sparsity. Ridge shrinks smoothly, keeps the closed form, and handles multicollinearity gracefully.",
+            },
+          ]}
+        />
+
+        <PrevNext prev={{ href: "/learn/regularized-regression/the-full-path-and-warm-starts", label: <>← The full path &amp; warm starts</> }} next={{ href: "/learn/regularized-regression/ridge-as-a-gaussian-prior", label: <>Next up · Ridge as a Gaussian prior →</> }} />
       </div>
     </article>
   );
 }
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
 const ol: React.CSSProperties = { margin: "0 0 10px", paddingLeft: "1.3em", fontSize: 15, color: "var(--muted)", lineHeight: 1.85 };
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-regression) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-regression) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0" };
 const th: React.CSSProperties = { textAlign: "left", padding: "8px 10px", borderBottom: "2px solid var(--border-strong)", fontWeight: 600, fontSize: 12.5, verticalAlign: "bottom" };
 const td: React.CSSProperties = { padding: "8px 10px", borderBottom: "1px solid var(--border)", color: "var(--muted)", lineHeight: 1.4, verticalAlign: "top" };

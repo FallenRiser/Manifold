@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { NormalEquationLab } from "@/components/labs/NormalEquationLab";
 import { CodeBlock } from "@/components/CodeBlock";
+import { REGRESSION_SETUP } from "@/lib/runtimeSetup";
 import { M, MathBlock } from "@/components/Math";
+import { LessonHeader } from "@/components/lesson";
 
 export const metadata = {
   title: "The normal equation — Manifold",
@@ -51,23 +53,16 @@ print(f"lstsq → intercept={theta[0]:.2f}, slope={theta[1]:.2f}")`;
 
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-regression)")}>Regression</span>
-        <span style={chip("var(--c-fundamentals)")}>Core idea</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 9 minutes</span>
-      </div>
-
-      <h1
-        className="font-serif"
-        style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}
-      >
-        The normal equation
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 8px", maxWidth: 620 }}>
-        Gradient descent finds the minimum by rolling downhill, one step at a
+      <LessonHeader
+        chips={[{ label: "Regression", color: "var(--c-regression)" }, { label: "Core idea", color: "var(--c-fundamentals)" }]}
+        time="about 9 minutes"
+        title={<>The normal equation</>}
+        intro={<>
+          Gradient descent finds the minimum by rolling downhill, one step at a
         time. But for a linear model, there's a shortcut: a single formula that
         lands you at the exact answer in one shot.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <p>
@@ -104,7 +99,7 @@ print(f"lstsq → intercept={theta[0]:.2f}, slope={theta[1]:.2f}")`;
             border: "1.5px solid color-mix(in srgb, var(--brand) 25%, var(--border))",
           }}
         >
-          <M>{String.raw`\textcolor{#7c3aed}{\theta^*} = (X^\top X)^{-1} X^\top y`}</M>
+          <M>{String.raw`\textcolor{#5872cc}{\theta^*} = (X^\top X)^{-1} X^\top y`}</M>
         </div>
         <p>
           That's the normal equation. One formula. No hyperparameters, no loop
@@ -167,7 +162,7 @@ print(f"lstsq → intercept={theta[0]:.2f}, slope={theta[1]:.2f}")`;
           numbers.
         </p>
 
-        <CodeBlock fromScratch={fromScratch} withLibrary={withLibrary} />
+        <CodeBlock setup={REGRESSION_SETUP} fromScratch={fromScratch} withLibrary={withLibrary} />
 
         <div
           style={{
@@ -191,17 +186,6 @@ print(f"lstsq → intercept={theta[0]:.2f}, slope={theta[1]:.2f}")`;
   );
 }
 
-function chip(color: string): React.CSSProperties {
-  return {
-    display: "inline-flex",
-    alignItems: "center",
-    background: `color-mix(in srgb, ${color} 13%, var(--surface))`,
-    color,
-    fontSize: 12,
-    padding: "3px 10px",
-    borderRadius: 999,
-  };
-}
 
 const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
 

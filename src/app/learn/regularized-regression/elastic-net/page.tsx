@@ -1,6 +1,8 @@
-import Link from "next/link";
 import { M, MathBlock } from "@/components/Math";
 import { CodeBlock } from "@/components/CodeBlock";
+import { ElasticNetMixLab } from "@/components/labs/ElasticNetMixLab";
+import { REGRESSION_SETUP } from "@/lib/runtimeSetup";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 export const metadata = {
   title: "Elastic-net: blending L1 & L2 — Manifold",
@@ -11,19 +13,16 @@ export const metadata = {
 export default function ElasticNetPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-regression)")}>Regression</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 6 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        Elastic-net: blending L1 & L2
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 24px", maxWidth: 620 }}>
-        Why choose between Lasso&rsquo;s selection and Ridge&rsquo;s stability when you can have both? Elastic-net adds
+      <LessonHeader
+        chips={[{ label: "Regression", color: "var(--c-regression)" }]}
+        time="about 6 minutes"
+        title={<>Elastic-net: blending L1 & L2</>}
+        intro={<>
+          Why choose between Lasso&rsquo;s selection and Ridge&rsquo;s stability when you can have both? Elastic-net adds
         the two penalties together — and the combination fixes every Lasso weakness from the last page while
         keeping the sparsity.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <h2>The objective</h2>
@@ -45,6 +44,8 @@ export default function ElasticNetPage() {
           rather than one-or-nothing. You keep L1&rsquo;s zeros and borrow L2&rsquo;s smoothness.
         </p>
 
+        <ElasticNetMixLab />
+
         <h2>How it fixes each Lasso weakness</h2>
         <ul style={ul}>
           <li>
@@ -61,26 +62,18 @@ export default function ElasticNetPage() {
           </li>
         </ul>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-regression)", marginBottom: 4 }}>
-            A strong default
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            Because it contains both Ridge and Lasso as special cases, elastic-net is a safe go-to when you&rsquo;re
+        <Callout color="var(--c-regression)" title={<>A strong default</>}>
+          Because it contains both Ridge and Lasso as special cases, elastic-net is a safe go-to when you&rsquo;re
             unsure which to use — tuning <M>{String.raw`\alpha`}</M> lets cross-validation <em>discover</em> the
             right blend. A small L2 component (e.g. <M>{String.raw`\alpha = 0.9`}</M>, mostly Lasso) is a common
             sweet spot: nearly all the sparsity of Lasso, but with the grouping and stability that make it
             trustworthy on real, correlated data.
-          </p>
-        </div>
+        </Callout>
 
         <h2>Elastic-net in code</h2>
-        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
+        <CodeBlock setup={REGRESSION_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 40, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/regularized-regression/when-the-lasso-struggles" style={navLink}>← When the Lasso struggles</Link>
-          <Link href="/learn/regularized-regression/tuning-the-mix" style={{ ...navLink, fontWeight: 600 }}>Next up · Tuning the mix →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/regularized-regression/when-the-lasso-struggles", label: <>← When the Lasso struggles</> }} next={{ href: "/learn/regularized-regression/tuning-the-mix", label: <>Next up · Tuning the mix →</> }} />
       </div>
     </article>
   );
@@ -106,9 +99,7 @@ const codeLib = `from sklearn.linear_model import ElasticNet
 enet = ElasticNet(alpha=0.1, l1_ratio=0.5).fit(X, y)
 print((enet.coef_ != 0).sum(), "features kept")   # sparse, but groups survive`;
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
+
 const ul: React.CSSProperties = { margin: "0 0 10px", paddingLeft: "1.3em", fontSize: 15, color: "var(--muted)", lineHeight: 1.8 };
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-regression) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-regression) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0" };
+
+

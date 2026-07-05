@@ -1,7 +1,8 @@
-import Link from "next/link";
 import { M, MathBlock } from "@/components/Math";
 import { CodeBlock } from "@/components/CodeBlock";
 import { CodeOutput } from "@/components/CodeOutput";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
+import { DecisionPoint } from "@/components/capstone/DecisionPoint";
 
 export const metadata = {
   title: "Capstone: Tobit & censored regression — Manifold",
@@ -12,22 +13,41 @@ export const metadata = {
 export default function CensoredRegressionPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-regression)")}>Capstone</span>
-        <span style={chip("var(--c-metrics)")}>Upgrade 2 · Censored target</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 9 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 42, lineHeight: 1.08, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        Upgrade 2 · Tobit & censored regression
-      </h1>
-      <p style={{ fontSize: 17.5, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 24px", maxWidth: 620 }}>
-        <strong>Diagnosis:</strong> the target is censored at 5.0 — 808 expensive blocks all recorded as the ceiling.
+      <LessonHeader
+        chips={[{ label: "Capstone", color: "var(--c-regression)" }, { label: "Upgrade 2 · Censored target", color: "var(--c-metrics)" }]}
+        time="about 9 minutes"
+        title={<>Upgrade 2 · Tobit & censored regression</>}
+        intro={<>
+          <strong>Diagnosis:</strong> the target is censored at 5.0 — 808 expensive blocks all recorded as the ceiling.
         OLS treats &ldquo;5.0&rdquo; as the truth, so it under-estimates every relationship. <strong>Fix:</strong> a model whose
         likelihood <em>knows</em> 5.0 is only a lower bound on those blocks&rsquo; real value.
-      </p>
+        </>}
+        titleSize={42}
+        introSize={17.5}
+      />
 
       <div className="lesson">
+        <DecisionPoint
+          question={<>808 blocks (4.9%) are pinned at exactly 5.0 — every one of them is really worth <em>at least</em> $500k, possibly far more. How do you handle them?</>}
+          options={[
+            {
+              label: "Drop the capped rows and fit on the clean 95%",
+              verdict: "miss",
+              response: <>That&rsquo;s not removing noise — it&rsquo;s removing <em>the most expensive neighbourhoods in California</em>, systematically. The model would never see the top of the market, and its coefficients would be biased by the selective deletion instead of by the cap. Worse than the disease.</>,
+            },
+            {
+              label: "Leave them — 5.0 is a fine approximation of “expensive”",
+              verdict: "miss",
+              response: <>OLS takes the 5.0 literally, and the clipped values flatten every slope — the coefficients attenuate toward zero. We measured it: the income effect reads 0.78 when its true value is 0.92. The model looks fine and quietly understates every relationship.</>,
+            },
+            {
+              label: "Change the likelihood — tell the model 5.0 means “at least 5.0”",
+              verdict: "best",
+              response: <>That&rsquo;s the Tobit model, and it&rsquo;s this page. Censored rows contribute the <em>probability</em> that the latent value exceeds the cap, not a pretend-exact 5.0 — which recovers the un-attenuated coefficients. Match the model to the data-generating process.</>,
+            },
+          ]}
+        />
+
         <h2>What censoring does to OLS</h2>
         <p>
           A block recorded at 5.0 might truly be worth 6, or 9 — we can&rsquo;t tell, only that it&rsquo;s <em>at least</em> 5.
@@ -76,22 +96,14 @@ the steeper slope is the TRUE income effect, freed from the cap`}</CodeOutput>
           accuracy on censored data is the only goal, the next upgrade wins.
         </p>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-regression)", marginBottom: 4 }}>
-            Match the model to the data-generating process
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            The deepest lesson here isn&rsquo;t Tobit specifically — it&rsquo;s that you model the process that <em>generated</em>
+        <Callout color="var(--c-regression)" title={<>Match the model to the data-generating process</>}>
+          The deepest lesson here isn&rsquo;t Tobit specifically — it&rsquo;s that you model the process that <em>generated</em>
             the data, including how it was recorded. The cap isn&rsquo;t noise to ignore; it&rsquo;s a known mechanism, and a
             model that encodes it extracts truth that OLS structurally cannot. Spotting &ldquo;this needs a censored model&rdquo;
             is the kind of judgement that separates someone who runs algorithms from someone who does statistics.
-          </p>
-        </div>
+        </Callout>
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 40, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/california-housing-capstone/spatial-features" style={navLink}>← Upgrade 1: spatial features</Link>
-          <Link href="/learn/california-housing-capstone/gradient-boosting" style={{ ...navLink, fontWeight: 600 }}>Next up · Upgrade 3: gradient boosting →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/california-housing-capstone/spatial-features", label: <>← Upgrade 1: spatial features</> }} next={{ href: "/learn/california-housing-capstone/gradient-boosting", label: <>Next up · Upgrade 3: gradient boosting →</> }} />
       </div>
     </article>
   );
@@ -117,8 +129,3 @@ beta_tobit = res.x[:-1]
 print("Tobit income coef:", beta_tobit[1].round(3),
       " vs OLS:", ols_income_coef.round(3))`;
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-regression) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-regression) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0" };

@@ -1,6 +1,9 @@
+import { Quiz } from "@/components/Quiz";
 import Link from "next/link";
 import { M, MathBlock } from "@/components/Math";
 import { CodeBlock } from "@/components/CodeBlock";
+import { CLUSTER_SETUP } from "@/lib/runtimeSetup";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 export const metadata = {
   title: "The curse of dimensionality — Manifold",
@@ -19,18 +22,15 @@ const gy = (v: number) => Math.round((padT + (1 - v / 4) * (H - padT - padB)) * 
 export default function CursePage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-clustering)")}>Clustering</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 6 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        The curse of dimensionality
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 24px", maxWidth: 620 }}>
-        k-Means is built entirely on distances. In high dimensions, distances quietly lose their meaning —
+      <LessonHeader
+        chips={[{ label: "Clustering", color: "var(--c-clustering)" }]}
+        time="about 6 minutes"
+        title={<>The curse of dimensionality</>}
+        intro={<>
+          k-Means is built entirely on distances. In high dimensions, distances quietly lose their meaning —
         so before we even reach the algorithm, it&rsquo;s worth knowing the trap that lurks in wide data.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <h2>Distances concentrate</h2>
@@ -86,28 +86,44 @@ export default function CursePage() {
           algorithm still runs and still returns <em>k</em> clusters — they&rsquo;re just far less trustworthy.
         </p>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-clustering)", marginBottom: 4 }}>
-            The standard escape
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            Reduce dimensions before clustering — PCA, UMAP, or an autoencoder — so distances become
+        <Callout color="var(--c-clustering)" title={<>The standard escape</>}>
+          Reduce dimensions before clustering — PCA, UMAP, or an autoencoder — so distances become
             meaningful again, and consider Manhattan distance, which concentrates a little less than
             Euclidean. The good news for modern work: real data usually lives on a low-dimensional{" "}
             <em>manifold</em> inside its high-dimensional space, and a good embedding finds it. That&rsquo;s why{" "}
             <Link href="/learn/k-means/clustering-after-dimensionality-reduction" style={inlineLink}>clustering
             after dimensionality reduction</Link> is a whole page later, and why embedding-based clustering
             works so well.
-          </p>
-        </div>
+        </Callout>
 
         <h2>See the contrast collapse</h2>
-        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
+        <CodeBlock setup={CLUSTER_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 40, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/k-means/distance-metrics-in-depth" style={navLink}>← Distance metrics in depth</Link>
-          <Link href="/learn/k-means/the-k-means-idea" style={{ ...navLink, fontWeight: 600 }}>Next up · The k-means idea →</Link>
-        </div>
+        <Quiz
+          accent="var(--c-clustering)"
+          questions={[
+            {
+              q: "In very high dimensions, distances between random points tend to…",
+              options: ["Concentrate — nearest and farthest neighbours become nearly the same distance away", "Spread further apart, making clusters easier to find", "Shrink toward zero"],
+              answer: 0,
+              explain: "The ratio of farthest to nearest distance approaches 1, so 'nearest centroid' loses its meaning — the contrast that k-means runs on evaporates.",
+            },
+            {
+              q: "The standard practical remedy before clustering high-dimensional data is…",
+              options: ["Switching to Manhattan distance", "Reducing dimensionality first (PCA, embeddings), then clustering", "Increasing k to compensate"],
+              answer: 1,
+              explain: "Fewer, denser dimensions restore distance contrast — which is why 'clustering after dimensionality reduction' has its own page later in this track.",
+            },
+            {
+              q: "Using plain Euclidean distance implicitly assumes the features are…",
+              options: ["On comparable scales", "Statistically independent", "Normally distributed"],
+              answer: 0,
+              explain: "A feature measured in thousands dominates one measured in units — the distance is effectively computed on that one feature alone. Scaling first is non-negotiable for k-means.",
+            },
+          ]}
+        />
+
+        <PrevNext prev={{ href: "/learn/k-means/distance-metrics-in-depth", label: <>← Distance metrics in depth</> }} next={{ href: "/learn/k-means/the-k-means-idea", label: <>Next up · The k-means idea →</> }} />
       </div>
     </article>
   );
@@ -137,10 +153,8 @@ model = make_pipeline(
 )
 labels = model.fit_predict(X_highdim)`;
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
+
 const ul: React.CSSProperties = { margin: "0 0 10px", paddingLeft: "1.3em", fontSize: 15, color: "var(--muted)", lineHeight: 1.8 };
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
+
 const inlineLink: React.CSSProperties = { color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-clustering) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-clustering) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0" };
+

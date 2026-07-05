@@ -1,5 +1,7 @@
-import Link from "next/link";
 import { CodeBlock } from "@/components/CodeBlock";
+import { LambdaCVLab } from "@/components/labs/LambdaCVLab";
+import { REGRESSION_SETUP } from "@/lib/runtimeSetup";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 export const metadata = {
   title: "Cross-validating the penalty — Manifold",
@@ -10,18 +12,15 @@ export const metadata = {
 export default function CVPenaltyPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-regression)")}>Regression</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 7 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        Cross-validating the penalty
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 24px", maxWidth: 620 }}>
-        Using cross-validation to pick λ is easy. Using it without quietly cheating — and getting an honest
+      <LessonHeader
+        chips={[{ label: "Regression", color: "var(--c-regression)" }]}
+        time="about 7 minutes"
+        title={<>Cross-validating the penalty</>}
+        intro={<>
+          Using cross-validation to pick λ is easy. Using it without quietly cheating — and getting an honest
         estimate of how the final model will perform — takes a little care. This page is about doing it right.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <h2>The basic loop</h2>
@@ -31,6 +30,8 @@ export default function CVPenaltyPage() {
           λ path is cheap, so you score a dense grid almost for free. This is what <code>RidgeCV</code>,{" "}
           <code>LassoCV</code>, and <code>ElasticNetCV</code> do.
         </p>
+
+        <LambdaCVLab />
 
         <h2>The trap: selection leaks into your score</h2>
         <p>
@@ -55,18 +56,13 @@ export default function CVPenaltyPage() {
           separate held-out test set will give the final estimate.
         </p>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-regression)", marginBottom: 4 }}>
-            The one-standard-error rule
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            CV error is itself a noisy estimate, so the exact minimum is partly luck. The widely-used{" "}
+        <Callout color="var(--c-regression)" title={<>The one-standard-error rule</>}>
+          CV error is itself a noisy estimate, so the exact minimum is partly luck. The widely-used{" "}
             <strong>1-SE rule</strong>: among all λ whose CV error is within one standard error of the best,
             pick the <em>most regularized</em> one (largest λ, smallest model). You give up a sliver of fit for
             a simpler, more robust model that&rsquo;s less likely to be a fluke of this particular data — especially
             valuable with Lasso, where it yields a sparser, sturdier feature set.
-          </p>
-        </div>
+        </Callout>
 
         <h2>Other leakage traps</h2>
         <ul style={ul}>
@@ -76,12 +72,9 @@ export default function CVPenaltyPage() {
         </ul>
 
         <h2>Nested CV in code</h2>
-        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
+        <CodeBlock setup={REGRESSION_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 40, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/regularized-regression/standardize-first" style={navLink}>← Standardize first</Link>
-          <Link href="/learn/regularized-regression/the-full-path-and-warm-starts" style={{ ...navLink, fontWeight: 600 }}>Next up · The full path &amp; warm starts →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/regularized-regression/standardize-first", label: <>← Standardize first</> }} next={{ href: "/learn/regularized-regression/the-full-path-and-warm-starts", label: <>Next up · The full path &amp; warm starts →</> }} />
       </div>
     </article>
   );
@@ -111,9 +104,7 @@ model = make_pipeline(StandardScaler(), LassoCV(cv=5, random_state=0))
 model.fit(X_train, y_train)
 print("test R²:", model.score(X_test, y_test))`;
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
+
 const ul: React.CSSProperties = { margin: "0 0 10px", paddingLeft: "1.3em", fontSize: 15, color: "var(--muted)", lineHeight: 1.8 };
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-regression) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-regression) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0" };
+
+

@@ -1,6 +1,7 @@
-import Link from "next/link";
 import { M } from "@/components/Math";
 import { CodeBlock } from "@/components/CodeBlock";
+import { CLUSTER_SETUP } from "@/lib/runtimeSetup";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 export const metadata = {
   title: "Accelerated k-means (Elkan) — Manifold",
@@ -11,20 +12,16 @@ export const metadata = {
 export default function ElkanPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-clustering)")}>Clustering</span>
-        <span style={chip("var(--c-metrics)")}>Go deeper</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 5 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        Accelerated k-means (Elkan)
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 24px", maxWidth: 620 }}>
-        The assign step recomputes every point-to-centroid distance, every iteration. Most of that
+      <LessonHeader
+        chips={[{ label: "Clustering", color: "var(--c-clustering)" }, { label: "Go deeper", color: "var(--c-metrics)" }]}
+        time="about 5 minutes"
+        title={<>Accelerated k-means (Elkan)</>}
+        intro={<>
+          The assign step recomputes every point-to-centroid distance, every iteration. Most of that
         work is wasted — Elkan&rsquo;s algorithm proves which distances can&rsquo;t possibly change the answer
         and skips them. Same clusters, far fewer calculations.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <h2>The wasted work</h2>
@@ -52,16 +49,11 @@ export default function ElkanPage() {
           centroid-to-centroid distances to skip rivals that are obviously too far.
         </p>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-clustering)", marginBottom: 4 }}>
-            Exact, not approximate
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            This is the key distinction from mini-batch k-means. Elkan returns the{" "}
+        <Callout color="var(--c-clustering)" title={<>Exact, not approximate</>}>
+          This is the key distinction from mini-batch k-means. Elkan returns the{" "}
             <strong>identical</strong> result Lloyd&rsquo;s would — it only avoids redundant arithmetic. It
             trades memory (storing the bounds) and bookkeeping for far fewer distance evaluations.
-          </p>
-        </div>
+        </Callout>
 
         <h2>When it helps — and when it doesn&rsquo;t</h2>
         <ul style={ul}>
@@ -82,12 +74,9 @@ export default function ElkanPage() {
         </p>
 
         <h2>You rarely call it by hand</h2>
-        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
+        <CodeBlock setup={CLUSTER_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 40, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/k-means/empty-clusters-and-edge-cases" style={navLink}>← Empty clusters &amp; edge cases</Link>
-          <Link href="/learn/k-means/mini-batch" style={{ ...navLink, fontWeight: 600 }}>Next up · Mini-batch k-means →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/k-means/empty-clusters-and-edge-cases", label: <>← Empty clusters &amp; edge cases</> }} next={{ href: "/learn/k-means/mini-batch", label: <>Next up · Mini-batch k-means →</> }} />
       </div>
     </article>
   );
@@ -108,9 +97,7 @@ const codeLib = `from sklearn.cluster import KMeans
 # Best on dense, low-dimensional data; sklearn auto-selects when you leave it default.
 km = KMeans(n_clusters=8, algorithm="elkan", n_init=10, random_state=0)`;
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
+
 const ul: React.CSSProperties = { margin: "0 0 10px", paddingLeft: "1.3em", fontSize: 15, color: "var(--muted)", lineHeight: 1.8 };
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-clustering) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-clustering) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0" };
+
+

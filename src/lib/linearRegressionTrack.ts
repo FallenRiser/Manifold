@@ -1,9 +1,13 @@
 export type TrackPage = { title: string; href?: string };
-export type TrackChapter = { title: string; pages: TrackPage[] };
+// tier: the depth band this chapter belongs to (siteMap TIERS) — 1 intuition,
+// 2 practitioner, 3 theory. Rendered as a small badge on the sidebar chapter
+// header so the four-depth promise is visible inside a track, not just on /map.
+export type TrackChapter = { title: string; pages: TrackPage[]; tier?: 1 | 2 | 3 };
 
 export const LR_TRACK: TrackChapter[] = [
   {
     title: "The problem & the intuition",
+    tier: 1,
     pages: [
       { title: "Why predict at all?", href: "/learn/linear-regression/why-predict-at-all" },
       { title: "What a model really is", href: "/learn/linear-regression/what-a-model-really-is" },
@@ -13,6 +17,7 @@ export const LR_TRACK: TrackChapter[] = [
   },
   {
     title: "Turning wrong into a number",
+    tier: 1,
     pages: [
       { title: "The cost function", href: "/learn/linear-regression/the-cost-function" },
       { title: "Why squared error?", href: "/learn/linear-regression/why-squared-error" },
@@ -22,6 +27,7 @@ export const LR_TRACK: TrackChapter[] = [
   },
   {
     title: "Gradient descent",
+    tier: 1,
     pages: [
       { title: "Roll downhill", href: "/learn/linear-regression/roll-downhill" },
       { title: "What is a gradient?", href: "/learn/linear-regression/what-is-a-gradient" },
@@ -34,6 +40,7 @@ export const LR_TRACK: TrackChapter[] = [
   },
   {
     title: "The direct solution",
+    tier: 2,
     pages: [
       { title: "The normal equation", href: "/learn/linear-regression/the-normal-equation" },
       { title: "Closed-form vs gradient descent", href: "/learn/linear-regression/closed-form-vs-gradient-descent" },
@@ -41,6 +48,7 @@ export const LR_TRACK: TrackChapter[] = [
   },
   {
     title: "From one feature to many",
+    tier: 2,
     pages: [
       { title: "Multiple linear regression", href: "/learn/linear-regression/multiple-linear-regression" },
       { title: "Feature scaling", href: "/learn/linear-regression/feature-scaling" },
@@ -50,6 +58,7 @@ export const LR_TRACK: TrackChapter[] = [
   },
   {
     title: "The assumptions",
+    tier: 2,
     pages: [
       { title: "The five assumptions", href: "/learn/linear-regression/the-five-assumptions" },
       { title: "Linearity", href: "/learn/linear-regression/linearity" },
@@ -61,6 +70,7 @@ export const LR_TRACK: TrackChapter[] = [
   },
   {
     title: "Diagnostics",
+    tier: 2,
     pages: [
       { title: "Residual-vs-fitted", href: "/learn/linear-regression/residual-vs-fitted" },
       { title: "Heteroscedasticity in depth", href: "/learn/linear-regression/heteroscedasticity-in-depth" },
@@ -70,6 +80,7 @@ export const LR_TRACK: TrackChapter[] = [
   },
   {
     title: "Evaluation",
+    tier: 2,
     pages: [
       { title: "R² and adjusted R²", href: "/learn/linear-regression/r-squared-and-adjusted" },
       { title: "RMSE vs MAE", href: "/learn/linear-regression/rmse-vs-mae" },
@@ -78,6 +89,7 @@ export const LR_TRACK: TrackChapter[] = [
   },
   {
     title: "Fixing & optimizing",
+    tier: 2,
     pages: [
       { title: "Transformations", href: "/learn/linear-regression/transformations" },
       { title: "Weighted least squares", href: "/learn/linear-regression/weighted-least-squares" },
@@ -87,6 +99,7 @@ export const LR_TRACK: TrackChapter[] = [
   },
   {
     title: "Inference",
+    tier: 3,
     pages: [
       { title: "Confidence intervals", href: "/learn/linear-regression/confidence-intervals" },
       { title: "Hypothesis tests & p-values", href: "/learn/linear-regression/hypothesis-tests-and-p-values" },
@@ -95,6 +108,7 @@ export const LR_TRACK: TrackChapter[] = [
   },
   {
     title: "In the wild",
+    tier: 2,
     pages: [
       { title: "When to use it (vs trees, GLMs)", href: "/learn/linear-regression/when-to-use-it" },
       { title: "Failure-mode gallery", href: "/learn/linear-regression/failure-mode-gallery" },

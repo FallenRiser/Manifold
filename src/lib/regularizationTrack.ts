@@ -8,6 +8,7 @@ import type { TrackChapter } from "@/lib/linearRegressionTrack";
 export const REG_TRACK: TrackChapter[] = [
   {
     title: "Why regularize",
+    tier: 1,
     pages: [
       { title: "Why regularize?", href: "/learn/regularized-regression" },
       { title: "Overfitting & the bias–variance tradeoff", href: "/learn/regularized-regression/overfitting-and-bias-variance" },
@@ -17,6 +18,7 @@ export const REG_TRACK: TrackChapter[] = [
   },
   {
     title: "Ridge regression · L2",
+    tier: 2,
     pages: [
       { title: "Ridge regression", href: "/learn/regularized-regression/ridge-regression" },
       { title: "The closed-form solution", href: "/learn/regularized-regression/the-closed-form-solution" },
@@ -27,6 +29,7 @@ export const REG_TRACK: TrackChapter[] = [
   },
   {
     title: "The Lasso · L1",
+    tier: 2,
     pages: [
       { title: "The Lasso", href: "/learn/regularized-regression/the-lasso" },
       { title: "Why L1 creates sparsity", href: "/learn/regularized-regression/why-l1-creates-sparsity" },
@@ -37,6 +40,7 @@ export const REG_TRACK: TrackChapter[] = [
   },
   {
     title: "Elastic-net",
+    tier: 2,
     pages: [
       { title: "When the Lasso struggles", href: "/learn/regularized-regression/when-the-lasso-struggles" },
       { title: "Elastic-net: blending L1 & L2", href: "/learn/regularized-regression/elastic-net" },
@@ -45,6 +49,7 @@ export const REG_TRACK: TrackChapter[] = [
   },
   {
     title: "Using it in practice",
+    tier: 2,
     pages: [
       { title: "Standardize first", href: "/learn/regularized-regression/standardize-first" },
       { title: "Cross-validating the penalty", href: "/learn/regularized-regression/cross-validating-the-penalty" },
@@ -54,6 +59,7 @@ export const REG_TRACK: TrackChapter[] = [
   },
   {
     title: "Theory · go deeper",
+    tier: 3,
     pages: [
       { title: "Ridge as a Gaussian prior (MAP)", href: "/learn/regularized-regression/ridge-as-a-gaussian-prior" },
       { title: "Lasso as a Laplace prior (MAP)", href: "/learn/regularized-regression/lasso-as-a-laplace-prior" },
@@ -63,6 +69,7 @@ export const REG_TRACK: TrackChapter[] = [
   },
   {
     title: "Apply it",
+    tier: 2,
     pages: [
       { title: "Capstone: California housing →", href: "/learn/california-housing-capstone" },
     ],

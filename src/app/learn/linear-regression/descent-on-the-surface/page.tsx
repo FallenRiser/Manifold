@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { DescentSurface3D } from "@/components/labs/DescentSurface3D";
+import { LessonHeader } from "@/components/lesson";
 
 export const metadata = {
   title: "Descent on the surface — Manifold",
@@ -10,23 +11,16 @@ export const metadata = {
 export default function DescentOnTheSurfacePage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-regression)")}>Regression</span>
-        <span style={chip("var(--c-fundamentals)")}>Core idea</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 6 minutes</span>
-      </div>
-
-      <h1
-        className="font-serif"
-        style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}
-      >
-        Descent on the surface
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 8px", maxWidth: 620 }}>
-        You understand the update rule and the learning rate. Now watch them
+      <LessonHeader
+        chips={[{ label: "Regression", color: "var(--c-regression)" }, { label: "Core idea", color: "var(--c-fundamentals)" }]}
+        time="about 6 minutes"
+        title={<>Descent on the surface</>}
+        intro={<>
+          You understand the update rule and the learning rate. Now watch them
         together — gradient descent tracing its path across the actual
         three-dimensional loss bowl, toward the minimum at the bottom.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <p>
@@ -134,17 +128,6 @@ export default function DescentOnTheSurfacePage() {
   );
 }
 
-function chip(color: string): React.CSSProperties {
-  return {
-    display: "inline-flex",
-    alignItems: "center",
-    background: `color-mix(in srgb, ${color} 13%, var(--surface))`,
-    color,
-    fontSize: 12,
-    padding: "3px 10px",
-    borderRadius: 999,
-  };
-}
 
 const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
 

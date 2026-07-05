@@ -1,8 +1,9 @@
-import Link from "next/link";
 import { ConfidenceIntervalLab } from "@/components/labs/ConfidenceIntervalLab";
 import { MathBlock } from "@/components/Math";
 import { CodeBlock } from "@/components/CodeBlock";
+import { REGRESSION_SETUP } from "@/lib/runtimeSetup";
 import { Backlinks } from "@/components/Backlinks";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 const codeScratch = `import numpy as np
 from scipy import stats
@@ -42,20 +43,16 @@ export const metadata = {
 export default function ConfidenceIntervalsPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-regression)")}>Regression</span>
-        <span style={chip("var(--brand)")}>Inference</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 5 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        Confidence intervals
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 8px", maxWidth: 620 }}>
-        Your model outputs a coefficient: <code>4.2</code>. That is the single
+      <LessonHeader
+        chips={[{ label: "Regression", color: "var(--c-regression)" }, { label: "Inference", color: "var(--brand)" }]}
+        time="about 5 minutes"
+        title={<>Confidence intervals</>}
+        intro={<>
+          Your model outputs a coefficient: <code>4.2</code>. That is the single
         most likely value based on your sample. But the true population value
         could easily be 4.1, or 4.9. Or -1.2.
-      </p>
+        </>}
+      />
 
       <Backlinks label="Related" items={[
         { label: "Hypothesis tests & p-values", href: "/learn/linear-regression/hypothesis-tests-and-p-values" },
@@ -110,17 +107,12 @@ export default function ConfidenceIntervalsPage() {
           chance), or it isn't (0% chance). You just don't know which.
         </p>
         
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-fundamentals)", marginBottom: 4 }}>
-            The correct interpretation
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            "If we were to repeat this exact experiment 100 times, collecting
+        <Callout color="var(--c-fundamentals)" title={<>The correct interpretation</>}>
+          "If we were to repeat this exact experiment 100 times, collecting
             100 different random samples and computing 100 different confidence
             intervals, exactly 95 of those intervals would contain the true
             population parameter."
-          </p>
-        </div>
+        </Callout>
         <p>
           The 95% describes the <strong>reliability of the procedure</strong>
           , not the probability of your specific interval. (If you want the
@@ -144,12 +136,9 @@ export default function ConfidenceIntervalsPage() {
           From scratch that&rsquo;s the coefficient covariance; statsmodels hands it back
           with <code>conf_int()</code>.
         </p>
-        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
+        <CodeBlock setup={REGRESSION_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 32, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/linear-regression/bias-variance-revisited" style={navLink}>← Bias-variance, revisited</Link>
-          <Link href="/learn/linear-regression/hypothesis-tests-and-p-values" style={navLink}>Next up · Hypothesis tests & p-values →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/linear-regression/bias-variance-revisited", label: <>← Bias-variance, revisited</> }} next={{ href: "/learn/linear-regression/hypothesis-tests-and-p-values", label: <>Next up · Hypothesis tests & p-values →</> }} />
       </div>
     </article>
   );
@@ -164,8 +153,6 @@ function DetailCard({ title, body, color }: { title: string; body: string; color
   );
 }
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}const grid2: React.CSSProperties = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 14, margin: "1.4rem 0" };
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-fundamentals) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-fundamentals) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0 0" };
+const grid2: React.CSSProperties = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 14, margin: "1.4rem 0" };
+
+

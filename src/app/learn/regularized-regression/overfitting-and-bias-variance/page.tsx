@@ -1,6 +1,7 @@
-import Link from "next/link";
 import { M } from "@/components/Math";
 import { CodeBlock } from "@/components/CodeBlock";
+import { REGRESSION_SETUP } from "@/lib/runtimeSetup";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 export const metadata = {
   title: "Overfitting & the bias–variance tradeoff — Manifold",
@@ -21,19 +22,16 @@ const bestI = TOT.indexOf(Math.min(...TOT));
 export default function BiasVariancePage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-regression)")}>Regression</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 6 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        Overfitting & the bias–variance tradeoff
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 24px", maxWidth: 620 }}>
-        Regularization is the bias–variance tradeoff made adjustable. To see <em>why</em> a penalty helps,
+      <LessonHeader
+        chips={[{ label: "Regression", color: "var(--c-regression)" }]}
+        time="about 6 minutes"
+        title={<>Overfitting & the bias–variance tradeoff</>}
+        intro={<>
+          Regularization is the bias–variance tradeoff made adjustable. To see <em>why</em> a penalty helps,
         you have to see what overfitting actually is — too much variance — and what the penalty trades for
         it.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <h2>Error splits into two parts</h2>
@@ -87,25 +85,17 @@ export default function BiasVariancePage() {
           </div>
         </div>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-regression)", marginBottom: 4 }}>
-            λ is the bias–variance dial
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            Read the whole track through this lens. <M>{String.raw`\lambda = 0`}</M> is pure OLS: minimum bias,
+        <Callout color="var(--c-regression)" title={<>λ is the bias–variance dial</>}>
+          Read the whole track through this lens. <M>{String.raw`\lambda = 0`}</M> is pure OLS: minimum bias,
             maximum variance (the left edge). <M>{String.raw`\lambda \to \infty`}</M> shrinks every coefficient
             to zero: maximum bias, zero variance (a flat line). Every value in between is a different point on
             the curve. Choosing λ <em>is</em> choosing where to sit on the bias–variance tradeoff.
-          </p>
-        </div>
+        </Callout>
 
         <h2>Measure the U-curve yourself</h2>
-        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
+        <CodeBlock setup={REGRESSION_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 40, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/regularized-regression" style={navLink}>← Why regularize?</Link>
-          <Link href="/learn/regularized-regression/shrinkage-the-core-idea" style={{ ...navLink, fontWeight: 600 }}>Next up · Shrinkage: the core idea →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/regularized-regression", label: <>← Why regularize?</> }} next={{ href: "/learn/regularized-regression/shrinkage-the-core-idea", label: <>Next up · Shrinkage: the core idea →</> }} />
       </div>
     </article>
   );
@@ -129,9 +119,7 @@ alphas = np.logspace(-3, 3, 50)
 model = RidgeCV(alphas=alphas, scoring="neg_mean_squared_error", cv=5).fit(X, y)
 print("best λ:", model.alpha_)`;
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
+
 const ul: React.CSSProperties = { margin: "0 0 10px", paddingLeft: "1.3em", fontSize: 15, color: "var(--muted)", lineHeight: 1.8 };
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-regression) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-regression) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0" };
+
+

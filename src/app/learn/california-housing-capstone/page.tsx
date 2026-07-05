@@ -1,30 +1,28 @@
-import Link from "next/link";
 import { HousingGeoMap } from "@/components/figures/HousingGeoMap";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 export const metadata = {
   title: "Capstone: California housing — Manifold",
   description:
-    "A complete, executed, end-to-end machine-learning project on real California housing data: framing, EDA, a linear baseline, and three diagnostic-driven upgrades — spatial features, a censored Tobit model, and gradient boosting — with every number and plot computed from the data.",
+    "A complete, executed, end-to-end machine-learning project on real California housing data: framing, EDA, a linear baseline, and three diagnostic-driven upgrades — spatial features, a censored Tobit model, and a full model zoo (random forest, XGBoost, LightGBM, stacking) reaching R² 0.858 — with every number and plot computed from the data.",
 };
 
 export default function CapstoneHubPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-regression)")}>Capstone</span>
-        <span style={chip("var(--c-metrics)")}>End-to-end project</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 7 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 46, lineHeight: 1.06, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        Predicting California housing prices
-      </h1>
-      <p style={{ fontSize: 17.5, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 24px", maxWidth: 620 }}>
-        One real dataset, taken all the way — the way a senior data scientist actually works. We frame the
+      <LessonHeader
+        chips={[{ label: "Capstone", color: "var(--c-regression)" }, { label: "End-to-end project", color: "var(--c-metrics)" }]}
+        time="about 7 minutes"
+        title={<>Predicting California housing prices</>}
+        intro={<>
+          One real dataset, taken all the way — the way a senior data scientist actually works. We frame the
         problem, interrogate the data, build an honest linear baseline, then drive three upgrades straight
         from the diagnostics. Every metric, coefficient, and plot on these pages is computed from the actual
         16,512-block dataset.
-      </p>
+        </>}
+        titleSize={46}
+        introSize={17.5}
+      />
 
       <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 16, padding: 16, margin: "0 0 8px" }}>
         <HousingGeoMap />
@@ -57,23 +55,20 @@ export default function CapstoneHubPage() {
           <li><strong>Diagnose</strong> — three concrete weaknesses surface: non-linear geography, a censored target, and unmodelled interactions.</li>
           <li><strong>Upgrade 1 · Geography</strong> — engineer spatial features (distance-to-coast, regions).</li>
           <li><strong>Upgrade 2 · Censoring</strong> — a Tobit model that knows the target was clipped at 5.0.</li>
-          <li><strong>Upgrade 3 · Non-linearity</strong> — gradient boosting to capture interactions and spatial structure.</li>
+          <li><strong>Upgrade 3 · The model zoo</strong> — push the linear ceiling with polynomials, then run random forest, XGBoost, LightGBM, and a stacking ensemble.</li>
           <li><strong>Select &amp; deliver</strong> — compare every model, justify the final choice, and ship sane predictions.</li>
+          <li><strong>Epilogue · Combine the upgrades</strong> — a censored-objective LightGBM (Tobit likelihood inside the booster) that cuts cap-zone error 7%, and per-prediction SHAP explanations that answer a stakeholder&rsquo;s &ldquo;why?&rdquo;.</li>
         </ol>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-regression)", marginBottom: 4 }}>
-            Where we end up (the spoiler)
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            The regularized linear baseline reaches <strong>R² = 0.672</strong>. Spatial features lift it to{" "}
-            <strong>0.691</strong>; the Tobit model corrects biased coefficients without chasing the score; and
-            gradient boosting jumps to <strong>R² = 0.843</strong> — a ~43% cut in error over the baseline. Each
-            gain is earned by addressing a named diagnostic, and we&rsquo;ll see exactly why the linear model left
-            that performance on the table. Every number here is reproduced from the real data on the page that
-            introduces it.
-          </p>
-        </div>
+        <Callout color="var(--c-regression)" title={<>Where we end up (the spoiler)</>}>
+          The regularized linear baseline reaches <strong>R² = 0.653</strong>. Spatial features and polynomial
+            terms push the linear ceiling to <strong>0.711</strong>; the Tobit model corrects biased coefficients
+            without chasing the score; and the model zoo — random forest, XGBoost, LightGBM — lands in the mid-0.80s,
+            with a <strong>stacking ensemble at R² = 0.858</strong>, a <strong>~62% cut in error</strong> over the
+            baseline. Each gain is earned by addressing a named diagnostic, and we&rsquo;ll see exactly why the linear
+            model left that performance on the table. Every number here is reproduced from the real data on the page
+            that introduces it.
+        </Callout>
 
         <h2>How to read it</h2>
         <p>
@@ -81,19 +76,24 @@ export default function CapstoneHubPage() {
           panels beneath them show the actual captured results from running it. Figures are computed from the
           data, not mocked. You can follow the narrative top to bottom, or jump to an upgrade from the sidebar.
         </p>
+        <p>
+          And this capstone is <em>played</em>, not just read: at every major juncture a{" "}
+          <strong>&ldquo;your call&rdquo;</strong> box asks what <em>you&rsquo;d</em> do before revealing the senior move, and{" "}
+          <strong>&ldquo;guess before you look&rdquo;</strong> sliders make you commit to a number before the real one
+          appears. Answer them honestly — the gap between your guess and the truth is where the learning is. The
+          final page ends with an interview-style <strong>defend-it</strong> self-test and a transfer challenge to
+          run on a dataset of your own.
+        </p>
+        <p>
+          It&rsquo;s also fully reproducible: the dataset and the entire analysis as a runnable Jupyter notebook are{" "}
+          <a href="/learn/california-housing-capstone/takeaways#reproduce-it-yourself">downloadable from the final page</a> —
+          every number on these pages falls out of running it top to bottom.
+        </p>
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 40, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/regularized-regression" style={navLink}>← Regularized regression</Link>
-          <Link href="/learn/california-housing-capstone/framing" style={{ ...navLink, fontWeight: 600 }}>Next up · Framing the problem →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/regularized-regression", label: <>← Regularized regression</> }} next={{ href: "/learn/california-housing-capstone/framing", label: <>Next up · Framing the problem →</> }} />
       </div>
     </article>
   );
 }
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
 const ol: React.CSSProperties = { margin: "0 0 10px", paddingLeft: "1.3em", fontSize: 15, color: "var(--muted)", lineHeight: 1.85 };
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-regression) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-regression) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0" };

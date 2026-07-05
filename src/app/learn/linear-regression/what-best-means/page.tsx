@@ -1,4 +1,5 @@
-import Link from "next/link";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
+import { Quiz } from "@/components/Quiz";
 
 export const metadata = {
   title: "What 'best' means — Manifold",
@@ -8,19 +9,15 @@ export const metadata = {
 export default function WhatBestMeansPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-regression)")}>Regression</span>
-        <span style={chip("var(--c-fundamentals)")}>Beginner</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 5 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        What &ldquo;best&rdquo; means
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 8px", maxWidth: 620 }}>
-        We&rsquo;ve been saying &ldquo;the best line&rdquo; for a few pages. It&rsquo;s time to
+      <LessonHeader
+        chips={[{ label: "Regression", color: "var(--c-regression)" }, { label: "Beginner", color: "var(--c-fundamentals)" }]}
+        time="about 5 minutes"
+        title={<>What &ldquo;best&rdquo; means</>}
+        intro={<>
+          We&rsquo;ve been saying &ldquo;the best line&rdquo; for a few pages. It&rsquo;s time to
         say exactly what best means — and why the loss surface makes the answer obvious.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <p>
@@ -116,39 +113,40 @@ export default function WhatBestMeansPage() {
           in machine learning. We&rsquo;ll meet it properly in Ch8 (Evaluation).
         </p>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-fundamentals)", marginBottom: 4 }}>
-            The synthesis
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            Training a linear regression model means finding (m*, b*) = argmin MSE(m, b). Because
+        <Callout color="var(--c-fundamentals)" title={<>The synthesis</>}>
+          Training a linear regression model means finding (m*, b*) = argmin MSE(m, b). Because
             the squared-error loss surface is a convex bowl, there&rsquo;s exactly one answer, and
             any optimiser that moves downhill will find it. The rest of this track is about
             understanding that optimiser, what the answer means, and what to do when things go wrong.
-          </p>
-        </div>
+        </Callout>
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 32, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/linear-regression/the-loss-surface" style={navLink}>← The loss surface</Link>
-          <Link href="/learn/linear-regression/what-is-a-gradient" style={navLink}>Next up · What is a gradient? →</Link>
-        </div>
+        <Quiz
+          questions={[
+            {
+              q: <>Why square the errors instead of just adding them up?</>,
+              options: ["Squaring makes the math look more impressive", "Raw errors cancel: +5 and −5 sum to zero, hiding both misses", "Squared errors are easier to explain to stakeholders", "Because errors are always negative"],
+              answer: 1,
+              explain: <>Positive and negative misses cancel in a raw sum. Squaring makes every miss count — and it penalises big misses disproportionately (an error of 2 costs 4× an error of 1).</>,
+            },
+            {
+              q: <>One point on the loss surface represents:</>,
+              options: ["One data point from the training set", "One choice of (slope, intercept) and the total loss that line earns", "One residual", "One step of gradient descent"],
+              answer: 1,
+              explain: <>The loss surface lives in <em>parameter</em> space, not data space: every location is a candidate line, its height is that line&rsquo;s MSE over the whole dataset. &ldquo;Best&rdquo; = the lowest point of the bowl.</>,
+            },
+            {
+              q: <>Model A makes one miss of 2; model B makes two misses of 1 each. Under MSE, which is punished more?</>,
+              options: ["A — 2² = 4 versus 1² + 1² = 2 for B", "B — two misses always beat one", "They tie: total miss is 2 in both", "MSE can't compare them"],
+              answer: 0,
+              explain: <>Squaring makes MSE care about <em>how</em> the total error is distributed: one big miss hurts more than several small ones. That&rsquo;s the property the &ldquo;why squared error&rdquo; page dissected.</>,
+            },
+          ]}
+        />
+
+        <PrevNext prev={{ href: "/learn/linear-regression/the-loss-surface", label: <>← The loss surface</> }} next={{ href: "/learn/linear-regression/what-is-a-gradient", label: <>Next up · What is a gradient? →</> }} />
       </div>
     </article>
   );
 }
 
-function chip(color: string): React.CSSProperties {
-  return {
-    display: "inline-flex", alignItems: "center",
-    background: `color-mix(in srgb, ${color} 13%, var(--surface))`,
-    color, fontSize: 12, padding: "3px 10px", borderRadius: 999,
-  };
-}
 
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-
-const callout: React.CSSProperties = {
-  background: "color-mix(in srgb, var(--c-fundamentals) 9%, var(--surface))",
-  border: "1px solid color-mix(in srgb, var(--c-fundamentals) 22%, var(--border))",
-  borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0 0",
-};

@@ -1,5 +1,6 @@
-import Link from "next/link";
 import { CodeBlock } from "@/components/CodeBlock";
+import { KNN_SETUP } from "@/lib/runtimeSetup";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 export const metadata = {
   title: "The algorithm, end to end — Manifold",
@@ -10,18 +11,15 @@ export const metadata = {
 export default function AlgorithmPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-classification)")}>Classification</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 6 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        The algorithm, end to end
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 24px", maxWidth: 620 }}>
-        You&rsquo;ve seen the intuition and the failure of 1-NN. Here is the complete k-NN algorithm, written
+      <LessonHeader
+        chips={[{ label: "Classification", color: "var(--c-classification)" }]}
+        time="about 6 minutes"
+        title={<>The algorithm, end to end</>}
+        intro={<>
+          You&rsquo;ve seen the intuition and the failure of 1-NN. Here is the complete k-NN algorithm, written
         out step by step — and the decision quietly built into each step that the rest of the track expands.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <h2>The four steps</h2>
@@ -63,30 +61,22 @@ export default function AlgorithmPage() {
         <p>
           Unlike most algorithms, you can read the whole thing at once — no optimizer, no training loop:
         </p>
-        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
+        <CodeBlock setup={KNN_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-classification)", marginBottom: 4 }}>
-            One subtlety: prediction is a function of the whole dataset
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            Because there&rsquo;s no compressed model, every prediction re-reads (a structured view of) the
+        <Callout color="var(--c-classification)" title={<>One subtlety: prediction is a function of the whole dataset</>}>
+          Because there&rsquo;s no compressed model, every prediction re-reads (a structured view of) the
             entire training set. Add a point and future predictions can change with no retraining — wonderful
             for online/streaming settings. But it also means the data must stay in memory and the dataset&rsquo;s
             quirks — outliers, imbalance, irrelevant features — feed <em>directly</em> into every answer.
             There&rsquo;s nowhere for bad data to hide.
-          </p>
-        </div>
+        </Callout>
 
         <p>
           The next two pages take the &ldquo;decide&rdquo; step apart for the two tasks — voting for classes,
           averaging for numbers — and then we&rsquo;ll render the boundary the algorithm draws.
         </p>
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 40, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/k-nearest-neighbors/from-1-nn-to-k-nn" style={navLink}>← From 1-NN to k-NN</Link>
-          <Link href="/learn/k-nearest-neighbors/classification-by-majority-vote" style={{ ...navLink, fontWeight: 600 }}>Next up · Classification by majority vote →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/k-nearest-neighbors/from-1-nn-to-k-nn", label: <>← From 1-NN to k-NN</> }} next={{ href: "/learn/k-nearest-neighbors/classification-by-majority-vote", label: <>Next up · Classification by majority vote →</> }} />
       </div>
     </article>
   );
@@ -118,9 +108,7 @@ knn = KNeighborsClassifier(
 knn.fit(X_train, y_train)
 y_pred = knn.predict(X_test)`;
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
+
 const ol: React.CSSProperties = { margin: "0 0 10px", paddingLeft: "1.3em", fontSize: 15, color: "var(--muted)", lineHeight: 1.85 };
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-classification) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-classification) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0" };
+
+

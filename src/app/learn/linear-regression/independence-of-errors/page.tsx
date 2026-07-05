@@ -1,4 +1,6 @@
-import Link from "next/link";
+import { M } from "@/components/Math";
+import { AutocorrelationLab } from "@/components/labs/AutocorrelationLab";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 export const metadata = {
   title: "Independence of errors — Manifold",
@@ -9,25 +11,21 @@ export const metadata = {
 export default function IndependenceOfErrorsPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-regression)")}>Regression</span>
-        <span style={chip("var(--warn)")}>Assumptions</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 6 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        Independence of errors
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 8px", maxWidth: 620 }}>
-        The model assumes each observation's error is its own — unrelated to any
+      <LessonHeader
+        chips={[{ label: "Regression", color: "var(--c-regression)" }, { label: "Assumptions", color: "var(--warn)" }]}
+        time="about 6 minutes"
+        title={<>Independence of errors</>}
+        intro={<>
+          The model assumes each observation's error is its own — unrelated to any
         other error. When observations share some hidden structure, this breaks,
         and your p-values become far too optimistic.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <h2>What it says</h2>
         <p>
-          Formally: <code>Cov(εᵢ, εⱼ) = 0</code> for all i ≠ j. Each
+          Formally: <M>{String.raw`\mathrm{Cov}(\varepsilon_i, \varepsilon_j) = 0`}</M> for all <M>{String.raw`i \neq j`}</M>. Each
           residual is generated independently. This assumption is violated
           whenever observations are grouped, ordered in time, or spatially
           clustered.
@@ -43,6 +41,8 @@ export default function IndependenceOfErrorsPage() {
           <ScenarioCard icon="🔁" title="Repeated measures" color="var(--c-regression)"
             body="Multiple measurements on the same subject across time or conditions. Within-subject errors correlate strongly." />
         </div>
+
+        <AutocorrelationLab />
 
         <h2>Why it matters</h2>
         <p>
@@ -79,23 +79,15 @@ export default function IndependenceOfErrorsPage() {
           <FixCard title="ARIMA / state-space models" body="For pure time-series problems, use models designed for autocorrelated data rather than patching OLS." color="var(--c-regression)" />
         </div>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-fundamentals)", marginBottom: 4 }}>
-            Cross-sectional vs time-series data
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            For a random sample of independent individuals, independence is
+        <Callout color="var(--c-fundamentals)" title={<>Cross-sectional vs time-series data</>}>
+          For a random sample of independent individuals, independence is
             usually safe to assume. The assumption bites hardest in time-series
             data, panel data (many individuals measured repeatedly), and spatial
             analyses. When in doubt: plot your residuals in the order they were
             collected.
-          </p>
-        </div>
+        </Callout>
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 32, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/linear-regression/linearity" style={navLink}>← Linearity</Link>
-          <Link href="/learn/linear-regression/homoscedasticity" style={navLink}>Next up · Homoscedasticity →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/linear-regression/linearity", label: <>← Linearity</> }} next={{ href: "/learn/linear-regression/homoscedasticity", label: <>Next up · Homoscedasticity →</> }} />
       </div>
     </article>
   );
@@ -123,10 +115,5 @@ function FixCard({ title, body, color }: { title: string; body: string; color: s
   );
 }
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
 const scenarioGrid: React.CSSProperties = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 10, margin: "1.4rem 0" };
 const fixGrid: React.CSSProperties = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 10, margin: "1.4rem 0" };
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-fundamentals) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-fundamentals) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0 0" };

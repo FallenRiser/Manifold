@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { M, MathBlock } from "@/components/Math";
 import { CodeBlock } from "@/components/CodeBlock";
+import { CLUSTER_SETUP } from "@/lib/runtimeSetup";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 export const metadata = {
   title: "Distance metrics in depth — Manifold",
@@ -11,19 +13,16 @@ export const metadata = {
 export default function DistanceMetricsPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-clustering)")}>Clustering</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 7 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        Distance metrics in depth
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 24px", maxWidth: 620 }}>
-        &ldquo;Nearest&rdquo; only means something once you fix a notion of distance. k-Means defaults to
+      <LessonHeader
+        chips={[{ label: "Clustering", color: "var(--c-clustering)" }]}
+        time="about 7 minutes"
+        title={<>Distance metrics in depth</>}
+        intro={<>
+          &ldquo;Nearest&rdquo; only means something once you fix a notion of distance. k-Means defaults to
         Euclidean, but that&rsquo;s a <em>choice</em> — and several alternatives encode genuinely different
         ideas of what makes two things similar.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <h2>The Minkowski family</h2>
@@ -81,27 +80,19 @@ export default function DistanceMetricsPage() {
           <li><strong>Gower</strong> — a per-feature blend that handles numeric + categorical + binary together.</li>
         </ul>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-clustering)", marginBottom: 4 }}>
-            The catch for k-means specifically
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            k-Means is wedded to <em>squared Euclidean</em> distance — that&rsquo;s what makes the mean the
+        <Callout color="var(--c-clustering)" title={<>The catch for k-means specifically</>}>
+          k-Means is wedded to <em>squared Euclidean</em> distance — that&rsquo;s what makes the mean the
             optimal centroid and guarantees convergence (the deep reason is{" "}
             <Link href="/learn/k-means/bregman-divergences" style={inlineLink}>Bregman divergences</Link>).
             You can&rsquo;t simply swap in cosine or Manhattan and keep the mean update. To use a different
             metric you switch algorithms: k-medoids (any metric), k-medians (L1), spherical k-means (cosine),
             k-modes (categorical). Choosing the distance is really choosing the method.
-          </p>
-        </div>
+        </Callout>
 
         <h2>Compute several at once</h2>
-        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
+        <CodeBlock setup={CLUSTER_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 40, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/k-means/similarity-and-distance" style={navLink}>← Similarity &amp; distance</Link>
-          <Link href="/learn/k-means/the-curse-of-dimensionality" style={{ ...navLink, fontWeight: 600 }}>Next up · The curse of dimensionality →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/k-means/similarity-and-distance", label: <>← Similarity &amp; distance</> }} next={{ href: "/learn/k-means/the-curse-of-dimensionality", label: <>Next up · The curse of dimensionality →</> }} />
       </div>
     </article>
   );
@@ -130,10 +121,8 @@ for metric in ["euclidean", "cityblock", "cosine", "chebyshev"]:
 VI = np.linalg.inv(np.cov(X.T))
 print("mahalanobis", cdist(X[:1], X[1:2], metric="mahalanobis", VI=VI)[0, 0])`;
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
+
 const ul: React.CSSProperties = { margin: "0 0 10px", paddingLeft: "1.3em", fontSize: 15, color: "var(--muted)", lineHeight: 1.8 };
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
+
 const inlineLink: React.CSSProperties = { color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-clustering) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-clustering) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0" };
+

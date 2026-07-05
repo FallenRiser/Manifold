@@ -1,6 +1,8 @@
-import Link from "next/link";
+import { PredictPrompt } from "@/components/PredictPrompt";
 import { CodeBlock } from "@/components/CodeBlock";
+import { CLUSTER_SETUP } from "@/lib/runtimeSetup";
 import { ElbowLab } from "@/components/labs/ElbowLab";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 export const metadata = {
   title: "The elbow method — Manifold",
@@ -11,18 +13,15 @@ export const metadata = {
 export default function ElbowMethodPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-clustering)")}>Clustering</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 6 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        The elbow method
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 24px", maxWidth: 620 }}>
-        k-Means needs you to choose <em>k</em> up front — but the data rarely tells you outright. The
+      <LessonHeader
+        chips={[{ label: "Clustering", color: "var(--c-clustering)" }]}
+        time="about 6 minutes"
+        title={<>The elbow method</>}
+        intro={<>
+          k-Means needs you to choose <em>k</em> up front — but the data rarely tells you outright. The
         elbow method is the oldest and most intuitive way to read the answer off a single plot.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <h2>Why you can&rsquo;t just minimise inertia</h2>
@@ -32,6 +31,13 @@ export default function ElbowMethodPage() {
           it always says <em>k</em> = <em>n</em>. The signal isn&rsquo;t the value of inertia; it&rsquo;s the{" "}
           <em>rate</em> at which it drops.
         </p>
+
+        <PredictPrompt
+          accent="var(--c-clustering)"
+          prompt={<>The lab’s data has 4 real blobs. As you push <em>k</em> past 4, what does inertia do?</>}
+          options={["Stops falling entirely — the curve goes flat", "Keeps falling, just much more slowly", "Starts rising"]}
+          nudge={<>Locked in. Slide k past the elbow in the lab and watch the curve’s slope carefully.</>}
+        />
 
         <h2>Look for the bend</h2>
         <p>
@@ -52,28 +58,20 @@ export default function ElbowMethodPage() {
           same &ldquo;point of maximum curvature&rdquo; idea.
         </p>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-clustering)", marginBottom: 4 }}>
-            Where the elbow fails
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            On well-separated blobs the bend is obvious. On real data it&rsquo;s often smeared into a gentle
+        <Callout color="var(--c-clustering)" title={<>Where the elbow fails</>}>
+          On well-separated blobs the bend is obvious. On real data it&rsquo;s often smeared into a gentle
             curve with <em>no</em> clear corner — overlapping clusters, varying densities, or genuine
             hierarchy all blur it. Treat the elbow as one piece of evidence, not a verdict. The next
             pages — silhouette and the gap statistic — give sturdier, less eyeball-dependent answers.
-          </p>
-        </div>
+        </Callout>
 
         <h2>Compute the curve</h2>
         <p>
           Fit k-means across a range of <em>k</em>, collect each <code>.inertia_</code>, and plot:
         </p>
-        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
+        <CodeBlock setup={CLUSTER_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 40, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/k-means/k-means-plus-plus" style={navLink}>← k-means++</Link>
-          <Link href="/learn/k-means/silhouette-analysis" style={{ ...navLink, fontWeight: 600 }}>Next up · Silhouette analysis →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/k-means/k-means-plus-plus", label: <>← k-means++</> }} next={{ href: "/learn/k-means/silhouette-analysis", label: <>Next up · Silhouette analysis →</> }} />
       </div>
     </article>
   );
@@ -106,8 +104,6 @@ plt.plot(list(ks), inertias, "o-")
 plt.xlabel("k"); plt.ylabel("inertia"); plt.title("Elbow plot")
 plt.show()`;
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-clustering) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-clustering) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0" };
+
+
+

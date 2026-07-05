@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 export const metadata = {
   title: "The failure-mode gallery — Manifold",
@@ -67,19 +67,15 @@ const ROWS: Row[] = [
 export default function GalleryPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-clustering)")}>Clustering</span>
-        <span style={chip("var(--c-metrics)")}>Reference</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 5 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        The failure-mode gallery
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 24px", maxWidth: 620 }}>
-        Every weakness we&rsquo;ve met, on one page. When a clustering looks wrong, scan the symptom column,
+      <LessonHeader
+        chips={[{ label: "Clustering", color: "var(--c-clustering)" }, { label: "Reference", color: "var(--c-metrics)" }]}
+        time="about 5 minutes"
+        title={<>The failure-mode gallery</>}
+        intro={<>
+          Every weakness we&rsquo;ve met, on one page. When a clustering looks wrong, scan the symptom column,
         find the likely cause, and jump to the fix. This is the diagnostic checklist to keep beside you.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <p>
@@ -112,18 +108,13 @@ export default function GalleryPage() {
           </table>
         </div>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-clustering)", marginBottom: 4 }}>
-            The one-question triage
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            Before blaming k-means, ask: <em>did I scale the features, and are my clusters plausibly round
+        <Callout color="var(--c-clustering)" title={<>The one-question triage</>}>
+          Before blaming k-means, ask: <em>did I scale the features, and are my clusters plausibly round
             and comparable in size?</em> If scaling is missing, fix that first — it&rsquo;s the most common and
             most invisible failure. If the geometry is genuinely non-spherical or wildly unequal, no amount
             of tuning will save k-means; reach for a method whose assumptions match your data. That choice
             is the next page.
-          </p>
-        </div>
+        </Callout>
 
         <p>
           None of this makes k-means a bad algorithm — it makes it a <em>specific</em> one. Knowing its
@@ -131,19 +122,11 @@ export default function GalleryPage() {
           it can&rsquo;t.
         </p>
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 40, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/k-means/unequal-sizes-and-densities" style={navLink}>← Unequal sizes &amp; densities</Link>
-          <Link href="/learn/k-means/vs-dbscan-gmm-hierarchical" style={{ ...navLink, fontWeight: 600 }}>Next up · k-means vs DBSCAN, GMM, hierarchical →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/k-means/unequal-sizes-and-densities", label: <>← Unequal sizes &amp; densities</> }} next={{ href: "/learn/k-means/vs-dbscan-gmm-hierarchical", label: <>Next up · k-means vs DBSCAN, GMM, hierarchical →</> }} />
       </div>
     </article>
   );
 }
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-clustering) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-clustering) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0" };
 const th: React.CSSProperties = { textAlign: "left", padding: "8px 10px", borderBottom: "2px solid var(--border-strong)", color: "var(--muted)", fontWeight: 500, fontSize: 12, verticalAlign: "bottom" };
 const td: React.CSSProperties = { padding: "8px 10px", borderBottom: "1px solid var(--border)", color: "var(--muted)", lineHeight: 1.45, verticalAlign: "top" };

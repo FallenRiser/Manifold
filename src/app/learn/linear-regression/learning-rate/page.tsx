@@ -1,6 +1,9 @@
 import Link from "next/link";
+import { M } from "@/components/Math";
 import { LearningRateLab } from "@/components/labs/LearningRateLab";
 import { CodeBlock } from "@/components/CodeBlock";
+import { REGRESSION_SETUP } from "@/lib/runtimeSetup";
+import { LessonHeader } from "@/components/lesson";
 
 const codeScratch = `import numpy as np
 
@@ -44,28 +47,21 @@ export const metadata = {
 export default function LearningRatePage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-regression)")}>Regression</span>
-        <span style={chip("var(--c-fundamentals)")}>Core idea</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 8 minutes</span>
-      </div>
-
-      <h1
-        className="font-serif"
-        style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}
-      >
-        Learning rate
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 8px", maxWidth: 620 }}>
-        The update rule has one number you have to choose yourself — α, the
+      <LessonHeader
+        chips={[{ label: "Regression", color: "var(--c-regression)" }, { label: "Core idea", color: "var(--c-fundamentals)" }]}
+        time="about 8 minutes"
+        title={<>Learning rate</>}
+        intro={<>
+          The update rule has one number you have to choose yourself — α, the
         learning rate. It's a small multiplier, but getting it wrong is the
         single most common reason gradient descent fails.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <p>
           Remember the update rule:{" "}
-          <code>θ := θ − α × ∇L</code>. The gradient tells us{" "}
+          <M>{String.raw`\theta := \theta - \alpha \,\nabla L`}</M>. The gradient tells us{" "}
           <em>which way</em> to step. The learning rate tells us{" "}
           <em>how far</em>. Too small and you'll converge, but it'll take
           forever. Too large and each step overshoots the minimum, bouncing
@@ -191,7 +187,7 @@ export default function LearningRatePage() {
           too small barely moves, too big diverges, and there&rsquo;s a sweet spot
           in between.
         </p>
-        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
+        <CodeBlock setup={REGRESSION_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
 
         <div
           style={{
@@ -253,17 +249,7 @@ function ZoneCard({
   );
 }
 
-function chip(color: string): React.CSSProperties {
-  return {
-    display: "inline-flex",
-    alignItems: "center",
-    background: `color-mix(in srgb, ${color} 13%, var(--surface))`,
-    color,
-    fontSize: 12,
-    padding: "3px 10px",
-    borderRadius: 999,
-  };
-}
+
 
 const zonesGrid: React.CSSProperties = {
   display: "grid",

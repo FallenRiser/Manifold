@@ -1,6 +1,8 @@
-import Link from "next/link";
 import { M } from "@/components/Math";
 import { CodeBlock } from "@/components/CodeBlock";
+import { ElasticNetMixLab } from "@/components/labs/ElasticNetMixLab";
+import { REGRESSION_SETUP } from "@/lib/runtimeSetup";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 export const metadata = {
   title: "Tuning the mix — Manifold",
@@ -11,19 +13,16 @@ export const metadata = {
 export default function TuningMixPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-regression)")}>Regression</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 5 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        Tuning the mix
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 24px", maxWidth: 620 }}>
-        Elastic-net&rsquo;s flexibility costs you a second hyperparameter. Tuning <M>{String.raw`\lambda`}</M> and{" "}
+      <LessonHeader
+        chips={[{ label: "Regression", color: "var(--c-regression)" }]}
+        time="about 5 minutes"
+        title={<>Tuning the mix</>}
+        intro={<>
+          Elastic-net&rsquo;s flexibility costs you a second hyperparameter. Tuning <M>{String.raw`\lambda`}</M> and{" "}
         <M>{String.raw`\alpha`}</M> together is straightforward with cross-validation — and the two knobs have
         clean, separate jobs.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <h2>Two knobs, two roles</h2>
@@ -42,18 +41,15 @@ export default function TuningMixPage() {
           <M>{String.raw`\{0.1, 0.5, 0.7, 0.9, 0.95, 1.0\}`}</M>.
         </p>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-regression)", marginBottom: 4 }}>
-            Where the sweet spot usually sits
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            For problems where you want sparsity, a high <M>{String.raw`\alpha`}</M> (0.7–0.95) is a common winner:
+        <ElasticNetMixLab />
+
+        <Callout color="var(--c-regression)" title={<>Where the sweet spot usually sits</>}>
+          For problems where you want sparsity, a high <M>{String.raw`\alpha`}</M> (0.7–0.95) is a common winner:
             mostly Lasso, with just enough L2 to stabilise selection and keep correlated groups together. If
             your features form strong correlated clusters and you care more about prediction than a short list,
             CV will pull <M>{String.raw`\alpha`}</M> lower. Letting cross-validation choose means you don&rsquo;t have to
             commit to Ridge-vs-Lasso up front — the data decides.
-          </p>
-        </div>
+        </Callout>
 
         <h2>Practical notes</h2>
         <ul style={ul}>
@@ -63,12 +59,9 @@ export default function TuningMixPage() {
         </ul>
 
         <h2>Joint CV in one call</h2>
-        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
+        <CodeBlock setup={REGRESSION_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 40, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/regularized-regression/elastic-net" style={navLink}>← Elastic-net: blending L1 &amp; L2</Link>
-          <Link href="/learn/regularized-regression/standardize-first" style={{ ...navLink, fontWeight: 600 }}>Next up · Standardize first →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/regularized-regression/elastic-net", label: <>← Elastic-net: blending L1 &amp; L2</> }} next={{ href: "/learn/regularized-regression/standardize-first", label: <>Next up · Standardize first →</> }} />
       </div>
     </article>
   );
@@ -99,9 +92,7 @@ model = ElasticNetCV(
 ).fit(X, y)
 print("chosen l1_ratio:", model.l1_ratio_, " λ:", model.alpha_)`;
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
+
 const ul: React.CSSProperties = { margin: "0 0 10px", paddingLeft: "1.3em", fontSize: 15, color: "var(--muted)", lineHeight: 1.8 };
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-regression) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-regression) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0" };
+
+

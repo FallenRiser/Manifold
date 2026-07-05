@@ -1,6 +1,7 @@
-import Link from "next/link";
 import { M } from "@/components/Math";
 import { CodeBlock } from "@/components/CodeBlock";
+import { REGRESSION_SETUP } from "@/lib/runtimeSetup";
+import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 export const metadata = {
   title: "When the Lasso struggles — Manifold",
@@ -11,19 +12,16 @@ export const metadata = {
 export default function WhenLassoStrugglesPage() {
   return (
     <article>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginBottom: 12 }}>
-        <span style={chip("var(--c-regression)")}>Regression</span>
-        <span style={{ fontSize: 12, color: "var(--faint)" }}>· about 5 minutes</span>
-      </div>
-
-      <h1 className="font-serif" style={{ fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.01em", margin: "0 0 8px", color: "var(--ink)" }}>
-        When the Lasso struggles
-      </h1>
-      <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.6, margin: "0 0 24px", maxWidth: 620 }}>
-        Lasso is brilliant, but it has three specific weaknesses — and they show up together precisely in the
+      <LessonHeader
+        chips={[{ label: "Regression", color: "var(--c-regression)" }]}
+        time="about 5 minutes"
+        title={<>When the Lasso struggles</>}
+        intro={<>
+          Lasso is brilliant, but it has three specific weaknesses — and they show up together precisely in the
         modern high-dimensional, correlated-feature problems it&rsquo;s most often reached for. Understanding them
         motivates the next page.
-      </p>
+        </>}
+      />
 
       <div className="lesson">
         <h2>1 — The grouping problem</h2>
@@ -54,26 +52,18 @@ export default function WhenLassoStrugglesPage() {
           deliverable.
         </p>
 
-        <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-regression)", marginBottom: 4 }}>
-            The common root — and the fix
-          </div>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
-            All three problems trace to the L1 penalty&rsquo;s sharp, corner-only geometry, which forces hard
+        <Callout color="var(--c-regression)" title={<>The common root — and the fix</>}>
+          All three problems trace to the L1 penalty&rsquo;s sharp, corner-only geometry, which forces hard
             either/or choices among correlated features. The cure is to <strong>mix in a little L2</strong>:
             ridge&rsquo;s rounded penalty restores the grouping behaviour and lifts the <M>{String.raw`n`}</M>-feature
             cap, while L1 still delivers sparsity. That blend is <strong>elastic-net</strong> — the next page —
             and these three weaknesses are exactly what it was invented to repair.
-          </p>
-        </div>
+        </Callout>
 
         <h2>Watch Lasso flip on correlated features</h2>
-        <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
+        <CodeBlock setup={REGRESSION_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 40, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
-          <Link href="/learn/regularized-regression/solving-the-lasso" style={navLink}>← Solving the Lasso</Link>
-          <Link href="/learn/regularized-regression/elastic-net" style={{ ...navLink, fontWeight: 600 }}>Next up · Elastic-net: blending L1 &amp; L2 →</Link>
-        </div>
+        <PrevNext prev={{ href: "/learn/regularized-regression/solving-the-lasso", label: <>← Solving the Lasso</> }} next={{ href: "/learn/regularized-regression/elastic-net", label: <>Next up · Elastic-net: blending L1 &amp; L2 →</> }} />
       </div>
     </article>
   );
@@ -100,8 +90,6 @@ const codeLib = `from sklearn.linear_model import Lasso, ElasticNet
 print("lasso :", Lasso(alpha=0.1).fit(X, y).coef_.round(2))
 print("enet  :", ElasticNet(alpha=0.1, l1_ratio=0.5).fit(X, y).coef_.round(2))`;
 
-function chip(color: string): React.CSSProperties {
-  return { display: "inline-flex", alignItems: "center", background: `color-mix(in srgb, ${color} 13%, var(--surface))`, color, fontSize: 12, padding: "3px 10px", borderRadius: 999 };
-}
-const navLink: React.CSSProperties = { fontSize: 14, color: "var(--brand)", textDecoration: "none" };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-regression) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-regression) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0" };
+
+
+
