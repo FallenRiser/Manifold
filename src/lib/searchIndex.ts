@@ -2,9 +2,12 @@ import { START_TRACK } from "./startHereTrack";
 import { LR_TRACK } from "./linearRegressionTrack";
 import { REG_TRACK } from "./regularizationTrack";
 import { POLY_TRACK } from "./polynomialRegressionTrack";
+import { KRR_TRACK } from "./kernelRidgeTrack";
+import { SVR_TRACK } from "./svrTrack";
 import { KM_TRACK } from "./kMeansTrack";
 import { KNN_TRACK } from "./knnTrack";
 import { LOG_TRACK } from "./logisticRegressionTrack";
+import { EVAL_TRACK } from "./evaluationTrack";
 import { CAP_TRACK } from "./housingCapstoneTrack";
 import type { TrackChapter } from "./linearRegressionTrack";
 
@@ -24,9 +27,12 @@ const TRACKS: { name: string; accent: string; chapters: TrackChapter[] }[] = [
   { name: "Linear regression", accent: "var(--c-regression)", chapters: LR_TRACK },
   { name: "Regularized regression", accent: "var(--c-regression)", chapters: REG_TRACK },
   { name: "Polynomial regression", accent: "var(--c-regression)", chapters: POLY_TRACK },
+  { name: "Kernel ridge regression", accent: "var(--c-regression)", chapters: KRR_TRACK },
+  { name: "Support vector regression", accent: "var(--c-regression)", chapters: SVR_TRACK },
   { name: "k-Means", accent: "var(--c-clustering)", chapters: KM_TRACK },
   { name: "k-Nearest neighbors", accent: "var(--c-classification)", chapters: KNN_TRACK },
   { name: "Logistic regression", accent: "var(--c-classification)", chapters: LOG_TRACK },
+  { name: "Evaluation & metrics", accent: "var(--c-metrics)", chapters: EVAL_TRACK },
   { name: "Housing capstone", accent: "var(--c-regression)", chapters: CAP_TRACK },
 ];
 

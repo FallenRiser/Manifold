@@ -8,11 +8,58 @@
 > the three-pass review loop, upgrade heuristics, and the ordered priority list. §§10–11 hold the
 > binding specifics (palette, lab standards, authoring checklist); §12 holds the judgement.
 >
-> Last updated: 2026-07-05 (late) — logistic regression **Tiers 1 & 2 complete** (18/25 pages).
-> Tier-2 shipped 12 pages across 4 chapters + 7 labs (`OddsRatioLab`, `ImbalanceLab`,
-> `SeparationLab`, `SoftmaxLab`, `RocLab`, `CalibrationLab`, `CostLab`) + `CREDIT_SETUP`. The
-> ROC/calibration/cost labs are built classification-agnostic to seed the Evaluation & Metrics
-> pillar (now the #1 priority). See §10.6 item 7 and the refreshed §12.7.
+> Last updated: 2026-07-07 — 🎉🎉 **THE ENTIRE REGRESSION FAMILY IS COMPLETE** — all 5 tracks live: linear,
+> ridge/lasso/elastic-net, polynomial, **kernel ridge (NEW, 12pp)**, **support vector regression (NEW, 11pp)**.
+> Built two brand-new Tier-2/3 kernel-methods tracks from scratch: `/learn/kernel-ridge-regression`
+> (kernelRidgeTrack.ts) — kernel trick → dual of ridge → kernels-as-similarity → (K+λI)⁻¹y solution → choosing
+> kernel/tuning/cost → representer theorem → GP connection → KRR-vs-SVR-vs-linear → worked example; and
+> `/learn/support-vector-regression` (svrTrack.ts) — ε-insensitive loss → tube & support vectors → soft-margin C
+> → primal → dual+kernel trick → kernels → hyperparams C/ε/γ → KRR-vs-SVR → when-to-use → worked example. TWO new
+> labs: **KernelRidgeLab** (real client-side RBF KRR fit, λ+γ chip-buttons, exp-curve mount-gated to avoid
+> hydration mismatch) and **SVRTubeLab** (ε-tube slider, support-vectors = points outside, live SV count). Real
+> numbers via **`scripts/kernel_cases.py`** (make_friedman1: linear ridge R²=0.667 → KRR R²=0.860 dense-300pts →
+> SVR R²=0.838 sparse-166pts). All 23 pages 200, tsc EXIT 0, 0 KaTeX errors, 0 hydration errors, both index chips
+> auto-flip "Complete", siteMap+searchIndex wired, /map shows Regression fully live. See §12.7 items 0l/0m.
+> Prior 2026-07-07: 🎉 **k-NEAREST NEIGHBORS TRACK COMPLETE (36/36)** — the FOURTH fully-complete
+> track (linear, logistic, polynomial, KNN). Built 28 pages across EIGHT chapters this session (8/36 → 36/36).
+> Final chapter Ch10 *In the wild* — **real-number case studies** backed by `scripts/knn_cases.py` (honest-numbers
+> doctrine): case-a-digit-recognition [load_digits, **98.67%** test acc at k=3, 6/450 errors, most-confused 9→3
+> with **real rendered 8×8 bitmaps**, PCA(30)=97.33%, brute==kd_tree], case-b-recommendation [user-based CF,
+> synthetic latent-factor ratings, RMSE **1.139 vs 1.306** baseline = 12.7% lift], case-c-similarity-and-anomaly
+> [digits precision@10 **0.9651**; kNN-dist & LOF anomaly ROC-AUC **1.000** (honest: digit-0 cluster is trivially
+> separable — framed as such)]. Case pages: real code (`CodeBlock`, no `setup` → no Run) + real `CodeOutput`.
+> siteMap `partial` dropped; index chip auto-flips to "Complete · 36 pages". NB the sidebar "N of 36" denominator
+> is KNN_DONE — track is **36 pages** total (earlier session notes mislabeled it as 33). Ch9
+> *Strengths, weaknesses & kin*: when-to-use-k-nn [green/red decision guide + pre-flight checklist],
+> k-nn-vs-logistic-regression-svm-trees [**10-criteria × 4-classifier comparison table**], k-nn-vs-k-means
+> [the name-trap table + mnemonic, cross-links k-means track]. Prior this session: Ch *Theory · go deeper*
+> (Tier 3): the-bayes-classifier-and-bayes-error [**static class-overlap figure**, R*=E[min(η,1−η)]],
+> the-1-nn-error-bound [Cover–Hart R*≤R₁ₙₙ≤2R*(1−R*); **static 2η(1−η) vs min(η,1−η) figure** + full proof],
+> consistency-of-k-nn [Stone's theorem, twin conditions k→∞ & k/n→0 mapped to variance/bias],
+> k-nn-as-non-parametric-estimation [η̂ estimation, k-NN density k/(nVₖ) as adaptive-bandwidth dual of KDE,
+> **static adaptive-window figure**, n^(−2/(d+2)) rate + curse]. Ch *Choosing k*
+> (the-role-of-k, bias-and-variance-in-k-nn, choosing-k-by-cross-validation), Ch *Distance & weighting*
+> (distance-metrics-for-k-nn, why-feature-scaling-matters, distance-weighted-voting,
+> the-curse-of-dimensionality), Ch *Making it work in practice* (preprocessing-and-encoding,
+> ties-and-class-imbalance, choosing-the-right-metric, feature-selection-and-weighting), Ch *Scaling the
+> search* (the-brute-force-cost, k-d-trees, ball-trees, approximate-nearest-neighbors). Reused
+> `KNNBoundaryLab`/`KNNChooseKLab`; many new **static server-rendered** figures (bias–variance U-curve;
+> distance-concentration bar chart; Minkowski unit-ball trio; majority-floods diagram; brute-force scan;
+> k-d partition; nested ball-tree spheres) + complexity/method tables — all module-scope, rounded coords,
+> zero hydration surface (no client labs on these pages). Did NOT reuse `ImbalanceLab` (its numbers are a
+> real logistic run — would misrepresent as k-NN); ANN page invents NO benchmark numbers (honest — method
+> families described qualitatively). tsc clean, all 200, KaTeX clean, sidebar auto-reads "23 pages".
+> siteMap keeps KNN `partial` (10 pages still greyed). See §12.7 items 0e/0f/0g/4.
+> 2026-07-06 — THREE completions. (1) **Logistic regression track COMPLETE**
+> (25/25) — Tier-3 theory + 3 *In the wild* cases. (2) **Evaluation & Metrics pillar COMPLETE** (10/10,
+> `/learn/evaluation`) — first fully-complete *pillar*, reuses eight pre-existing labs. (3) **Polynomial
+> & basis-function track COMPLETE** (14/14) — fixed two live 404s (lib linked pages that never existed),
+> then shipped 9 pages; new `SplineKnotsLab` (round SVG coords to avoid a sin/cos hydration mismatch).
+> **Three fully-complete tracks now: linear, logistic, polynomial**, plus the metrics pillar. All: tsc
+> clean, KaTeX clean, hydration clean, `partial`/`In progress` flags dropped. See §12.7 items 0b/0c/0d.
+> Prior (2026-07-05 late): logistic regression **Tiers 1 & 2 complete** (18/25 pages) — Tier-2
+> shipped 12 pages across 4 chapters + 7 labs (`OddsRatioLab`, `ImbalanceLab`, `SeparationLab`,
+> `SoftmaxLab`, `RocLab`, `CalibrationLab`, `CostLab`) + `CREDIT_SETUP`.
 > Earlier 2026-07-05: added **§12, the handoff playbook**, after a day that shipped the Start-here
 > onboarding track, logistic Tier-1 (6 pages + 4 real-data labs), mobile drawer (`LessonShell`),
 > editable `CodeBlock` + `LabFrame`, tier badges + `ModelAnatomy` throughline, `Term` glossary
@@ -737,25 +784,140 @@ When deciding what to polish, apply in order:
    half-designed by ThresholdLab) → trees.
 5. **Reader-visible before internal.** Refactors only when they unblock a reader-visible win.
 
-### 12.7 Priorities for the next lead (ordered; updated 2026-07-05 late)
+### 12.7 Priorities for the next lead (ordered; updated 2026-07-06)
 
 0. ✅ **DONE** — logistic **Tiers 1 & 2 complete** (18/25 pages). Tier-2 shipped 4 chapters +
    labs `OddsRatioLab`/`ImbalanceLab`/`SeparationLab`/`SoftmaxLab`/`RocLab`/`CalibrationLab`/
    `CostLab`, plus `CREDIT_SETUP`. Only Tier-3 theory (4) + *In the wild* cases (3) remain greyed.
-1. **Evaluation & Metrics pillar, first pages** — the labs already exist: `RocLab`, `CalibrationLab`,
-   `CostLab`, `ImbalanceLab`, `ThresholdLab` were built classification-agnostic on purpose. Stand
-   up the pillar track (lib + `LessonShell` layout + searchIndex) and reuse them: confusion
-   matrix & the threshold, precision/recall/F1, ROC/AUC & PR, calibration, cost-sensitive
-   thresholds. This is the highest-leverage move — the labs are done, it's mostly prose + wiring,
-   and it's the "story missing its ending" for all of classification.
-2. **Logistic Tier-3 + cases** — to make logistic the second fully-complete track after LR:
-   maximum-likelihood derivation of log loss, convexity, GLM view, the generative twin (naive
-   Bayes/LDA — `CalibrationLab` already set up the contrast); then the credit-default and
-   medical-screening cases (reuse `CostLab`/`RocLab` on a narrative dataset).
-3. **LR static-page upgrades** — the §9 item-2 list (residual diagnostics shared lab, Q–Q,
-   CV/bias–variance) is the oldest unpaid debt in the best track.
-4. **KNN + polynomial completion** — both are honest partials; each needs ~2-3 chapters to stop
-   being asterisks on /map.
+0b. ✅ **DONE 2026-07-06** — **Evaluation & Metrics pillar COMPLETE** (10/10 pages, first
+   fully-complete *pillar*; `/learn/evaluation`, `evaluationTrack.ts`). Ch1 T1 (accuracy trap →
+   confusion matrix → precision/recall/F1) reuses `ImbalanceLab`/`ThresholdLab`; Ch2 T2 (ROC/AUC &
+   PR → calibration → cost-sensitive) reuses `RocLab`/`CalibrationLab`/`CostLab`; Ch3 T2 (RMSE-vs-MAE
+   → R²/adjusted-R²) reuses `ErrorMetricsLab`/`RSquaredLab`; Ch4 T2 (cross-validation → the
+   evaluation checklist) reuses `CrossValidationLab` + a synthesis page. **Every lab pre-existed** —
+   the whole pillar was prose + wiring, the §12.6 "reuse the lab" bet paying off twice. Framed
+   model-agnostically as *metric selection* ("no best metric, only the one matching what a mistake
+   costs"). All labs verified interactive, tsc clean, 0 console errors, siteMap card "5 live"/0 soon.
+0c. ✅ **DONE 2026-07-06** — **Logistic regression track COMPLETE** (25/25 pages) — the second
+   fully-complete *track* after linear regression. Tier-3 theory (4): maximum-likelihood → log loss,
+   convexity of the objective (PSD Hessian proof + a self-contained convex/non-convex `Landscape` SVG),
+   GLM view (family table, canonical-link gradient), generative twin (naive Bayes/LDA, reuses
+   `CalibrationLab`). *In the wild* cases (3): when-to-use decision table, Case A credit default
+   (reuses `ImbalanceLab`/`OddsRatioLab`/`CostLab` end-to-end), Case B medical screening (reuses
+   `ThresholdLab`/`RocLab` + the base-rate trap). Index chip auto-flips to "Complete"; siteMap
+   `partial` dropped. All KaTeX clean, tsc EXIT 0, 0 console errors. Theory pages are prose+KaTeX
+   (no new numbers); cases reuse the existing real-run labs, so the repro guard still covers everything.
+0d. ✅ **DONE 2026-07-06** — **Polynomial & basis-function track COMPLETE** (14/14) — third
+   fully-complete track. Also FIXED A BUG: the lib linked `basis-functions` + `runge-and-instability`
+   as done but the page files never existed → two live 404s in the sidebar; built both. Then shipped
+   the 9 greyed pages: RBF (reuses `BasisFunctionLab`), splines (new `SplineKnotsLab` — a
+   self-contained interactive knot figure; **round SVG coords with `.toFixed(2)` or sin/cos trips a
+   hydration mismatch** — lesson for any new math-driven SVG lab), natural/smoothing splines,
+   bias–variance (`BiasVarianceLab`), choosing bases (`CrossValidationLab`), regularizing
+   (`RidgePolyLab`), pipelines/leakage (CodeBlock), when-to-use (table), worked example (CodeBlock).
+   Index chip auto-flips to "Complete"; siteMap `partial` dropped. tsc EXIT 0, KaTeX clean, hydration
+   clean after the toFixed fix. THREE complete tracks now: linear, logistic, polynomial.
+0e. ✅ **DONE 2026-07-07** — **KNN Tier-2 depth: two chapters (8/33 → 15/33)**. *Choosing k*
+   (the-role-of-k → bias-and-variance-in-k-nn → choosing-k-by-cross-validation) and *Distance &
+   weighting* (distance-metrics-for-k-nn → why-feature-scaling-matters → distance-weighted-voting →
+   the-curse-of-dimensionality). Reused `KNNBoundaryLab` (role-of-k) + `KNNChooseKLab` (choosing-k) via
+   `LabFrame`+`PredictPrompt`; the other 5 pages are prose+KaTeX+Quiz with **two new static
+   server-rendered figures** (a bias–variance U-curve; a distance-concentration bar chart) and one
+   Minkowski unit-ball trio + a worked scaling table — all computed at module scope with rounded coords,
+   so no hydration risk (server components, not client). Honest-numbers safe: no new computed numbers,
+   the σ²/k and 0.1^(1/d) figures are analytic. `knnTrack.ts` hrefs added; searchIndex auto-picks-up;
+   **siteMap keeps `partial: true`** (correct — 5 chapters / 18 pages still greyed). Verified: tsc EXIT
+   0, all 7 pages 200, KaTeX clean, SSR polyline coords all rounded (the console's SplineKnotsLab
+   hydration errors are the known STALE cumulative-buffer artifacts, not live — splines SSR is clean).
+0f. ✅ **DONE 2026-07-07** — **KNN *Making it work in practice* chapter (15/33 → 19/33)**:
+   preprocessing-and-encoding (categorical→distance encoding, KNNImputer, ColumnTransformer order),
+   ties-and-class-imbalance (tie rules + imbalance remedies; **new static majority-floods figure**;
+   deliberately did NOT reuse `ImbalanceLab` — its numbers are a real logistic run, would misrepresent as
+   k-NN), choosing-the-right-metric (reframed as a *validation workflow* + symptom→metric decision table,
+   NOT a re-catalog of distance-metrics-for-k-nn; stresses metric×k×weights interaction → joint grid),
+   feature-selection-and-weighting (filter/wrapper/embedded → weighting as generalized scaling → metric
+   learning LMNN/NCA, one spectrum). Also **wired the-curse-of-dimensionality's `next` forward** into this
+   chapter (it was prev-only). All prose+KaTeX+Quiz+CodeBlock; no client labs → no hydration surface.
+   siteMap still `partial`. tsc EXIT 0, all 200, KaTeX clean.
+0g. ✅ **DONE 2026-07-07** — **KNN *Scaling the search* chapter (19/33 → 23/33)**: the-brute-force-cost
+   (O(n·d) per query, lazy-fit trap, complexity table + **static scan-every-point figure**; when brute is
+   still right), k-d-trees (median splits, descend+backtrack pruning, **static 2-D partition figure**,
+   why it dies past ~20 dims), ball-trees (centroid+radius, triangle-inequality bound
+   max(0,‖q−c‖−r), **static nested-spheres figure**, any-metric advantage), approximate-nearest-neighbors
+   (recall@k, the LSH/tree/graph/quantization families as a qualitative table — **no invented benchmark
+   numbers**, honest; HNSW code block has no `setup` → no Run since hnswlib isn't in Pyodide). Wired
+   feature-selection-and-weighting's `next` forward. All prose+KaTeX+Quiz+CodeBlock+static SVG; no client
+   labs → no hydration surface. siteMap still `partial`. tsc EXIT 0, all 200, KaTeX clean.
+0h. ✅ **DONE 2026-07-07** — **KNN *Regression & other uses* chapter (23/33 → 26/33)**:
+   k-nn-regression-in-depth (uniform-average staircase vs distance-weighted-smooth — **static figure**;
+   no-extrapolation property; choosing k by RMSE/MAE cross-links eval pillar), local-weighted-regression
+   (LOESS = local *linear* vs local *constant*/Nadaraya–Watson; **static figure computed via closed-form
+   weighted-least-squares at module scope**, demonstrating lower boundary bias; the degree-0/1/2 kernel
+   family), k-nn-for-imputation-and-anomaly-detection (KNNImputer as neighbour-average-of-a-feature; LOF
+   / k-distance outlier scoring with a **static neighbour-distance figure**; "one distance, three jobs").
+   Wired approximate-nearest-neighbors' `next` forward. All server components (static SVG + CodeBlock),
+   no client labs → no hydration surface. Note: chapter-2's regression-by-averaging page already
+   cross-linked `/local-weighted-regression`, so that slug was pre-committed. tsc EXIT 0, all 200, KaTeX
+   clean.
+0i. ✅ **DONE 2026-07-07** — **KNN *Theory · go deeper* chapter, Tier 3 (26/33 → 30/33)**:
+   the-bayes-classifier-and-bayes-error (optimal posterior rule, R*=E[min(η,1−η)] as the irreducible
+   floor; **static overlapping-density figure** with shaded Bayes error), the-1-nn-error-bound (Cover–Hart:
+   nearest label → draw from η, asymptotic error 2η(1−η), full pointwise proof R*≤R₁ₙₙ≤2R*(1−R*)≤2R*;
+   **static 2η(1−η)-vs-min(η,1−η) figure** touching at 0,½,1), consistency-of-k-nn (Stone 1977; the twin
+   conditions k→∞ [variance→0] & k/n→0 [bias→0] shown as the bias–variance decomposition restated as
+   limits; √n satisfies both, with 1/k = k/n = 1/√n), k-nn-as-non-parametric-estimation (k-NN really
+   estimates η̂; density k/(nVₖ) as adaptive bandwidth = dual of KDE; rate n^(−2/(d+2)) → curse attacks the
+   *rate*). All chips use `Tier 3 · theory` with grey `--c-metrics` accent (doctrine §10.1). Math-dense but
+   **0 KaTeX errors** (server + live DOM). All server components, static SVG figures analytic (no invented
+   numbers) → no hydration surface. Wired imputation page's `next` forward. tsc EXIT 0, all 200.
+0j. ✅ **DONE 2026-07-07** — **KNN *Strengths, weaknesses & kin* chapter (30/36 → 33/36)**:
+   when-to-use-k-nn (green/red "reach for it / avoid it" columns, the strength-hides-a-flaw list, a
+   pre-flight checklist cross-linking scaling/metric/k/dimensionality/cost/imbalance pages),
+   k-nn-vs-logistic-regression-svm-trees (a **10-criteria × 4-classifier comparison table** — model type,
+   boundary, train/infer cost, interpretability, extrapolation, scaling, high-d, irrelevant features,
+   non-linearity — k-NN column tinted; "try first, rarely ship alone" framing), k-nn-vs-k-means (the
+   name-trap 8-row table + one-sentence mnemonic; cross-links the k-means clustering track, uses
+   `--c-clustering` accent for the k-means column). No new labs (synthesis chapter, tables + cross-links).
+   Wired k-nn-as-non-parametric-estimation's `next` forward. tsc EXIT 0, all 200, KaTeX clean.
+0k. ✅ **DONE 2026-07-07** — **KNN *In the wild* cases (33/36 → 36/36) → TRACK COMPLETE**. Real runs in
+   **`scripts/knn_cases.py`** (deterministic; python 3.13 + sklearn 1.8): Case A digit-recognition (load_digits
+   98.67%@k=3, 6/450 errors, 9→3 confusion with real 8×8 `DigitGrid` bitmaps, PCA(30)=97.33%, brute==kd_tree),
+   Case B recommendation (synthetic latent-factor ratings, user-based cosine-CF RMSE 1.139 vs 1.306 baseline,
+   +12.7%; = distance-weighted k-NN regression), Case C similarity+anomaly (precision@10=0.9651; kNN-dist & LOF
+   ROC-AUC 1.000 — honestly framed as an easy separation since digit-0 is a tight cluster; LOF-vs-global note).
+   Case pages use `CodeBlock` (no `setup` → no Run, since load_digits/LOF aren't reliably in Pyodide) + real
+   `CodeOutput`. Honest-numbers doctrine satisfied. siteMap `partial` dropped; index chip → "Complete · 36 pages";
+   k-nn-vs-k-means wired forward. tsc EXIT 0, all 200, KaTeX clean, real bitmaps render.
+0l. ✅ **DONE 2026-07-07** — **Kernel Ridge Regression track built from scratch (12/12)**.
+   `/learn/kernel-ridge-regression`, `kernelRidgeTrack.ts`, accent blue `--c-regression`. Ch1 from-ridge-to-kernels
+   (the-kernel-trick, the-dual-form-of-ridge [full w=Xᵀα → α=(K+λI)⁻¹y derivation], kernels-as-similarity [static
+   RBF decay figure + kernel table]), Ch2 in-depth (the-kernel-ridge-solution [reuses **new KernelRidgeLab**],
+   choosing-the-kernel, tuning-lambda-and-gamma [4-quadrant regime cards], the-computational-cost [O(n³), Nyström/RFF]),
+   Ch3 theory·T3 (the-representer-theorem [orthogonality proof], kernel-ridge-and-gaussian-processes [KRR = GP
+   posterior mean, λ=σ²], kernel-ridge-vs-svr-vs-linear [comparison table + real numbers]), Ch4 worked-example.
+   **KernelRidgeLab**: real client-side RBF fit α=(K+λI)⁻¹y via Gauss-elim `solve()` (borrowed from BasisFunctionLab),
+   λ+γ chip-buttons; the exp-derived fit `<polyline>` is **mount-gated** (`ready` state via useEffect) so SSR omits it
+   → zero hydration risk (data points are deterministic mulberry32, safe to SSR). Index chip auto-"Complete · 12 pages".
+0m. ✅ **DONE 2026-07-07** — **Support Vector Regression track built from scratch (11/11) → REGRESSION FAMILY
+   COMPLETE**. `/learn/support-vector-regression`, `svrTrack.ts`. Ch1 ε-insensitive idea (index [**new SVRTubeLab**],
+   the-epsilon-insensitive-loss [static loss-comparison figure ε-insens vs |r| vs r²], the-tube-and-support-vectors
+   [reuses SVRTubeLab + PredictPrompt], soft-margin-c-and-slack [C = inverse of λ]), Ch2 mechanics (the-primal-problem,
+   the-dual-and-the-kernel-trick [box constraints 0≤α≤C = robustness; ε-term = sparsity], kernels-for-svr,
+   hyperparameters-c-epsilon-gamma [3-knob table]), Ch3 practice (kernel-ridge-vs-svr [reciprocal comparison + real
+   numbers], when-to-use-svr [green/red guide], worked-example). **SVRTubeLab**: OLS fit + ε-tube slider; points
+   outside tube = support vectors (filled), inside = free (hollow); live SV count. No transcendentals in coords, all
+   `.toFixed(2)` → hydration-safe. Real numbers for both worked examples from **`scripts/kernel_cases.py`**
+   (make_friedman1, python 3.13/sklearn 1.8): linear ridge R²=0.667 → KRR R²=0.860 (dense, all 300 pts) → SVR
+   R²=0.838 (sparse, 166/300 SVs). siteMap both hrefs added (Regression `partial` never used — was greyed by
+   absent href); searchIndex both wired. **All 5 Regression tracks now live.** tsc EXIT 0, all 23 pages 200, 0 KaTeX/hydration errors.
+1. **LR static-page upgrades** — the §9 item-2 list (residual diagnostics shared lab, Q–Q,
+   CV/bias–variance) is the oldest unpaid debt in the best track. **Now the top content priority** —
+   five tracks complete + a whole family done, but the *flagship* LR track still carries the oldest polish debt.
+4. ✅ **KNN COMPLETE (36/36)** + ✅ **REGRESSION FAMILY COMPLETE** (linear, ridge, polynomial, kernel-ridge, SVR).
+   Next greyed surfaces per /map: **Classification** — Naive Bayes (pairs with logistic generative-twin + KNN
+   Bayes-error pages), SVM (sibling of the just-built SVR — reuse the margin/kernel framing), kernel methods;
+   or **Trees & ensembles** (usually the tabular winner). Prefer deepening a near-complete family; the SVM track
+   would now be low-effort given the SVR machinery just written.
 5. **Challenge mode + URL-hash lab state** (§10.3 leftovers) — goals convert fiddling into
    learning; shareable lab states are free marketing.
 6. **Chapter recaps + Tier-0 prerequisite pills** (§4 leftovers) — the last unshipped

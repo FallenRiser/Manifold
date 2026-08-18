@@ -64,19 +64,19 @@ export const LOG_TRACK: TrackChapter[] = [
     title: "Theory · go deeper",
     tier: 3,
     pages: [
-      { title: "Maximum likelihood: where log loss comes from" },
-      { title: "Convexity of the log-loss objective" },
-      { title: "Logistic regression as a GLM" },
-      { title: "The generative twin: naive Bayes & LDA" },
+      { title: "Maximum likelihood: where log loss comes from", href: "/learn/logistic-regression/maximum-likelihood" },
+      { title: "Convexity of the log-loss objective", href: "/learn/logistic-regression/convexity-of-log-loss" },
+      { title: "Logistic regression as a GLM", href: "/learn/logistic-regression/logistic-regression-as-a-glm" },
+      { title: "The generative twin: naive Bayes & LDA", href: "/learn/logistic-regression/generative-twin-naive-bayes-lda" },
     ],
   },
   {
     title: "In the wild",
     tier: 2,
     pages: [
-      { title: "When to use it (vs trees, SVMs, k-NN)" },
-      { title: "Case A: credit default prediction" },
-      { title: "Case B: medical screening & thresholds" },
+      { title: "When to use it (vs trees, SVMs, k-NN)", href: "/learn/logistic-regression/when-to-use-logistic-regression" },
+      { title: "Case A: credit default prediction", href: "/learn/logistic-regression/case-credit-default" },
+      { title: "Case B: medical screening & thresholds", href: "/learn/logistic-regression/case-medical-screening" },
     ],
   },
 ];

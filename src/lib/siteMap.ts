@@ -18,9 +18,9 @@ export const FAMILIES: Group[] = [
     tracks: [
       { title: "Linear regression", href: "/learn/linear-regression" },
       { title: "Ridge, Lasso & Elastic-net", href: "/learn/regularized-regression" },
-      { title: "Polynomial & basis-function regression", href: "/learn/polynomial-regression", partial: true },
-      { title: "Kernel ridge regression" },
-      { title: "Support vector regression" },
+      { title: "Polynomial & basis-function regression", href: "/learn/polynomial-regression" },
+      { title: "Kernel ridge regression", href: "/learn/kernel-ridge-regression" },
+      { title: "Support vector regression", href: "/learn/support-vector-regression" },
     ],
   },
   {
@@ -28,8 +28,8 @@ export const FAMILIES: Group[] = [
     color: "var(--c-classification)",
     blurb: "Predict a category, and learn where the boundary goes.",
     tracks: [
-      { title: "Logistic regression", href: "/learn/logistic-regression", partial: true },
-      { title: "k-Nearest Neighbors", href: "/learn/k-nearest-neighbors", partial: true },
+      { title: "Logistic regression", href: "/learn/logistic-regression" },
+      { title: "k-Nearest Neighbors", href: "/learn/k-nearest-neighbors" },
       { title: "Naive Bayes" },
       { title: "Support Vector Machines" },
       { title: "Kernel methods" },
@@ -113,10 +113,11 @@ export const PILLARS: Group[] = [
     color: "var(--c-metrics)",
     blurb: "How do you know it's any good — and which metric matters?",
     tracks: [
-      { title: "Confusion matrix & the threshold" },
-      { title: "Accuracy, precision, recall, F1" },
-      { title: "ROC/AUC & precision–recall" },
-      { title: "Calibration & cost-sensitive thresholds" },
+      { title: "Confusion matrix & the threshold", href: "/learn/evaluation" },
+      { title: "Accuracy, precision, recall, F1", href: "/learn/evaluation/precision-recall-and-f1" },
+      { title: "ROC/AUC & precision–recall", href: "/learn/evaluation/roc-auc-and-pr-curves" },
+      { title: "Calibration & cost-sensitive thresholds", href: "/learn/evaluation/calibration" },
+      { title: "Regression metrics & cross-validation", href: "/learn/evaluation/rmse-vs-mae" },
     ],
   },
   {

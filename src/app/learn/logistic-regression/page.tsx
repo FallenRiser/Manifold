@@ -31,7 +31,7 @@ export default function LogisticHubPage() {
   return (
     <article>
       <LessonHeader
-        chips={[{ label: "Classification", color: ACCENT }, { label: `In progress · ${LOG_DONE} of ${LOG_TOTAL} pages`, color: "var(--c-fundamentals)" }]}
+        chips={[{ label: "Classification", color: ACCENT }, { label: LOG_DONE >= LOG_TOTAL ? `Complete · ${LOG_TOTAL} pages` : `In progress · ${LOG_DONE} of ${LOG_TOTAL} pages`, color: "var(--c-fundamentals)" }]}
         time="about 8 minutes"
         title={<>From numbers to categories</>}
         intro={<>

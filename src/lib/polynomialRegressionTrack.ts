@@ -19,25 +19,25 @@ export const POLY_TRACK: TrackChapter[] = [
     pages: [
       { title: "Basis functions: the big idea", href: "/learn/polynomial-regression/basis-functions" },
       { title: "The trouble with high degrees", href: "/learn/polynomial-regression/runge-and-instability" },
-      { title: "Radial basis functions" },
-      { title: "Piecewise: splines" },
-      { title: "Natural & smoothing splines" },
+      { title: "Radial basis functions", href: "/learn/polynomial-regression/radial-basis-functions" },
+      { title: "Piecewise: splines", href: "/learn/polynomial-regression/splines" },
+      { title: "Natural & smoothing splines", href: "/learn/polynomial-regression/natural-and-smoothing-splines" },
     ],
   },
   {
     title: "Controlling flexibility",
     pages: [
-      { title: "Bias–variance & the degree" },
-      { title: "Choosing the number of bases" },
-      { title: "Regularizing the basis" },
+      { title: "Bias–variance & the degree", href: "/learn/polynomial-regression/bias-variance-and-the-degree" },
+      { title: "Choosing the number of bases", href: "/learn/polynomial-regression/choosing-the-number-of-bases" },
+      { title: "Regularizing the basis", href: "/learn/polynomial-regression/regularizing-the-basis" },
     ],
   },
   {
     title: "In the wild",
     pages: [
-      { title: "Pipelines, scaling & leakage" },
-      { title: "When to use it (vs kernels, trees)" },
-      { title: "A worked example" },
+      { title: "Pipelines, scaling & leakage", href: "/learn/polynomial-regression/pipelines-scaling-and-leakage" },
+      { title: "When to use it (vs kernels, trees)", href: "/learn/polynomial-regression/when-to-use-basis-regression" },
+      { title: "A worked example", href: "/learn/polynomial-regression/worked-example" },
     ],
   },
 ];

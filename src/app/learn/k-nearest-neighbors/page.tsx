@@ -14,7 +14,7 @@ export default function KNNHubPage() {
   return (
     <article>
       <LessonHeader
-        chips={[{ label: "Classification", color: "var(--c-classification)" }, { label: `In progress · ${KNN_DONE} of ${KNN_TOTAL} pages`, color: "var(--c-fundamentals)" }]}
+        chips={[{ label: "Classification", color: "var(--c-classification)" }, { label: KNN_DONE >= KNN_TOTAL ? `Complete · ${KNN_TOTAL} pages` : `In progress · ${KNN_DONE} of ${KNN_TOTAL} pages`, color: "var(--c-fundamentals)" }]}
         time="about 6 minutes"
         title={<>What is k-NN?</>}
         intro={<>

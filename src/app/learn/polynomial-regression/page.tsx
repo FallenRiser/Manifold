@@ -14,7 +14,7 @@ export default function PolyHubPage() {
   return (
     <article>
       <LessonHeader
-        chips={[{ label: "Regression", color: "var(--c-regression)" }, { label: `In progress · ${POLY_DONE} of ${POLY_TOTAL} pages`, color: "var(--c-fundamentals)" }]}
+        chips={[{ label: "Regression", color: "var(--c-regression)" }, { label: POLY_DONE >= POLY_TOTAL ? `Complete · ${POLY_TOTAL} pages` : `In progress · ${POLY_DONE} of ${POLY_TOTAL} pages`, color: "var(--c-fundamentals)" }]}
         time="about 6 minutes"
         title={<>Why straight lines fail</>}
         intro={<>
