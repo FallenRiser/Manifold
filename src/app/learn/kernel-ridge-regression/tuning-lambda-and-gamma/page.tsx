@@ -1,6 +1,7 @@
 import { M, MathBlock } from "@/components/Math";
 import { CodeBlock } from "@/components/CodeBlock";
 import { Quiz } from "@/components/Quiz";
+import { KrrTuningLab } from "@/components/labs/KrrTuningLab";
 import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 export const metadata = {
@@ -56,6 +57,14 @@ export default function TuningPage() {
             <div style={{ fontSize: 13, color: "var(--muted)", lineHeight: 1.5 }}>So much shrinkage the coefficients collapse toward zero; the fit flattens to the mean.</div>
           </div>
         </div>
+
+        <p>
+          Those four corners are the extremes of one continuous landscape. Below is that landscape for real: every
+          cell is a <M>{String.raw`(\lambda, \gamma)`}</M> pair, coloured by its cross-validated error. Notice the
+          good region is a tilted <em>diagonal</em>, not a spot — click along it and watch the fit stay good while
+          both knobs move together:
+        </p>
+        <KrrTuningLab />
 
         <h2>Search the grid, on a log scale</h2>
         <p>

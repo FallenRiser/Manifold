@@ -150,7 +150,9 @@ print(f"R²:  {r2_score(y, y_hat):.3f}")`;
           Which raises the real question: how would a computer <em>find</em> that best line, when
           it can&rsquo;t eyeball the chart like you just did? That search — rolling downhill toward
           the smallest error — is called <strong>gradient descent</strong>, and it&rsquo;s the
-          engine under almost every model you&rsquo;ll ever train. That&rsquo;s where we go next.
+          engine under almost every model you&rsquo;ll ever train. Before we can build it, though, we
+          need to make &ldquo;error&rdquo; precise and map the landscape it descends — which is exactly
+          where the next few pages go.
         </p>
 
         <Callout color="var(--c-fundamentals)" title={<>Why this matters later</>}>

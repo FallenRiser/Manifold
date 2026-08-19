@@ -37,10 +37,10 @@ export default function WorkedExamplePage() {
         <p>
           Scale first (the RBF kernel reads distances), then grid-search <M>{String.raw`\lambda`}</M> (called{" "}
           <code>alpha</code> in scikit-learn) and <M>{String.raw`\gamma`}</M> together by cross-validation, and
-          score once on the held-out test set. Reproducible in <code>scripts/kernel_cases.py</code>:
+          score once on the held-out test set. The code and its actual output:
         </p>
         <CodeBlock fromScratch={code} />
-        <CodeOutput label="output · scripts/kernel_cases.py">{output}</CodeOutput>
+        <CodeOutput label="output">{output}</CodeOutput>
 
         <h2>Reading the result</h2>
         <ul style={ul}>
@@ -67,20 +67,10 @@ export default function WorkedExamplePage() {
             That is the entire value proposition of kernel ridge regression.
         </Callout>
 
-        <p>
-          On this same data, <Link href="/learn/support-vector-regression" style={inlineLink}>support vector
-          regression</Link> scores a near-identical <M>{String.raw`R^2 = 0.838`}</M> — but from a model built on
-          just 166 of the 300 points. If a sparse, robust model is worth a sliver of accuracy, that&rsquo;s the next
-          track.
-        </p>
-
-        <Callout color="var(--c-regression)" title={<>That completes the kernel ridge regression track</>}>
-          You&rsquo;ve gone from &ldquo;ridge can&rsquo;t bend&rsquo; through the kernel trick, the dual form, the{" "}
-            <M>{String.raw`(K+\lambda I)^{-1}y`}</M> solution, tuning and cost, and the theory that underwrites it
-            all — to a real nonlinear fit. Next in the Regression family:{" "}
-            <Link href="/learn/support-vector-regression" style={inlineLink}>support vector regression</Link>,
-            the sparse, tube-based cousin. Or revisit anything from the{" "}
-            <Link href="/map" style={{ color: "var(--brand)", textDecoration: "none" }}>curriculum map</Link>.
+        <Callout color="var(--c-regression)" title={<>Next: KRR in the wild</>}>
+          That was kernel ridge on a clean benchmark. The two <strong>In the wild</strong> cases that follow measure
+            its two defining traits against real runs — <Link href="/learn/kernel-ridge-regression/case-a-dense-vs-sparse" style={inlineLink}>its density</Link>, head-to-head with SVR&rsquo;s sparsity, and{" "}
+            <Link href="/learn/kernel-ridge-regression/case-b-efficient-loocv" style={inlineLink}>the near-free LOOCV tuning</Link> that density buys — with numbers from a script you can run.
         </Callout>
 
         <Quiz
@@ -107,7 +97,7 @@ export default function WorkedExamplePage() {
           ]}
         />
 
-        <PrevNext prev={{ href: "/learn/kernel-ridge-regression/kernel-ridge-vs-svr-vs-linear", label: <>← Kernel ridge vs SVR vs linear</> }} next={{ href: "/learn/support-vector-regression", label: <>Next track · Support vector regression →</> }} />
+        <PrevNext prev={{ href: "/learn/kernel-ridge-regression/scaling-krr-to-large-n", label: <>← Scaling KRR to large n</> }} next={{ href: "/learn/kernel-ridge-regression/case-a-dense-vs-sparse", label: <>Next up · Case A: dense vs sparse →</> }} />
       </div>
     </article>
   );

@@ -30,10 +30,10 @@ export default function SVRWorkedExamplePage() {
           Same data as the kernel ridge worked example: <code>make_friedman1</code> (a sine interaction plus a
           quadratic term, 10 features, 300 train / 100 test), standardised. We grid-search all three SVR knobs —
           <M>{String.raw`C`}</M>, <M>{String.raw`\varepsilon`}</M>, and <M>{String.raw`\gamma`}</M> — by
-          cross-validation, then score once on the test set (reproducible in <code>scripts/kernel_cases.py</code>):
+          cross-validation, then score once on the test set — the code and its actual output are shown below:
         </p>
         <CodeBlock fromScratch={code} />
-        <CodeOutput label="output · scripts/kernel_cases.py">{output}</CodeOutput>
+        <CodeOutput label="output">{output}</CodeOutput>
 
         <h2>Reading the result</h2>
         <ul style={ul}>
@@ -61,24 +61,11 @@ export default function SVRWorkedExamplePage() {
             closed-form simplicity is the easier call. Now you can make that choice deliberately.
         </Callout>
 
-        <h2>The Regression family, complete</h2>
-        <p>
-          This closes the Regression family. You&rsquo;ve gone from a straight line to a curved,
-          infinite-dimensional, sparse, robust regressor — each step adding one idea:
-        </p>
-        <ul style={ul}>
-          <li><Link href="/learn/linear-regression" style={inlineLink}>Linear regression</Link> — fit a plane.</li>
-          <li><Link href="/learn/regularized-regression" style={inlineLink}>Ridge, Lasso &amp; Elastic-net</Link> — shrink the weights to generalise.</li>
-          <li><Link href="/learn/polynomial-regression" style={inlineLink}>Polynomial &amp; basis functions</Link> — bend the line with explicit features.</li>
-          <li><Link href="/learn/kernel-ridge-regression" style={inlineLink}>Kernel ridge</Link> — bend it with implicit, infinite features via the kernel trick.</li>
-          <li><strong>Support vector regression</strong> — keep only the points that matter, and forgive small errors.</li>
-        </ul>
-
-        <Callout color="var(--c-regression)" title={<>Where to go next</>}>
-          With regression complete, the natural next families are <strong>classification</strong> (the support
-            vector machine is SVR&rsquo;s sibling — same margin idea, discrete labels) and <strong>trees &amp;
-            ensembles</strong> (the usual winner on messy tabular data). Explore the whole curriculum on the{" "}
-            <Link href="/map" style={{ color: "var(--brand)", textDecoration: "none" }}>map</Link>.
+        <Callout color="var(--c-regression)" title={<>Next: SVR in the wild</>}>
+          That was SVR on a clean benchmark, where it essentially ties kernel ridge. The two{" "}
+            <strong>In the wild</strong> cases that follow put its two distinctive strengths on trial separately —{" "}
+            <Link href="/learn/support-vector-regression/case-a-forecasting" style={inlineLink}>the kernel</Link>, on a
+            chaotic forecasting problem, and <Link href="/learn/support-vector-regression/case-b-robustness" style={inlineLink}>the loss function</Link>, against gross outliers — with numbers from a script you can run.
         </Callout>
 
         <Quiz
@@ -105,7 +92,7 @@ export default function SVRWorkedExamplePage() {
           ]}
         />
 
-        <PrevNext prev={{ href: "/learn/support-vector-regression/when-to-use-svr", label: <>← When to use SVR</> }} next={{ href: "/map", label: <>Explore the curriculum map →</> }} />
+        <PrevNext prev={{ href: "/learn/support-vector-regression/when-to-use-svr", label: <>← When to use SVR</> }} next={{ href: "/learn/support-vector-regression/case-a-forecasting", label: <>Next up · Case A: forecasting a chaotic series →</> }} />
       </div>
     </article>
   );

@@ -107,7 +107,7 @@ export default function DualPage() {
           ]}
         />
 
-        <PrevNext prev={{ href: "/learn/support-vector-regression/the-primal-problem", label: <>← The primal problem</> }} next={{ href: "/learn/support-vector-regression/kernels-for-svr", label: <>Next up · Kernels for SVR →</> }} />
+        <PrevNext prev={{ href: "/learn/support-vector-regression/the-primal-problem", label: <>← The primal problem</> }} next={{ href: "/learn/support-vector-regression/solving-the-qp-smo", label: <>Next up · Solving the QP: SMO →</> }} />
       </div>
     </article>
   );

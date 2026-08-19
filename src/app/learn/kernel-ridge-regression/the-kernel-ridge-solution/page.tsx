@@ -58,7 +58,7 @@ export default function KRRSolutionPage() {
         <LabFrame
           accent="var(--c-regression)"
           tryThis={<>Set γ = 60 and sweep λ from 0.001 → 1: watch the fit go from interpolating spikes to a flat line. Then fix λ = 0.01 and sweep γ.</>}
-          insight={<>λ adds to the diagonal (smoothing); γ fills the matrix (shape). They&rsquo;re different levers — which is why you must tune them together, the next page.</>}
+          insight={<>λ adds to the diagonal (smoothing); γ fills the matrix (shape). They&rsquo;re different levers — which is why you must tune them together, as the tuning page ahead shows.</>}
         >
           <KernelRidgeLab />
         </LabFrame>
@@ -107,7 +107,7 @@ export default function KRRSolutionPage() {
           ]}
         />
 
-        <PrevNext prev={{ href: "/learn/kernel-ridge-regression/kernels-as-similarity", label: <>← Kernels as similarity</> }} next={{ href: "/learn/kernel-ridge-regression/choosing-the-kernel", label: <>Next up · Choosing the kernel →</> }} />
+        <PrevNext prev={{ href: "/learn/kernel-ridge-regression/kernels-as-similarity", label: <>← Kernels as similarity</> }} next={{ href: "/learn/kernel-ridge-regression/solving-the-linear-system", label: <>Next up · Solving the linear system →</> }} />
       </div>
     </article>
   );

@@ -99,7 +99,7 @@ export default function LossSurfacePage() {
             it here on a simple bowl and you&rsquo;ve met the engine under all of it.
         </Callout>
 
-        <PrevNext prev={{ href: "/learn/linear-regression/why-squared-error", label: <>← Why squared error?</> }} next={{ href: "/learn/linear-regression/what-is-a-gradient", label: <>Next up · What is a gradient? →</> }} />
+        <PrevNext prev={{ href: "/learn/linear-regression/why-squared-error", label: <>← Why squared error?</> }} next={{ href: "/learn/linear-regression/what-best-means", label: <>Next up · What best means →</> }} />
       </div>
     </article>
   );

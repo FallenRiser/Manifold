@@ -1,5 +1,6 @@
 import { M, MathBlock } from "@/components/Math";
 import { Quiz } from "@/components/Quiz";
+import { EpsilonLossLab } from "@/components/labs/EpsilonLossLab";
 import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 export const metadata = {
@@ -7,19 +8,6 @@ export const metadata = {
   description:
     "The loss that defines SVR: zero for errors within ε, then linear beyond. See how it differs from squared and absolute loss, and why 'flat then linear' produces both sparsity and robustness.",
 };
-
-// Three loss functions of the residual r: epsilon-insensitive (eps=0.5),
-// absolute |r|, and squared r^2. Analytic, rounded at module scope.
-const EPS = 0.5;
-const RS = Array.from({ length: 81 }, (_, i) => -1.2 + (2.4 * i) / 80);
-const eInsens = (r: number) => Math.max(0, Math.abs(r) - EPS);
-const absL = (r: number) => Math.abs(r);
-const sqL = (r: number) => r * r;
-const W = 360, H = 200, padL = 24, padB = 24, padT = 12, padR = 12;
-const YMAX = 1.5;
-const px = (r: number) => Math.round((padL + ((r + 1.2) / 2.4) * (W - padL - padR)) * 100) / 100;
-const py = (v: number) => Math.round((H - padB - Math.min(v, YMAX) / YMAX * (H - padB - padT)) * 100) / 100;
-const line = (f: (r: number) => number) => RS.map((r) => `${px(r)},${py(f(r))}`).join(" ");
 
 export default function EpsInsensitiveLossPage() {
   return (
@@ -45,27 +33,7 @@ export default function EpsInsensitiveLossPage() {
           know:
         </p>
 
-        <figure style={{ margin: "1.4rem 0", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 14, padding: 16 }}>
-          <svg viewBox={`0 0 ${W} ${H}`} style={{ width: "100%", height: "auto", display: "block" }} role="img" aria-label="Three loss functions of the residual: squared loss is a parabola, absolute loss a V, and the epsilon-insensitive loss is flat within epsilon then linear.">
-            <rect x={0} y={0} width={W} height={H} rx={8} fill="var(--canvas)" stroke="var(--border-strong)" />
-            <line x1={px(0)} y1={padT} x2={px(0)} y2={H - padB} stroke="var(--border)" strokeWidth={1} />
-            {/* epsilon markers */}
-            <line x1={px(-EPS)} y1={py(0)} x2={px(-EPS)} y2={padT} stroke="var(--faint)" strokeWidth={0.8} strokeDasharray="2 3" />
-            <line x1={px(EPS)} y1={py(0)} x2={px(EPS)} y2={padT} stroke="var(--faint)" strokeWidth={0.8} strokeDasharray="2 3" />
-            <polyline points={line(sqL)} fill="none" stroke="var(--c-fundamentals)" strokeWidth={2} />
-            <polyline points={line(absL)} fill="none" stroke="var(--faint)" strokeWidth={1.8} strokeDasharray="4 3" />
-            <polyline points={line(eInsens)} fill="none" stroke="var(--c-regression)" strokeWidth={2.8} />
-            <text x={px(0)} y={py(0) + 12} fontSize={8.5} fill="var(--faint)" textAnchor="middle">−ε   0   +ε</text>
-            <text x={px(0.95)} y={py(sqL(0.95)) - 3} fontSize={9} fill="var(--c-fundamentals)">squared</text>
-            <text x={px(1.05)} y={py(absL(1.05)) + 2} fontSize={9} fill="var(--faint)">|r|</text>
-            <text x={px(0.55)} y={py(eInsens(0.9)) - 3} fontSize={9} fill="var(--c-regression)">ε-insensitive</text>
-          </svg>
-          <figcaption style={{ fontSize: 12.5, color: "var(--muted)", marginTop: 8, lineHeight: 1.55 }}>
-            Squared loss (parabola) punishes every deviation and explodes on outliers. Absolute loss (V) is linear
-            but still penalises everything. The ε-insensitive loss is <strong>flat inside the tube</strong> and
-            linear outside — free in the middle, bounded-slope at the edges.
-          </figcaption>
-        </figure>
+        <EpsilonLossLab />
 
         <h2>Two consequences, straight from the shape</h2>
         <ul style={ul}>

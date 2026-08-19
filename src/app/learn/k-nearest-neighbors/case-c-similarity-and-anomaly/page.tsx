@@ -33,7 +33,7 @@ export default function CaseCSimilarityAnomalyPage() {
           of the k nearest, how many are genuinely relevant (here: share the query digit&rsquo;s label)?
         </p>
         <CodeBlock fromScratch={codeC1} />
-        <CodeOutput label="output · scripts/knn_cases.py">{outputC1}</CodeOutput>
+        <CodeOutput label="output">{outputC1}</CodeOutput>
         <p>
           <strong>96.5%</strong> of each digit&rsquo;s ten nearest images are the same digit — with no labels used
           at query time, just distance. That single number is why nearest-neighbour retrieval underpins so much
@@ -49,7 +49,7 @@ export default function CaseCSimilarityAnomalyPage() {
           Testing on a clean cluster of 0-digits with a handful of other digits mixed in as anomalies:
         </p>
         <CodeBlock fromScratch={codeC2} />
-        <CodeOutput label="output · scripts/knn_cases.py">{outputC2}</CodeOutput>
+        <CodeOutput label="output">{outputC2}</CodeOutput>
         <p>
           Both scores hit <strong>ROC-AUC 1.000</strong> — perfect separation. That&rsquo;s honest but easy: the
           0-digits form one tight, coherent cluster, so anything from another digit is unmistakably far away.

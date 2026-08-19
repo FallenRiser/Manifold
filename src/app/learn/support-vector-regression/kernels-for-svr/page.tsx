@@ -83,7 +83,7 @@ export default function KernelsForSVRPage() {
           ]}
         />
 
-        <PrevNext prev={{ href: "/learn/support-vector-regression/the-dual-and-the-kernel-trick", label: <>← The dual &amp; the kernel trick</> }} next={{ href: "/learn/support-vector-regression/hyperparameters-c-epsilon-gamma", label: <>Next up · Hyperparameters: C, ε, γ →</> }} />
+        <PrevNext prev={{ href: "/learn/support-vector-regression/solving-the-qp-smo", label: <>← Solving the QP: SMO</> }} next={{ href: "/learn/support-vector-regression/hyperparameters-c-epsilon-gamma", label: <>Next up · Hyperparameters: C, ε, γ →</> }} />
       </div>
     </article>
   );

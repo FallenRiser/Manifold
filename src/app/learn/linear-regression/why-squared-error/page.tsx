@@ -60,7 +60,8 @@ export default function WhySquaredErrorPage() {
           the loss surface). That smoothness means there&rsquo;s a tidy formula for the best line,
           <em>and</em> it&rsquo;s easy for an algorithm to roll downhill to the bottom. Absolute
           error has a sharp kink at zero that makes both of those harder. This is the reason squared
-          error pairs so naturally with <strong>gradient descent</strong>, coming up next.
+          error pairs so naturally with <strong>gradient descent</strong>, the search method we build
+          up to over the next few pages.
         </p>
 
         <PredictPrompt

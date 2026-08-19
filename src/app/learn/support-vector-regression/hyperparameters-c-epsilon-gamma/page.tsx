@@ -1,6 +1,7 @@
 import { M } from "@/components/Math";
 import { CodeBlock } from "@/components/CodeBlock";
 import { Quiz } from "@/components/Quiz";
+import { SVRKnobsLab } from "@/components/labs/SVRKnobsLab";
 import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 export const metadata = {
@@ -52,6 +53,13 @@ export default function HyperparametersPage() {
             </tbody>
           </table>
         </div>
+
+        <p>
+          Reading about three interacting knobs only gets you so far — turn them yourself. This is a real
+          ε-SVR, solved in your browser on nonlinear data with one planted outlier. Change any knob and watch the
+          fit, the tube, and the support-vector counts respond:
+        </p>
+        <SVRKnobsLab />
 
         <h2>How they pull on each other</h2>
         <ul style={ul}>
@@ -107,7 +115,7 @@ export default function HyperparametersPage() {
           ]}
         />
 
-        <PrevNext prev={{ href: "/learn/support-vector-regression/kernels-for-svr", label: <>← Kernels for SVR</> }} next={{ href: "/learn/support-vector-regression/kernel-ridge-vs-svr", label: <>Next up · Kernel ridge vs SVR →</> }} />
+        <PrevNext prev={{ href: "/learn/support-vector-regression/kernels-for-svr", label: <>← Kernels for SVR</> }} next={{ href: "/learn/support-vector-regression/nu-svr", label: <>Next up · ν-SVR: controlling the support vectors →</> }} />
       </div>
     </article>
   );

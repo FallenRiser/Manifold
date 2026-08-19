@@ -8,8 +8,16 @@
 > the three-pass review loop, upgrade heuristics, and the ordered priority list. §§10–11 hold the
 > binding specifics (palette, lab standards, authoring checklist); §12 holds the judgement.
 >
-> Last updated: 2026-07-07 — 🎉🎉 **THE ENTIRE REGRESSION FAMILY IS COMPLETE** — all 5 tracks live: linear,
-> ridge/lasso/elastic-net, polynomial, **kernel ridge (NEW, 12pp)**, **support vector regression (NEW, 11pp)**.
+> Last updated: 2026-08-19 — 🎉🎉 **THE ENTIRE REGRESSION FAMILY IS COMPLETE** + **BOTH KERNEL TRACKS NOW AT 16pp
+> MASTERY PARITY**. 5 tracks live: linear, ridge/lasso/elastic-net, polynomial, **kernel ridge (NOW 16pp)**,
+> **support vector regression (NOW 16pp)**. SVR expanded +5: Tier-3 **SMO** (how the QP is solved), **ν-SVR** (bound
+> the SV/error fraction), **scaling to large n** (Nyström/RFF → linear SVR), **In the wild** — Case A Mackey-Glass
+> forecasting (RBF SVR RMSE 0.0044 vs ridge 0.0095, 224/669 SVs), Case B robustness (OLS ×3.7 worse under 10%
+> outliers, SVR ×1.0); numbers from `scripts/svr_cases.py`. KRR expanded +4: Tier-3 **solving-the-linear-system**
+> (Cholesky, λ-as-conditioner, eigendecomposition → closed-form LOOCV), **scaling-krr-to-large-n** (density makes it
+> worse than SVR; Nyström/RFF → primal ridge), **In the wild** — Case A dense-vs-sparse (KRR R²=0.9291 stores 600/600
+> vs SVR 0.9200 stores 291/600 = 2.1× larger), Case B efficient-LOOCV (closed-form 102ms picks λ≈0.0054 vs 5-fold
+> GridSearch 3815ms λ≈0.0042 — same regime, 37× faster); numbers from `scripts/krr_cases.py`.
 > Built two brand-new Tier-2/3 kernel-methods tracks from scratch: `/learn/kernel-ridge-regression`
 > (kernelRidgeTrack.ts) — kernel trick → dual of ridge → kernels-as-similarity → (K+λI)⁻¹y solution → choosing
 > kernel/tuning/cost → representer theorem → GP connection → KRR-vs-SVR-vs-linear → worked example; and
@@ -18,7 +26,9 @@
 > labs: **KernelRidgeLab** (real client-side RBF KRR fit, λ+γ chip-buttons, exp-curve mount-gated to avoid
 > hydration mismatch) and **SVRTubeLab** (ε-tube slider, support-vectors = points outside, live SV count). Real
 > numbers via **`scripts/kernel_cases.py`** (make_friedman1: linear ridge R²=0.667 → KRR R²=0.860 dense-300pts →
-> SVR R²=0.838 sparse-166pts). All 23 pages 200, tsc EXIT 0, 0 KaTeX errors, 0 hydration errors, both index chips
+> SVR R²=0.838 sparse-166pts), **`scripts/svr_cases.py`** (Mackey-Glass forecasting + outlier robustness), and
+> **`scripts/krr_cases.py`** (dense-vs-sparse + closed-form LOOCV timing). All
+> 32 regression-kernel pages 200, tsc EXIT 0, 0 KaTeX errors, 0 hydration errors, both index chips
 > auto-flip "Complete", siteMap+searchIndex wired, /map shows Regression fully live. See §12.7 items 0l/0m.
 > Prior 2026-07-07: 🎉 **k-NEAREST NEIGHBORS TRACK COMPLETE (36/36)** — the FOURTH fully-complete
 > track (linear, logistic, polynomial, KNN). Built 28 pages across EIGHT chapters this session (8/36 → 36/36).

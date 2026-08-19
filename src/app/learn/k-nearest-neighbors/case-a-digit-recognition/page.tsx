@@ -53,11 +53,10 @@ export default function CaseADigitsPage() {
 
         <h2>A three-line classifier, and the real result</h2>
         <p>
-          Split off a test set, fit k-NN, score it. Here&rsquo;s the actual run (reproducible in{" "}
-          <code>scripts/knn_cases.py</code>):
+          Split off a test set, fit k-NN, score it. Here&rsquo;s the actual run — the code and its output:
         </p>
         <CodeBlock fromScratch={codeA} />
-        <CodeOutput label="output · scripts/knn_cases.py">{outputA}</CodeOutput>
+        <CodeOutput label="output">{outputA}</CodeOutput>
         <p>
           <strong>98.67% test accuracy</strong> at <code>k = 3</code> — 6 wrong out of 450 — from a model that
           does no training and knows nothing about digits beyond &ldquo;compare the pixels.&rdquo; That is the

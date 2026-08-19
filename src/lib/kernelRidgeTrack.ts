@@ -22,6 +22,7 @@ export const KRR_TRACK: TrackChapter[] = [
     tier: 2,
     pages: [
       { title: "The kernel ridge solution", href: "/learn/kernel-ridge-regression/the-kernel-ridge-solution" },
+      { title: "Solving the linear system", href: "/learn/kernel-ridge-regression/solving-the-linear-system" },
       { title: "Choosing the kernel", href: "/learn/kernel-ridge-regression/choosing-the-kernel" },
       { title: "Tuning λ and γ", href: "/learn/kernel-ridge-regression/tuning-lambda-and-gamma" },
       { title: "The computational cost", href: "/learn/kernel-ridge-regression/the-computational-cost" },
@@ -37,10 +38,19 @@ export const KRR_TRACK: TrackChapter[] = [
     ],
   },
   {
-    title: "Apply it",
+    title: "In practice",
     tier: 2,
     pages: [
+      { title: "Scaling KRR to large n", href: "/learn/kernel-ridge-regression/scaling-krr-to-large-n" },
       { title: "A worked example", href: "/learn/kernel-ridge-regression/worked-example" },
+    ],
+  },
+  {
+    title: "In the wild",
+    tier: 2,
+    pages: [
+      { title: "Case A: dense vs sparse", href: "/learn/kernel-ridge-regression/case-a-dense-vs-sparse" },
+      { title: "Case B: efficient leave-one-out CV", href: "/learn/kernel-ridge-regression/case-b-efficient-loocv" },
     ],
   },
 ];

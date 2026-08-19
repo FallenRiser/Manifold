@@ -42,7 +42,7 @@ export const FAMILIES: Group[] = [
     color: "var(--c-trees)",
     blurb: "Interpretable splits, then the power of combining many.",
     tracks: [
-      { title: "Decision trees" },
+      { title: "Decision trees", href: "/learn/decision-trees" },
       { title: "Bagging & random forests" },
       { title: "Boosting (AdaBoost, gradient boosting)" },
       { title: "Stacking & blending" },

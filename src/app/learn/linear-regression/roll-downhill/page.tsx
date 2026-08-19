@@ -126,7 +126,7 @@ print(f"intercept:            {model.intercept_[0]:.2f}")
             <strong style={{ color: "var(--ink)" }}>Learning rate matters.</strong>{" "}
             Push the slider up and the steps get bigger — faster at first, but
             risky. Too high and the ball flies past the minimum and{" "}
-            <em>diverges</em>. We'll unpack that on the next page.
+            <em>diverges</em> — the failure we unpack when we reach the learning rate.
           </li>
         </ul>
 

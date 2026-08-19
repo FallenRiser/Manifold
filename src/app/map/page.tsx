@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { TIERS, FAMILIES, PILLARS, FOUNDATIONS, type Group } from "@/lib/siteMap";
 import { Reveal } from "@/components/Reveal";
+import { CurriculumAtlas } from "@/components/CurriculumAtlas";
 
 export const metadata = {
   title: "The map — Manifold",
@@ -77,6 +78,18 @@ export default function MapPage() {
             })}
           </div>
         </div>
+      </Reveal>
+
+      <Reveal delay={120}>
+        <section className="chapter">
+          <div className="chapter-eyebrow">The atlas</div>
+          <h2 className="chapter-title">One connected map</h2>
+          <p className="chapter-sub">
+            The ten worlds and how they connect — each arc a path from one family&rsquo;s ideas into the
+            next. The full track-by-track index follows below.
+          </p>
+          <CurriculumAtlas />
+        </section>
       </Reveal>
 
       {SECTIONS.map((sec) => (

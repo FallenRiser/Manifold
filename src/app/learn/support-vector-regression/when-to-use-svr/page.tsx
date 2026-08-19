@@ -91,7 +91,7 @@ export default function WhenToUseSVRPage() {
           ]}
         />
 
-        <PrevNext prev={{ href: "/learn/support-vector-regression/kernel-ridge-vs-svr", label: <>← Kernel ridge vs SVR</> }} next={{ href: "/learn/support-vector-regression/worked-example", label: <>Next up · A worked example →</> }} />
+        <PrevNext prev={{ href: "/learn/support-vector-regression/scaling-svr-to-large-n", label: <>← Scaling SVR to large n</> }} next={{ href: "/learn/support-vector-regression/worked-example", label: <>Next up · A worked example →</> }} />
       </div>
     </article>
   );

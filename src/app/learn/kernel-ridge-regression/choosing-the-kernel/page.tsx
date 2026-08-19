@@ -1,6 +1,7 @@
 import { M, MathBlock } from "@/components/Math";
 import { CodeBlock } from "@/components/CodeBlock";
 import { Quiz } from "@/components/Quiz";
+import { KernelPickerLab } from "@/components/labs/KernelPickerLab";
 import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 
 export const metadata = {
@@ -40,6 +41,13 @@ export default function ChoosingKernelPage() {
             which is why it&rsquo;s the default and fits a huge range of functions.
           </li>
         </ul>
+
+        <p>
+          Switch between the three on the same data and the difference is stark — the linear kernel can only draw a
+          line, the polynomial adds one global bend, and the RBF follows every local wiggle. The lower panel shows
+          <em> why</em>: each kernel&rsquo;s notion of &ldquo;similarity&rdquo; has a completely different shape.
+        </p>
+        <KernelPickerLab />
 
         <Callout color="var(--c-regression)" title={<>When in doubt, RBF</>}>
           The RBF kernel is the sensible first choice for most problems: it&rsquo;s a <em>universal</em> kernel
@@ -100,7 +108,7 @@ export default function ChoosingKernelPage() {
           ]}
         />
 
-        <PrevNext prev={{ href: "/learn/kernel-ridge-regression/the-kernel-ridge-solution", label: <>← The kernel ridge solution</> }} next={{ href: "/learn/kernel-ridge-regression/tuning-lambda-and-gamma", label: <>Next up · Tuning λ and γ →</> }} />
+        <PrevNext prev={{ href: "/learn/kernel-ridge-regression/solving-the-linear-system", label: <>← Solving the linear system</> }} next={{ href: "/learn/kernel-ridge-regression/tuning-lambda-and-gamma", label: <>Next up · Tuning λ and γ →</> }} />
       </div>
     </article>
   );

@@ -70,8 +70,8 @@ export default function ComparisonPage() {
 
         <h2>The same data, three fits</h2>
         <p>
-          On <code>make_friedman1</code> — a strongly nonlinear target with 10 features (real run in{" "}
-          <code>scripts/kernel_cases.py</code>) — the spectrum shows up in the numbers:
+          On <code>make_friedman1</code> — a strongly nonlinear target with 10 features, from a real run (not
+          illustrative) — the spectrum shows up in the numbers:
         </p>
         <ul style={ul}>
           <li><strong>Linear ridge:</strong> test <M>{String.raw`R^2 = 0.667`}</M>. It simply can&rsquo;t bend to the nonlinearity.</li>
@@ -122,7 +122,7 @@ export default function ComparisonPage() {
           ]}
         />
 
-        <PrevNext prev={{ href: "/learn/kernel-ridge-regression/kernel-ridge-and-gaussian-processes", label: <>← Kernel ridge &amp; Gaussian processes</> }} next={{ href: "/learn/kernel-ridge-regression/worked-example", label: <>Next up · A worked example →</> }} />
+        <PrevNext prev={{ href: "/learn/kernel-ridge-regression/kernel-ridge-and-gaussian-processes", label: <>← Kernel ridge &amp; Gaussian processes</> }} next={{ href: "/learn/kernel-ridge-regression/scaling-krr-to-large-n", label: <>Next up · Scaling KRR to large n →</> }} />
       </div>
     </article>
   );

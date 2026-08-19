@@ -63,8 +63,7 @@ export default function KRRvsSVRPage() {
 
         <h2>Head to head on real data</h2>
         <p>
-          Both on the nonlinear <code>make_friedman1</code> benchmark (300 train / 100 test, real run in{" "}
-          <code>scripts/kernel_cases.py</code>):
+          Both on the nonlinear <code>make_friedman1</code> benchmark (300 train / 100 test), from a real run:
         </p>
         <ul style={ul}>
           <li><strong>Kernel ridge (RBF):</strong> test <M>{String.raw`R^2 = 0.860`}</M>, model uses <strong>all 300</strong> training points.</li>
@@ -86,9 +85,10 @@ export default function KRRvsSVRPage() {
 
         <p>
           Both share the same <M>{String.raw`n \times n`}</M> scaling wall, so neither is the answer for millions
-          of points — there you&rsquo;d reach for the approximations from the{" "}
-          <Link href="/learn/kernel-ridge-regression/the-computational-cost" style={inlineLink}>cost page</Link> or a
-          different model family. The next page turns this comparison into a concrete decision guide.
+          of points — the very next page tackles exactly that, scaling SVR with the same kind of kernel
+          approximations introduced on kernel ridge&rsquo;s{" "}
+          <Link href="/learn/kernel-ridge-regression/the-computational-cost" style={inlineLink}>cost page</Link>. A
+          concrete decision guide for choosing between the two models follows a little later.
         </p>
 
         <Quiz
@@ -115,7 +115,7 @@ export default function KRRvsSVRPage() {
           ]}
         />
 
-        <PrevNext prev={{ href: "/learn/support-vector-regression/hyperparameters-c-epsilon-gamma", label: <>← Hyperparameters: C, ε, γ</> }} next={{ href: "/learn/support-vector-regression/when-to-use-svr", label: <>Next up · When to use SVR →</> }} />
+        <PrevNext prev={{ href: "/learn/support-vector-regression/nu-svr", label: <>← ν-SVR: controlling the support vectors</> }} next={{ href: "/learn/support-vector-regression/scaling-svr-to-large-n", label: <>Next up · Scaling SVR to large n →</> }} />
       </div>
     </article>
   );

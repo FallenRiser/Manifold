@@ -4,6 +4,7 @@ import { REG_TRACK } from "./regularizationTrack";
 import { POLY_TRACK } from "./polynomialRegressionTrack";
 import { KRR_TRACK } from "./kernelRidgeTrack";
 import { SVR_TRACK } from "./svrTrack";
+import { DECISION_TREES_TRACK } from "./decisionTreesTrack";
 import { KM_TRACK } from "./kMeansTrack";
 import { KNN_TRACK } from "./knnTrack";
 import { LOG_TRACK } from "./logisticRegressionTrack";
@@ -29,6 +30,7 @@ const TRACKS: { name: string; accent: string; chapters: TrackChapter[] }[] = [
   { name: "Polynomial regression", accent: "var(--c-regression)", chapters: POLY_TRACK },
   { name: "Kernel ridge regression", accent: "var(--c-regression)", chapters: KRR_TRACK },
   { name: "Support vector regression", accent: "var(--c-regression)", chapters: SVR_TRACK },
+  { name: "Decision trees", accent: "var(--c-trees)", chapters: DECISION_TREES_TRACK },
   { name: "k-Means", accent: "var(--c-clustering)", chapters: KM_TRACK },
   { name: "k-Nearest neighbors", accent: "var(--c-classification)", chapters: KNN_TRACK },
   { name: "Logistic regression", accent: "var(--c-classification)", chapters: LOG_TRACK },

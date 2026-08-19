@@ -65,8 +65,9 @@ export default function SVRHubPage() {
         <h2>The arc of this track</h2>
         <ol style={ol}>
           <li><strong>The ε-insensitive idea</strong> — the loss, the tube, support vectors, and the soft-margin C that handles points outside.</li>
-          <li><strong>The mechanics</strong> — the primal optimisation, the dual and its kernel trick, kernels, and the three hyperparameters.</li>
-          <li><strong>In practice &amp; theory</strong> — kernel ridge vs SVR head-to-head, when to reach for SVR, and a worked example.</li>
+          <li><strong>The mechanics</strong> — the primal, the dual and its kernel trick, how the QP is actually solved (SMO), kernels, the three hyperparameters, and the ν-SVR variant.</li>
+          <li><strong>In practice</strong> — kernel ridge vs SVR head-to-head, scaling to large datasets, when to reach for SVR, and a worked example.</li>
+          <li><strong>In the wild</strong> — two real runs that isolate SVR&rsquo;s two strengths: the kernel on a chaotic forecast, and the loss against outliers.</li>
         </ol>
 
         <Callout color="var(--c-regression)" title={<>Prerequisites</>}>

@@ -143,7 +143,7 @@ export default function WhatBestMeansPage() {
           ]}
         />
 
-        <PrevNext prev={{ href: "/learn/linear-regression/the-loss-surface", label: <>← The loss surface</> }} next={{ href: "/learn/linear-regression/what-is-a-gradient", label: <>Next up · What is a gradient? →</> }} />
+        <PrevNext prev={{ href: "/learn/linear-regression/the-loss-surface", label: <>← The loss surface</> }} next={{ href: "/learn/linear-regression/roll-downhill", label: <>Next up · Roll downhill →</> }} />
       </div>
     </article>
   );

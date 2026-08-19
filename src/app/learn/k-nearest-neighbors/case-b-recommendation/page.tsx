@@ -50,11 +50,11 @@ export default function CaseBRecommendationPage() {
         <h2>A real run</h2>
         <p>
           On a synthetic ratings matrix built from latent taste factors — 200 users, 60 items, ~3,000 observed
-          ratings — with a fifth of the observed ratings held out for testing (reproducible in{" "}
-          <code>scripts/knn_cases.py</code>):
+          ratings — with a fifth of the observed ratings held out for testing, the code and its actual output are
+          below:
         </p>
         <CodeBlock fromScratch={codeB} />
-        <CodeOutput label="output · scripts/knn_cases.py">{outputB}</CodeOutput>
+        <CodeOutput label="output">{outputB}</CodeOutput>
         <p>
           User-based k-NN CF reaches <strong>RMSE 1.139</strong> against a <strong>1.306</strong> global-mean
           baseline — a <strong>12.7% improvement</strong> from doing nothing but averaging over similar users.
