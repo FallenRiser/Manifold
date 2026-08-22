@@ -5,11 +5,14 @@ import { POLY_TRACK } from "./polynomialRegressionTrack";
 import { KRR_TRACK } from "./kernelRidgeTrack";
 import { SVR_TRACK } from "./svrTrack";
 import { DECISION_TREES_TRACK } from "./decisionTreesTrack";
+import { RANDOM_FORESTS_TRACK } from "./randomForestsTrack";
+import { BOOSTING_TRACK } from "./boostingTrack";
 import { KM_TRACK } from "./kMeansTrack";
 import { KNN_TRACK } from "./knnTrack";
 import { LOG_TRACK } from "./logisticRegressionTrack";
 import { EVAL_TRACK } from "./evaluationTrack";
 import { CAP_TRACK } from "./housingCapstoneTrack";
+import { NEO_TRACK } from "./neoCapstoneTrack";
 import type { TrackChapter } from "./linearRegressionTrack";
 
 // Flat, static search index over every live lesson page, built from the track
@@ -31,11 +34,14 @@ const TRACKS: { name: string; accent: string; chapters: TrackChapter[] }[] = [
   { name: "Kernel ridge regression", accent: "var(--c-regression)", chapters: KRR_TRACK },
   { name: "Support vector regression", accent: "var(--c-regression)", chapters: SVR_TRACK },
   { name: "Decision trees", accent: "var(--c-trees)", chapters: DECISION_TREES_TRACK },
+  { name: "Random forests", accent: "var(--c-trees)", chapters: RANDOM_FORESTS_TRACK },
+  { name: "Boosting", accent: "var(--c-trees)", chapters: BOOSTING_TRACK },
   { name: "k-Means", accent: "var(--c-clustering)", chapters: KM_TRACK },
   { name: "k-Nearest neighbors", accent: "var(--c-classification)", chapters: KNN_TRACK },
   { name: "Logistic regression", accent: "var(--c-classification)", chapters: LOG_TRACK },
   { name: "Evaluation & metrics", accent: "var(--c-metrics)", chapters: EVAL_TRACK },
   { name: "Housing capstone", accent: "var(--c-regression)", chapters: CAP_TRACK },
+  { name: "Asteroid-hazard capstone", accent: "var(--c-space)", chapters: NEO_TRACK },
 ];
 
 export const SEARCH_INDEX: SearchEntry[] = TRACKS.flatMap((t) =>

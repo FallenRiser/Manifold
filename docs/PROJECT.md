@@ -8,7 +8,59 @@
 > the three-pass review loop, upgrade heuristics, and the ordered priority list. §§10–11 hold the
 > binding specifics (palette, lab standards, authoring checklist); §12 holds the judgement.
 >
-> Last updated: 2026-08-19 — 🎉🎉 **THE ENTIRE REGRESSION FAMILY IS COMPLETE** + **BOTH KERNEL TRACKS NOW AT 16pp
+> Last updated: 2026-08-21 — 🌳🌲 **BOTH TREES TRACKS EXPANDED TO MASTERY PARITY.** Decision Trees **14→20pp**,
+> Random Forests **14→21pp** (user: "is 14 enough for mastery?" → "full parity"; they're two of the most-used
+> tabular models and deserve KNN/logistic-level depth, not polynomial-level). **DT +6:** missing-values-and-surrogate-splits,
+> the-algorithm-family (ID3/C4.5/CHAID, gain-ratio fixes cardinality bias), oblique-and-multivariate-trees (+staircase-vs-diagonal
+> figure), class-weights-and-cost-sensitive, probabilities-and-calibration (+reliability figure), case-b-regression (Cal-housing,
+> tree R²0.673, no-extrapolation cap). **RF +7:** imbalanced-forests (honest surprise: class_weight WEAK for forests
+> recall 0.515→0.423; **threshold** 0.5→0.3 lifts to 0.680), regression-forests (R² 0.673→**0.795**, OOB 0.807),
+> quantile-regression-forests (**+QuantileForestLab**, 80% interval coverage **0.839**, band flares where noisy),
+> strength-and-correlation (**Breiman PE*≤ρ̄(1−s²)/s²** — formalises max_features tradeoff + no-overfit-from-more-trees),
+> isolation-forests (path-length anomaly, ROC-AUC 0.969), importance-for-correlated-features (MDI splits credit x1 .354/x2 .479,
+> perm zeroes it x1 .024 — twin compensates), case-b-intervals (finale, 4-Q quiz). Numbers appended to `scripts/tree_cases.py`
+> + `scripts/forest_cases.py` (Cal-housing + framed-synthetic demos). Both chains rewired & re-verified end-to-end;
+> **`next build` EXIT 0, all pages static-prerendered** (.html generated ⇒ KaTeX rendered, 0 SSR errors). ⚠️ RF's original
+> 14 pages were built earlier THIS session then compacted out of context → I nearly rebuilt them; caught via `ls`+mtimes
+> before clobbering (**lesson: `ls` the target dir before "continuing" a big build after a /compact**). Dev server STILL
+> wedged (whole-router 404s incl. existing pages — framework, not code) → **live interactive eyeball of all labs still owed.**
+> **Next family track: Boosting** (`/learn/boosting` — AdaBoost + gradient boosting; sequential/bias-reduction vs forest's parallel/variance).
+>
+> Prior 2026-08-20 (cont.) — 🌲 **RANDOM FORESTS TRACK COMPLETE (14pp)** — 2nd Trees-family track.
+> `/learn/random-forests` (`randomForestsTrack.ts`). Ch1 wisdom-of-many-trees (index *Averaging trees* [**ForestVoteLab**:
+> circular boundary, B-slider grows a bagged forest, mount-gated vote-field heatmap melts jagged→smooth ring], bagging
+> [**BootstrapLab**: ~37% OOB = 1/e], out-of-bag-error) · Ch2 (decorrelating-the-trees [**DecorrelationLab**: max_features
+> sweep, correlation rises + accuracy weak at m=1], the-algorithm, feature-importance) · Ch3 (hyperparameters, extra-trees,
+> forest-vs-tree-vs-boosting) · Ch4 T3 (why-averaging-works [**CorrelatedVarianceLab**: Var=ρσ²+(1−ρ)σ²/B, ρ/B sliders,
+> the ρ-floor], limits-of-forests) · Ch5 (proximities [RF-as-kernel], when-to-use) · Ch6 case-a-covertype + 5-Q final quiz.
+> **Honest numbers `scripts/forest_cases.py`** (Forest Cover Type, 25k subsample): single tree **0.760** → RF **OOB 0.844 ≈
+> test 0.847** (+8.7pts), n_estimators plateau (B=1→0.708 … 300→0.847, never overfits), Elevation importance +0.284. 4 new
+> labs all deterministic+rounded/mount-gated. **Verified by full `next build`** (all 215 pages static-prerender, 0 errors;
+> SSR HTML has real numbers + KaTeX clean) — because the **dev server was stuck in a whole-router 404 state all session**
+> (framework-level, not code; `rm .next`+restart didn't fix). Live visual eyeball of the 4 labs still owed. **Next: Boosting.**
+> Details: memory `random-forests-track.md`.
+>
+> Prior 2026-08-20 — 🌳 **DECISION TREES TRACK COMPLETE (14pp)** — first track of the **Trees & ensembles**
+> family, built from scratch. `/learn/decision-trees` (`decisionTreesTrack.ts`, green `--c-trees`). Ch1 Twenty
+> questions (T1: splitting-the-space [**new DecisionTreeLab** — real client-side CART on a noisy checkerboard,
+> depth slider → leaf-rectangle staircase + live train/test acc], what-makes-a-good-split [**new ImpurityLab** —
+> drag a split, live Gini + info gain + snap-to-best], growing-the-tree [CART recursion + code]) · Ch2 Choosing a
+> split (T2: impurity-measures [Gini/entropy/misclass curves, why concavity matters], regression-trees [**new
+> RegressionTreeLab** 1-D variance-split staircase], numeric-and-categorical-splits [scale-invariance, Breiman
+> ordering trick, missing values]) · Ch3 Controlling complexity (T2: how-trees-overfit [reuses DecisionTreeLab],
+> pre-pruning [5 knobs + horizon effect], cost-complexity-pruning [R_α, weakest-link, CV]) · Ch4 Theory (T3:
+> why-greedy [NP-complete, XOR failure, optimal-tree solvers], bias-and-variance-of-trees [low-bias/high-variance
+> → **motivates the whole ensembles family**]) · Ch5 Kin (T2: feature-importance [MDI bias, permutation, iris tree
+> flowchart], when-to-use-a-tree [green/red guide]) · Ch6 In the wild (case-a-titanic). **Honest numbers via
+> `scripts/tree_cases.py`** (Titanic, sklearn 1.8, **drops leakage cols boat/body/home.dest**): full tree 227
+> leaves train 0.967/test 0.762 → CV-pruned **depth 3, 8 leaves, test 0.832**; first split is `sex` → tree
+> rediscovers "women & children first"; permutation importance sex +0.261 dominant. Index chip auto-flips
+> "Complete · 14 pages"; siteMap Decision-trees href added (Trees family "1 live", atlas node clickable);
+> searchIndex wired. tsc EXIT 0, all 14 pages 200, KaTeX clean, 0 hydration, both themes. **Next: random forests**
+> (reuse DecisionTreeLab + the Ch4 bias–variance setup). See §12.7 item 4. Details in memory `decision-trees-track.md`.
+> ⚠️ Dev server hit the §7 degraded state again mid-build (many client comps fast) — `preview_stop`→`rm -rf .next`→`preview_start` fixed it.
+>
+> Prior 2026-08-19 — 🎉🎉 **THE ENTIRE REGRESSION FAMILY IS COMPLETE** + **BOTH KERNEL TRACKS NOW AT 16pp
 > MASTERY PARITY**. 5 tracks live: linear, ridge/lasso/elastic-net, polynomial, **kernel ridge (NOW 16pp)**,
 > **support vector regression (NOW 16pp)**. SVR expanded +5: Tier-3 **SMO** (how the QP is solved), **ν-SVR** (bound
 > the SV/error fraction), **scaling to large n** (Nyström/RFF → linear SVR), **In the wild** — Case A Mackey-Glass
@@ -923,11 +975,15 @@ When deciding what to polish, apply in order:
 1. **LR static-page upgrades** — the §9 item-2 list (residual diagnostics shared lab, Q–Q,
    CV/bias–variance) is the oldest unpaid debt in the best track. **Now the top content priority** —
    five tracks complete + a whole family done, but the *flagship* LR track still carries the oldest polish debt.
-4. ✅ **KNN COMPLETE (36/36)** + ✅ **REGRESSION FAMILY COMPLETE** (linear, ridge, polynomial, kernel-ridge, SVR).
-   Next greyed surfaces per /map: **Classification** — Naive Bayes (pairs with logistic generative-twin + KNN
-   Bayes-error pages), SVM (sibling of the just-built SVR — reuse the margin/kernel framing), kernel methods;
-   or **Trees & ensembles** (usually the tabular winner). Prefer deepening a near-complete family; the SVM track
-   would now be low-effort given the SVR machinery just written.
+4. ✅ **KNN (36/36)** + ✅ **REGRESSION FAMILY** + ✅ **DECISION TREES (14/14)** + ✅ **RANDOM FORESTS (14/14)** — all 2026-08-20.
+   Trees & ensembles family is 2/4 tracks done. **Next in the family: Boosting** (`/learn/boosting`) — AdaBoost +
+   gradient boosting, the tabular ceiling-raiser. Reuse the tree CART code + the "parallel variance (forest) vs
+   sequential bias (boosting)" framing already teed up on random-forests' forest-vs-tree-vs-boosting page + case.
+   Flagship lab idea: a sequential residual-fitting stagewise lab (watch each stump correct the last; learning-rate
+   + n_rounds → train/val curves that CAN overfit, unlike the forest). Then **Stacking**. Other greyed surfaces if
+   pivoting: **Classification** — Naive Bayes, SVM (low-effort sibling of built SVR), kernel methods. Prefer finishing
+   the Trees family. NOTE: a live-visual eyeball of the decision-trees + random-forests labs is still owed (dev server
+   was wedged 2026-08-20; both tracks verified via `next build` + node instead).
 5. **Challenge mode + URL-hash lab state** (§10.3 leftovers) — goals convert fiddling into
    learning; shareable lab states are free marketing.
 6. **Chapter recaps + Tier-0 prerequisite pills** (§4 leftovers) — the last unshipped

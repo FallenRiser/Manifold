@@ -2,6 +2,7 @@ import Link from "next/link";
 import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 import { CodeBlock } from "@/components/CodeBlock";
 import { CodeOutput } from "@/components/CodeOutput";
+import { Quiz } from "@/components/Quiz";
 
 export const metadata = {
   title: "Case: predicting who survived — Manifold",
@@ -139,7 +140,7 @@ pruned: test 0.832  leaves 8`}</CodeOutput>
 |   |--- age >  9.50        (adult man)
 |   |   |--- ... -> died`}</CodeOutput>
         <p>
-          The very first question the tree chose to ask is <strong>&ldquo;is the passenger female?&rdquo;</strong>
+          The very first question the tree chose to ask is <strong>&ldquo;is the passenger female?&rdquo;</strong>{" "}
           Females mostly survive; among males, the next question is <strong>&ldquo;is this a child (age ≤
           9.5)?&rdquo;</strong>, and young boys with few siblings survive while adult men mostly don&rsquo;t.
           Nobody told the tree the maritime code of &ldquo;women and children first&rdquo; — it recovered that
@@ -174,9 +175,66 @@ embarked   +0.000`}</CodeOutput>
           forests and boosting</Link>, the rest of this family — when you need the last few points of accuracy.
         </Callout>
 
+        <Quiz
+          title="Can you answer these?"
+          accent={TREES}
+          questions={[
+            {
+              q: <>A tree is still &ldquo;form + loss + optimiser.&rdquo; What plays the role of the optimiser?</>,
+              options: [
+                "Gradient descent on the leaf values",
+                "Greedy recursive splitting — pick the best split, recurse, then prune",
+                "A closed-form matrix solve",
+              ],
+              answer: 1,
+              explain: <>The form is a partition into boxes, the loss is node impurity, and the optimiser is greedy top-down splitting (CART) followed by pruning — combinatorial, not continuous.</>,
+            },
+            {
+              q: <>You standardise every feature and one-hot encode the categoricals before fitting a tree. What's the effect on accuracy?</>,
+              options: [
+                "Large improvement",
+                "Roughly none from scaling; one-hot can actively hurt high-cardinality features",
+                "The tree can't fit at all now",
+              ],
+              answer: 1,
+              explain: <>Trees split on value order, so scaling is a no-op; one-hot fragments high-cardinality features across thin columns and often hurts. The Titanic pipeline deliberately skipped both.</>,
+            },
+            {
+              q: <>The full Titanic tree scored 0.967 on training but 0.762 on test. What single move fixed it?</>,
+              options: [
+                "Adding more features",
+                "Constraining size — CV-tuned depth pruned 227 leaves to 8 and raised test to 0.832",
+                "Switching Gini to entropy",
+              ],
+              answer: 1,
+              explain: <>The 20-point train–test gap was memorised noise. Cross-validated depth (or cost-complexity pruning) shrinks the tree and improves generalisation — the core lesson of the complexity chapter.</>,
+            },
+            {
+              q: <>Why is misclassification error used for pruning but Gini/entropy for growing?</>,
+              options: [
+                "Misclassification is faster to compute",
+                "Gini/entropy are concave, so every useful split registers positive gain; misclassification's flat regions hide progress",
+                "They give completely different trees",
+              ],
+              answer: 1,
+              explain: <>A concave impurity rewards any split that purifies a child, which greedy growth needs. Pruning, by contrast, optimises the error rate we ultimately care about.</>,
+            },
+            {
+              q: <>You need the best possible accuracy on this data and don't need to explain the model. What do you ship?</>,
+              options: [
+                "The depth-3 tree — it's interpretable",
+                "An ensemble of trees (random forest / gradient boosting)",
+                "A single unpruned tree",
+              ],
+              answer: 1,
+              explain: <>A single tree is for understanding; an ensemble almost always wins on accuracy for tabular data. Here you'd keep the depth-3 tree for the story and ship a forest for the score — the throughline into the rest of this family.</>,
+            },
+          ]}
+        />
+
         <PrevNext
           prev={{ href: "/learn/decision-trees/when-to-use-a-tree", label: <>← When to use a single tree</> }}
-          next={{ href: "/map", label: <>Next family · Random forests, on the map →</> }}
+          next={{ href: "/learn/decision-trees/case-b-regression", label: <>Next up · A regression tree, end to end →</> }}
         />
       </div>
     </article>

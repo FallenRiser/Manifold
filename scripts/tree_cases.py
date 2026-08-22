@@ -88,3 +88,48 @@ perm = permutation_importance(depth3, X_te, y_te, n_repeats=30, random_state=RS)
 print("[permutation importance, depth-3 tree, on test set]")
 for j in np.argsort(perm.importances_mean)[::-1]:
     print(f"  {FEATURES[j]:10s} {perm.importances_mean[j]:+.3f}")
+
+
+# ============================================================================
+# Case B — a REGRESSION tree, end to end (California housing).
+# Ties to the capstone dataset. Shows the depth/overfit tradeoff, the staircase,
+# no-extrapolation, and feature importance for a numeric target.
+# ============================================================================
+print("\n\n===== CASE B: regression tree on California housing =====")
+from sklearn.datasets import fetch_california_housing
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.metrics import mean_squared_error, r2_score
+
+cal = fetch_california_housing(as_frame=True)
+Xc = cal.data.to_numpy(float)
+yc = cal.target.to_numpy(float)  # median house value in $100k
+cfeat = list(cal.data.columns)
+Xc_tr, Xc_te, yc_tr, yc_te = train_test_split(Xc, yc, test_size=0.25, random_state=RS)
+print(f"train {len(yc_tr)}  test {len(yc_te)}  features {Xc.shape[1]}")
+
+print("\n[depth sweep — a regression tree overfits too]")
+for d in [2, 4, 6, 8, 12, None]:
+    t = DecisionTreeRegressor(max_depth=d, random_state=RS).fit(Xc_tr, yc_tr)
+    rmse_tr = mean_squared_error(yc_tr, t.predict(Xc_tr)) ** 0.5
+    rmse_te = mean_squared_error(yc_te, t.predict(Xc_te)) ** 0.5
+    label = str(d) if d is not None else "None"
+    print(f"  depth {label:>4}  leaves {t.get_n_leaves():>5}  train RMSE {rmse_tr:.3f}  test RMSE {rmse_te:.3f}  test R2 {r2_score(yc_te, t.predict(Xc_te)):.3f}")
+
+# a CV-tuned depth
+best_d, best = None, 1e9
+for d in [4, 5, 6, 7, 8, 9, 10]:
+    cv = -cross_val_score(DecisionTreeRegressor(max_depth=d, random_state=RS), Xc_tr, yc_tr,
+                          cv=5, scoring="neg_root_mean_squared_error").mean()
+    if cv < best:
+        best, best_d = cv, d
+tuned = DecisionTreeRegressor(max_depth=best_d, random_state=RS).fit(Xc_tr, yc_tr)
+print(f"\n  CV-best depth {best_d}: test RMSE {mean_squared_error(yc_te, tuned.predict(Xc_te))**0.5:.3f}  R2 {r2_score(yc_te, tuned.predict(Xc_te)):.3f}")
+
+# no extrapolation demo: predictions are bounded by training targets
+print(f"  training target range: [{yc_tr.min():.2f}, {yc_tr.max():.2f}]")
+print(f"  tree prediction range: [{tuned.predict(Xc_te).min():.2f}, {tuned.predict(Xc_te).max():.2f}]  (never exceeds training)")
+
+perm_c = permutation_importance(tuned, Xc_te, yc_te, n_repeats=10, random_state=RS)
+print("\n[permutation importance, top 4]")
+for j in np.argsort(perm_c.importances_mean)[::-1][:4]:
+    print(f"  {cfeat[j]:12s} {perm_c.importances_mean[j]:+.3f}")

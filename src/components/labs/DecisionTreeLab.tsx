@@ -2,17 +2,20 @@
 
 import { useMemo, useState } from "react";
 
-// A real CART decision tree, grown client-side on 2-D data, with a depth knob.
-// One manipulable cause (max depth) → one visible effect (the axis-aligned
-// staircase boundary) → three readouts (leaves, train accuracy, test accuracy).
-// The data is a noisy checkerboard: a single split can't separate it (≈50%),
-// depth 2 captures the four quadrants, and past that the tree starts chasing the
-// 10% label noise — train accuracy marches to 100% while test accuracy stalls
-// then slips. That gap IS overfitting, made playable.
+// A real CART decision tree grown client-side on 2-D data, shown TWO ways at
+// once: the axis-aligned partition (the boxes) and the tree itself (the
+// flowchart) — the two representations updating together as you drag depth, so
+// "a tree is a set of boxes" and "a tree is a flowchart" become one picture.
 //
-// Deterministic (mulberry32 seed + exact arithmetic), and every emitted SVG
-// coordinate is rounded, so server and client render identically — no hydration
-// mismatch, no mount-gating needed.
+// Two datasets make both of a tree's failure modes playable:
+//   • Checkerboard (XOR + 10% noise): axis-aligned, so a tree nails it at depth
+//     2 — the failure here is OVERFITTING (push depth, train→100%, test slips).
+//   • Diagonal (y > x + noise): the boundary is diagonal, so the tree can only
+//     approximate it with a STAIRCASE — the representational failure, visible as
+//     the boxes stepping along the diagonal.
+//
+// Deterministic (mulberry32 + exact arithmetic) with every emitted coordinate
+// rounded, so SSR and client render identically — no hydration mismatch.
 
 function mulberry32(a: number) {
   return function () {
@@ -26,15 +29,19 @@ function mulberry32(a: number) {
 
 type Pt = { x: number; y: number; c: 0 | 1 };
 type Box = { x0: number; x1: number; y0: number; y1: number };
-type Node = Box & { leaf: boolean; pred: 0 | 1; feat?: 0 | 1; thr?: number; left?: Node; right?: Node };
+type Node = Box & {
+  leaf: boolean; pred: 0 | 1; feat?: 0 | 1; thr?: number; left?: Node; right?: Node;
+  col?: number; row?: number;
+};
+type Kind = "xor" | "diag";
 
-function makeData(seed: number, n: number, flip: number): Pt[] {
+function makeData(seed: number, n: number, flip: number, kind: Kind): Pt[] {
   const r = mulberry32(seed);
   const pts: Pt[] = [];
   for (let i = 0; i < n; i++) {
     const x = r();
     const y = r();
-    let c: 0 | 1 = (x > 0.5) !== (y > 0.5) ? 1 : 0;
+    let c: 0 | 1 = kind === "xor" ? ((x > 0.5) !== (y > 0.5) ? 1 : 0) : y > x ? 1 : 0;
     if (r() < flip) c = (c ^ 1) as 0 | 1;
     pts.push({ x, y, c });
   }
@@ -55,7 +62,7 @@ function majority(pts: Pt[]): 0 | 1 {
 }
 
 function bestSplit(pts: Pt[]) {
-  const base = gini(pts) * pts.length; // count-weighted impurity
+  const base = gini(pts) * pts.length;
   let best: { feat: 0 | 1; thr: number } | null = null;
   let bestScore = base;
   for (const feat of [0, 1] as const) {
@@ -112,11 +119,33 @@ function collectLeaves(node: Node, acc: Node[]) {
     collectLeaves(node.right!, acc);
   }
 }
+// tidy layout: assign each leaf a column slot, each internal node the midpoint
+function assign(node: Node, row: number, slot: { v: number }): number {
+  node.row = row;
+  if (node.leaf) {
+    node.col = slot.v;
+    slot.v += 1;
+    return row;
+  }
+  const dl = assign(node.left!, row + 1, slot);
+  const dr = assign(node.right!, row + 1, slot);
+  node.col = (node.left!.col! + node.right!.col!) / 2;
+  return Math.max(dl, dr);
+}
+function collectNodes(node: Node, acc: Node[]) {
+  acc.push(node);
+  if (!node.leaf) {
+    collectNodes(node.left!, acc);
+    collectNodes(node.right!, acc);
+  }
+}
 
-const TRAIN = makeData(7, 90, 0.1);
-const TEST = makeData(99, 240, 0.1);
+const DATA: Record<Kind, { train: Pt[]; test: Pt[] }> = {
+  xor: { train: makeData(7, 90, 0.1, "xor"), test: makeData(99, 240, 0.1, "xor") },
+  diag: { train: makeData(7, 90, 0.08, "diag"), test: makeData(99, 240, 0.08, "diag") },
+};
 
-const W = 360;
+const W = 300;
 const H = 300;
 const PAD = 10;
 const f = (n: number) => Math.round(n * 100) / 100;
@@ -127,78 +156,119 @@ const CLASS_COLOR = ["var(--c-regression)", "var(--c-classification)"];
 
 export function DecisionTreeLab() {
   const [depth, setDepth] = useState(2);
+  const [kind, setKind] = useState<Kind>("xor");
 
-  const { leaves, trainAcc, testAcc } = useMemo(() => {
-    const root = build(TRAIN, 0, depth, { x0: 0, x1: 1, y0: 0, y1: 1 });
+  const { leaves, nodes, nLeaves, maxRow, trainAcc, testAcc } = useMemo(() => {
+    const { train, test } = DATA[kind];
+    const root = build(train, 0, depth, { x0: 0, x1: 1, y0: 0, y1: 1 });
+    const slot = { v: 0 };
+    const maxRow = assign(root, 0, slot);
     const leaves: Node[] = [];
     collectLeaves(root, leaves);
+    const nodes: Node[] = [];
+    collectNodes(root, nodes);
     const acc = (data: Pt[]) => data.reduce((s, p) => s + (predict(root, p) === p.c ? 1 : 0), 0) / data.length;
-    return { leaves, trainAcc: acc(TRAIN), testAcc: acc(TEST) };
-  }, [depth]);
+    return { leaves, nodes, nLeaves: slot.v, maxRow, trainAcc: acc(train), testAcc: acc(test) };
+  }, [depth, kind]);
+
+  const showLabels = nLeaves <= 12;
+  // tree-diagram geometry
+  const slotW = showLabels ? 78 : Math.max(18, Math.min(34, 300 / Math.max(1, nLeaves)));
+  const TW = Math.max(260, nLeaves * slotW);
+  const rowH = 44;
+  const TH = (maxRow + 1) * rowH + 24;
+  const tx = (col: number) => f(slotW / 2 + col * slotW);
+  const ty = (row: number) => f(20 + row * rowH);
 
   return (
-    <div
-      style={{
-        background: "var(--canvas)",
-        border: "1px solid var(--border-strong)",
-        borderRadius: 14,
-        padding: "16px 16px 14px",
-      }}
-    >
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 18, alignItems: "flex-start" }}>
-        <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ maxWidth: 380, flex: "1 1 300px", display: "block" }} role="img" aria-label="Decision tree partition of a 2-D feature space">
-          {/* leaf regions — the staircase boundary */}
-          {leaves.map((lf, i) => (
-            <rect
-              key={i}
-              x={px(lf.x0)}
-              y={py(lf.y1)}
-              width={f((lf.x1 - lf.x0) * (W - 2 * PAD))}
-              height={f((lf.y1 - lf.y0) * (H - 2 * PAD))}
-              fill={CLASS_COLOR[lf.pred]}
-              fillOpacity={0.13}
-              stroke="var(--border-strong)"
-              strokeWidth={0.75}
-            />
+    <div style={{ background: "var(--canvas)", border: "1px solid var(--border-strong)", borderRadius: 14, padding: "16px 16px 14px" }}>
+      {/* controls */}
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 16, alignItems: "center", marginBottom: 14 }}>
+        <div style={{ display: "inline-flex", gap: 6 }}>
+          {(["xor", "diag"] as Kind[]).map((k) => (
+            <button
+              key={k}
+              onClick={() => setKind(k)}
+              style={{
+                fontSize: 12.5, padding: "5px 11px", borderRadius: 999,
+                border: `1px solid ${kind === k ? "var(--c-trees)" : "var(--border-strong)"}`,
+                background: kind === k ? "color-mix(in srgb, var(--c-trees) 12%, var(--surface))" : "var(--surface)",
+                color: kind === k ? "var(--c-trees)" : "var(--muted)", cursor: "pointer", fontWeight: kind === k ? 500 : 400,
+              }}
+            >
+              {k === "xor" ? "Checkerboard" : "Diagonal"}
+            </button>
           ))}
-          {/* training points */}
-          {TRAIN.map((p, i) => (
-            <circle key={i} cx={px(p.x)} cy={py(p.y)} r={4} fill={CLASS_COLOR[p.c]} stroke="var(--surface)" strokeWidth={1} />
-          ))}
-          {/* axis labels */}
-          <text x={W / 2} y={H - 1} fontSize={10} textAnchor="middle" fill="var(--faint)">feature x₁</text>
-          <text x={3} y={H / 2} fontSize={10} textAnchor="middle" fill="var(--faint)" transform={`rotate(-90 3 ${H / 2})`}>feature x₂</text>
-        </svg>
-
-        <div style={{ flex: "1 1 200px", minWidth: 190 }}>
-          <label style={{ fontSize: 12.5, color: "var(--muted)", display: "block", marginBottom: 6 }}>
-            Max depth: <strong style={{ color: "var(--ink)" }}>{depth}</strong>
-          </label>
-          <input
-            type="range"
-            min={1}
-            max={8}
-            step={1}
-            value={depth}
-            onChange={(e) => setDepth(Number(e.target.value))}
-            style={{ width: "100%", accentColor: "var(--c-trees)" }}
-          />
-
-          <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 8, marginTop: 16 }}>
-            <Stat label="Leaves (regions)" value={String(leaves.length)} />
-            <Bar label="Train accuracy" value={trainAcc} color="var(--c-trees)" />
-            <Bar label="Test accuracy" value={testAcc} color="var(--brand-2)" />
-          </div>
-
-          <div style={{ display: "flex", gap: 12, marginTop: 14, fontSize: 12, color: "var(--muted)" }}>
-            <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}>
-              <span style={{ width: 9, height: 9, borderRadius: 999, background: CLASS_COLOR[0] }} /> class A
-            </span>
-            <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}>
-              <span style={{ width: 9, height: 9, borderRadius: 999, background: CLASS_COLOR[1] }} /> class B
-            </span>
-          </div>
         </div>
+        <label style={{ fontSize: 12.5, color: "var(--muted)", display: "inline-flex", alignItems: "center", gap: 8, flex: "1 1 180px" }}>
+          Max depth <strong style={{ color: "var(--ink)" }}>{depth}</strong>
+          <input type="range" min={1} max={8} step={1} value={depth} onChange={(e) => setDepth(Number(e.target.value))} style={{ flex: 1, accentColor: "var(--c-trees)" }} />
+        </label>
+      </div>
+
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 16, alignItems: "flex-start" }}>
+        {/* partition */}
+        <div style={{ flex: "1 1 260px", minWidth: 240 }}>
+          <div style={{ fontSize: 11, color: "var(--faint)", marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.08em" }}>The boxes</div>
+          <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ maxWidth: 320, display: "block" }} role="img" aria-label="Decision tree partition of a 2-D feature space">
+            {leaves.map((lf, i) => (
+              <rect key={i} x={px(lf.x0)} y={py(lf.y1)} width={f((lf.x1 - lf.x0) * (W - 2 * PAD))} height={f((lf.y1 - lf.y0) * (H - 2 * PAD))} fill={CLASS_COLOR[lf.pred]} fillOpacity={0.13} stroke="var(--border-strong)" strokeWidth={0.75} />
+            ))}
+            {DATA[kind].train.map((p, i) => (
+              <circle key={i} cx={px(p.x)} cy={py(p.y)} r={3.6} fill={CLASS_COLOR[p.c]} stroke="var(--surface)" strokeWidth={1} />
+            ))}
+            <text x={W / 2} y={H - 1} fontSize={10} textAnchor="middle" fill="var(--faint)">feature x₁</text>
+            <text x={3} y={H / 2} fontSize={10} textAnchor="middle" fill="var(--faint)" transform={`rotate(-90 3 ${H / 2})`}>feature x₂</text>
+          </svg>
+        </div>
+
+        {/* the tree */}
+        <div style={{ flex: "1 1 300px", minWidth: 240 }}>
+          <div style={{ fontSize: 11, color: "var(--faint)", marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.08em" }}>The tree that built them</div>
+          <div style={{ overflowX: "auto" }}>
+            <svg viewBox={`0 0 ${TW} ${TH}`} width="100%" style={{ minWidth: showLabels ? TW : Math.min(TW, 320), maxWidth: Math.max(TW, 320), display: "block" }} role="img" aria-label="The decision tree as a flowchart">
+              {/* edges */}
+              {nodes.filter((n) => !n.leaf).map((n, i) => (
+                <g key={`e${i}`}>
+                  <line x1={tx(n.col!)} y1={ty(n.row!)} x2={tx(n.left!.col!)} y2={ty(n.left!.row!)} stroke="var(--border-strong)" strokeWidth={1} />
+                  <line x1={tx(n.col!)} y1={ty(n.row!)} x2={tx(n.right!.col!)} y2={ty(n.right!.row!)} stroke="var(--border-strong)" strokeWidth={1} />
+                </g>
+              ))}
+              {/* nodes */}
+              {nodes.map((n, i) => {
+                if (n.leaf) {
+                  return <circle key={`n${i}`} cx={tx(n.col!)} cy={ty(n.row!)} r={showLabels ? 8 : 5} fill={CLASS_COLOR[n.pred]} stroke="var(--surface)" strokeWidth={1.5} />;
+                }
+                if (!showLabels) {
+                  return <circle key={`n${i}`} cx={tx(n.col!)} cy={ty(n.row!)} r={4} fill="var(--muted)" />;
+                }
+                const label = `${n.feat === 0 ? "x₁" : "x₂"} ≤ ${n.thr!.toFixed(2)}`;
+                return (
+                  <g key={`n${i}`}>
+                    <rect x={tx(n.col!) - 34} y={ty(n.row!) - 11} width={68} height={22} rx={6} fill="var(--surface)" stroke="var(--border-strong)" strokeWidth={1} />
+                    <text x={tx(n.col!)} y={ty(n.row!) + 3.5} fontSize={10.5} textAnchor="middle" fill="var(--ink)" style={{ fontFamily: "var(--font-geist-mono)" }}>{label}</text>
+                  </g>
+                );
+              })}
+            </svg>
+          </div>
+          {!showLabels && (
+            <div style={{ fontSize: 11.5, color: "var(--muted)", marginTop: 4 }}>
+              Too many nodes to label — {nLeaves} leaves. A tree this bushy is memorising, not learning.
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* readouts */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 14, marginTop: 16 }}>
+        <Stat label="Leaves (regions)" value={String(nLeaves)} />
+        <Bar label="Train accuracy" value={trainAcc} color="var(--c-trees)" />
+        <Bar label="Test accuracy" value={testAcc} color="var(--brand-2)" />
+      </div>
+      <div style={{ display: "flex", gap: 14, marginTop: 12, fontSize: 12, color: "var(--muted)" }}>
+        <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}><span style={{ width: 9, height: 9, borderRadius: 999, background: CLASS_COLOR[0] }} /> class A</span>
+        <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}><span style={{ width: 9, height: 9, borderRadius: 999, background: CLASS_COLOR[1] }} /> class B</span>
       </div>
     </div>
   );

@@ -18,7 +18,7 @@ export default function WhenToUsePage() {
         time="about 6 minutes"
         title={<>When to use a single tree</>}
         intro={<>
-          Time for the honest verdict. A lone decision tree is one of the most useful models to <em>understand</em>
+          Time for the honest verdict. A lone decision tree is one of the most useful models to <em>understand</em>{" "}
           and one of the least likely to be the model you <em>ship</em> for accuracy. Knowing which situation
           you&rsquo;re in is the whole skill.
         </>}
@@ -56,7 +56,7 @@ export default function WhenToUsePage() {
           rule most practitioners follow:
         </p>
         <Callout color={TREES} title={<>The working rule</>}>
-          Use a <strong>single tree to understand</strong> your data and to explain a decision; use an
+          Use a <strong>single tree to understand</strong> your data and to explain a decision; use an{" "}
           <strong> ensemble of trees to predict</strong> when accuracy is what matters. The two roles rarely
           compete — you often fit a shallow tree for the story and a boosted forest for the leaderboard, on the
           same dataset.
@@ -112,7 +112,7 @@ export default function WhenToUsePage() {
         />
 
         <PrevNext
-          prev={{ href: "/learn/decision-trees/feature-importance", label: <>← Feature importance & reading a tree</> }}
+          prev={{ href: "/learn/decision-trees/probabilities-and-calibration", label: <>← Probabilities & calibration</> }}
           next={{ href: "/learn/decision-trees/case-a-titanic", label: <>Next up · Case: predicting who survived →</> }}
         />
       </div>

@@ -46,7 +46,7 @@ export default function BiasVariancePage() {
           systematic mismatch left. All of its error is variance and noise.
         </p>
         <p>
-          And its <strong>variance is unusually high</strong>, for a specific structural reason: the splits are
+          And its <strong>variance is unusually high</strong>, for a specific structural reason: the splits are{" "}
           <em> hard</em> and <em>hierarchical</em>. Change a handful of training points and the best split at
           the root can flip to a different feature or threshold. When the root moves, <em>every</em> subproblem
           beneath it is redefined, and the entire tree below reorganises. There&rsquo;s no averaging, no
@@ -78,7 +78,7 @@ export default function BiasVariancePage() {
           bias untouched. Trees are the <em>ideal</em> base learner for this: their bias is already near zero,
           so if you can grow many diverse deep trees and average them, you drive variance down and keep bias
           low — a predictor better than any single tree could be. That&rsquo;s <strong>bagging</strong> and{" "}
-          <strong>random forests</strong>. <strong>Boosting</strong> plays the other side: it combines many
+          <strong>random forests</strong>. <strong>Boosting</strong> plays the other side: it combines many{" "}
           <em> high-bias</em> shallow trees to drive bias down instead. The tree&rsquo;s awkward
           bias–variance profile isn&rsquo;t a flaw to tolerate — it&rsquo;s the raw material the whole family
           is built on.

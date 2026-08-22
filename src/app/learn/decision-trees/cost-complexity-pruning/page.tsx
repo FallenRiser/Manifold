@@ -1,5 +1,8 @@
 import Link from "next/link";
 import { Quiz } from "@/components/Quiz";
+import { PruningLab } from "@/components/labs/PruningLab";
+import { PredictPrompt } from "@/components/PredictPrompt";
+import { LabFrame } from "@/components/LabFrame";
 import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 import { M, MathBlock } from "@/components/Math";
 import { CodeBlock } from "@/components/CodeBlock";
@@ -29,7 +32,7 @@ export default function CostComplexityPruningPage() {
       <div className="lesson">
         <h2>Charge rent per leaf</h2>
         <p>
-          Grow the tree out (call it <M>{String.raw`T_0`}</M>). Now score any subtree <M>{String.raw`T`}</M>
+          Grow the tree out (call it <M>{String.raw`T_0`}</M>). Now score any subtree <M>{String.raw`T`}</M>{" "}
           not just by its error but by its error <em>plus a penalty for size</em>:
         </p>
         <MathBlock>{String.raw`R_\alpha(T) = R(T) + \alpha\,|\widetilde{T}|`}</MathBlock>
@@ -57,10 +60,31 @@ export default function CostComplexityPruningPage() {
             is just the root — predict the overall majority.</li>
         </ul>
         <p>
-          This is <strong>weakest-link pruning</strong>. The elegant part: although <M>{String.raw`\alpha`}</M>
+          This is <strong>weakest-link pruning</strong>. The elegant part: although <M>{String.raw`\alpha`}</M>{" "}
           is continuous, it produces only finitely many distinct trees, and each is optimal for a whole range
           of <M>{String.raw`\alpha`}</M>. So pruning reduces to choosing one tree from a short list.
         </p>
+
+        <h2>Walk the pruning path</h2>
+        <p>
+          The lab below grows a full tree on noisy data, then walks its real weakest-link sequence. Drag{" "}
+          <M>{String.raw`\ \alpha`}</M> from zero (the full tree, left) up to where only the root survives
+          (right), and watch training accuracy and held-out <em>validation</em> accuracy move.
+        </p>
+
+        <PredictPrompt
+          accent={TREES}
+          prompt={<>As you prune more (raise α), what does the <em>validation</em> accuracy do?</>}
+          options={["Falls the whole time", "Rises, peaks, then falls", "Only ever rises"]}
+        />
+
+        <LabFrame
+          accent={TREES}
+          tryThis={<>Drag α up from the full tree. Watch training accuracy fall steadily while validation accuracy climbs — then find where validation turns over, and hit &ldquo;Snap to best α.&rdquo;</>}
+          insight={<>Training accuracy falls monotonically as the tree shrinks — the full tree always wins on training. Validation tells the real story: it <em>rises</em> as noise-branches are cut, peaks at a small tree (here ~5 leaves), then <em>falls</em> once pruning starts removing real structure. That peak is the tree cross-validation keeps; everything left of it is memorised noise, everything right is over-pruned.</>}
+        >
+          <PruningLab />
+        </LabFrame>
 
         <h2>Pick α by cross-validation</h2>
         <p>
@@ -138,7 +162,7 @@ final = DecisionTreeClassifier(random_state=0, ccp_alpha=best_alpha).fit(X_train
 
         <PrevNext
           prev={{ href: "/learn/decision-trees/pre-pruning", label: <>← Pre-pruning: the stopping knobs</> }}
-          next={{ href: "/learn/decision-trees/why-greedy", label: <>Next up · Why greedy? →</> }}
+          next={{ href: "/learn/decision-trees/the-algorithm-family", label: <>Next up · The algorithm family: ID3, C4.5, CHAID →</> }}
         />
       </div>
     </article>

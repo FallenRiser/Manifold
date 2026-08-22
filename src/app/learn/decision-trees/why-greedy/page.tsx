@@ -43,8 +43,8 @@ export default function WhyGreedyPage() {
 
         <h2>Impurity is a surrogate for what we actually want</h2>
         <p>
-          There&rsquo;s a second compromise hiding inside the first. What we ultimately care about is
-          <em> generalisation error</em>, which we can&rsquo;t see at training time. So the tree optimises a
+          There&rsquo;s a second compromise hiding inside the first. What we ultimately care about is{" "}
+          <em> generalisation error</em>, which we can&rsquo;t see at training time. So the tree optimises a{" "}
           <strong> surrogate</strong> we <em>can</em> compute — the immediate impurity drop — and trusts that
           locally purer nodes lead to a globally better tree. Most of the time that trust is well placed:
           impurity reduction is a reasonable, if myopic, proxy for progress.
@@ -83,7 +83,7 @@ export default function WhyGreedyPage() {
         </Callout>
 
         <PrevNext
-          prev={{ href: "/learn/decision-trees/cost-complexity-pruning", label: <>← Cost-complexity pruning</> }}
+          prev={{ href: "/learn/decision-trees/class-weights-and-cost-sensitive", label: <>← Class weights & cost-sensitive trees</> }}
           next={{ href: "/learn/decision-trees/bias-and-variance-of-trees", label: <>Next up · The bias–variance profile →</> }}
         />
       </div>

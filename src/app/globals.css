@@ -35,6 +35,42 @@
   --c-rl: #c28400;           /* riso gold (text-safe) */
   --c-fundamentals: #d97a00; /* riso bright amber */
   --c-metrics: #6e6e78;
+  --c-space: #4b3fd1;         /* deep-space indigo — asteroid-hazard capstone accent */
+
+  /* Always-dark "sky" palette for the asteroid capstone's special sections.
+     Theme-independent (the sky is dark in light mode too), so defined once. */
+  --space-sky: #0b0b16;
+  --space-panel: #191933;
+  --space-border: #23233a;
+  --space-star: #cdd0ff;
+  --space-ink: #f4f2ff;
+  --space-ink-soft: #c9c6e6;
+  --space-faint: #a7a4cc;
+  --space-haz: #f7b23b;       /* hazardous class on the dark sky */
+  --space-safe: #8f83ff;      /* not-hazardous class on the dark sky */
+  --space-orbit: #5a5a8a;
+
+  /* Transfer test I — pulsars. A dark radio-observatory palette (theme-independent,
+     like the sky above): a distinct field, so it gets a distinct skin. */
+  --radio-bg: #06100f;
+  --radio-panel: #0d201f;
+  --radio-border: #1b3836;
+  --radio-ink: #e9fbf9;
+  --radio-ink-soft: #b4dedb;
+  --radio-faint: #78b0ac;
+  --radio-pulse: #35cdd2;     /* radio-cyan accent (on the dark panel) */
+  --radio-accent: #0e8f95;    /* deeper teal, legible on the editorial body */
+
+  /* Transfer test II — bank marketing. An always-LIGHT ledger-paper palette: a
+     cold, non-space field, so it deliberately breaks from the dark panels. */
+  --bank-bg: #f5efe2;
+  --bank-panel: #eee4d1;
+  --bank-border: #d7cab0;
+  --bank-ink: #29230f;
+  --bank-ink-soft: #5a5137;
+  --bank-faint: #8a7d5f;
+  --bank-accent: #1f7a52;     /* term-deposit green */
+  --bank-rule: #c8b78f;       /* ledger rule lines */
 
   --good: #009155;
   --warn: #d97a00;
@@ -70,6 +106,7 @@
   --c-rl: #f0b429;
   --c-fundamentals: #f59e2d;
   --c-metrics: #a1a19a;
+  --c-space: #9385ff;         /* deep-space indigo → periwinkle in dark */
 
   --good: #2ecc8f;
   --warn: #f0b429;
@@ -97,6 +134,7 @@
   --color-neural: var(--c-neural);
   --color-fundamentals: var(--c-fundamentals);
   --color-metrics: var(--c-metrics);
+  --color-space: var(--c-space);
   --color-good: var(--good);
   --color-warn: var(--warn);
   --color-bad: var(--bad);
@@ -417,6 +455,11 @@ a.gtrack:hover { color: var(--accent); padding-left: 5px; }
   * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
   .reveal-item { opacity: 1 !important; transform: none !important; }
 }
+
+/* Asteroid capstone: one-shot "arrival" fade-in for the sky (motion as
+   punctuation, never a loop). The reduced-motion rule above neutralises it. */
+@keyframes neoSkyIn { from { opacity: 0; } to { opacity: 0.9; } }
+.neo-sky { opacity: 0.9; animation: neoSkyIn 1100ms ease-out both; }
 
 /* ----- sugar-high syntax tokens — restrained print pigments in both modes
    (no Dracula / neon: PROJECT.md §10.1 rule 5) ----- */

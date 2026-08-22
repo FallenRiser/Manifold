@@ -73,8 +73,8 @@ export default function DecisionTreesHubPage() {
 
         <LabFrame
           accent={TREES}
-          tryThis={<>Start at depth 1 and step up one at a time. Watch the boxes multiply, and watch the two accuracy bars — <em>train</em> and <em>test</em> — pull apart.</>}
-          insight={<>Depth 2 finds the four quadrants (test jumps to ~80%). Test accuracy peaks around depth 3 (~84%), then <em>falls</em> even as train accuracy marches to a perfect 100%. That widening gap is the tree memorising the noise — the defining failure mode of a single tree.</>}
+          tryThis={<>Start at depth 1 and step up one at a time — watch the <em>boxes</em> multiply on the left and the <em>tree</em> grow on the right, and the two accuracy bars pull apart. Then flip to the <strong>Diagonal</strong> dataset and see what a tree does with a slanted boundary.</>}
+          insight={<>Depth 2 finds the four quadrants (test jumps to ~80%); test peaks around depth 3 (~84%), then <em>falls</em> as train marches to 100% — that widening gap is the tree memorising noise. On the Diagonal set, notice the boxes forming a clumsy <em>staircase</em> along the diagonal: a tree can only cut straight across an axis, so a slanted line is exactly what it&rsquo;s worst at.</>}
         >
           <DecisionTreeLab />
         </LabFrame>
@@ -95,7 +95,8 @@ export default function DecisionTreesHubPage() {
           <li><strong>They ask about features on their own terms.</strong> No scaling, no one-hot dance for
             ordered categories, numeric and categorical side by side, missing values handled natively.</li>
           <li><strong>They carve non-linear, interacting boundaries</strong> out of nothing but straight cuts —
-            the checkerboard above is invisible to a linear model.</li>
+            the checkerboard above is invisible to a linear model. (The flip side: a plain <em>diagonal</em>{" "}
+            takes a whole staircase of cuts, as the lab&rsquo;s second dataset shows.)</li>
           <li><strong>They&rsquo;re high-variance.</strong> That&rsquo;s a weakness alone — but it&rsquo;s
             exactly the raw material that <Link href="/map" style={link}>bagging and boosting</Link> turn into
             the strongest tabular models there are.</li>

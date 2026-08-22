@@ -80,7 +80,7 @@ export default function HowTreesOverfitPage() {
         </Callout>
 
         <PrevNext
-          prev={{ href: "/learn/decision-trees/numeric-and-categorical-splits", label: <>← Numeric & categorical splits</> }}
+          prev={{ href: "/learn/decision-trees/missing-values-and-surrogate-splits", label: <>← Missing values & surrogate splits</> }}
           next={{ href: "/learn/decision-trees/pre-pruning", label: <>Next up · Pre-pruning: the stopping knobs →</> }}
         />
       </div>

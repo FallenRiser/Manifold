@@ -139,7 +139,7 @@ for j in np.argsort(perm.importances_mean)[::-1]:
 
         <PrevNext
           prev={{ href: "/learn/decision-trees/bias-and-variance-of-trees", label: <>← The bias–variance profile</> }}
-          next={{ href: "/learn/decision-trees/when-to-use-a-tree", label: <>Next up · When to use a single tree →</> }}
+          next={{ href: "/learn/decision-trees/probabilities-and-calibration", label: <>Next up · Probabilities & calibration →</> }}
         />
       </div>
     </article>

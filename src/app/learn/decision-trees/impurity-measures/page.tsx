@@ -108,7 +108,7 @@ export default function ImpurityMeasuresPage() {
         </p>
         <MathBlock>{String.raw`\text{gain} = I(\text{parent}) - \frac{n_L}{n}\,I(L) - \frac{n_R}{n}\,I(R)`}</MathBlock>
         <p>
-          With <M>{String.raw`I`}</M> = entropy, this quantity is literally the <em>mutual information</em>
+          With <M>{String.raw`I`}</M> = entropy, this quantity is literally the <em>mutual information</em>{" "}
           between the split and the label — hence the name &ldquo;information gain.&rdquo; With Gini it has no
           information-theoretic name but behaves the same way. The tree tries every candidate split and keeps
           the one with the largest gain, node after node.

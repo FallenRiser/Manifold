@@ -44,7 +44,7 @@ export default function RegressionTreesPage() {
 
         <h2>The fit is a staircase</h2>
         <p>
-          Because every leaf predicts a single constant (its mean), a regression tree&rsquo;s prediction is
+          Because every leaf predicts a single constant (its mean), a regression tree&rsquo;s prediction is{" "}
           <strong> piecewise constant</strong>: flat within each leaf&rsquo;s region, jumping at the split
           boundaries. On 1-D data it looks exactly like a staircase.
         </p>
@@ -72,13 +72,13 @@ export default function RegressionTreesPage() {
             as crude steps. This is precisely where a single tree loses to a spline or a linear model —
             and where an <em>ensemble</em> of many trees, whose averaged steps blur into something smooth,
             wins it back.</li>
-          <li><strong>Robust to monotone feature transforms.</strong> Splits depend only on the <em>order</em>
+          <li><strong>Robust to monotone feature transforms.</strong> Splits depend only on the <em>order</em>{" "}
             of feature values, so logging or scaling an input changes nothing — a convenience linear models
             don&rsquo;t enjoy.</li>
         </ul>
 
         <Callout color={TREES} title={<>Same tree, both jobs</>}>
-          This is why the canonical algorithm is called <strong>CART</strong> — Classification <em>And</em>
+          This is why the canonical algorithm is called <strong>CART</strong> — Classification <em>And</em>{" "}
           Regression Trees. One structure, one greedy procedure; only the leaf value (majority vs mean) and the
           impurity (Gini/entropy vs variance) change. Random forests and gradient boosting inherit both modes
           for free.

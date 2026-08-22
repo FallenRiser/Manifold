@@ -84,7 +84,7 @@ export default function GoodSplitPage() {
         </LabFrame>
 
         <p>
-          Notice the greedy instinct in action: the winning cut doesn&rsquo;t balance the two sides, it
+          Notice the greedy instinct in action: the winning cut doesn&rsquo;t balance the two sides, it{" "}
           <em> purifies one of them</em>. The right child becomes entirely one class; the left is left holding
           the ambiguous middle, to be split again later. This is how a tree reasons at every single node.
         </p>

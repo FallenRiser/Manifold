@@ -43,8 +43,8 @@ export const FAMILIES: Group[] = [
     blurb: "Interpretable splits, then the power of combining many.",
     tracks: [
       { title: "Decision trees", href: "/learn/decision-trees" },
-      { title: "Bagging & random forests" },
-      { title: "Boosting (AdaBoost, gradient boosting)" },
+      { title: "Bagging & random forests", href: "/learn/random-forests" },
+      { title: "Boosting (AdaBoost, gradient boosting)", href: "/learn/boosting" },
       { title: "Stacking & blending" },
     ],
   },
@@ -102,6 +102,7 @@ export const PILLARS: Group[] = [
     blurb: "Given raw data, what do you actually do — step by step?",
     tracks: [
       { title: "California housing capstone", href: "/learn/california-housing-capstone" },
+      { title: "Asteroid-hazard capstone", href: "/learn/asteroid-hazard-capstone" },
       { title: "Exploratory data analysis" },
       { title: "Framing & preprocessing" },
       { title: "Baselines & model selection" },

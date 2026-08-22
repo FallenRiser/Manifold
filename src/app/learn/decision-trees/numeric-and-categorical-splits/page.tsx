@@ -31,7 +31,7 @@ export default function SplitsPage() {
           For a numeric feature, a split is a threshold <M>{String.raw`x_j \le t`}</M>. The only thresholds
           worth trying sit <em>between</em> adjacent sorted values — anywhere inside a gap gives the identical
           partition. So the tree sorts the feature&rsquo;s values (<M>{String.raw`O(n\log n)`}</M>), places a
-          candidate at each midpoint, and sweeps left to right updating the impurity in one pass. At most
+          candidate at each midpoint, and sweeps left to right updating the impurity in one pass. At most{" "}
           <M>{String.raw`\ n-1`}</M> candidates per feature.
         </p>
         <p>
@@ -74,27 +74,17 @@ export default function SplitsPage() {
             <M>{String.raw`k`}</M> binary columns. Each split can then only peel off <em>one</em> category at a
             time, which fragments the data and buries the feature&rsquo;s importance across many thin columns —
             actively harmful for high-cardinality features in trees.</li>
-          <li><strong>Native categorical handling</strong> (LightGBM, modern XGBoost, and sklearn&rsquo;s
+          <li><strong>Native categorical handling</strong> (LightGBM, modern XGBoost, and sklearn&rsquo;s{" "}
             <code> HistGradientBoosting</code>) implements the ordering trick internally — the right answer when
             you have it.</li>
         </ul>
 
-        <h2>Missing values, without imputing</h2>
+        <h2>And a third kind of value: missing</h2>
         <p>
-          Trees can handle a missing feature value <em>during the split itself</em>, which is rarer than it
-          should be among ML models. Two schemes dominate:
-        </p>
-        <ul style={ul}>
-          <li><strong>Surrogate splits</strong> (classic CART): for each split, find backup features whose
-            split mimics the primary one, and use a surrogate to route any point whose primary value is
-            missing.</li>
-          <li><strong>Learned default direction</strong> (XGBoost, LightGBM, sklearn&rsquo;s histogram trees):
-            simply try sending all the missing-value points left, then right, and keep whichever reduces the
-            loss more. The missing-ness itself becomes part of the model — often informative.</li>
-        </ul>
-        <p>
-          Either way, no separate imputation step is required, and &ldquo;this value is missing&rdquo; can be a
-          signal the tree exploits rather than a gap you must paper over.
+          There&rsquo;s one more case a split has to handle — a value that isn&rsquo;t there at all. Trees can
+          route missing values <em>during the split itself</em>, no imputation required, and can even treat
+          missingness as a signal. That mechanism — surrogate splits and learned default directions — is rich
+          enough for its own page, <Link href="/learn/decision-trees/missing-values-and-surrogate-splits" style={link}>next</Link>.
         </p>
 
         <Quiz
@@ -135,7 +125,7 @@ export default function SplitsPage() {
 
         <PrevNext
           prev={{ href: "/learn/decision-trees/regression-trees", label: <>← Regression trees</> }}
-          next={{ href: "/learn/decision-trees/how-trees-overfit", label: <>Next up · How a tree overfits →</> }}
+          next={{ href: "/learn/decision-trees/missing-values-and-surrogate-splits", label: <>Next up · Missing values & surrogate splits →</> }}
         />
       </div>
     </article>
@@ -143,3 +133,4 @@ export default function SplitsPage() {
 }
 
 const ul: React.CSSProperties = { margin: "0 0 12px", paddingLeft: "1.3em", fontSize: 15, color: "var(--muted)", lineHeight: 1.8 };
+const link: React.CSSProperties = { color: "var(--brand)", textDecoration: "none" };
