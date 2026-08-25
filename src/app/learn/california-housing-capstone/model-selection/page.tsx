@@ -14,7 +14,7 @@ export default function ModelSelectionPage() {
   return (
     <article>
       <LessonHeader
-        chips={[{ label: "Capstone", color: "var(--c-regression)" }, { label: <>Decision &amp; delivery</>, color: "var(--c-metrics)" }]}
+        chips={[{ label: "Capstone", color: "var(--c-housing)" }, { label: <>Decision &amp; delivery</>, color: "var(--c-metrics)" }]}
         time="about 10 minutes"
         title={<>Final model selection</>}
         intro={<>
@@ -156,7 +156,7 @@ export default function ModelSelectionPage() {
           <li><strong>For a quick, robust default</strong> with near-zero tuning, the random forest is already 0.834.</li>
         </ul>
 
-        <Callout color="var(--c-regression)" title={<>&ldquo;Best model&rdquo; depends on the question</>}>
+        <Callout color="var(--c-housing)" title={<>&ldquo;Best model&rdquo; depends on the question</>}>
           There is no single best model — there&rsquo;s the best model <em>for a stated objective and budget</em>. For
             raw prediction, it&rsquo;s the stacking ensemble; for a maintainable system, XGBoost; for inference, Tobit; for
             transparency, the linear model. We can name all four because we built the full ladder and measured every
@@ -191,7 +191,7 @@ print("random :", r2_score(y, p_random))    # 0.856
 print("spatial:", r2_score(y, p_spatial))   # 0.699`;
 
 const ul: React.CSSProperties = { margin: "0 0 10px", paddingLeft: "1.3em", fontSize: 15, color: "var(--muted)", lineHeight: 1.8 };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-regression) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-regression) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0" };
+const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-housing) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-housing) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0" };
 const figWrap: React.CSSProperties = { background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 14, padding: 14, margin: "1.2rem 0" };
 const cap: React.CSSProperties = { fontSize: 12, color: "var(--muted)", marginTop: 8, lineHeight: 1.5 };
 const th: React.CSSProperties = { textAlign: "left", padding: "7px 9px", borderBottom: "2px solid var(--border-strong)", color: "var(--muted)", fontWeight: 500, fontSize: 12 };

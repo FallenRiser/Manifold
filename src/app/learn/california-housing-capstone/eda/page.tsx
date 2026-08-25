@@ -22,7 +22,7 @@ function HistFig() {
       <rect x={0} y={0} width={W} height={H} rx={8} fill="var(--canvas)" stroke="var(--border-strong)" />
       {HIST.map((c, i) => {
         const h = (c / max) * (H - padT - padB), last = i === HIST.length - 1;
-        return <rect key={i} x={Math.round((padL + i * bw + 1) * 100) / 100} y={Math.round((H - padB - h) * 100) / 100} width={Math.round((bw - 2) * 100) / 100} height={Math.round(h * 100) / 100} fill={last ? "var(--bad, #d9534f)" : "var(--c-regression)"} fillOpacity={last ? 0.85 : 0.7} rx={1} />;
+        return <rect key={i} x={Math.round((padL + i * bw + 1) * 100) / 100} y={Math.round((H - padB - h) * 100) / 100} width={Math.round((bw - 2) * 100) / 100} height={Math.round(h * 100) / 100} fill={last ? "var(--bad, #d9534f)" : "var(--c-housing)"} fillOpacity={last ? 0.85 : 0.7} rx={1} />;
       })}
       <text x={Math.round(padL + (HIST.length - 0.5) * bw)} y={26} fontSize={8} fill="var(--bad, #d9534f)" textAnchor="end">cap →</text>
       <text x={W / 2} y={H - 4} fontSize={9} fill="var(--faint)" textAnchor="middle">TargetPrice · 0 → 5.0</text>
@@ -36,8 +36,8 @@ function IncomeFig() {
   return (
     <svg viewBox={`0 0 ${W} ${H}`} style={{ width: "100%", height: "auto", display: "block" }}>
       <rect x={0} y={0} width={W} height={H} rx={8} fill="var(--canvas)" stroke="var(--border-strong)" />
-      <polyline points={INC_MID.map((m, i) => `${sx(m)},${sy(INC_PRICE[i])}`).join(" ")} fill="none" stroke="var(--c-regression)" strokeWidth={2.4} />
-      {INC_MID.map((m, i) => <circle key={i} cx={sx(m)} cy={sy(INC_PRICE[i])} r={3} fill="var(--c-regression)" />)}
+      <polyline points={INC_MID.map((m, i) => `${sx(m)},${sy(INC_PRICE[i])}`).join(" ")} fill="none" stroke="var(--c-housing)" strokeWidth={2.4} />
+      {INC_MID.map((m, i) => <circle key={i} cx={sx(m)} cy={sy(INC_PRICE[i])} r={3} fill="var(--c-housing)" />)}
       <text x={W / 2} y={H - 4} fontSize={9} fill="var(--faint)" textAnchor="middle">median income →</text>
       <text x={10} y={H / 2} fontSize={9} fill="var(--faint)" textAnchor="middle" transform={`rotate(-90 10 ${H / 2})`}>mean price</text>
     </svg>
@@ -48,7 +48,7 @@ export default function EDAPage() {
   return (
     <article>
       <LessonHeader
-        chips={[{ label: "Capstone", color: "var(--c-regression)" }, { label: "2 · Understand the data", color: "var(--c-metrics)" }]}
+        chips={[{ label: "Capstone", color: "var(--c-housing)" }, { label: "2 · Understand the data", color: "var(--c-metrics)" }]}
         time="about 8 minutes"
         title={<>EDA: distributions & signal</>}
         intro={<>
@@ -114,7 +114,7 @@ export default function EDAPage() {
           correlation buries it.
         </p>
 
-        <Callout color="var(--c-regression)" title={<>What EDA already told us about modeling</>}>
+        <Callout color="var(--c-housing)" title={<>What EDA already told us about modeling</>}>
           Before fitting anything: income gives a clean linear backbone, the target is censored at the top,
             and geography is the biggest signal but is non-linear and only weakly <em>linearly</em> correlated.
             That single paragraph predicts the entire shape of this project — a decent linear baseline, a known

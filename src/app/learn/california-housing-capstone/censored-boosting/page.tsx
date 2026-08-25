@@ -19,7 +19,7 @@ export default function CensoredBoostingPage() {
   return (
     <article>
       <LessonHeader
-        chips={[{ label: "Capstone", color: "var(--c-regression)" }, { label: "Bonus · Combining the upgrades", color: "var(--c-trees)" }]}
+        chips={[{ label: "Capstone", color: "var(--c-housing)" }, { label: "Bonus · Combining the upgrades", color: "var(--c-trees)" }]}
         time="about 12 minutes"
         title={<>Bonus · Censored boosting &amp; per-prediction SHAP</>}
         intro={<>
@@ -118,7 +118,7 @@ mean error on cap-zone blocks:  plain -0.556   censored -0.439`}</CodeOutput>
             means at least 5.0&rdquo; looks like in production.</div>
         </div>
 
-        <Callout color="var(--c-regression)" title={<>Which one ships?</>}>
+        <Callout color="var(--c-housing)" title={<>Which one ships?</>}>
           It depends on the deliverable — as always. For the test-set submission scored against <em>clipped</em>{" "}
             prices, the two are indistinguishable, so the simpler plain objective wins. But for a real valuation tool —
             where the expensive tail is precisely where lawsuits live, and where &ldquo;this block is worth <em>more than</em>{" "}
@@ -180,7 +180,7 @@ mean error on cap-zone blocks:  plain -0.556   censored -0.439`}</CodeOutput>
           &ldquo;the model missed&rdquo; into &ldquo;the model leaned on income for a block too small to trust.&rdquo;
         </p>
 
-        <Callout color="var(--c-regression)" title={<>What this epilogue actually taught</>}>
+        <Callout color="var(--c-housing)" title={<>What this epilogue actually taught</>}>
           Two things, and neither is a score. First: the components of this capstone <em>compose</em> — the Tobit
             likelihood from Upgrade 2 dropped straight into the booster from Upgrade 3, because losses are plug-in
             parts. Once you see models as form + loss + optimiser, &ldquo;combine the upgrades&rdquo; stops being research and

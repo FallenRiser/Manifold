@@ -12,7 +12,7 @@ export default function TakeawaysPage() {
   return (
     <article>
       <LessonHeader
-        chips={[{ label: "Capstone", color: "var(--c-regression)" }, { label: <>Decision &amp; delivery</>, color: "var(--c-metrics)" }]}
+        chips={[{ label: "Capstone", color: "var(--c-housing)" }, { label: <>Decision &amp; delivery</>, color: "var(--c-metrics)" }]}
         time="about 8 minutes"
         title={<>Predictions & takeaways</>}
         intro={<>
@@ -50,7 +50,7 @@ after clip(0.15, 5.0): min = 0.438  max = 5.00`}</CodeOutput>
           lacks. A one-line fix that prevents an obviously-wrong deliverable.
         </p>
 
-        <Callout color="var(--c-regression)" title={<>What we&rsquo;d still do, given more time</>}>
+        <Callout color="var(--c-housing)" title={<>What we&rsquo;d still do, given more time</>}>
           Even at R² 0.858 the work isn&rsquo;t &ldquo;done.&rdquo; Next steps: <strong>combine the upgrades</strong> — a
             censored <em>boosting</em> objective marries Upgrade 2&rsquo;s cap-awareness with the ensemble&rsquo;s power,
             attacking the one weakness we couldn&rsquo;t (the cap-zone RMSE). We actually did this one — the{" "}

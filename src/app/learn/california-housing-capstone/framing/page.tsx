@@ -13,7 +13,7 @@ export default function FramingPage() {
   return (
     <article>
       <LessonHeader
-        chips={[{ label: "Capstone", color: "var(--c-regression)" }, { label: "1 · The project", color: "var(--c-metrics)" }]}
+        chips={[{ label: "Capstone", color: "var(--c-housing)" }, { label: "1 · The project", color: "var(--c-metrics)" }]}
         time="about 8 minutes"
         title={<>Framing the problem</>}
         intro={<>
@@ -75,7 +75,7 @@ TargetPrice  count=16512  mean=2.07  std=1.16
           rationalising whichever number looks best later.
         </p>
 
-        <Callout color="var(--c-regression)" title={<>3 — The fact that shapes everything: the target is censored</>}>
+        <Callout color="var(--c-housing)" title={<>3 — The fact that shapes everything: the target is censored</>}>
           The output above already flagged it: the target maxes out at exactly <strong>5.0</strong>, with{" "}
             <strong>808 blocks (4.9%)</strong> pinned at that ceiling. This is <strong>censoring</strong> — every
             home worth $500k or $900k was recorded as &ldquo;5.0.&rdquo; We haven&rsquo;t modeled anything yet and already know

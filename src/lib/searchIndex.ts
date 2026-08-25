@@ -8,9 +8,11 @@ import { DECISION_TREES_TRACK } from "./decisionTreesTrack";
 import { RANDOM_FORESTS_TRACK } from "./randomForestsTrack";
 import { BOOSTING_TRACK } from "./boostingTrack";
 import { KM_TRACK } from "./kMeansTrack";
+import { PCA_TRACK } from "./pcaTrack";
 import { KNN_TRACK } from "./knnTrack";
 import { LOG_TRACK } from "./logisticRegressionTrack";
 import { EVAL_TRACK } from "./evaluationTrack";
+import { MF_TRACK } from "./mathFoundationsTrack";
 import { CAP_TRACK } from "./housingCapstoneTrack";
 import { NEO_TRACK } from "./neoCapstoneTrack";
 import type { TrackChapter } from "./linearRegressionTrack";
@@ -37,9 +39,11 @@ const TRACKS: { name: string; accent: string; chapters: TrackChapter[] }[] = [
   { name: "Random forests", accent: "var(--c-trees)", chapters: RANDOM_FORESTS_TRACK },
   { name: "Boosting", accent: "var(--c-trees)", chapters: BOOSTING_TRACK },
   { name: "k-Means", accent: "var(--c-clustering)", chapters: KM_TRACK },
+  { name: "Principal component analysis", accent: "var(--c-dimred)", chapters: PCA_TRACK },
   { name: "k-Nearest neighbors", accent: "var(--c-classification)", chapters: KNN_TRACK },
   { name: "Logistic regression", accent: "var(--c-classification)", chapters: LOG_TRACK },
   { name: "Evaluation & metrics", accent: "var(--c-metrics)", chapters: EVAL_TRACK },
+  { name: "Math foundations", accent: "var(--c-fundamentals)", chapters: MF_TRACK },
   { name: "Housing capstone", accent: "var(--c-regression)", chapters: CAP_TRACK },
   { name: "Asteroid-hazard capstone", accent: "var(--c-space)", chapters: NEO_TRACK },
 ];

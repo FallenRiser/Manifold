@@ -17,7 +17,7 @@ export default function ModelZooPage() {
   return (
     <article>
       <LessonHeader
-        chips={[{ label: "Capstone", color: "var(--c-regression)" }, { label: "Upgrade 3 · The model zoo", color: "var(--c-trees)" }]}
+        chips={[{ label: "Capstone", color: "var(--c-housing)" }, { label: "Upgrade 3 · The model zoo", color: "var(--c-trees)" }]}
         time="about 14 minutes"
         title={<>Beyond linear — the model zoo</>}
         intro={<>
@@ -129,7 +129,7 @@ elapsed: 41.2s`}</CodeOutput>
           </div>
         </div>
 
-        <Callout color="var(--c-regression)" title={<>The payoff of the whole arc</>}>
+        <Callout color="var(--c-housing)" title={<>The payoff of the whole arc</>}>
           This jump validates the diagnostic-driven approach. We didn&rsquo;t reach for boosting first and hope — we
             <em> earned</em> it by showing the linear model&rsquo;s residuals held non-linear, interacting structure that
             even dozens of polynomial terms only half-captured, then chose the tools built for exactly that. And we didn&rsquo;t

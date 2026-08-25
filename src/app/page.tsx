@@ -3,6 +3,9 @@ import { HeroFitLab } from "@/components/HeroFitLab";
 import { ContinueCard } from "@/components/ContinueCard";
 import { Reveal } from "@/components/Reveal";
 import { HousingGeoMap } from "@/components/figures/HousingGeoMap";
+import { NeoField } from "@/components/figures/NeoField";
+import { CapstoneCard } from "@/components/CapstoneCard";
+import { CAPSTONES } from "@/lib/siteMap";
 import { LR_TOTAL, LR_DONE } from "@/lib/linearRegressionTrack";
 import { REG_TOTAL, REG_DONE } from "@/lib/regularizationTrack";
 import { POLY_TOTAL, POLY_DONE } from "@/lib/polynomialRegressionTrack";
@@ -192,49 +195,19 @@ export default function Home() {
         </section>
       </Reveal>
 
-      {/* ---------- Capstone showcase ---------- */}
+      {/* ---------- Capstones showcase ---------- */}
       <Reveal>
         <section className="chapter" style={{ marginBottom: 84 }}>
-          <div className="chapter-eyebrow">The capstone</div>
-          <h2 className="chapter-title">One real dataset, taken all the way.</h2>
+          <div className="chapter-eyebrow">The capstones</div>
+          <h2 className="chapter-title">Real datasets, taken all the way.</h2>
           <p className="chapter-sub">
-            16,512 California census blocks, the way a senior data scientist works: frame, explore,
-            baseline, diagnose — then three upgrades, each earned by a named diagnostic.
+            Where the algorithms meet reality. Each capstone works one messy, real dataset the way a
+            senior data scientist would — framing, honest evaluation, and a justified model climb — with
+            every number computed from the actual data.
           </p>
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "minmax(0, 1.1fr) minmax(0, 0.9fr)",
-              gap: 28,
-              alignItems: "center",
-            }}
-            className="hero-grid"
-          >
-            <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 16, padding: 14 }}>
-              <HousingGeoMap />
-            </div>
-            <div>
-              <div style={{ display: "flex", gap: 12, marginBottom: 16 }}>
-                {[
-                  { label: "linear baseline", value: "R² 0.653" },
-                  { label: "stacked ensemble", value: "R² 0.858" },
-                  { label: "error cut", value: "~62%" },
-                ].map((s) => (
-                  <div key={s.label} style={{ background: "var(--surface-2)", borderRadius: 12, padding: "10px 14px" }}>
-                    <div style={{ fontSize: 11, color: "var(--muted)" }}>{s.label}</div>
-                    <div className="font-display" style={{ fontSize: 17, fontWeight: 500, color: "var(--ink)" }}>{s.value}</div>
-                  </div>
-                ))}
-              </div>
-              <p style={{ fontSize: 14.5, lineHeight: 1.7, color: "var(--muted)", margin: "0 0 18px" }}>
-                Spatial features, a censored Tobit model, and a full model zoo — random forest,
-                XGBoost, LightGBM, stacking — with every number and plot computed from the actual
-                data. Not a toy walkthrough: the reasoning behind every decision.
-              </p>
-              <Link href="/learn/california-housing-capstone" style={{ fontSize: 14, fontWeight: 500, color: "var(--ink)", textDecoration: "underline", textUnderlineOffset: 3 }}>
-                Read the capstone →
-              </Link>
-            </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 20 }}>
+            <CapstoneCard capstone={CAPSTONES[0]} figure={<HousingGeoMap />} />
+            <CapstoneCard capstone={CAPSTONES[1]} figure={<NeoField />} />
           </div>
         </section>
       </Reveal>

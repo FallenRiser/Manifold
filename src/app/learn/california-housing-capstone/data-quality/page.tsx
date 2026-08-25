@@ -13,7 +13,7 @@ export default function DataQualityPage() {
   return (
     <article>
       <LessonHeader
-        chips={[{ label: "Capstone", color: "var(--c-regression)" }, { label: "2 · Understand the data", color: "var(--c-metrics)" }]}
+        chips={[{ label: "Capstone", color: "var(--c-housing)" }, { label: "2 · Understand the data", color: "var(--c-metrics)" }]}
         time="about 8 minutes"
         title={<>Data quality & cleaning</>}
         intro={<>
@@ -83,7 +83,7 @@ skew:  TotalRooms 18.6   AvgOccupancy 87.9
           ]}
         />
 
-        <Callout color="var(--c-regression)" title={<>The judgement: correct, transform, or impute — rarely delete</>}>
+        <Callout color="var(--c-housing)" title={<>The judgement: correct, transform, or impute — rarely delete</>}>
           Deletion is tempting but wrong here: it discards rows that are fine on every other feature, and it&rsquo;s
             impossible at prediction time — the test set has the same artifacts and you must score every row.
             So: <strong>impossible values</strong> (negative pop) become missing and get imputed;{" "}

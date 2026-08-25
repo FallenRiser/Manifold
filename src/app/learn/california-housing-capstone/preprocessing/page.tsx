@@ -12,7 +12,7 @@ export default function PreprocessingPage() {
   return (
     <article>
       <LessonHeader
-        chips={[{ label: "Capstone", color: "var(--c-regression)" }, { label: "3 · The linear baseline", color: "var(--c-metrics)" }]}
+        chips={[{ label: "Capstone", color: "var(--c-housing)" }, { label: "3 · The linear baseline", color: "var(--c-metrics)" }]}
         time="about 8 minutes"
         title={<>Preprocessing pipeline</>}
         intro={<>
@@ -45,7 +45,7 @@ design matrix: (16512, 10)  -> ready for modeling`}</CodeOutput>
           data is now honest and model-ready.
         </p>
 
-        <Callout color="var(--c-regression)" title={<>The one rule that prevents most disasters: fit on train, apply to test</>}>
+        <Callout color="var(--c-housing)" title={<>The one rule that prevents most disasters: fit on train, apply to test</>}>
           Every statistic the pipeline learns — the medians, the scaler&rsquo;s means and standard deviations — is
             computed on the <em>training</em> data and reused on the test data, never re-fit. Re-fitting per split
             leaks information and inflates your scores. Wrapping the scaler in a scikit-learn <code>Pipeline</code>

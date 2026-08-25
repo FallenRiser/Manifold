@@ -13,7 +13,7 @@ export default function SpatialFeaturesPage() {
   return (
     <article>
       <LessonHeader
-        chips={[{ label: "Capstone", color: "var(--c-regression)" }, { label: "Upgrade 1 · Geography", color: "var(--c-metrics)" }]}
+        chips={[{ label: "Capstone", color: "var(--c-housing)" }, { label: "Upgrade 1 · Geography", color: "var(--c-metrics)" }]}
         time="about 8 minutes"
         title={<>Upgrade 1 · Spatial feature engineering</>}
         intro={<>
@@ -77,7 +77,7 @@ added: dist_coast, dist_sf, dist_la, + 12 region one-hots`}</CodeOutput>
           capturing the geography needs a model that can carve arbitrary regions on its own — which is Upgrade 3.
         </p>
 
-        <Callout color="var(--c-regression)" title={<>Feature engineering is domain knowledge as code</>}>
+        <Callout color="var(--c-housing)" title={<>Feature engineering is domain knowledge as code</>}>
           None of these features were in the data — they come from <em>knowing</em> that California real estate is
             about the coast and the metros, and encoding that belief numerically. That&rsquo;s the essence of feature
             engineering: not blind transformation, but translating what you understand about the domain into inputs

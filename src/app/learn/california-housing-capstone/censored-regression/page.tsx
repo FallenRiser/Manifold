@@ -14,7 +14,7 @@ export default function CensoredRegressionPage() {
   return (
     <article>
       <LessonHeader
-        chips={[{ label: "Capstone", color: "var(--c-regression)" }, { label: "Upgrade 2 · Censored target", color: "var(--c-metrics)" }]}
+        chips={[{ label: "Capstone", color: "var(--c-housing)" }, { label: "Upgrade 2 · Censored target", color: "var(--c-metrics)" }]}
         time="about 9 minutes"
         title={<>Upgrade 2 · Tobit & censored regression</>}
         intro={<>
@@ -96,7 +96,7 @@ the steeper slope is the TRUE income effect, freed from the cap`}</CodeOutput>
           accuracy on censored data is the only goal, the next upgrade wins.
         </p>
 
-        <Callout color="var(--c-regression)" title={<>Match the model to the data-generating process</>}>
+        <Callout color="var(--c-housing)" title={<>Match the model to the data-generating process</>}>
           The deepest lesson here isn&rsquo;t Tobit specifically — it&rsquo;s that you model the process that <em>generated</em>
             the data, including how it was recorded. The cap isn&rsquo;t noise to ignore; it&rsquo;s a known mechanism, and a
             model that encodes it extracts truth that OLS structurally cannot. Spotting &ldquo;this needs a censored model&rdquo;

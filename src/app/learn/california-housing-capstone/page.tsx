@@ -11,7 +11,7 @@ export default function CapstoneHubPage() {
   return (
     <article>
       <LessonHeader
-        chips={[{ label: "Capstone", color: "var(--c-regression)" }, { label: "End-to-end project", color: "var(--c-metrics)" }]}
+        chips={[{ label: "Capstone", color: "var(--c-housing)" }, { label: "End-to-end project", color: "var(--c-metrics)" }]}
         time="about 7 minutes"
         title={<>Predicting California housing prices</>}
         intro={<>
@@ -60,7 +60,7 @@ export default function CapstoneHubPage() {
           <li><strong>Epilogue · Combine the upgrades</strong> — a censored-objective LightGBM (Tobit likelihood inside the booster) that cuts cap-zone error 7%, and per-prediction SHAP explanations that answer a stakeholder&rsquo;s &ldquo;why?&rdquo;.</li>
         </ol>
 
-        <Callout color="var(--c-regression)" title={<>Where we end up (the spoiler)</>}>
+        <Callout color="var(--c-housing)" title={<>Where we end up (the spoiler)</>}>
           The regularized linear baseline reaches <strong>R² = 0.653</strong>. Spatial features and polynomial
             terms push the linear ceiling to <strong>0.711</strong>; the Tobit model corrects biased coefficients
             without chasing the score; and the model zoo — random forest, XGBoost, LightGBM — lands in the mid-0.80s,

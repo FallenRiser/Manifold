@@ -1,7 +1,45 @@
+import { CAP_TOTAL } from "./housingCapstoneTrack";
+import { NEO_TOTAL } from "./neoCapstoneTrack";
+
 // `partial` = the track is live but its outline is not fully built yet; /map
 // must say so rather than present it like a finished track (PROJECT.md §10.5).
 export type Track = { title: string; href?: string; partial?: boolean };
 export type Group = { name: string; color: string; blurb: string; tracks: Track[] };
+
+// Capstones are the applied, end-to-end projects — each with its own identity and
+// accent, showcased on the landing page and the map rather than buried as a track.
+export type Capstone = {
+  title: string;
+  href: string;
+  color: string;
+  kind: string;
+  pages: number;
+  blurb: string;
+  stat: string;
+};
+
+export const CAPSTONES: Capstone[] = [
+  {
+    title: "California housing",
+    href: "/learn/california-housing-capstone",
+    color: "var(--c-housing)",
+    kind: "Regression",
+    pages: CAP_TOTAL,
+    blurb:
+      "16,512 census blocks, worked the way a senior does: frame, clean, baseline — then three diagnostic-driven upgrades to a stacked ensemble.",
+    stat: "R² 0.653 → 0.858",
+  },
+  {
+    title: "Asteroid hazard",
+    href: "/learn/asteroid-hazard-capstone",
+    color: "var(--c-space)",
+    kind: "Classification",
+    pages: NEO_TOTAL,
+    blurb:
+      "90,836 near-Earth approaches, taught for transfer: choose a metric and split that can't lie, then earn every rung of the model climb.",
+    stat: "PR-AUC 0.29 → 0.48",
+  },
+];
 
 export const TIERS = [
   { n: "0", name: "Math Foundations", blurb: "the prerequisites, only when you need them" },
@@ -64,7 +102,7 @@ export const FAMILIES: Group[] = [
     color: "var(--c-dimred)",
     blurb: "Squeeze many features into a few you can see.",
     tracks: [
-      { title: "Principal component analysis" },
+      { title: "Principal component analysis", href: "/learn/pca" },
       { title: "Kernel PCA" },
       { title: "Manifold learning (Isomap, LLE)" },
       { title: "t-SNE & UMAP" },
@@ -99,10 +137,8 @@ export const PILLARS: Group[] = [
   {
     name: "The data workflow",
     color: "var(--c-metrics)",
-    blurb: "Given raw data, what do you actually do — step by step?",
+    blurb: "Given raw data, what do you actually do — step by step? (See the capstones above for the whole arc, end to end.)",
     tracks: [
-      { title: "California housing capstone", href: "/learn/california-housing-capstone" },
-      { title: "Asteroid-hazard capstone", href: "/learn/asteroid-hazard-capstone" },
       { title: "Exploratory data analysis" },
       { title: "Framing & preprocessing" },
       { title: "Baselines & model selection" },
@@ -137,14 +173,14 @@ export const PILLARS: Group[] = [
 export const FOUNDATIONS: Group[] = [
   {
     name: "Math foundations",
-    color: "var(--c-metrics)",
-    blurb: "Tier 0 — short interactive refreshers, linked when needed.",
+    color: "var(--c-fundamentals)",
+    blurb: "Tier 0 — the maths under everything, built from scratch and linked when needed.",
     tracks: [
-      { title: "Linear algebra" },
-      { title: "Calculus & convex optimization" },
-      { title: "Probability" },
-      { title: "Concentration inequalities" },
-      { title: "Information theory" },
+      { title: "Linear algebra", href: "/learn/math-foundations/vectors" },
+      { title: "Calculus & convex optimization", href: "/learn/math-foundations/derivatives" },
+      { title: "Probability", href: "/learn/math-foundations/random-variables" },
+      { title: "Concentration inequalities", href: "/learn/math-foundations/markov-chebyshev" },
+      { title: "Information theory", href: "/learn/math-foundations/entropy" },
     ],
   },
   {

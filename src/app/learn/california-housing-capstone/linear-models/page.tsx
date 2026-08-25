@@ -29,7 +29,7 @@ function BarFig() {
         return (
           <g key={m.name}>
             <text x={padL - 6} y={y + rowH / 2 + 2} fontSize={8.5} fill="var(--muted)" textAnchor="end">{m.name}</text>
-            <rect x={padL} y={Math.round((y + 3) * 100) / 100} width={Math.round((bx(m.rmse) - padL) * 100) / 100} height={Math.round((rowH - 6) * 100) / 100} fill={base ? "var(--faint)" : "var(--c-regression)"} fillOpacity={base ? 0.5 : 0.78} rx={1.5} />
+            <rect x={padL} y={Math.round((y + 3) * 100) / 100} width={Math.round((bx(m.rmse) - padL) * 100) / 100} height={Math.round((rowH - 6) * 100) / 100} fill={base ? "var(--faint)" : "var(--c-housing)"} fillOpacity={base ? 0.5 : 0.78} rx={1.5} />
             <text x={bx(m.rmse) + 4} y={y + rowH / 2 + 2} fontSize={8} fill="var(--muted)">{m.rmse.toFixed(3)}</text>
           </g>
         );
@@ -42,7 +42,7 @@ export default function LinearModelsPage() {
   return (
     <article>
       <LessonHeader
-        chips={[{ label: "Capstone", color: "var(--c-regression)" }, { label: "3 · The linear baseline", color: "var(--c-metrics)" }]}
+        chips={[{ label: "Capstone", color: "var(--c-housing)" }, { label: "3 · The linear baseline", color: "var(--c-metrics)" }]}
         time="about 9 minutes"
         title={<>Baseline & regularized models</>}
         intro={<>
@@ -85,7 +85,7 @@ export default function LinearModelsPage() {
             elastic-net all land at the same 0.681. Regularization neither helps nor hurts the score here.</div>
         </div>
 
-        <Callout color="var(--c-regression)" title={<>Why regularization didn&rsquo;t boost accuracy — and why that&rsquo;s the right outcome</>}>
+        <Callout color="var(--c-housing)" title={<>Why regularization didn&rsquo;t boost accuracy — and why that&rsquo;s the right outcome</>}>
           Regularization fights overfitting, and here there&rsquo;s almost none to fight:{" "}
             <strong>16,512 rows, only 10 features</strong> (n ≫ p). OLS has ample data to pin down ten
             coefficients, so its variance is already low and a penalty has little to remove. The tells confirm

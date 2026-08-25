@@ -45,8 +45,8 @@ export function Header() {
           <Link href="/map" style={navLink}>
             Algorithms
           </Link>
-          <Link href="/learn/california-housing-capstone" style={navLink}>
-            Capstone
+          <Link href="/map#capstones" style={navLink}>
+            Capstones
           </Link>
           <SearchPalette />
           <ThemeToggle />

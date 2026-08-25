@@ -1,7 +1,8 @@
 import Link from "next/link";
-import { TIERS, FAMILIES, PILLARS, FOUNDATIONS, type Group } from "@/lib/siteMap";
+import { TIERS, FAMILIES, PILLARS, FOUNDATIONS, CAPSTONES, type Group } from "@/lib/siteMap";
 import { Reveal } from "@/components/Reveal";
 import { CurriculumAtlas } from "@/components/CurriculumAtlas";
+import { CapstoneCard } from "@/components/CapstoneCard";
 
 export const metadata = {
   title: "The map — Manifold",
@@ -91,6 +92,24 @@ export default function MapPage() {
           <CurriculumAtlas />
         </section>
       </Reveal>
+
+      <section className="chapter" id="capstones" style={{ scrollMarginTop: 80 }}>
+        <Reveal>
+          <div className="chapter-eyebrow">The capstones</div>
+          <h2 className="chapter-title">Where it all comes together</h2>
+          <p className="chapter-sub">
+            Applied, end-to-end projects on real datasets — every stage from framing to a shipped model,
+            each with its own identity. The place to see the whole workflow at once.
+          </p>
+        </Reveal>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 16 }}>
+          {CAPSTONES.map((c, i) => (
+            <Reveal key={c.href} delay={i * 55} style={{ height: "100%" }}>
+              <CapstoneCard capstone={c} />
+            </Reveal>
+          ))}
+        </div>
+      </section>
 
       {SECTIONS.map((sec) => (
         <section key={sec.part} className="chapter">

@@ -2,12 +2,15 @@ import Link from "next/link";
 import { ManifoldMark } from "./ManifoldMark";
 
 const LEARN = [
+  { name: "Math foundations", href: "/learn/math-foundations" },
   { name: "Linear regression", href: "/learn/linear-regression" },
   { name: "Regularized regression", href: "/learn/regularized-regression" },
   { name: "Polynomial regression", href: "/learn/polynomial-regression" },
   { name: "k-Means clustering", href: "/learn/k-means" },
   { name: "k-Nearest Neighbors", href: "/learn/k-nearest-neighbors" },
+  { name: "Principal component analysis", href: "/learn/pca" },
   { name: "California housing capstone", href: "/learn/california-housing-capstone" },
+  { name: "Asteroid-hazard capstone", href: "/learn/asteroid-hazard-capstone" },
 ];
 
 export function Footer() {

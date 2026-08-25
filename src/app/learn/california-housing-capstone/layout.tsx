@@ -13,7 +13,7 @@ export default function HousingCapstoneLayout({
         <TrackSidebar
           track={CAP_TRACK}
           title="Housing capstone"
-          accent="var(--c-regression)"
+          accent="var(--c-housing)"
           done={CAP_DONE}
           total={CAP_TOTAL}
         />

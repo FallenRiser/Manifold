@@ -42,7 +42,7 @@ export default function DiagnosticsPage() {
   return (
     <article>
       <LessonHeader
-        chips={[{ label: "Capstone", color: "var(--c-regression)" }, { label: "3 · The linear baseline", color: "var(--c-metrics)" }]}
+        chips={[{ label: "Capstone", color: "var(--c-housing)" }, { label: "3 · The linear baseline", color: "var(--c-metrics)" }]}
         time="about 9 minutes"
         title={<>Diagnostics: what it misses</>}
         intro={<>
@@ -79,7 +79,7 @@ residuals split by the 5.0 cap:
   mean residual at cap      : +1.041     <- under-predicts by ~$104k`}</CodeOutput>
 
         <div style={callout}>
-          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-regression)", marginBottom: 4 }}>
+          <div className="font-display" style={{ fontSize: 13, fontWeight: 500, color: "var(--c-housing)", marginBottom: 4 }}>
             The three diagnoses — and the three upgrades they demand
           </div>
           <div style={{ color: "var(--muted)", fontSize: 14.5, lineHeight: 1.6 }}>
@@ -129,6 +129,6 @@ residuals split by the 5.0 cap:
 }
 
 const ul: React.CSSProperties = { margin: "0 0 10px", paddingLeft: "1.3em", fontSize: 15, color: "var(--muted)", lineHeight: 1.8 };
-const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-regression) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-regression) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0" };
+const callout: React.CSSProperties = { background: "color-mix(in srgb, var(--c-housing) 9%, var(--surface))", border: "1px solid color-mix(in srgb, var(--c-housing) 22%, var(--border))", borderRadius: 12, padding: "13px 15px", margin: "1.8rem 0" };
 const figWrap: React.CSSProperties = { background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 14, padding: 14, margin: "1.2rem 0" };
 const cap: React.CSSProperties = { fontSize: 12, color: "var(--muted)", marginTop: 8, lineHeight: 1.5 };
