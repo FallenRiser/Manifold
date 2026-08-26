@@ -8,7 +8,46 @@
 > the three-pass review loop, upgrade heuristics, and the ordered priority list. §§10–11 hold the
 > binding specifics (palette, lab standards, authoring checklist); §12 holds the judgement.
 >
-> Last updated: 2026-08-21 — 🌳🌲 **BOTH TREES TRACKS EXPANDED TO MASTERY PARITY.** Decision Trees **14→20pp**,
+> Last updated: 2026-08-27 — 🎓 **LEARNING THEORY (20pp) + MODEL SELECTION (16pp) BUILT — the two foundations
+> pillars the concentration strand was written for.** `/learn/learning-theory` (`learningTheoryTrack.ts`, Tier 3)
+> and `/learn/model-selection` (`modelSelectionTrack.ts`, Tier 2), both gray `--c-metrics`. **36 pages, all live,
+> tsc EXIT 0, all 200, 0 KaTeX errors, every cross-link verified.**
+> **LT arc:** Ch1 generalization (risk-vs-empirical-risk, no-free-lunch [pairing-argument proof], union bound,
+> finite classes) · Ch2 PAC (definition, sample complexity, agnostic + approximation/estimation split, ERM +
+> the memorizer catastrophe) · Ch3 capacity (when counting fails, VC dimension, Sauer's lemma, the VC bound,
+> Rademacher) · Ch4 margins (margin, margin bounds, boosting-and-margins incl. **Breiman's arc-gv counterexample
+> — the theory's own prediction failed**) · Ch5 stability (definition, stability⇒generalization, when-the-bounds-break).
+> **MS arc:** selection problem (what you're choosing = a CLASS, approx-vs-est, the selection trap) · validation
+> (train/val/test, CV, folds, nested CV) · capacity (SRM, regularization, early stopping, AIC/BIC/MDL) · practice
+> (learning curves, one-SE rule, non-i.i.d. splits, the 9-step checklist).
+> **NEW SHARED PRIMITIVE:** `<Proof>` in `lesson.tsx` — the collapsible "Go deeper ▾" Tier-3 aside §4 has wanted
+> since 2026-07-04, finally shipped. Main flow keeps statement + intuition + the one load-bearing step; the aside
+> holds the FULL derivation. All ~396 pages inherit it. Styles in globals.css (`.proof-aside`).
+> **5 new labs:** `ShatteringLab` (flagship — 3 presets prove the ∃ quantifier: triangle 8/8 shattered, collinear
+> 6/8, square 14/16 with the 2 XOR labelings refused; exact 720-direction separability sweep, verified live),
+> `EmpiricalRiskLab` (best-of-1000 coin flips breaks the Hoeffding band at EVERY n — selection bias and the band
+> both scale 1/√n), `UnionBoundLab`, `SampleComplexityLab` (1/ε vs 1/ε²), `RademacherLab` (exact DP over sign
+> changes; capacity 1 → 0.454, capacity 13 → **1.000**), `MarginLab`, `StabilityLab`, `LearningCurveLab`.
+> MS reuses `BiasVarianceLab`/`CrossValidationLab`/`RidgePolyLab` unmodified (§12.6 rule 2 paying off again).
+> **HONEST NUMBERS — 2 new scripts, both exit 0.** `scripts/learning_theory_cases.py`: VC bound **vacuous**
+> (linear p=784, n=60,000 → gap **0.795**; needs **7.4M** examples for 0.1); random labels with 4,000 random
+> features → train **1.0000** / test **0.0870** (chance 0.10) vs true labels 1.0000/0.9667; **double descent
+> measured** (n=178: classical best p=80 → 0.0929, peak at p=n → **4.778**, p=4000 → **0.0180**, i.e. 5× better
+> than the classical optimum). `scripts/model_selection_cases.py`: selection optimism (200 true-0.500 coin flips
+> → best-of **0.5975**), nested vs flat CV (**0.9807 → 0.9747, +0.0060**), one-SE rule (α 22× stronger, test MSE
+> 0.1516 → 0.1436), learning curves.
+> ⚠️ **TWO SELF-CAUGHT ERRORS worth remembering.** (1) My first `EmpiricalRiskLab` used best-of-50 at true risk
+> 0.30 — the bias (0.073) stayed INSIDE the band (0.096), so the lab showed a broken promise that wasn't broken.
+> Fixed by deriving the required M analytically (bias ≈ z_M·σ, both sides scale 1/√n, so only M matters).
+> (2) `model_selection_cases.py` §4 first used a linear SVC as the "underfit" model — it reached 0.938 and its
+> validation was STILL CLIMBING, so "more data won't help" was false. Swapped to a depth-2 tree that genuinely
+> plateaus (val 0.3166 → 0.3183 over 647 extra examples, gap **0.0011**). **Lesson: when a lab or figure exists to
+> demonstrate an effect, verify the effect actually occurs in the numbers before writing the prose around it.**
+> Registered: searchIndex (both), siteMap (both groups now have real hrefs — Learning theory & Model selection
+> are no longer greyed), Footer. Closes the dead `/learn/model-selection` links left by the math-foundations track.
+> **Next foundations:** Optimization pillar is the last greyed foundation.
+>
+> Prior 2026-08-21 — 🌳🌲 **BOTH TREES TRACKS EXPANDED TO MASTERY PARITY.** Decision Trees **14→20pp**,
 > Random Forests **14→21pp** (user: "is 14 enough for mastery?" → "full parity"; they're two of the most-used
 > tabular models and deserve KNN/logistic-level depth, not polynomial-level). **DT +6:** missing-values-and-surrogate-splits,
 > the-algorithm-family (ID3/C4.5/CHAID, gain-ratio fixes cardinality bias), oblique-and-multivariate-trees (+staircase-vs-diagonal

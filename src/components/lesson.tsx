@@ -85,6 +85,55 @@ export function Callout({
   );
 }
 
+// A collapsible "Go deeper ▾" aside holding a FULL derivation (PROJECT.md §4:
+// "collapsible Go deeper ▾ Tier-3 asides"). Doctrine: theory is opt-in, never a
+// gate — the main flow carries the statement, the intuition, and the one
+// load-bearing step; everything inside a <Proof> is the complete argument for
+// readers who want it. Native <details> so it needs no client JS, keeps the page
+// a server component, and stays keyboard- and search-accessible.
+export function Proof({
+  title = "the full derivation",
+  color = "var(--c-metrics)",
+  children,
+}: {
+  /** what's inside, e.g. "why boundedness gives an exponential bound" */
+  title?: React.ReactNode;
+  color?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <details
+      className="proof-aside"
+      style={{
+        background: `color-mix(in srgb, ${color} 6%, var(--surface))`,
+        border: `1px solid color-mix(in srgb, ${color} 20%, var(--border))`,
+        borderRadius: 12,
+        padding: "11px 15px",
+        margin: "1.4rem 0",
+      }}
+    >
+      <summary
+        className="font-display"
+        style={{ fontSize: 13, fontWeight: 500, color, cursor: "pointer", listStyle: "none" }}
+      >
+        <span className="proof-caret" aria-hidden="true">▸</span> Go deeper — {title}
+      </summary>
+      <div
+        style={{
+          color: "var(--muted)",
+          fontSize: 14.5,
+          lineHeight: 1.65,
+          paddingTop: 10,
+          marginTop: 10,
+          borderTop: `1px solid color-mix(in srgb, ${color} 16%, var(--border))`,
+        }}
+      >
+        {children}
+      </div>
+    </details>
+  );
+}
+
 export function PrevNext({
   prev,
   next,

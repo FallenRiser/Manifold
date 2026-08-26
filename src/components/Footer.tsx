@@ -3,6 +3,8 @@ import { ManifoldMark } from "./ManifoldMark";
 
 const LEARN = [
   { name: "Math foundations", href: "/learn/math-foundations" },
+  { name: "Learning theory", href: "/learn/learning-theory" },
+  { name: "Model selection", href: "/learn/model-selection" },
   { name: "Linear regression", href: "/learn/linear-regression" },
   { name: "Regularized regression", href: "/learn/regularized-regression" },
   { name: "Polynomial regression", href: "/learn/polynomial-regression" },

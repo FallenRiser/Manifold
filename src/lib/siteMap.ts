@@ -162,10 +162,10 @@ export const PILLARS: Group[] = [
     color: "var(--c-metrics)",
     blurb: "Capacity, overfitting, and choosing among models.",
     tracks: [
-      { title: "Estimation vs approximation error" },
-      { title: "ERM & structural risk minimization" },
-      { title: "Cross-validation" },
-      { title: "Regularization as capacity control" },
+      { title: "Estimation vs approximation error", href: "/learn/model-selection/approximation-vs-estimation" },
+      { title: "ERM & structural risk minimization", href: "/learn/model-selection/structural-risk-minimization" },
+      { title: "Cross-validation", href: "/learn/model-selection/cross-validation" },
+      { title: "Regularization as capacity control", href: "/learn/model-selection/regularization-as-capacity" },
     ],
   },
 ];
@@ -188,11 +188,11 @@ export const FOUNDATIONS: Group[] = [
     color: "var(--c-metrics)",
     blurb: "Tier 3 — the guarantees behind why learning works.",
     tracks: [
-      { title: "Generalization: the central question" },
-      { title: "The PAC framework" },
-      { title: "Rademacher complexity & VC-dimension" },
-      { title: "Margin theory" },
-      { title: "Algorithmic stability" },
+      { title: "Generalization: the central question", href: "/learn/learning-theory" },
+      { title: "The PAC framework", href: "/learn/learning-theory/pac-learnability" },
+      { title: "Rademacher complexity & VC-dimension", href: "/learn/learning-theory/vc-dimension" },
+      { title: "Margin theory", href: "/learn/learning-theory/margins" },
+      { title: "Algorithmic stability", href: "/learn/learning-theory/algorithmic-stability" },
     ],
   },
   {

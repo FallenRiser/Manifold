@@ -13,6 +13,8 @@ import { KNN_TRACK } from "./knnTrack";
 import { LOG_TRACK } from "./logisticRegressionTrack";
 import { EVAL_TRACK } from "./evaluationTrack";
 import { MF_TRACK } from "./mathFoundationsTrack";
+import { LT_TRACK } from "./learningTheoryTrack";
+import { MS_TRACK } from "./modelSelectionTrack";
 import { CAP_TRACK } from "./housingCapstoneTrack";
 import { NEO_TRACK } from "./neoCapstoneTrack";
 import type { TrackChapter } from "./linearRegressionTrack";
@@ -44,6 +46,8 @@ const TRACKS: { name: string; accent: string; chapters: TrackChapter[] }[] = [
   { name: "Logistic regression", accent: "var(--c-classification)", chapters: LOG_TRACK },
   { name: "Evaluation & metrics", accent: "var(--c-metrics)", chapters: EVAL_TRACK },
   { name: "Math foundations", accent: "var(--c-fundamentals)", chapters: MF_TRACK },
+  { name: "Learning theory", accent: "var(--c-metrics)", chapters: LT_TRACK },
+  { name: "Model selection", accent: "var(--c-metrics)", chapters: MS_TRACK },
   { name: "Housing capstone", accent: "var(--c-regression)", chapters: CAP_TRACK },
   { name: "Asteroid-hazard capstone", accent: "var(--c-space)", chapters: NEO_TRACK },
 ];
