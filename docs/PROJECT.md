@@ -8,7 +8,37 @@
 > the three-pass review loop, upgrade heuristics, and the ordered priority list. §§10–11 hold the
 > binding specifics (palette, lab standards, authoring checklist); §12 holds the judgement.
 >
-> Last updated: 2026-08-27 — 🎓 **LEARNING THEORY (20pp) + MODEL SELECTION (16pp) BUILT — the two foundations
+> Last updated: 2026-08-28 — 🧭 **THE DATA WORKFLOW PILLAR BUILT (28pp) — the last unbuilt cross-cutting
+> pillar, and the first one that is about judgement rather than machinery.** `/learn/data-workflow`
+> (`dataWorkflowTrack.ts`, accent `--c-metrics`), 7 chapters: Before you model · Framing · Meeting the data ·
+> Data quality & leakage · Preparing features · From baseline to better · Beyond the notebook.
+> **Spine: MODEL QUALITY IS DECIDED BEFORE THE MODEL.** Each chapter is one class of pre-`.fit()` decision
+> that has a wrong default which feels right; the checklist is deliberately the LAST page, so it reads as
+> derived rather than as instructions. Deliberate boundaries — Evaluation owns *which metric*, Model
+> selection owns *CV machinery*, the capstones own *the end-to-end walkthrough*; this pillar owns framing,
+> data quality, leakage, features, error analysis and life after deployment.
+> **5 new labs** (all `--c-metrics`, hydration-safe, every number from a real run):
+> `SimpsonsParadoxLab` (240 real points, slopes computed in-component so the readouts cannot drift from the
+> prose — pooled **−0.95**, four clinics **+0.69…+0.84**), `LeakageLab` (leaky-vs-pipeline CV over a
+> p-sweep, honest curve pinned at chance while the leaky one climbs **0.636 → 0.878**),
+> `MissingnessLab` (MCAR/MAR/MNAR survival curves + mean estimates + held-out R²),
+> `ErrorAnalysisLab` (**flagship** — three slicings, one of which pays and two of which are duds, sorted by
+> *lift*), `DriftLab` (the covariate-shift/concept-drift 2×2). Reuses `DistributionLab`, `InfluenceLab`,
+> `CategoricalFeaturesLab`, `FeatureScalingLab`.
+> **Honest numbers:** `scripts/data_workflow_cases.py` (8 sections, exit 0). Preprocessing leakage
+> **0.878 reported where truth is 0.500**; group leakage **R² 0.569 → 0.044**; temporal leakage
+> **R² 0.396 → −0.220**; baselines (**98.7% accuracy worth +0.0402**); MNAR imputation failing where MAR is
+> recovered; error slices (**25% of traffic holding 14 of 15 errors**); Simpson's paradox; drift.
+> ⚠️ **Three of the eight sections failed to demonstrate their own point on the first run** and were fixed by
+> changing the *experiment* — see [[verify-the-effect-before-writing-the-prose]]; the drift section became
+> materially better pedagogy as a result (two scenarios and a 2×2, instead of one asserted decay curve).
+> 🎨 **SITE-WIDE FIX shipped alongside:** Tailwind preflight was stripping markers, indentation and item
+> spacing from every `<ul>`/`<ol>` in `.lesson` — **every bulleted list on all ~400 pages was rendering as
+> run-on unstyled text.** Added `.lesson ul/ol/li` rules to `globals.css` (disc/decimal markers, `--faint`
+> marker colour, `--muted` body matching `.lesson > p`, ink `<strong>`, 0.55rem item rhythm, tightened
+> nesting). One-file edit, inherited everywhere — §12.6 rule 2 in action.
+>
+> Prior 2026-08-27 — 🎓 **LEARNING THEORY (20pp) + MODEL SELECTION (16pp) BUILT — the two foundations
 > pillars the concentration strand was written for.** `/learn/learning-theory` (`learningTheoryTrack.ts`, Tier 3)
 > and `/learn/model-selection` (`modelSelectionTrack.ts`, Tier 2), both gray `--c-metrics`. **36 pages, all live,
 > tsc EXIT 0, all 200, 0 KaTeX errors, every cross-link verified.**
@@ -1023,6 +1053,27 @@ When deciding what to polish, apply in order:
    pivoting: **Classification** — Naive Bayes, SVM (low-effort sibling of built SVR), kernel methods. Prefer finishing
    the Trees family. NOTE: a live-visual eyeball of the decision-trees + random-forests labs is still owed (dev server
    was wedged 2026-08-20; both tracks verified via `next build` + node instead).
+4b. **NEURAL NETWORKS — two requested tracks, spec'd 2026-08-28 (user request).** The family's
+   roadmap entry "Activations, init & normalisation" was one line covering three unrelated jobs;
+   split into **`Activation functions — choosing & designing`** and **`Architecture design — depth,
+   width & what to apply when`**, both spec'd in full at `docs/curriculum-map.md` §6.6a / §6.6b.
+   The user's framing, which is the binding requirement: *how each activation works · when exactly
+   to use which · how to develop the intuition to select one · how to design a new one for a
+   requirement*; then *how to plan layers and neuron counts and when to apply what*. So both tracks
+   are **intuition-first, not catalogue-first** — 6.6a teaches activations as a small space of
+   **properties** (gradient behaviour, range/zero-centring, smoothness, cost) so a learner can
+   diagnose a stuck run and could derive Swish from its requirements; 6.6b answers "how many layers,
+   how many neurons" as **a directed search procedure with priors** (get it training → overfit
+   deliberately → regularise), with each technique introduced at the symptom that motivates it.
+   Flagship labs: `ActivationExplorerLab` (curve **and** derivative, live dead-gradient shading) and
+   `ArchitectureSandboxLab`. Two honest-numbers scripts required — `activation_cases.py` (one fixed
+   MLP, every activation, plus the per-layer gradient-norm table) and `architecture_cases.py` (a real
+   depth × width sweep). ⚠️ Both scripts must clear
+   [[verify-the-effect-before-writing-the-prose]]: check the vanishing gradient and the
+   depth-beats-width gap actually appear at the chosen constants before writing the claim.
+   Prereqs: backprop for 6.6a; learning curves + capacity (Model selection) for 6.6b. Neither is
+   built — **roadmap only.** These are the first NN tracks, so they also pay the family's
+   infrastructure cost (accent `--c-neural` coral, a track lib, a layout).
 5. **Challenge mode + URL-hash lab state** (§10.3 leftovers) — goals convert fiddling into
    learning; shareable lab states are free marketing.
 6. **Chapter recaps + Tier-0 prerequisite pills** (§4 leftovers) — the last unshipped

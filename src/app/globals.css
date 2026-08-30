@@ -176,6 +176,27 @@ body {
   color: var(--ink);
   font-weight: 500;
 }
+/* Lists read as prose, not as a wall: Tailwind's preflight strips markers and
+   indentation from ul/ol, so without this every bulleted list on the site
+   collapses into run-on text. Same colour treatment as .lesson > p. */
+.lesson ul,
+.lesson ol {
+  color: var(--muted);
+  margin: 1.1rem 0;
+  padding-left: 1.35rem;
+}
+.lesson ul { list-style: disc; }
+.lesson ol { list-style: decimal; }
+.lesson li { margin: 0 0 0.55rem; padding-left: 0.2rem; }
+.lesson li:last-child { margin-bottom: 0; }
+.lesson li::marker { color: var(--faint); }
+.lesson li strong {
+  color: var(--ink);
+  font-weight: 500;
+}
+/* nested lists tighten rather than repeat the outer rhythm */
+.lesson li > ul,
+.lesson li > ol { margin: 0.45rem 0 0; }
 .lesson h2 {
   font-family: var(--font-display);
   font-size: 1.5rem;

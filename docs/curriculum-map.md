@@ -125,9 +125,100 @@ Each family is a hub of algorithm **tracks**; each track spans Tiers 1–3.
 ### 6.6 Neural networks · coral
 - From perceptron to the multilayer perceptron
 - Backpropagation & training dynamics
-- Activations, initialisation, normalisation
+- **Activation functions — choosing & designing** *(own track, see below)*
+- **Architecture design — depth, width & what to apply when** *(own track, see below)*
+- Initialisation & normalisation
 - Regularisation — dropout, weight decay, early stopping
 - *(Later/stretch: CNNs, sequence models, attention)*
+
+#### 6.6a Activation functions — choosing & designing · Tier 1→2
+
+The goal is not a lookup table of formulas; it is **a learner who can look at a stuck
+training run and name which property of their activation caused it**, and who could
+justify a new one.
+
+*What each function actually does* — for every activation, the same four-part anatomy:
+the curve, **the derivative** (the part that decides whether learning happens),
+the output range, and the failure mode it was invented to fix.
+- Step & sign — why the perceptron couldn't be trained by gradient descent
+- Sigmoid & tanh — squashing, saturation, why tanh's zero-centring beats sigmoid in hidden layers
+- ReLU — the default, and what it bought: non-saturating gradient, sparsity, cheapness
+- Dying ReLU, and the family that answers it — Leaky ReLU, PReLU, ELU, SELU
+- Smooth moderns — GELU, Swish/SiLU, Mish — and *what the smoothness actually buys*
+- Output-layer activations are a different question — identity, sigmoid, softmax —
+  chosen by the **loss and the label space**, never by taste
+- Gated/other — GLU family, softplus, maxout *(brief, for completeness)*
+
+*The intuition — the properties, not the names.* The load-bearing chapter. Every
+activation is a point in a small space of properties, and choosing one means choosing
+properties:
+- **Gradient behaviour** — where is the derivative ≈ 0? Saturation is the whole story
+  behind vanishing gradients; ties directly to backprop's chain-rule product
+- **Range & zero-centring** — why non-zero-mean activations bias the gradient, and how
+  normalisation makes this matter less than it did in 2012
+- **Monotonicity, smoothness, non-linearity** — what breaks if you drop each
+- **Cost** — an exp() per unit per step is not free
+- **The one non-negotiable** — non-linear, or the whole network collapses to one
+  linear map (the proof is one line and belongs here)
+
+*When to use which* — an explicit decision procedure with reasons, not a table:
+hidden layers by default → ReLU; deep/transformer → GELU or SiLU; RNN state → tanh;
+self-normalising nets → SELU with its required init; output layer ← determined by the
+task. Plus the **honest note** that most modern differences are worth fractions of a
+point, and are dominated by architecture, data and normalisation.
+
+*Designing a new one* — the transferable skill. State the property you need, write a
+function with it, check the derivative doesn't vanish or explode, check it's cheap,
+then measure. Case study: **derive Swish's shape from the requirements** (smooth,
+non-monotone near zero, unbounded above, bounded below) and see it land where the
+search did.
+
+**Labs.** `ActivationExplorerLab` (flagship — curve *and* derivative side by side,
+sliders on the shape parameters, live "where does the gradient die?" shading) ·
+`VanishingGradientLab` (gradient magnitude per layer vs depth, activation-switchable —
+sigmoid dies, ReLU doesn't) · `DyingReLULab` · `ActivationBakeoffLab`
+(same net, same data, swap the activation, honest measured curves).
+
+**Honest numbers.** `scripts/activation_cases.py` — one fixed MLP on one dataset,
+every activation, measured; plus the per-layer gradient-norm table that makes the
+vanishing-gradient claim concrete rather than asserted.
+
+#### 6.6b Architecture design — depth, width & what to apply when · Tier 2
+
+The question every learner asks first and every course answers last: *how many layers,
+how many neurons?* Answered as **a search procedure with priors**, not a number.
+
+- **What depth buys** — composition, feature hierarchy, and the exponential-advantage
+  results (stated honestly, with their caveats). Why depth beats width per parameter.
+- **What width buys** — universal approximation is a *width* theorem; state it, then
+  immediately state what it does not promise (nothing about learnability or data).
+- Reading it off the data instead of guessing: input dimension, sample size,
+  signal complexity, and the **capacity intuition from [[learning theory]]** —
+  parameters vs n, and why the classical rule-of-thumb is wrong post-double-descent.
+- **Sensible starting points** and where they come from — the funnel, constant-width,
+  the "start too big and regularise" modern default.
+- **The order of operations** — what to reach for and when: get it training first,
+  then overfit deliberately, then regularise. Normalisation, residual connections,
+  and dropout each introduced *at the symptom that motivates them*.
+- Skip/residual connections as an **architecture-level answer to a gradient problem** —
+  the link back to 6.6a.
+- Budgeting — parameters, memory, latency — and tuning depth/width **jointly**, which
+  is the [[model selection]] lesson applied here.
+- **The diagnostic loop** — learning curves and train/val gap tell you which knob to
+  turn, so architecture search is directed rather than random.
+
+**Labs.** `ArchitectureSandboxLab` (flagship — add/remove layers and neurons on a live
+2-D task, watch the decision boundary and the parameter count move together) ·
+`DepthVsWidthLab` (same parameter budget, spent two ways) · `CapacityLadderLab`
+(underfit → fit → overfit, driven by width alone).
+
+**Honest numbers.** `scripts/architecture_cases.py` — a real depth × width sweep with
+measured train/val, so the recommendations are read off data and the plateau is
+visible.
+
+**Prerequisites:** backpropagation (for 6.6a's gradient story), learning curves and
+the capacity material in Model selection (for 6.6b). Both are Tier 1→2; the
+approximation-theory statements are Tier 3 and belong in `<Proof>` asides.
 
 ### 6.7 Reinforcement learning · amber *(Mohri 17)*
 - The RL scenario & Markov decision processes
@@ -147,9 +238,39 @@ The engine threaded through every family; has its own reference pages.
 
 ## 7. Cross-cutting pillars · gray
 
-### 7.1 The Data Workflow
-Given a dataset, what do you actually do? EDA → problem framing → preprocessing →
-baseline → model selection → diagnosis → optimization. Interactive, dataset-driven.
+### 7.1 The Data Workflow · **BUILT 2026-08-28 · 28 pages · `/learn/data-workflow`**
+Given a dataset, what do you actually do? Built as **judgement, not a checklist** — the
+spine is *model quality is decided before the model*, and each chapter is one class of
+pre-`.fit()` decision with a wrong default that feels right. The checklist is the LAST
+page on purpose, so it reads as derived rather than as instructions.
+
+1. **Before you model** — the loop (not a line), working backwards from the decision,
+   and what one row is (the unit of analysis).
+2. **Framing** — the label is constructed not found · the time-travel test ·
+   task choice · the eight-line framing contract.
+3. **Meeting the data** — EDA as hypothesis generation · distribution shapes as
+   evidence about mechanisms · confounds and Simpson's paradox · ten sanity checks.
+4. **Data quality & leakage** — MCAR/MAR/MNAR · outliers vs influence · the four faces
+   of leakage · pipelines as the structural fix.
+5. **Preparing features** — preprocessing as modelling · encodings · scaling and
+   transforms · feature engineering and its honest ROI.
+6. **From baseline to better** — the baseline ladder · the first real model ·
+   **error analysis (the pillar's flagship page)** · the diagnosis→action table.
+7. **Beyond the notebook** — reproducibility · drift and monitoring · feedback loops ·
+   the workflow playbook.
+
+**Boundaries (deliberate):** §7.2 owns *which metric*, §7.3 owns *CV machinery*, the
+capstones own *the end-to-end walkthrough*. This pillar owns framing, data quality,
+leakage, features, diagnosis and life after deployment.
+
+**Labs.** `SimpsonsParadoxLab` · `LeakageLab` · `MissingnessLab` ·
+`ErrorAnalysisLab` (flagship) · `DriftLab`. Reuses `DistributionLab`, `InfluenceLab`,
+`CategoricalFeaturesLab`, `FeatureScalingLab`.
+
+**Honest numbers.** `scripts/data_workflow_cases.py`, 8 sections. The three largest
+measured failures are all decisions made before the model was chosen: temporal leakage
+**0.62 of R²**, group leakage **0.52 of R²**, preprocessing leakage **0.38 of accuracy
+manufactured from pure noise**.
 
 ### 7.2 Evaluation & Metrics
 Confusion matrix · accuracy/precision/recall/F1 · ROC/AUC · precision–recall/AP ·

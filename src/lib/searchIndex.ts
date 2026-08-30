@@ -15,6 +15,10 @@ import { EVAL_TRACK } from "./evaluationTrack";
 import { MF_TRACK } from "./mathFoundationsTrack";
 import { LT_TRACK } from "./learningTheoryTrack";
 import { MS_TRACK } from "./modelSelectionTrack";
+import { DW_TRACK } from "./dataWorkflowTrack";
+import { PM_TRACK } from "./perceptronMlpTrack";
+import { BP_TRACK } from "./backpropTrack";
+import { ACT_TRACK } from "./activationsTrack";
 import { CAP_TRACK } from "./housingCapstoneTrack";
 import { NEO_TRACK } from "./neoCapstoneTrack";
 import type { TrackChapter } from "./linearRegressionTrack";
@@ -48,6 +52,10 @@ const TRACKS: { name: string; accent: string; chapters: TrackChapter[] }[] = [
   { name: "Math foundations", accent: "var(--c-fundamentals)", chapters: MF_TRACK },
   { name: "Learning theory", accent: "var(--c-metrics)", chapters: LT_TRACK },
   { name: "Model selection", accent: "var(--c-metrics)", chapters: MS_TRACK },
+  { name: "The data workflow", accent: "var(--c-metrics)", chapters: DW_TRACK },
+  { name: "Perceptron → MLP", accent: "var(--c-neural)", chapters: PM_TRACK },
+  { name: "Backpropagation", accent: "var(--c-neural)", chapters: BP_TRACK },
+  { name: "Activation functions", accent: "var(--c-neural)", chapters: ACT_TRACK },
   { name: "Housing capstone", accent: "var(--c-regression)", chapters: CAP_TRACK },
   { name: "Asteroid-hazard capstone", accent: "var(--c-space)", chapters: NEO_TRACK },
 ];
