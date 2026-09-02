@@ -28,6 +28,7 @@ export const ACT_TRACK: TrackChapter[] = [
       { title: "Non-linear, or nothing", href: "/learn/activation-functions/the-non-negotiable" },
       { title: "The derivative is the point", href: "/learn/activation-functions/the-derivative-is-the-point" },
       { title: "Saturation", href: "/learn/activation-functions/saturation" },
+      { title: "Where your units actually sit", href: "/learn/activation-functions/where-your-units-sit" },
     ],
   },
   {

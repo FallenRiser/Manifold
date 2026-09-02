@@ -241,6 +241,11 @@ written in our own voice with our own visuals. Never reproduce its text/proofs/f
 
 ## 2. Status — what's DONE
 
+> ⚠️ **This section is a historical snapshot from the first weeks and is now badly out of date.**
+> It describes 11 live pages; the site is well past 400. **For actual status read §12.7**, whose
+> `0a…0o` entries are the running build log. §10.6 supersedes §3's ordering, and §12 supersedes
+> §§4–9 wherever they disagree. Kept for the origin story, not as a status report.
+
 The Next.js app is scaffolded, the design system is in place, and the homepage, the `/map`
 curriculum atlas, and the first **11 pages of the Linear Regression track** are live.
 
@@ -914,8 +919,18 @@ When deciding what to polish, apply in order:
    completion → Evaluation & Metrics pillar (the confusion-matrix/ROC lab is already
    half-designed by ThresholdLab) → trees.
 5. **Reader-visible before internal.** Refactors only when they unblock a reader-visible win.
+6. **Never set a page budget before the topic list.** (Added 2026-08-31, after the user caught a
+   self-imposed 20-page cap across three neural-network tracks.) Chapter and page counts are an
+   *output* of what the subject needs, not an input. When auditing a track for depth, the useful
+   test is not "are the pages long enough" — word counts were uniform and every page had a lab or a
+   quiz — it is **"which topics are missing"**: word-count for outliers, check quiz/lab coverage,
+   then grep the track for terms a mastery treatment must contain. Text already on the site that
+   *promises* something not yet written is the strongest possible signal of a gap.
+7. **`grep -rl <LabName> src/` before creating any lab.** A `Write` to an existing lab path silently
+   replaces a component other tracks depend on; the tool result says "updated", not "created", and
+   that word is the only warning you get. (Recovered from git after overwriting `LearningRateLab`.)
 
-### 12.7 Priorities for the next lead (ordered; updated 2026-07-06)
+### 12.7 Priorities for the next lead (ordered; updated 2026-08-31)
 
 0. ✅ **DONE** — logistic **Tiers 1 & 2 complete** (18/25 pages). Tier-2 shipped 4 chapters +
    labs `OddsRatioLab`/`ImbalanceLab`/`SeparationLab`/`SoftmaxLab`/`RocLab`/`CalibrationLab`/
@@ -1041,39 +1056,85 @@ When deciding what to polish, apply in order:
    (make_friedman1, python 3.13/sklearn 1.8): linear ridge R²=0.667 → KRR R²=0.860 (dense, all 300 pts) → SVR
    R²=0.838 (sparse, 166/300 SVs). siteMap both hrefs added (Regression `partial` never used — was greyed by
    absent href); searchIndex both wired. **All 5 Regression tracks now live.** tsc EXIT 0, all 23 pages 200, 0 KaTeX/hydration errors.
+0n. ✅ **DONE 2026-08-30/31** — **NEURAL NETWORKS family, tracks 1–3 of 6 built from scratch
+   (64 pages, 15 labs, 3 honest-numbers scripts)**. User brief, verbatim: *"lets start with neural
+   network family and close it completely"*. Accent coral `--c-neural` (already in `globals.css`).
+   **Build order is dependency order, not siteMap order** — activations cannot be taught honestly
+   before gradients, architecture not before activations:
+   - ✅ **Perceptron → MLP** (21 pp) `/learn/perceptron-to-mlp`, `perceptronMlpTrack.ts`. Spine:
+     *a neuron is a linear model with a switch, and stacking them buys features you did not design* —
+     arrives at the same fact twice, geometrically (XOR needs a bend) and algebraically (no
+     non-linearity ⇒ the stack collapses), because most readers only believe it after both.
+     7 labs: `NeuronLab`, `PerceptronRuleLab` (runs the rule in-component), `XorLab`,
+     `LinearCollapseLab`, `CapacityLadderLab`, `SpiralLab`, `WeightSymmetryLab`. Script
+     `perceptron_mlp_cases.py` (8 §§). **New shared primitive `src/components/labs/halfplane.ts`**
+     (Sutherland–Hodgman clipping) — fixed a real correctness bug where three labs drew a fixed
+     triangle for a half-plane that can be a quad or pentagon, so the shading was silently wrong.
+   - ✅ **Backpropagation & training** (22 pp) `/learn/backpropagation`, `backpropTrack.ts`. Spine:
+     *backprop is the chain rule, organised so nothing is computed twice*; the second half turns
+     training failures into measurements. 4 labs: `GradientFlowLab` (flagship), `ChainRuleLab`,
+     `LearningRateSweepLab`, `ScheduleLab`. Script `backprop_cases.py` (10 §§).
+   - ✅ **Activation functions** (21 pp) `/learn/activation-functions`, `activationsTrack.ts`. Spine:
+     *an activation is a derivative you are choosing*. 4 labs: `ActivationExplorerLab` (flagship —
+     computes its own numbers so readouts cannot drift from prose), `DyingReLULab`,
+     `ActivationBakeoffLab`, `UnitDistributionLab`. Script `activation_cases.py` (8 §§).
+   **Cross-track number continuity is deliberate**: activations §2 reuses backprop §3's data, depth
+   and init so sigmoid/tanh/relu reproduce that track's published 2.9e7 / 1.627 / 0.2555 exactly
+   before widening the comparison. Backprop's by-hand page continues track 1's exact 13-parameter net.
+   Registered in `searchIndex.ts`, `Footer.tsx`, `siteMap.ts`. All 64 pages 200, tsc EXIT 0,
+   0 KaTeX errors, every lab eyeballed live with its numbers read back out of the DOM.
+0o. ✅ **DONE 2026-08-31 — MASTERY PASS on the three built NN tracks (60 → 64 pages).** User
+   pushed back: *"I feel you have set some internal hard cap of 20 pages which if needed for
+   improving the content should be done."* **They were right** — 20/20/20 was a convention copied
+   from the Trees family, not a finding. **Audit method worth reusing:** word-count every page
+   (uniform 1,000–1,900 incl. JSX ⇒ no thin pages), confirm quiz/lab coverage per page, then grep the
+   family for topics a mastery treatment needs (`warmup`, `permutation`, `schedule`, `checkpoint`, …).
+   The gaps were **missing topics, not thin prose**, and three were already promised by live text.
+   Four pages added, each with a new measured script section:
+   `many-equivalent-solutions` (T1) · `learning-rate-schedules` + `the-memory-bill` (T2) ·
+   `where-your-units-sit` (T3). ⚠️ The last one **corrects the track's own earlier framing**: sigmoid
+   is **0.0% saturated at initialisation**, so "sigmoid units saturate ⇒ gradients vanish" is false —
+   the units sit in the *best* part of the curve and 0.25 still compounds. Rule going forward:
+   **the page count follows the topic list; never the reverse.**
+> **Live ranking as of 2026-08-31: item 4b is the top priority** — the user's standing brief is to
+> close the Neural networks family, three of six tracks are done, and the numbers for the next two
+> are already measured. The numbered items below keep their original labels as historical anchors;
+> read 4b first, then 1.
+
 1. **LR static-page upgrades** — the §9 item-2 list (residual diagnostics shared lab, Q–Q,
-   CV/bias–variance) is the oldest unpaid debt in the best track. **Now the top content priority** —
-   five tracks complete + a whole family done, but the *flagship* LR track still carries the oldest polish debt.
-4. ✅ **KNN (36/36)** + ✅ **REGRESSION FAMILY** + ✅ **DECISION TREES (14/14)** + ✅ **RANDOM FORESTS (14/14)** — all 2026-08-20.
-   Trees & ensembles family is 2/4 tracks done. **Next in the family: Boosting** (`/learn/boosting`) — AdaBoost +
-   gradient boosting, the tabular ceiling-raiser. Reuse the tree CART code + the "parallel variance (forest) vs
-   sequential bias (boosting)" framing already teed up on random-forests' forest-vs-tree-vs-boosting page + case.
-   Flagship lab idea: a sequential residual-fitting stagewise lab (watch each stump correct the last; learning-rate
-   + n_rounds → train/val curves that CAN overfit, unlike the forest). Then **Stacking**. Other greyed surfaces if
-   pivoting: **Classification** — Naive Bayes, SVM (low-effort sibling of built SVR), kernel methods. Prefer finishing
-   the Trees family. NOTE: a live-visual eyeball of the decision-trees + random-forests labs is still owed (dev server
-   was wedged 2026-08-20; both tracks verified via `next build` + node instead).
-4b. **NEURAL NETWORKS — two requested tracks, spec'd 2026-08-28 (user request).** The family's
-   roadmap entry "Activations, init & normalisation" was one line covering three unrelated jobs;
-   split into **`Activation functions — choosing & designing`** and **`Architecture design — depth,
-   width & what to apply when`**, both spec'd in full at `docs/curriculum-map.md` §6.6a / §6.6b.
-   The user's framing, which is the binding requirement: *how each activation works · when exactly
-   to use which · how to develop the intuition to select one · how to design a new one for a
-   requirement*; then *how to plan layers and neuron counts and when to apply what*. So both tracks
-   are **intuition-first, not catalogue-first** — 6.6a teaches activations as a small space of
-   **properties** (gradient behaviour, range/zero-centring, smoothness, cost) so a learner can
-   diagnose a stuck run and could derive Swish from its requirements; 6.6b answers "how many layers,
-   how many neurons" as **a directed search procedure with priors** (get it training → overfit
-   deliberately → regularise), with each technique introduced at the symptom that motivates it.
-   Flagship labs: `ActivationExplorerLab` (curve **and** derivative, live dead-gradient shading) and
-   `ArchitectureSandboxLab`. Two honest-numbers scripts required — `activation_cases.py` (one fixed
-   MLP, every activation, plus the per-layer gradient-norm table) and `architecture_cases.py` (a real
-   depth × width sweep). ⚠️ Both scripts must clear
-   [[verify-the-effect-before-writing-the-prose]]: check the vanishing gradient and the
-   depth-beats-width gap actually appear at the chosen constants before writing the claim.
-   Prereqs: backprop for 6.6a; learning curves + capacity (Model selection) for 6.6b. Neither is
-   built — **roadmap only.** These are the first NN tracks, so they also pay the family's
-   infrastructure cost (accent `--c-neural` coral, a track lib, a layout).
+   CV/bias–variance) is the oldest unpaid debt in the best track. **The top *polish* priority**, and
+   the oldest one on the list: many tracks and two whole families are complete, yet the *flagship*
+   LR track still carries debt from the first month.
+4. ✅ **KNN (36/36)** + ✅ **REGRESSION FAMILY** + ✅ **DECISION TREES (19)** + ✅ **RANDOM FORESTS (20)**
+   (2026-08-20/21) + ✅ **BOOSTING (22)** (2026-08-21). **Trees & ensembles is 3/4 tracks done —
+   `Stacking` is the only one left**, and both the forest and boosting tracks already tee it up.
+   *(Corrected 2026-08-31: this entry previously said 2/4 with Boosting as "next" and claimed a
+   live-visual eyeball of the tree labs was still owed. Boosting shipped 2026-08-21 with 3 labs, and
+   all 12 tree-family labs were verified live on 2026-08-22 — the "wedged dev server" was only the
+   `basePath: '/Manifold'` prefix.)*
+   Other greyed surfaces if pivoting away from Trees: **Classification** — Naive Bayes, SVM
+   (low-effort sibling of the built SVR), kernel methods.
+4b. **NEURAL NETWORKS — finish the family. Tracks 1–3 are BUILT (see 0n/0o); three remain**, and
+   the user's standing brief is to *close it completely*. Build them in this order:
+   - **4. Architecture design — depth, width & what to apply when** — spec'd in full at
+     `docs/curriculum-map.md` §6.6b. Answers "how many layers, how many neurons" as **a directed
+     search procedure with priors** (get it training → overfit deliberately → regularise), each
+     technique introduced at the symptom that motivates it. Flagship `ArchitectureSandboxLab`;
+     script `architecture_cases.py` (a real depth × width sweep). ⚠️ **`CapacityLadderLab` and
+     `SpiralLab` already exist** (track 1) — reuse or rename, and run
+     `grep -rl <LabName> src/` before creating any lab (see the near-miss in §12.6 notes).
+     Prereqs: learning curves + capacity from Model selection. Three assets are already waiting for
+     it: the memory bill's depth-vs-width scaling (params ∝ W², activations ∝ W), track 1's capacity
+     ladder, and the residual-connections-as-a-gradient-fix thread that both other tracks tee up.
+   - **5. Initialisation & normalisation** — the family's largest unpaid debt, because **all three
+     built tracks defer to it by name**. Activations measured the honest complication repeatedly:
+     the same sigmoid net spans a 29,000,000× and a 65× gradient ratio on **initialisation scale
+     alone**, and `where-your-units-sit` shows tanh drifting from 0.1% to 30.1% saturated *during
+     training* (2% → 82% by layer). That is this track's opening argument, already measured.
+   - **6. Regularisation — dropout, weight decay, early stopping.**
+   ⚠️ Every script must clear [[verify-the-effect-before-writing-the-prose]] — it fired four
+   separate times across tracks 1–3, twice on experiments that measured nothing and twice on
+   experiments that measured the wrong quantity.
 5. **Challenge mode + URL-hash lab state** (§10.3 leftovers) — goals convert fiddling into
    learning; shareable lab states are free marketing.
 6. **Chapter recaps + Tier-0 prerequisite pills** (§4 leftovers) — the last unshipped

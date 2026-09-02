@@ -218,7 +218,7 @@ export default function UniversalApproximationPage() {
 
         <PrevNext
           prev={{ href: "/learn/perceptron-to-mlp/what-can-go-wrong", label: <>← What can go wrong</> }}
-          next={{ href: "/learn/perceptron-to-mlp/where-an-mlp-wins", label: <>Next up · Where an MLP wins →</> }}
+          next={{ href: "/learn/perceptron-to-mlp/many-equivalent-solutions", label: <>Next up · Where an MLP wins →</> }}
         />
       </div>
     </article>

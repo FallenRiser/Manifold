@@ -164,7 +164,7 @@ export default function LearningRatePage() {
 
         <PrevNext
           prev={{ href: "/learn/backpropagation/backprop-bugs", label: <>← The bugs you will actually hit</> }}
-          next={{ href: "/learn/backpropagation/batch-size-and-noise", label: <>Next up · Batch size &amp; gradient noise →</> }}
+          next={{ href: "/learn/backpropagation/learning-rate-schedules", label: <>Next up · Batch size &amp; gradient noise →</> }}
         />
       </div>
     </article>

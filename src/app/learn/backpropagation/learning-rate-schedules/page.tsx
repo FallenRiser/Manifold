@@ -81,7 +81,8 @@ export default function SchedulesPage() {
         </p>
         <p>
           <strong>The loss floor: large and real.</strong> Best constant 0.1318, cosine 0.0920 — the schedule
-          reaches a training loss <strong>43% lower</strong>. That is the noise-floor argument above, measured.
+          reaches a training loss <strong>30% lower</strong>, or equivalently the best constant sits 43% above what
+          decaying achieves. That is the noise-floor argument above, measured.
         </p>
         <p>
           <strong>The variance: large and real, and underrated.</strong> The loss spread across five seeds is{" "}

@@ -22,8 +22,8 @@ const CHAPTERS: { name: string; href: string; blurb: string; topics: string }[] 
   {
     name: "The algorithm",
     href: "/learn/backpropagation/the-backward-pass",
-    blurb: "The backward pass in full, worked by hand on thirteen parameters, then written once in matrix form — and the reuse argument that explains the speed.",
-    topics: "the backward pass · by hand · four equations · why it is cheap",
+    blurb: "The backward pass in full, worked by hand on thirteen parameters, then written once in matrix form — the reuse argument that explains the speed, and the memory bill that pays for it.",
+    topics: "the backward pass · by hand · four equations · why it is cheap · the memory bill",
   },
   {
     name: "Doing it for real",
@@ -34,8 +34,8 @@ const CHAPTERS: { name: string; href: string; blurb: string; topics: string }[] 
   {
     name: "Training dynamics",
     href: "/learn/backpropagation/the-learning-rate",
-    blurb: "The gradient tells you a direction, not a distance. Everything that decides how far to go, measured on one problem.",
-    topics: "learning rate · batch size · momentum & Adam · saddles",
+    blurb: "The gradient tells you a direction, not a distance. Everything that decides how far to go — and how far to go later — measured on one problem.",
+    topics: "learning rate · schedules · batch size · momentum & Adam · saddles",
   },
   {
     name: "When gradients misbehave",

@@ -187,7 +187,7 @@ export default function BatchSizePage() {
         />
 
         <PrevNext
-          prev={{ href: "/learn/backpropagation/the-learning-rate", label: <>← The learning rate</> }}
+          prev={{ href: "/learn/backpropagation/learning-rate-schedules", label: <>← The learning rate</> }}
           next={{ href: "/learn/backpropagation/momentum-and-adaptive-methods", label: <>Next up · Momentum &amp; adaptive methods →</> }}
         />
       </div>

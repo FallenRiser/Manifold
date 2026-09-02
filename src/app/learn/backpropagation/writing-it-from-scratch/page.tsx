@@ -197,7 +197,7 @@ final accuracy on the ten: 1.0`}</CodeOutput>
         />
 
         <PrevNext
-          prev={{ href: "/learn/backpropagation/why-it-is-cheap", label: <>← Why it is cheap</> }}
+          prev={{ href: "/learn/backpropagation/the-memory-bill", label: <>← Why it is cheap</> }}
           next={{ href: "/learn/backpropagation/gradient-checking", label: <>Next up · Gradient checking →</> }}
         />
       </div>

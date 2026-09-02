@@ -68,7 +68,7 @@ export const FAMILIES: Group[] = [
     tracks: [
       { title: "Logistic regression", href: "/learn/logistic-regression" },
       { title: "k-Nearest Neighbors", href: "/learn/k-nearest-neighbors" },
-      { title: "Naive Bayes" },
+      { title: "Naive Bayes", href: "/learn/naive-bayes" },
       { title: "Support Vector Machines" },
       { title: "Kernel methods" },
       { title: "Perceptron & online classifiers" },
@@ -117,9 +117,9 @@ export const FAMILIES: Group[] = [
       { title: "Perceptron → multilayer perceptron", href: "/learn/perceptron-to-mlp" },
       { title: "Backpropagation & training", href: "/learn/backpropagation" },
       { title: "Activation functions — choosing & designing", href: "/learn/activation-functions" },
-      { title: "Architecture design — depth, width & what to apply when" },
-      { title: "Initialisation & normalisation" },
-      { title: "Regularisation (dropout, weight decay)" },
+      { title: "Architecture design — depth, width & what to apply when", href: "/learn/architecture-design" },
+      { title: "Initialisation & normalisation", href: "/learn/initialisation-and-normalisation" },
+      { title: "Regularisation (dropout, weight decay)", href: "/learn/nn-regularisation" },
     ],
   },
   {

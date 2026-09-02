@@ -197,7 +197,7 @@ export default function SaturationPage() {
 
         <PrevNext
           prev={{ href: "/learn/activation-functions/the-derivative-is-the-point", label: <>← The derivative is the point</> }}
-          next={{ href: "/learn/activation-functions/the-step", label: <>Next up · The step, and why it could not be trained →</> }}
+          next={{ href: "/learn/activation-functions/where-your-units-sit", label: <>Next up · The step, and why it could not be trained →</> }}
         />
       </div>
     </article>

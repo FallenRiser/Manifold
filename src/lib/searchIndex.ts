@@ -10,6 +10,7 @@ import { BOOSTING_TRACK } from "./boostingTrack";
 import { KM_TRACK } from "./kMeansTrack";
 import { PCA_TRACK } from "./pcaTrack";
 import { KNN_TRACK } from "./knnTrack";
+import { NB_TRACK } from "./naiveBayesTrack";
 import { LOG_TRACK } from "./logisticRegressionTrack";
 import { EVAL_TRACK } from "./evaluationTrack";
 import { MF_TRACK } from "./mathFoundationsTrack";
@@ -19,6 +20,9 @@ import { DW_TRACK } from "./dataWorkflowTrack";
 import { PM_TRACK } from "./perceptronMlpTrack";
 import { BP_TRACK } from "./backpropTrack";
 import { ACT_TRACK } from "./activationsTrack";
+import { ARCH_TRACK } from "./architectureTrack";
+import { INIT_TRACK } from "./initNormTrack";
+import { REG_NN_TRACK } from "./regularisationTrack";
 import { CAP_TRACK } from "./housingCapstoneTrack";
 import { NEO_TRACK } from "./neoCapstoneTrack";
 import type { TrackChapter } from "./linearRegressionTrack";
@@ -47,6 +51,7 @@ const TRACKS: { name: string; accent: string; chapters: TrackChapter[] }[] = [
   { name: "k-Means", accent: "var(--c-clustering)", chapters: KM_TRACK },
   { name: "Principal component analysis", accent: "var(--c-dimred)", chapters: PCA_TRACK },
   { name: "k-Nearest neighbors", accent: "var(--c-classification)", chapters: KNN_TRACK },
+  { name: "Naive Bayes", accent: "var(--c-classification)", chapters: NB_TRACK },
   { name: "Logistic regression", accent: "var(--c-classification)", chapters: LOG_TRACK },
   { name: "Evaluation & metrics", accent: "var(--c-metrics)", chapters: EVAL_TRACK },
   { name: "Math foundations", accent: "var(--c-fundamentals)", chapters: MF_TRACK },
@@ -56,6 +61,9 @@ const TRACKS: { name: string; accent: string; chapters: TrackChapter[] }[] = [
   { name: "Perceptron → MLP", accent: "var(--c-neural)", chapters: PM_TRACK },
   { name: "Backpropagation", accent: "var(--c-neural)", chapters: BP_TRACK },
   { name: "Activation functions", accent: "var(--c-neural)", chapters: ACT_TRACK },
+  { name: "Architecture design", accent: "var(--c-neural)", chapters: ARCH_TRACK },
+  { name: "Initialisation & normalisation", accent: "var(--c-neural)", chapters: INIT_TRACK },
+  { name: "Regularisation", accent: "var(--c-neural)", chapters: REG_NN_TRACK },
   { name: "Housing capstone", accent: "var(--c-regression)", chapters: CAP_TRACK },
   { name: "Asteroid-hazard capstone", accent: "var(--c-space)", chapters: NEO_TRACK },
 ];

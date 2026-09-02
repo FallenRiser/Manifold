@@ -212,7 +212,7 @@ for name, model in [("baseline", DummyClassifier(strategy="most_frequent")),
         />
 
         <PrevNext
-          prev={{ href: "/learn/perceptron-to-mlp/universal-approximation", label: <>← Universal approximation</> }}
+          prev={{ href: "/learn/perceptron-to-mlp/many-equivalent-solutions", label: <>← Universal approximation</> }}
           next={{ href: "/learn/perceptron-to-mlp/where-an-mlp-loses", label: <>Next up · Where an MLP loses →</> }}
         />
       </div>

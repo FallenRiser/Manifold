@@ -16,8 +16,8 @@ const CHAPTERS: { name: string; href: string; blurb: string; topics: string }[] 
   {
     name: "What an activation is for",
     href: "/learn/activation-functions/the-non-negotiable",
-    blurb: "The one property that is not negotiable, the half of the picture nobody draws, and the single measurement that predicts every failure in the rest of the track.",
-    topics: "non-linearity · the derivative · saturation",
+    blurb: "The one property that is not negotiable, the half of the picture nobody draws, the measurement that predicts every failure in the track — and where your units actually sit on the curve.",
+    topics: "non-linearity · the derivative · saturation · where units sit",
   },
   {
     name: "The squashing era",

@@ -123,15 +123,31 @@ Each family is a hub of algorithm **tracks**; each track spans Tiers 1–3.
 - Random projections & the Johnson–Lindenstrauss lemma *(Tier 3)*
 
 ### 6.6 Neural networks · coral
-- From perceptron to the multilayer perceptron
-- Backpropagation & training dynamics
-- **Activation functions — choosing & designing** *(own track, see below)*
-- **Architecture design — depth, width & what to apply when** *(own track, see below)*
-- Initialisation & normalisation
-- Regularisation — dropout, weight decay, early stopping
+Built in **dependency order, not list order** (2026-08-30/31): activations cannot be taught
+honestly before gradients, and architecture not before activations.
+
+1. ✅ **From perceptron to the multilayer perceptron** — **BUILT · 21 pages ·
+   `/learn/perceptron-to-mlp`**. Spine: *a neuron is a linear model with a switch, and stacking
+   them buys features you did not design.* Chapters: the unit · one neuron is not enough · the
+   forward pass · making it learn · what networks are and are not. 7 labs; script
+   `perceptron_mlp_cases.py`. Owns the unit, the stack and the forward pass — training is named,
+   not opened.
+2. ✅ **Backpropagation & training dynamics** — **BUILT · 22 pages · `/learn/backpropagation`**.
+   Spine: *backprop is the chain rule, organised so nothing is computed twice.* Chapters: the
+   problem · the algorithm · doing it for real · training dynamics · when gradients misbehave.
+   4 labs; script `backprop_cases.py`. Owns the gradient pathologies **as pathologies**; the fixes
+   belong to 6.6a and to Initialisation & normalisation.
+3. ✅ **Activation functions — choosing & designing** — **BUILT · 21 pages ·
+   `/learn/activation-functions`** *(spec + what shipped, §6.6a below)*
+4. ⬜ **Architecture design — depth, width & what to apply when** *(spec'd, §6.6b below)*
+5. ⬜ **Initialisation & normalisation** — the family's largest unpaid debt: all three built tracks
+   defer to it by name, and two of them have already **measured its opening argument** (the same
+   sigmoid net spans a 29,000,000× and a 65× gradient ratio on init scale alone; tanh drifts from
+   0.1% to 30.1% saturated during training, 2% → 82% by layer).
+6. ⬜ **Regularisation — dropout, weight decay, early stopping**
 - *(Later/stretch: CNNs, sequence models, attention)*
 
-#### 6.6a Activation functions — choosing & designing · Tier 1→2
+#### 6.6a Activation functions — choosing & designing · Tier 1→2 · **BUILT 2026-08-30**
 
 The goal is not a lookup table of formulas; it is **a learner who can look at a stuck
 training run and name which property of their activation caused it**, and who could
@@ -183,6 +199,27 @@ sigmoid dies, ReLU doesn't) · `DyingReLULab` · `ActivationBakeoffLab`
 every activation, measured; plus the per-layer gradient-norm table that makes the
 vanishing-gradient claim concrete rather than asserted.
 
+##### What actually shipped, and where it left the spec
+21 pages / 5 chapters: *what an activation is for · the squashing era · the ReLU family ·
+the smooth moderns · choosing & designing*. The spec above is otherwise covered in full.
+Three deliberate departures, all worth keeping in mind for tracks 4–6:
+
+- **`VanishingGradientLab` was not built.** The backprop track had already shipped
+  `GradientFlowLab` doing exactly that job, so it gained an `extended` prop adding the rest of
+  the zoo (§12.6 rule 2 — upgrade the shared component, not the instance). Backprop's own page
+  still shows its original three series.
+- **One page was added that the spec did not anticipate: `where-your-units-sit`** (§8 of the
+  script). It measures the pre-activation distribution rather than the curve, and it **corrects the
+  standard story the rest of the track had been telling**: sigmoid is **0.0% saturated at
+  initialisation** and 0.7% after training, so "sigmoid units saturate ⇒ gradients vanish" is false.
+  The units sit in the *best* part of the curve and 0.25 still compounds. tanh is the activation
+  that actually drifts out (0.1% → 30.1%; 2% → 82% by layer). Any track that argues about regions of
+  a curve owes the reader this measurement.
+- **The track refuses to rank the activations.** Five seeds, and six of seven candidates finish
+  inside a band narrower than their own seed spread; only sigmoid separates. The defensible claim is
+  about *variance* (Swish spread 0.019 vs ReLU 0.114), not about a ceiling. Reporting a single run
+  per activation — which is what most of the literature does — could demonstrate any ordering.
+
 #### 6.6b Architecture design — depth, width & what to apply when · Tier 2
 
 The question every learner asks first and every course answers last: *how many layers,
@@ -209,12 +246,30 @@ how many neurons?* Answered as **a search procedure with priors**, not a number.
 
 **Labs.** `ArchitectureSandboxLab` (flagship — add/remove layers and neurons on a live
 2-D task, watch the decision boundary and the parameter count move together) ·
-`DepthVsWidthLab` (same parameter budget, spent two ways) · `CapacityLadderLab`
+`DepthVsWidthLab` (same parameter budget, spent two ways) · ~~`CapacityLadderLab`~~
 (underfit → fit → overfit, driven by width alone).
+
+⚠️ **`CapacityLadderLab` and `SpiralLab` already exist** — track 1 built both. Reuse the
+capacity ladder rather than rebuilding it (it already runs 1 → 256 units on moons with
+train/test at each step), and **run `grep -rl <LabName> src/` before creating any lab**: a
+`Write` to an existing lab path silently replaces a component other tracks depend on.
 
 **Honest numbers.** `scripts/architecture_cases.py` — a real depth × width sweep with
 measured train/val, so the recommendations are read off data and the plateau is
 visible.
+
+**Three measurements already banked by the built tracks**, which this one should pick up
+rather than re-derive:
+- **Depth and width cost different things.** From backprop's memory bill: parameters scale as
+  `W²` per layer and activations as `W`, so 4× the width is 16× the parameters and 4× the
+  activations, while 4× the depth quadruples both. A wide-shallow net is parameter-heavy; a
+  deep-narrow one is activation-heavy.
+- **The capacity ladder is measured** (track 1): 1 unit 0.6410 → 3 units 0.8524 → 64 units
+  0.9190 → 256 units 0.9181, i.e. the plateau is real and the train–test gap does *not* widen
+  monotonically — a "widening gap" claim was checked and withdrawn.
+- **Depth rescued the ReLU family** in the activation bakeoff (ReLU 0.784 → 0.839 going from 2 to
+  10 hidden layers) and destroyed sigmoid over the same change. Depth amplifies the per-layer
+  factor in both directions, which is the cleanest available bridge from 6.6a into this track.
 
 **Prerequisites:** backpropagation (for 6.6a's gradient story), learning curves and
 the capacity material in Model selection (for 6.6b). Both are Tier 1→2; the

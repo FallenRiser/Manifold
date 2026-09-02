@@ -139,7 +139,7 @@ export default function StepPage() {
         />
 
         <PrevNext
-          prev={{ href: "/learn/activation-functions/saturation", label: <>← Saturation</> }}
+          prev={{ href: "/learn/activation-functions/where-your-units-sit", label: <>← Saturation</> }}
           next={{ href: "/learn/activation-functions/sigmoid", label: <>Next up · Sigmoid →</> }}
         />
       </div>

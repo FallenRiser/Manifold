@@ -39,8 +39,8 @@ const CHAPTERS: { name: string; href: string; blurb: string; topics: string }[] 
   {
     name: "What networks are and are not",
     href: "/learn/perceptron-to-mlp/universal-approximation",
-    blurb: "The famous theorem and the much smaller thing it actually promises, then two measured cases: one where a network is transformative and one where it loses to a forest.",
-    topics: "universal approximation · where it wins · where it loses · when to reach",
+    blurb: "The famous theorem and the much smaller thing it actually promises, why the same function has astronomically many spellings, then two measured cases — one where a network is transformative and one where it loses to a forest.",
+    topics: "universal approximation · no single best weights · where it wins · where it loses · when to reach",
   },
 ];
 

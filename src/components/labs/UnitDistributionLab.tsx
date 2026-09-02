@@ -14,7 +14,7 @@ import { useState } from "react";
 
 type Row = {
   key: string; label: string; init: number[]; trained: number[];
-  sat0: number; sat1: number; sd0: number; sd1: number; max1: number;
+  sat0: number; sat1: number; sd0: number; sd1: number; max0: number; max1: number;
   acc: number; perLayer: number[]; note: string;
 };
 
@@ -25,7 +25,7 @@ const ROWS: Row[] = [
     key: "sigmoid", label: "sigmoid",
     init: [0.0, 0.0001, 0.003, 0.0257, 0.5428, 0.405, 0.0232, 0.0003, 0.0, 0.0],
     trained: [0.0013, 0.0103, 0.1162, 0.2069, 0.2976, 0.2005, 0.1138, 0.05, 0.0031, 0.0002],
-    sat0: 0.0, sat1: 0.007, sd0: 0.521, sd1: 1.424, max1: 8.87, acc: 0.9190,
+    sat0: 0.0, sat1: 0.007, sd0: 0.521, sd1: 1.424, max0: 4.14, max1: 8.87, acc: 0.9190,
     perLayer: [0.016, 0.0002, 0.0, 0.0018, 0.0, 0.024],
     note: "The result that should surprise you. Sigmoid is the activation this track has spent five pages criticising, and at initialisation 0.0% of its units are saturated — every one of them sits in the steep middle of the curve, spread 0.52 wide. After training it is still only 0.7%. Sigmoid's problem at depth was never that its units sit in the flat tails; it is that even in the steep middle the slope is at most 0.25, and 0.25 compounds.",
   },
@@ -33,7 +33,7 @@ const ROWS: Row[] = [
     key: "tanh", label: "tanh",
     init: [0.0, 0.0001, 0.003, 0.0214, 0.4669, 0.4894, 0.0189, 0.0003, 0.0, 0.0],
     trained: [0.0549, 0.0463, 0.1088, 0.1065, 0.1845, 0.1858, 0.1058, 0.1153, 0.0393, 0.0529],
-    sat0: 0.0009, sat1: 0.3008, sd0: 0.425, sd1: 3.243, max1: 15.49, acc: 0.9048,
+    sat0: 0.0009, sat1: 0.3008, sd0: 0.425, sd1: 3.243, max0: 4.14, max1: 15.49, acc: 0.9048,
     perLayer: [0.0205, 0.2053, 0.1766, 0.208, 0.3761, 0.8183],
     note: "Starts almost perfectly centred — 0.1% saturated, spread 0.43 — and training pushes it outward to 30.1%, with the spread growing from 0.43 to 3.24. Read the per-layer row: 2% in the first hidden layer rising to 82% in the last. Saturation here is something training CAUSED, and it is concentrated at the end of the network.",
   },
@@ -41,7 +41,7 @@ const ROWS: Row[] = [
     key: "relu", label: "ReLU",
     init: [0.0, 0.0013, 0.0165, 0.0946, 0.3937, 0.4044, 0.079, 0.0106, 0.0, 0.0],
     trained: [0.0968, 0.0743, 0.154, 0.1458, 0.1731, 0.152, 0.076, 0.0631, 0.0272, 0.0377],
-    sat0: 0.506, sat1: 0.644, sd0: 0.818, sd1: 4.374, max1: 105.31, acc: 0.8952,
+    sat0: 0.506, sat1: 0.644, sd0: 0.818, sd1: 4.374, max0: 5.86, max1: 105.31, acc: 0.8952,
     perLayer: [0.5208, 0.5862, 0.5883, 0.6838, 0.7601, 0.7247],
     note: "50.6% switched off before training has started — which is not a failure but the definition of ReLU: half the line has zero slope and a symmetric initialisation puts half the units there. Training takes it to 64.4%. Note the largest pre-activation: 105.3, against sigmoid's 8.9. Nothing bounds a ReLU network's activations, and they grow.",
   },
@@ -61,6 +61,7 @@ export function UnitDistributionLab() {
   const bw = (X1 - X0) / BINS.length;
   const sat = when === "init" ? r.sat0 : r.sat1;
   const sd = when === "init" ? r.sd0 : r.sd1;
+  const mx = when === "init" ? r.max0 : r.max1;
 
   return (
     <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 16, padding: 16, margin: "1.6rem 0" }} className="not-prose">
@@ -140,7 +141,7 @@ export function UnitDistributionLab() {
         {[
           ["units saturated", `${(sat * 100).toFixed(1)}%`, sat > 0.25],
           ["spread of z", sd.toFixed(3), false],
-          [when === "trained" ? "largest |z|" : "test accuracy", when === "trained" ? r.max1.toFixed(2) : "—", when === "trained" && r.max1 > 50],
+          ["largest |z|", mx.toFixed(2), mx > 50],
         ].map(([l, v, bad]) => (
           <div key={l as string} style={{ background: "var(--surface-2)", borderRadius: 10, padding: "6px 10px", flex: "1 1 110px" }}>
             <div style={{ fontSize: 10.5, color: "var(--muted)" }}>{l as string}</div>

@@ -68,6 +68,45 @@ y = default
 df = pd.DataFrame(X, columns=feature_names); df["default"] = y
 `;
 
+// Naive-Bayes context. Deliberately CORRELATED features (4 redundant on top of
+// 6 informative, class_sep 0.8, 5% label noise) so the independence assumption
+// is violated and GaussianNB comes out overconfident — the calibration story.
+// Numbers on the pages come from scripts/naive_bayes_cases.py.
+export const NB_SETUP = `import numpy as np
+from sklearn.naive_bayes import GaussianNB, MultinomialNB, BernoulliNB
+from sklearn.linear_model import LogisticRegression
+from sklearn.datasets import make_classification
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
+X, y = make_classification(n_samples=4000, n_features=12, n_informative=6,
+                           n_redundant=4, n_clusters_per_class=2,
+                           class_sep=0.8, flip_y=0.05, random_state=0)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.5, random_state=0)
+X_new = X_test[:3]
+`;
+
+// Naive-Bayes TEXT context — a small synthetic bag-of-words corpus (the same
+// two-topic model as scripts/naive_bayes_cases.py), so Multinomial/Bernoulli
+// and smoothing snippets run offline. X_* are word-count matrices.
+export const NB_TEXT_SETUP = `import numpy as np
+from sklearn.naive_bayes import MultinomialNB, BernoulliNB
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
+_rng = np.random.RandomState(0)
+_vocab, _doc_len, _n = 400, 25, 1200
+_base = _rng.gamma(0.4, size=_vocab)
+def _topic(idx):
+    w = _base.copy(); w[idx] *= 2.4; return w / w.sum()
+_sa = _rng.choice(_vocab, 18, replace=False)
+_sb = _rng.choice(_vocab, 18, replace=False)
+_pa, _pb = _topic(_sa), _topic(_sb)
+X = np.array([_rng.multinomial(_doc_len, _pa if d % 2 == 0 else _pb) for d in range(_n)])
+y = np.array([d % 2 for d in range(_n)])
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=0, stratify=y)
+X_new = X_test[:3]
+`;
+
 // Classification context — k-nearest-neighbors track.
 export const KNN_SETUP = `import numpy as np
 from sklearn.datasets import make_classification

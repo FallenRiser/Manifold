@@ -59,10 +59,12 @@ export default function ManyEquivalentSolutionsPage() {
           tryThis={<>Step through all five presets and watch the two boxes at the bottom move in opposite
             directions. <strong>Negate units 1 &amp; 2</strong> is the one worth pausing on — it changes the sign of
             half the weights.</>}
-          insight={<>Every preset moves the weights and none of them move the outputs. The difference column reads{" "}
-            <strong>0</strong> — genuinely zero, because these are the same arithmetic operations in a different
-            order rather than an approximation. On a real trained network with 16 hidden units, permuting the layer
-            moved the weights by a mean of <strong>0.8855</strong> and the predictions by{" "}
+          insight={<>Every preset moves the weights — by 0.22 to 1.15 on average — and none of them move the
+            outputs. The difference column reads <strong>0</strong> or{" "}
+            <strong>10<sup>−16</sup></strong>: exactly zero when the arithmetic happens to be identical, and one
+            unit in the last place of a double when the same sum is accumulated in a different order. Both are the
+            absence of a change, not a small one. On a real trained network with 16 hidden units, permuting the
+            layer moved the weights by a mean of <strong>0.8855</strong> and the predictions by{" "}
             <strong>2.2 × 10<sup>−16</sup></strong>.</>}
         >
           <WeightSymmetryLab />

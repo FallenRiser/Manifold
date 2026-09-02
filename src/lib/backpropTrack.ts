@@ -39,6 +39,7 @@ export const BP_TRACK: TrackChapter[] = [
       { title: "Backprop by hand", href: "/learn/backpropagation/backprop-by-hand" },
       { title: "The four equations", href: "/learn/backpropagation/the-four-equations" },
       { title: "Why it is cheap", href: "/learn/backpropagation/why-it-is-cheap" },
+      { title: "The memory bill", href: "/learn/backpropagation/the-memory-bill" },
     ],
   },
   {
@@ -56,6 +57,7 @@ export const BP_TRACK: TrackChapter[] = [
     tier: 2,
     pages: [
       { title: "The learning rate", href: "/learn/backpropagation/the-learning-rate" },
+      { title: "Learning-rate schedules", href: "/learn/backpropagation/learning-rate-schedules" },
       { title: "Batch size & gradient noise", href: "/learn/backpropagation/batch-size-and-noise" },
       { title: "Momentum & adaptive methods", href: "/learn/backpropagation/momentum-and-adaptive-methods" },
       { title: "Saddles, plateaus & why noise helps", href: "/learn/backpropagation/saddles-and-plateaus" },

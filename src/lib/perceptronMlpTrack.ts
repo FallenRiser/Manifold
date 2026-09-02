@@ -62,6 +62,7 @@ export const PM_TRACK: TrackChapter[] = [
     tier: 2,
     pages: [
       { title: "Universal approximation", href: "/learn/perceptron-to-mlp/universal-approximation" },
+      { title: "There is no single best set of weights", href: "/learn/perceptron-to-mlp/many-equivalent-solutions" },
       { title: "Where an MLP wins", href: "/learn/perceptron-to-mlp/where-an-mlp-wins" },
       { title: "Where an MLP loses", href: "/learn/perceptron-to-mlp/where-an-mlp-loses" },
       { title: "When to reach for a network", href: "/learn/perceptron-to-mlp/when-to-reach-for-a-network" },

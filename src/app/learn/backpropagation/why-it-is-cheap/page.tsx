@@ -205,7 +205,7 @@ export default function WhyCheapPage() {
 
         <PrevNext
           prev={{ href: "/learn/backpropagation/the-four-equations", label: <>← The four equations</> }}
-          next={{ href: "/learn/backpropagation/writing-it-from-scratch", label: <>Next up · Writing it from scratch →</> }}
+          next={{ href: "/learn/backpropagation/the-memory-bill", label: <>Next up · Writing it from scratch →</> }}
         />
       </div>
     </article>
