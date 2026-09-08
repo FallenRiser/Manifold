@@ -82,9 +82,8 @@ export default function InitNormHub() {
           pre-activation std within a factor of two of one across all eight layers.
         </p>
 
-        <Callout color={CORAL} title={<>The version of this you can check</>}>
-          Every number in this track comes from <code>scripts/init_norm_cases.py</code>, run on
-          python 3.13 / sklearn 1.8 / numpy 2.3. That includes the honest findings: Xavier is the{" "}
+        <Callout color={CORAL} title={<>The honest findings, kept in</>}>
+          Every number in this track is measured, not asserted. That includes the honest findings: Xavier is the{" "}
           <em>wrong</em> init for ReLU (its variance decays 0.25 → 0.0008 over ten layers while He&rsquo;s
           holds near 0.6), zero initialisation gives a network of effective width one, and normalisation
           buys its stability by making the init scale <em>almost stop mattering</em> — not by making any

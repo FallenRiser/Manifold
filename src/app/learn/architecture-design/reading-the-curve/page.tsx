@@ -176,8 +176,7 @@ export default function ReadingTheCurvePage() {
         </div>
         <p style={{ fontSize: 13, color: "var(--muted)" }}>
           All models trained on two-moons (1000 train, 200 test) with ReLU, Adam lr=0.001, 200
-          epochs, averaged over five seeds. Section 6 of{" "}
-          <code>scripts/architecture_cases.py</code>.
+          epochs, averaged over five seeds.
         </p>
 
         <Proof color={CORAL} title="why loss is more informative than accuracy during training">

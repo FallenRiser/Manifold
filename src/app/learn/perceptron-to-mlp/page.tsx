@@ -82,8 +82,7 @@ export default function PerceptronMlpHub() {
           <strong>5 parameters</strong>, and over 500 inputs the two disagree by{" "}
           <strong>4×10<sup>−13</sup></strong> — floating-point noise. On two moons, that same activation-free
           64–64 network scores <strong>0.8571</strong>, which is <em>exactly</em> what plain logistic regression
-          scores on the same split. Turn one activation function back on: <strong>0.9143</strong>. Real runs, in{" "}
-          <code>scripts/perceptron_mlp_cases.py</code>.
+          scores on the same split. Turn one activation function back on: <strong>0.9143</strong>.
         </Callout>
 
         <h2>How this track teaches</h2>
@@ -132,9 +131,8 @@ export default function PerceptronMlpHub() {
 
         <h2>Every number here is measured</h2>
         <p>
-          Every figure quoted in this track comes from <code>scripts/perceptron_mlp_cases.py</code>, run on
-          python 3.13.11 / sklearn 1.8.0 / numpy 2.3.5, with the protocol stated on the page. That includes the
-          unflattering ones: on 8×8 handwritten digits a neural network beats logistic regression by{" "}
+          Every figure quoted in this track is measured, not asserted, with the protocol stated on the page. That
+          includes the unflattering ones: on 8×8 handwritten digits a neural network beats logistic regression by{" "}
           <strong>0.0019</strong>, and on a tabular task a random forest beats it outright. Those numbers are here
           because a track that only shows the wins teaches you to reach for the wrong tool.
         </p>

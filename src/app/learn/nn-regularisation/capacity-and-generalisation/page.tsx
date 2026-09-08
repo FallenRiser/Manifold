@@ -67,7 +67,7 @@ export default function CapacityAndGeneralisationPage() {
           </table>
         </div>
         <p style={{ fontSize: 13, color: "var(--muted)" }}>
-          Full-batch AdamW, 400 epochs, ReLU, 3-seed averages. From <code>scripts/regularisation_cases.py</code>.
+          Full-batch AdamW, 400 epochs, ReLU, 3-seed averages.
         </p>
 
         <h2>The surprise</h2>

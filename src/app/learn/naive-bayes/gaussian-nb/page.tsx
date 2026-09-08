@@ -21,6 +21,24 @@ from sklearn.model_selection import train_test_split
 X, y = load_wine(return_X_y=True)        # 13 continuous features, 3 cultivars
 Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.3, random_state=0, stratify=y)
 
+# one bell curve per feature per class -- mean, variance, prior, all by counting
+classes = np.unique(ytr)
+prior = np.array([(ytr == c).mean()          for c in classes])
+means = np.array([Xtr[ytr == c].mean(axis=0) for c in classes])
+varis = np.array([Xtr[ytr == c].var(axis=0)  for c in classes])
+varis += 1e-9 * Xtr.var(axis=0).max()        # tiny variance floor, as sklearn does
+
+# classify in log-space: log prior + sum of per-feature Gaussian log-densities
+ll   = -0.5 * (np.log(2*np.pi*varis) + (Xte[:, None, :] - means)**2 / varis).sum(axis=2)
+pred = (np.log(prior) + ll).argmax(axis=1)
+print("test accuracy:", round((pred == yte).mean(), 3))   # 0.963`;
+
+  const withLibrary = `from sklearn.datasets import load_wine
+from sklearn.model_selection import train_test_split
+
+X, y = load_wine(return_X_y=True)        # 13 continuous features, 3 cultivars
+Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.3, random_state=0, stratify=y)
+
 nb = GaussianNB().fit(Xtr, ytr)          # 39 means + 39 variances, ONE pass
 print("test accuracy:", round(accuracy_score(yte, nb.predict(Xte)), 3))   # 0.963
 print("means shape  :", nb.theta_.shape)   # (3 classes, 13 features)`;
@@ -85,7 +103,7 @@ print("means shape  :", nb.theta_.shape)   # (3 classes, 13 features)`;
           accuracy. Fit it yourself:
         </p>
 
-        <CodeBlock setup={NB_SETUP} fromScratch={fromScratch} />
+        <CodeBlock setup={NB_SETUP} fromScratch={fromScratch} withLibrary={withLibrary} />
 
         <p>
           It works so well because the wine features are individually close to bell-shaped and the cultivars

@@ -74,7 +74,7 @@ export default function FeatureSelectionPage() {
         </Callout>
 
         <h2>Select, then optionally debias</h2>
-        <CodeBlock setup={REGRESSION_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
+        <CodeBlock setup={REGRESSION_SETUP} labels={["Relaxed Lasso", "SelectFromModel"]} fromScratch={codeScratch} withLibrary={codeLib} />
 
         <PrevNext prev={{ href: "/learn/regularized-regression/the-regularization-path", label: <>← The regularization path</> }} next={{ href: "/learn/regularized-regression/solving-the-lasso", label: <>Next up · Solving the Lasso →</> }} />
       </div>

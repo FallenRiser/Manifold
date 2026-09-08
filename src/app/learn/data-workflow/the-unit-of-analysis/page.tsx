@@ -86,7 +86,7 @@ export default function UnitOfAnalysisPage() {
           start={0.45}
           actual={0.0439}
           decimals={3}
-          reveal={<>Effectively nothing. <strong>0.044</strong> — the model was almost entirely recalling which patient it was looking at. The visit-level features carried a real but modest signal, and the random split reported that signal plus 0.525 of pure recognition. Nothing in the code errored, and the ordinary CV number was the one that would have gone in the slide deck. Real run: <code>scripts/data_workflow_cases.py</code> §3.</>}
+          reveal={<>Effectively nothing. <strong>0.044</strong> — the model was almost entirely recalling which patient it was looking at. The visit-level features carried a real but modest signal, and the random split reported that signal plus 0.525 of pure recognition. Nothing in the code errored, and the ordinary CV number was the one that would have gone in the slide deck.</>}
         />
 
         <p>

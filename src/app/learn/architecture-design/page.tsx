@@ -91,11 +91,11 @@ export default function ArchitectureDesignHub() {
           visible.
         </p>
 
-        <Callout color={CORAL} title={<>The version of this you can check</>}>
-          Every number in this track comes from <code>scripts/architecture_cases.py</code>, run on
-          python 3.13.11 / sklearn 1.8.0 / numpy 2.3.5 with the protocol stated on the page. That
-          includes the honest finding: on this problem, adding depth beyond 2 does not help,
-          width plateaus at 16, and regularisation does not improve a gap that is already 0.015.
+        <Callout color={CORAL} title={<>The honest findings, kept in</>}>
+          Every number in this track is measured, not asserted, with the protocol stated on each page. That
+          includes the findings that do not flatter a bigger network: on this problem, adding depth beyond 2
+          does not help, width plateaus at 16, and regularisation does not improve a gap that is already
+          0.015.
         </Callout>
 
         <h2>The seven chapters</h2>

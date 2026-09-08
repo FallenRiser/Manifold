@@ -91,8 +91,7 @@ export default function L2PenaltyPage() {
           The sharpest place to see this is a regression, where the penalty produces the textbook
           bias&ndash;variance tradeoff with no ambiguity. Take a smooth one-dimensional target, draw 60
           noisy points from it, and fit a deliberately over-wide network with AdamW, sweeping the weight
-          decay from zero upward. Every row below is measured in{" "}
-          <code>scripts/regularisation_cases.py</code>.
+          decay from zero upward. Every row below is measured.
         </p>
 
         <div style={{ overflowX: "auto", margin: "1.2rem 0" }}>
@@ -124,8 +123,7 @@ export default function L2PenaltyPage() {
           </table>
         </div>
         <p style={{ fontSize: 13, color: "var(--muted)" }}>
-          Over-wide MLP, AdamW, 60 noisy points of a smooth 1-D target. From{" "}
-          <code>scripts/regularisation_cases.py</code>.
+          Over-wide MLP, AdamW, 60 noisy points of a smooth 1-D target.
         </p>
 
         <p>

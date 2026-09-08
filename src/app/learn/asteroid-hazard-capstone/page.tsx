@@ -95,8 +95,7 @@ export default function NeoCapstoneHubPage() {
         </ol>
 
         <p style={{ fontSize: 13.5, color: "var(--muted)" }}>
-          Fully reproducible: the dataset ships with the site and every number is produced by{" "}
-          <code>scripts/neo_cases.py</code>. Follow top-to-bottom, or jump from the sidebar.
+          Fully reproducible: the dataset ships with the site. Follow top-to-bottom, or jump from the sidebar.
         </p>
 
         <PrevNext

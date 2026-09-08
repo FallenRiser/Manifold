@@ -81,8 +81,7 @@ export default function BackpropHub() {
           A 2–32–32–1 network with 1,185 parameters, on 200 examples. One backward sweep:{" "}
           <strong>0.32 ms</strong>. The same gradient by nudging each parameter in turn:{" "}
           <strong>402 ms</strong>. Both give the same answer — they agree to a relative difference of{" "}
-          <strong>9 × 10<sup>−10</sup></strong>. One of them scales. Real runs, in{" "}
-          <code>scripts/backprop_cases.py</code>.
+          <strong>9 × 10<sup>−10</sup></strong>. One of them scales.
         </Callout>
 
         <h2>The half nobody advertises</h2>

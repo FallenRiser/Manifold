@@ -76,7 +76,7 @@ export default function TanhPage() {
 
         <h2>Measured, not asserted</h2>
         <p>
-          Section 4 of the script takes a four-hidden-layer network, computes single-example gradients, and counts
+          Take a four-hidden-layer network, compute single-example gradients, and count
           the fraction of weight columns whose entries all share a sign:
         </p>
 

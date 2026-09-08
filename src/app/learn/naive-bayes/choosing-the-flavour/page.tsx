@@ -68,8 +68,7 @@ for name, model in [("Gaussian (wrong)   ", GaussianNB()),
             </tbody>
           </table>
         </div>
-        <p style={{ fontSize: 13, color: "var(--muted)" }}>
-          Accuracies from <code>scripts/naive_bayes_cases.py</code>. Wine is a 13-feature, 3-class continuous
+        <p style={{ fontSize: 13, color: "var(--muted)" }}> Wine is a 13-feature, 3-class continuous
           problem; the text numbers are from a synthetic two-topic corpus; the Bernoulli figure is
           median-binarized wine.
         </p>

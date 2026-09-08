@@ -82,8 +82,7 @@ export default function DropoutAtTestPage() {
             </tbody>
           </table>
         </div>
-        <p style={{ fontSize: 13, color: "var(--muted)" }}>
-          From <code>scripts/regularisation_cases.py</code>. The single-pass row is the mean and standard
+        <p style={{ fontSize: 13, color: "var(--muted)" }}> The single-pass row is the mean and standard
           deviation of accuracy across independent masked passes.
         </p>
 

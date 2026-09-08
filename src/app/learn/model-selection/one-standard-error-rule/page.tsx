@@ -58,7 +58,7 @@ export default function OneSeRulePage() {
         <h2>Measured on a real path</h2>
         <p>
           A degree-9 polynomial ridge on noisy sine data, 5-fold CV over 25 penalties, held-out test set kept
-          aside (<code>scripts/model_selection_cases.py</code>):
+          aside:
         </p>
 
         <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12, padding: "12px 15px", margin: "1.2rem 0" }}>

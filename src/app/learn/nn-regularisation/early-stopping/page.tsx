@@ -48,8 +48,7 @@ export default function EarlyStoppingPage() {
           The sharpest picture comes from a regression setup, because there the test error genuinely
           bottoms out and then climbs. A wide network fits 80 noisy points of a smooth one-dimensional
           target (56 train, 24 validation), trained with Adam for 4000 epochs while we track validation
-          MSE. Everything below is a five-seed average from{" "}
-          <code>scripts/regularisation_cases.py</code>.
+          MSE. Everything below is a five-seed average.
         </p>
 
         <div style={{ overflowX: "auto", margin: "1.2rem 0" }}>
@@ -76,7 +75,7 @@ export default function EarlyStoppingPage() {
           </table>
         </div>
         <p style={{ fontSize: 13, color: "var(--muted)" }}>
-          Test MSE against the clean target. From <code>scripts/regularisation_cases.py</code>.
+          Test MSE against the clean target.
         </p>
 
         <p>
@@ -130,8 +129,7 @@ export default function EarlyStoppingPage() {
           </table>
         </div>
         <p style={{ fontSize: 13, color: "var(--muted)" }}>
-          Same classifier as the rest of the track, SGD, three-seed average. From{" "}
-          <code>scripts/regularisation_cases.py</code>.
+          Same classifier as the rest of the track, SGD, three-seed average.
         </p>
 
         <p>

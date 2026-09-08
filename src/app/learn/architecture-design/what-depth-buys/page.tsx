@@ -109,7 +109,7 @@ export default function WhatDepthBuysPage() {
           </table>
         </div>
         <p style={{ fontSize: 13, color: "var(--muted)" }}>
-          Width fixed at 32, ReLU activations, He initialisation. From <code>scripts/architecture_cases.py</code>.
+          Width fixed at 32, ReLU activations, He initialisation.
         </p>
 
         <p>

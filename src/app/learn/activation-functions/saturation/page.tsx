@@ -95,7 +95,7 @@ export default function SaturationPage() {
           </table>
         </div>
         <p style={{ fontSize: 13, color: "var(--muted)" }}>
-          Section 1 of <code>scripts/activation_cases.py</code>. Ranges are measured on the same interval, so the
+          Ranges are measured on the same interval, so the
           &ldquo;∞&rdquo; entries read 8.00 there; they are unbounded above in truth.
         </p>
 

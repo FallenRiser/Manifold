@@ -98,7 +98,7 @@ for Model in (GaussianNB, BernoulliNB):
           is an argmax. Swapping flavours is a single word. Run it:
         </p>
 
-        <CodeBlock setup={NB_SETUP} fromScratch={fromScratch} withLibrary={withLibrary} />
+        <CodeBlock setup={NB_SETUP} labels={["The workflow", "Swapping flavours"]} fromScratch={fromScratch} withLibrary={withLibrary} />
 
         <Callout color={TEAL} title={<>The idea worth keeping</>}>
           If you remember one thing, remember the spine: <strong>a broken model of the probabilities can

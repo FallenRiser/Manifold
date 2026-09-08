@@ -99,7 +99,7 @@ export default function MemoryAndComputePage() {
           </table>
         </div>
         <p style={{ fontSize: 13, color: "var(--muted)" }}>
-          From <code>scripts/architecture_cases.py</code> and the backpropagation track.
+          Measured, with the backpropagation track.
           Parameters in float32 (4 bytes each); activations include the stored values for all layers.
         </p>
 

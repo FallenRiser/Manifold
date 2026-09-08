@@ -60,7 +60,7 @@ export default function DropoutRatePage() {
           </table>
         </div>
         <p style={{ fontSize: 13, color: "var(--muted)" }}>
-          Train accuracy 1.000 at every rate. From <code>scripts/regularisation_cases.py</code>.
+          Train accuracy 1.000 at every rate.
         </p>
 
         <h2>Reading the curve</h2>

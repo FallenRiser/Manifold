@@ -73,8 +73,7 @@ export default function ReconstructionPage() {
           Notice the numbers move together exactly as the theory promised: at <M>k=20</M>, variance kept is 89.4%
           and the pixel error has fallen from 15.98 (at <M>k=1</M>) to 1.98. By <M>k=30</M> you&rsquo;re at 95.9%
           and an error of 0.77. You are storing less than half the numbers and losing almost nothing a human eye
-          would notice — the essence of lossy compression. (All figures are real runs from{" "}
-          <code>scripts/pca_cases.py</code>.)
+          would notice — the essence of lossy compression. (All figures are real runs.)
         </p>
 
         <Callout color={DIM} title={<>Denoising falls out for free</>}>

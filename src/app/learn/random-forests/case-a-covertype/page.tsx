@@ -46,8 +46,7 @@ export default function CovertypeCasePage() {
         intro={<>
           One dataset to show why &ldquo;just try a random forest&rdquo; is such good advice. We&rsquo;ll
           classify patches of forest by their cover type — a forest classifying forests — and watch bagging turn
-          a mediocre single tree into a strong model with essentially no tuning. Every number is from{" "}
-          <code>scripts/forest_cases.py</code>.
+          a mediocre single tree into a strong model with essentially no tuning.
         </>}
       />
 

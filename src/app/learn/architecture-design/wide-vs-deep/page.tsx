@@ -90,7 +90,7 @@ export default function WideVsDeepPage() {
           </table>
         </div>
         <p style={{ fontSize: 13, color: "var(--muted)" }}>
-          Section 4 of <code>scripts/architecture_cases.py</code>. Five seeds, 100 epochs each.
+          Five seeds, 100 epochs each.
         </p>
 
         <h2>Reading the result</h2>

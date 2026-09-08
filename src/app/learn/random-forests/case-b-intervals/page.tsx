@@ -41,7 +41,7 @@ export default function IntervalsCasePage() {
           The <Link href="/learn/random-forests/case-a-covertype" style={link}>covertype case</Link> showed a
           forest winning a classification leaderboard. This one closes the track on the regression side: the
           same California housing data as the decision-tree case, now with a forest that predicts a <em>range</em>,
-          not just a number. Every figure is from <code>scripts/forest_cases.py</code>.
+          not just a number.
         </>}
       />
 

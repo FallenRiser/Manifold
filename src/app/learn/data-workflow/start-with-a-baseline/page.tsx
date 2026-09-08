@@ -73,7 +73,7 @@ export default function BaselinePage() {
           start={0.7}
           actual={0.9465}
           decimals={4}
-          reveal={<><strong>0.9465.</strong> The model&rsquo;s entire contribution is <strong>+0.0402</strong> — an eighth of what it was worth on the balanced version, reported as a higher headline number. Anyone shown &ldquo;98.7% accuracy&rdquo; without the baseline would conclude the second model was the better one. Real runs: <code>scripts/data_workflow_cases.py</code> §1.</>}
+          reveal={<><strong>0.9465.</strong> The model&rsquo;s entire contribution is <strong>+0.0402</strong> — an eighth of what it was worth on the balanced version, reported as a higher headline number. Anyone shown &ldquo;98.7% accuracy&rdquo; without the baseline would conclude the second model was the better one.</>}
         />
 
         <p>

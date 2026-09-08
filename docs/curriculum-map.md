@@ -276,11 +276,29 @@ the capacity material in Model selection (for 6.6b). Both are Tier 1→2; the
 approximation-theory statements are Tier 3 and belong in `<Proof>` asides.
 
 ### 6.7 Reinforcement learning · amber *(Mohri 17)*
-- The RL scenario & Markov decision processes
-- Policies, value functions, optimal policies
-- Planning — value iteration, policy iteration, linear programming
-- Learning — TD(0), Q-learning, SARSA, TD(λ)
-- Large state spaces & function approximation
+- The RL scenario & Markov decision processes — **BUILT** (`/learn/markov-decision-processes`)
+- Policies, value functions, optimal policies — **BUILT** (in the MDP track)
+- Planning — value iteration, policy iteration — **BUILT** (`/learn/planning`)
+- Learning — TD(0), Q-learning, SARSA, TD(λ) — **BUILT** (`/learn/learning`)
+- Large state spaces & function approximation — *next track (unbuilt)* — **this IS value-based Deep
+  RL: DQN, target networks, experience replay, the deadly triad**
+- Policy gradients + actor–critic — *later track (unbuilt; actor–critic confirmed coming here)* —
+  **this IS policy-based Deep RL: REINFORCE → A2C → PPO**
+
+> **Note — "Deep RL" is not a separate track by design.** It's the destination of the two tracks
+> above, sequenced bottom-up (tabular → function approximation → policy gradients) because DQN can't be
+> taught honestly before the deadly triad, which needs tabular Q-learning first. See `PROJECT.md` §13.4.
+
+**RL capstones (PLANNED 2026-09-08 · not built — full spec in `PROJECT.md` §13):**
+- **A · Tabular control** — a hand-built world (Windy Gridworld / Taxi / warehouse robot) solved
+  end-to-end; caps the three built tracks; SARSA vs Q-learning vs Expected SARSA + α/ε/γ tuning.
+  *Buildable now, runnable-notebook genre.*
+- **B · "Evolving a driver"** — a Hill Climb Racing clone learned by **neuroevolution** over
+  generations (CodeBullet-style); hand-built 2D car physics + live-evolution lab. *On-site sim.*
+- **C · "Learning to parry"** — a **Lies of P imitation-learning field report**: the user screen-grabs
+  their own offline gameplay (KBM, GTX 1660 Ti 6 GB), trains a behavioral-cloning CNN off-site, and
+  the site documents the pipeline + links to GitHub/HuggingFace artifacts. *Field-report genre;
+  results ship only after the real model exists.*
 
 ### 6.8 Optimization (fundamentals strand) · gray-warm
 The engine threaded through every family; has its own reference pages.

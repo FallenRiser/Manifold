@@ -17,10 +17,15 @@ interface CodeBlockProps {
   /** Optional hidden preamble (declares X, y, …). When provided, a Run button appears
    *  and executes `setup + code` in-browser via Pyodide. Omit it to hide Run entirely. */
   setup?: string;
+  /** Optional tab labels, defaulting to ["From scratch", "With a library"]. Override on
+   *  pages whose two panes contrast something else — e.g. an explicit loop vs a built-in
+   *  helper — so the tabs never claim "From scratch" for code that isn't. */
+  labels?: readonly [string, string];
   language?: string;
 }
 
-const TABS = ["From scratch", "With a library"] as const;
+// Tab labels default to from-scratch / library; override via the `labels` prop.
+const DEFAULT_TABS = ["From scratch", "With a library"] as const;
 
 let pyodidePromise: Promise<any> | null = null;
 
@@ -28,8 +33,10 @@ export function CodeBlock({
   fromScratch,
   withLibrary,
   setup,
+  labels,
   language = "Python",
 }: CodeBlockProps) {
+  const TABS = labels ?? DEFAULT_TABS;
   const hasTwo = withLibrary != null && withLibrary.trim() !== fromScratch.trim();
   const canRun = setup != null && language.toLowerCase() === "python";
 

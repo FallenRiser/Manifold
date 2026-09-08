@@ -30,7 +30,7 @@ export default function CorrelatedImportancePage() {
           Take one genuine driver of the target and give the model <strong>two near-duplicate copies</strong> of
           it, <code>x1</code> and <code>x2</code> (correlation ≈ 0.99), plus four noise features. We know the
           truth: <code>x1</code> and <code>x2</code> are equally, jointly important. Watch what a random
-          forest&rsquo;s two importance measures say (real run, <code>scripts/forest_cases.py</code>):
+          forest&rsquo;s two importance measures say (real run):
         </p>
         <CodeOutput label="importance of the two duplicated drivers">{`MDI  (impurity):     x1 0.354   x2 0.479     sum 0.834
 permutation:         x1 0.024   x2 0.372`}</CodeOutput>

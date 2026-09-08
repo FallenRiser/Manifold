@@ -15,8 +15,18 @@ const TEAL = "var(--c-classification)";
 const link: React.CSSProperties = { color: "var(--brand)", textDecoration: "none" };
 
 export default function MultinomialNbPage() {
-  const fromScratch = `# training is COUNTING: one pass builds the class word-frequency tables
-mnb = MultinomialNB().fit(X_train, y_train)                     # no iteration
+  const fromScratch = `# training = COUNTING. Sum each class's word counts, smooth, normalise to
+# a per-class word distribution -- one pass, no iteration.
+classes  = np.unique(y_train)
+logprior = np.log([(y_train == c).mean() for c in classes])
+counts   = np.array([X_train[y_train == c].sum(axis=0) + 1.0 for c in classes])
+logtheta = np.log(counts / counts.sum(axis=1, keepdims=True))
+
+# score a document: log P(y) + sum of count * log P(word | y)
+pred = (logprior + X_test @ logtheta.T).argmax(axis=1)
+print("MultinomialNB (by hand):", round((pred == y_test).mean(), 3))`;
+
+  const withLibrary = `mnb = MultinomialNB().fit(X_train, y_train)                     # one counting pass
 lr  = LogisticRegression(max_iter=2000).fit(X_train, y_train)   # iterative solver
 
 print("MultinomialNB :", round(accuracy_score(y_test, mnb.predict(X_test)), 3))
@@ -88,7 +98,7 @@ print("vocab / docs  :", X_train.shape[1], "words /", X_train.shape[0], "train d
           iterative model — while training in a single counting pass. Run the head-to-head:
         </p>
 
-        <CodeBlock setup={NB_TEXT_SETUP} fromScratch={fromScratch} />
+        <CodeBlock setup={NB_TEXT_SETUP} fromScratch={fromScratch} withLibrary={withLibrary} />
 
         <Callout color={TEAL} title={<>Why the workhorse for text</>}>
           Text is high-dimensional and sparse: tens of thousands of vocabulary words, of which any one document

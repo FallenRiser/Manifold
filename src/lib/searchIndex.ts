@@ -23,8 +23,12 @@ import { ACT_TRACK } from "./activationsTrack";
 import { ARCH_TRACK } from "./architectureTrack";
 import { INIT_TRACK } from "./initNormTrack";
 import { REG_NN_TRACK } from "./regularisationTrack";
+import { MDP_TRACK } from "./mdpTrack";
+import { PLANNING_TRACK } from "./planningTrack";
+import { LEARNING_TRACK } from "./learningTrack";
 import { CAP_TRACK } from "./housingCapstoneTrack";
 import { NEO_TRACK } from "./neoCapstoneTrack";
+import { RL_CAP_TRACK } from "./rlCapstoneTrack";
 import type { TrackChapter } from "./linearRegressionTrack";
 
 // Flat, static search index over every live lesson page, built from the track
@@ -64,8 +68,12 @@ const TRACKS: { name: string; accent: string; chapters: TrackChapter[] }[] = [
   { name: "Architecture design", accent: "var(--c-neural)", chapters: ARCH_TRACK },
   { name: "Initialisation & normalisation", accent: "var(--c-neural)", chapters: INIT_TRACK },
   { name: "Regularisation", accent: "var(--c-neural)", chapters: REG_NN_TRACK },
+  { name: "Markov decision processes", accent: "var(--c-rl)", chapters: MDP_TRACK },
+  { name: "Planning", accent: "var(--c-rl)", chapters: PLANNING_TRACK },
+  { name: "Learning", accent: "var(--c-rl)", chapters: LEARNING_TRACK },
   { name: "Housing capstone", accent: "var(--c-regression)", chapters: CAP_TRACK },
   { name: "Asteroid-hazard capstone", accent: "var(--c-space)", chapters: NEO_TRACK },
+  { name: "Warehouse-robot capstone", accent: "var(--c-warehouse)", chapters: RL_CAP_TRACK },
 ];
 
 export const SEARCH_INDEX: SearchEntry[] = TRACKS.flatMap((t) =>

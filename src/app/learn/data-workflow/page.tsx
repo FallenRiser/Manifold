@@ -93,8 +93,7 @@ export default function DataWorkflowHub() {
           <em>no signal whatsoever</em>, and 5-fold CV reports <strong>0.878</strong> accuracy where the truth is
           0.500. Split a dataset of repeated patient visits at random rather than by patient, and{" "}
           <span style={{ whiteSpace: "nowrap" }}>R² 0.569</span> becomes <strong>0.044</strong> the moment you test
-          on a patient the model has never met. Neither run errored. Both were real runs in{" "}
-          <code>scripts/data_workflow_cases.py</code>.
+          on a patient the model has never met. Neither run errored. Both were real runs.
         </Callout>
 
         <h2>How this pillar teaches</h2>
@@ -141,9 +140,9 @@ export default function DataWorkflowHub() {
         <h2>Every number here is measured</h2>
         <p>
           The claims in this pillar are quantitative because vague ones are unfalsifiable and therefore useless.
-          All of them come from <code>scripts/data_workflow_cases.py</code>, run on python 3.13.11 / sklearn 1.8.0,
-          with the protocol stated on the page. Where the honest answer is that an effect is small, we say so —
-          knowing which mistakes don&rsquo;t matter is half of knowing which ones do.
+          All of them are measured, not asserted, with the protocol stated on the page. Where the honest answer
+          is that an effect is small, we say so — knowing which mistakes don&rsquo;t matter is half of knowing
+          which ones do.
         </p>
 
         <PrevNext

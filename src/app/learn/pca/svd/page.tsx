@@ -55,7 +55,7 @@ export default function SvdPage() {
         <p>
           This isn&rsquo;t an approximation. Run both routes on <code>load_digits</code> and the eigenvalues agree to
           <strong> 13 decimal places</strong> (max difference <M>{String.raw`4\times10^{-13}`}</M> across all 64) — a
-          real check in <code>scripts/pca_cases.py</code>. Same components, same variances, two roads.
+          real check. Same components, same variances, two roads.
         </p>
 
         <h2>So why prefer the SVD?</h2>

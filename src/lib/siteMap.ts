@@ -127,9 +127,9 @@ export const FAMILIES: Group[] = [
     color: "var(--c-rl)",
     blurb: "Learn by acting, from reward instead of labels.",
     tracks: [
-      { title: "MDPs, policies & value functions" },
-      { title: "Planning (value & policy iteration)" },
-      { title: "TD learning, Q-learning, SARSA" },
+      { title: "MDPs, policies & value functions", href: "/learn/markov-decision-processes" },
+      { title: "Planning (value & policy iteration)", href: "/learn/planning" },
+      { title: "Learning (TD, Q-learning, SARSA)", href: "/learn/learning" },
       { title: "Function approximation" },
     ],
   },

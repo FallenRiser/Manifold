@@ -144,7 +144,7 @@ export default function LayerNormPage() {
           </table>
         </div>
         <p style={{ fontSize: 13, color: "var(--muted)" }}>
-          10 layers, He initialisation, ReLU. From <code>scripts/init_norm_cases.py</code>.
+          10 layers, He initialisation, ReLU.
         </p>
 
         <p>

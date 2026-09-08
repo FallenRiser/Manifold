@@ -163,8 +163,7 @@ export default function RademacherPage() {
           and CIFAR-10 labels with random ones and train. The networks reached{" "}
           <strong>zero training error</strong> — perfect memorization of pure noise — while the very same
           architectures, trained on real labels, generalized excellently. In Rademacher terms these classes have
-          complexity ≈ 1, so the bound above is vacuous, and yet they work. Our own reproduction of this on digits
-          is in <code>scripts/learning_theory_cases.py</code>: with 4,000 random features, random labels give train
+          complexity ≈ 1, so the bound above is vacuous, and yet they work. Our own reproduction of this on digits, with 4,000 random features,, random labels give train
           accuracy <strong>1.0000</strong> and test accuracy <strong>0.0870</strong> against a chance rate of 0.10,
           while real labels give <strong>1.0000</strong> and <strong>0.9667</strong>. Same class, same optimiser.{" "}
           <Link href="/learn/learning-theory/when-the-bounds-break" style={link}>The final chapter</Link> takes

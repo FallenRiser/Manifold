@@ -31,7 +31,7 @@ export default function ImbalancedForestsPage() {
         <p>
           Take a binary problem with 5% positives. A default random forest scores high accuracy and high
           precision, but look at its <strong>recall</strong> — the fraction of true positives it actually
-          catches. Here is a real run (20 features, 5% positive, in <code>scripts/forest_cases.py</code>):
+          catches. Here is a real run (20 features, 5% positive):
         </p>
         <CodeOutput label="recall / precision on the positive class">{`default (threshold 0.5)      recall 0.515   precision 0.820
 class_weight = balanced      recall 0.423   precision 0.820

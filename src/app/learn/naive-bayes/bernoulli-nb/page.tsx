@@ -26,6 +26,27 @@ Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.3, random_state=0, strat
 binz = KBinsDiscretizer(n_bins=2, encode="ordinal", strategy="quantile")
 Btr, Bte = binz.fit_transform(Xtr), binz.transform(Xte)
 
+# P(feature present | class), smoothed -- one coin per feature per class
+classes  = np.unique(ytr)
+logprior = np.log([(ytr == c).mean() for c in classes])
+p = np.array([(Btr[ytr == c].sum(axis=0) + 1.0) / ((ytr == c).sum() + 2.0) for c in classes])
+
+# the Bernoulli score credits present AND absent features: x*log p + (1-x)*log(1-p)
+ll   = Bte @ np.log(p).T + (1 - Bte) @ np.log(1 - p).T
+pred = (logprior + ll).argmax(axis=1)
+print("BernoulliNB (by hand):", round((pred == yte).mean(), 3))   # 0.944`;
+
+  const withLibrary = `from sklearn.datasets import load_wine
+from sklearn.preprocessing import KBinsDiscretizer
+from sklearn.model_selection import train_test_split
+
+X, y = load_wine(return_X_y=True)
+Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.3, random_state=0, stratify=y)
+
+# collapse every feature to ONE bit: above its median, or below
+binz = KBinsDiscretizer(n_bins=2, encode="ordinal", strategy="quantile")
+Btr, Bte = binz.fit_transform(Xtr), binz.transform(Xte)
+
 acc = accuracy_score(yte, BernoulliNB().fit(Btr, ytr).predict(Bte))
 print("BernoulliNB on 1-bit-per-feature wine:", round(acc, 3))   # 0.944`;
 
@@ -98,7 +119,7 @@ print("BernoulliNB on 1-bit-per-feature wine:", round(acc, 3))   # 0.944`;
           up, for reducing every feature to one bit. Run it:
         </p>
 
-        <CodeBlock setup={NB_SETUP} fromScratch={fromScratch} />
+        <CodeBlock setup={NB_SETUP} fromScratch={fromScratch} withLibrary={withLibrary} />
 
         <h2>When Bernoulli beats Multinomial, and vice-versa</h2>
         <p>

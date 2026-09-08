@@ -97,7 +97,7 @@ export default function HePage() {
           </table>
         </div>
         <p style={{ fontSize: 13, color: "var(--muted)" }}>
-          10 layers, width 64, ReLU. From <code>scripts/init_norm_cases.py</code>.
+          10 layers, width 64, ReLU.
         </p>
 
         <p>

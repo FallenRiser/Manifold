@@ -61,8 +61,7 @@ export default function BatchnormAsRegPage() {
           </table>
         </div>
         <p style={{ fontSize: 13, color: "var(--muted)" }}>
-          Three-seed average, train accuracy 1.000 throughout, no other regulariser present. From{" "}
-          <code>scripts/regularisation_cases.py</code>.
+          Three-seed average, train accuracy 1.000 throughout, no other regulariser present.
         </p>
 
         <p>

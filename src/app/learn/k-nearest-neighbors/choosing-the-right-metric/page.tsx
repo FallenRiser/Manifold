@@ -108,7 +108,7 @@ export default function ChoosingMetricPage() {
           are next.
         </p>
 
-        <CodeBlock setup={KNN_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
+        <CodeBlock setup={KNN_SETUP} labels={["Explicit loop", "GridSearchCV"]} fromScratch={codeScratch} withLibrary={codeLib} />
 
         <Quiz
           accent="var(--c-classification)"

@@ -38,7 +38,7 @@ export default function RegressionCasePage() {
           The Titanic case was classification; this one is regression, on the California housing data behind the
           site&rsquo;s <Link href="/learn/california-housing-capstone" style={link}>capstone</Link>. Watch a
           single regression tree repeat every lesson of this track — overfitting, the staircase, no
-          extrapolation — on a numeric target. Numbers are from <code>scripts/tree_cases.py</code>.
+          extrapolation — on a numeric target.
         </>}
       />
 

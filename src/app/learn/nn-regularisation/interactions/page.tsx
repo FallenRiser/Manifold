@@ -64,7 +64,7 @@ export default function InteractionsPage() {
           </table>
         </div>
         <p style={{ fontSize: 13, color: "var(--muted)" }}>
-          Three-seed average, train accuracy 1.000 throughout. From <code>scripts/regularisation_cases.py</code>.
+          Three-seed average, train accuracy 1.000 throughout.
         </p>
 
         <h2>Reading the table honestly</h2>

@@ -117,7 +117,7 @@ export default function NestedCvPage() {
         <p>
           Warnings about flat CV are common; actual numbers are rarer. So we ran it — breast cancer dataset, an
           SVC pipeline, a 20-point grid over <M>C</M> and <M>{String.raw`\gamma`}</M>, 4-fold inner and 4-fold
-          outer, averaged over 5 repeats (<code>scripts/model_selection_cases.py</code>):
+          outer, averaged over 5 repeats:
         </p>
         <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12, padding: "12px 15px", margin: "1.2rem 0" }}>
           <div style={{ fontSize: 14, color: "var(--ink)", lineHeight: 1.85 }}>

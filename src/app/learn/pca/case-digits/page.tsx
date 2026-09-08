@@ -44,8 +44,7 @@ export default function CaseDigitsPage() {
         title={<>Case: compressing handwritten digits</>}
         intro={<>Time to run the whole pipeline on real data. The <code>load_digits</code> dataset is 1,797 handwritten
           numerals as 8×8 images — 64 pixels each. We&rsquo;ll fit PCA, read its scree plot, pick <M>k</M>, and put a
-          hard number on how much we compressed. All outputs are real runs from{" "}
-          <code>scripts/pca_cases.py</code>.</>}
+          hard number on how much we compressed. All outputs are real runs.</>}
       />
 
       <div className="lesson">

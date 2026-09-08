@@ -59,7 +59,7 @@ export default function TuningMixPage() {
         </ul>
 
         <h2>Joint CV in one call</h2>
-        <CodeBlock setup={REGRESSION_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
+        <CodeBlock setup={REGRESSION_SETUP} labels={["Grid by hand", "ElasticNetCV"]} fromScratch={codeScratch} withLibrary={codeLib} />
 
         <PrevNext prev={{ href: "/learn/regularized-regression/elastic-net", label: <>← Elastic-net: blending L1 &amp; L2</> }} next={{ href: "/learn/regularized-regression/standardize-first", label: <>Next up · Standardize first →</> }} />
       </div>

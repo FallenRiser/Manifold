@@ -18,22 +18,42 @@ export default function BayesRuleAsAClassifierPage() {
   const fromScratch = `from sklearn.datasets import make_classification
 from sklearn.model_selection import train_test_split
 
-# the 2-class, 2-feature problem from section 1 of the script
+# a 2-class, 2-feature problem, 600 points
 X, y = make_classification(n_samples=600, n_features=2, n_informative=2,
                            n_redundant=0, n_clusters_per_class=1,
                            class_sep=1.3, random_state=0)
 Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.3, random_state=0)
 
-nb = GaussianNB().fit(Xtr, ytr)
-print("priors:", nb.class_prior_.round(3))            # P(y)  ->  [0.507 0.493]
+# Estimate the generator straight from the data -- no model object.
+classes = np.unique(ytr)
+priors  = np.array([(ytr == c).mean()            for c in classes])   # P(y)
+means   = np.array([Xtr[ytr == c].mean(axis=0)   for c in classes])   # per-class mean
+varis   = np.array([Xtr[ytr == c].var(axis=0)    for c in classes])   # per-class variance
+print("priors:", priors.round(3))                                     # [0.507 0.493]
 
-# Bayes' rule BY HAND for one test point: prior x Gaussian likelihood
+# Bayes' rule for one test point: prior x product of Gaussian likelihoods
 x = Xte[0]
-g     = np.exp(-(x - nb.theta_)**2 / (2*nb.var_)) / np.sqrt(2*np.pi*nb.var_)
-score = nb.class_prior_ * g.prod(axis=1)              # P(y) * P(x|y)
-print("by hand :", (score / score.sum()).round(4))    # normalise -> posterior
-print("sklearn :", nb.predict_proba([x]).round(4))     # identical
-print("accuracy:", round(accuracy_score(yte, nb.predict(Xte)), 3))`;
+g     = np.exp(-(x - means)**2 / (2*varis)) / np.sqrt(2*np.pi*varis)
+score = priors * g.prod(axis=1)                                        # P(y) * P(x|y)
+print("by hand:", (score / score.sum()).round(4))                     # [0.0015 0.9985]
+
+# Accuracy: take the argmax of that same score across the test set
+G    = np.exp(-(Xte[:, None] - means)**2 / (2*varis)) / np.sqrt(2*np.pi*varis)
+pred = (priors * G.prod(axis=2)).argmax(axis=1)
+print("accuracy:", round((pred == yte).mean(), 3))                    # 0.95`;
+
+  const withLibrary = `from sklearn.datasets import make_classification
+from sklearn.model_selection import train_test_split
+
+X, y = make_classification(n_samples=600, n_features=2, n_informative=2,
+                           n_redundant=0, n_clusters_per_class=1,
+                           class_sep=1.3, random_state=0)
+Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.3, random_state=0)
+
+nb = GaussianNB().fit(Xtr, ytr)          # the same means, variances and priors
+print("priors  :", nb.class_prior_.round(3))              # [0.507 0.493]
+print("posterior:", nb.predict_proba([Xte[0]]).round(4))  # [[0.0015 0.9985]]
+print("accuracy:", round(accuracy_score(yte, nb.predict(Xte)), 3))   # 0.95`;
 
   return (
     <article>
@@ -122,12 +142,14 @@ print("accuracy:", round(accuracy_score(yte, nb.predict(Xte)), 3))`;
 
         <h2>The code</h2>
         <p>
-          Here is Bayes&rsquo; rule computed literally — prior times the product of per-feature Gaussian
-          likelihoods, normalised — next to scikit-learn&rsquo;s one-liner. They print identical numbers,
-          because they are the same arithmetic.
+          The from-scratch version estimates the generator directly from the data — priors by counting,
+          per-class means and variances with NumPy — then applies Bayes&rsquo; rule literally: prior times
+          the product of per-feature Gaussian likelihoods, normalised. The library version is{" "}
+          <code>GaussianNB</code>&rsquo;s one-liner. They print identical numbers, because they are the same
+          arithmetic — sklearn is just doing the counting for you.
         </p>
 
-        <CodeBlock setup={NB_SETUP} fromScratch={fromScratch} />
+        <CodeBlock setup={NB_SETUP} fromScratch={fromScratch} withLibrary={withLibrary} />
 
         <Callout color={TEAL} title={<>Modelling the generator, not the boundary</>}>
           Logistic regression would have fitted one boundary line and reported which side{" "}

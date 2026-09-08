@@ -112,7 +112,7 @@ export default function WhenBatchNormHelpsPage() {
           </table>
         </div>
         <p style={{ fontSize: 13, color: "var(--muted)" }}>
-          Width 32, He init, Adam, 5 seeds, two-moons. From <code>scripts/init_norm_cases.py</code>.
+          Width 32, He init, Adam, 5 seeds, two-moons.
         </p>
 
         <p>

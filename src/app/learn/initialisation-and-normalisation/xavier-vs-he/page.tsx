@@ -69,7 +69,6 @@ export default function XavierVsHePage() {
         </div>
         <p style={{ fontSize: 13, color: "var(--muted)" }}>
           10 layers, width 64. Gradient ratio and activation variances measured at initialisation.
-          From <code>scripts/init_norm_cases.py</code>.
         </p>
 
         <h2>Reading the three activations</h2>

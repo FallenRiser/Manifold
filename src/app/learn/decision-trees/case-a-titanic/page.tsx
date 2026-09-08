@@ -63,8 +63,7 @@ export default function TitanicCasePage() {
         intro={<>
           Everything in this track, on one real dataset. We&rsquo;ll grow a tree on the Titanic passenger
           list, watch it overfit, prune it two ways, and then do the thing only a tree lets you do — read its
-          rules and see what it actually learned. Every number below is from the run in{" "}
-          <code>scripts/tree_cases.py</code>; the code is on the page.
+          rules and see what it actually learned. Every number below is from a real run; the code is on the page.
         </>}
       />
 
@@ -115,7 +114,7 @@ pruned: test 0.832  leaves 8`}</CodeOutput>
           Cross-validation peaks at <strong>depth 3</strong> and falls monotonically after — the U-curve of the{" "}
           <Link href="/learn/decision-trees/bias-and-variance-of-trees" style={link}>bias–variance page</Link>,
           measured. The depth-3 tree has just <strong>8 leaves</strong> yet scores <strong>83.2% on test</strong>
-          — seven points <em>better</em> than the 227-leaf giant. Cost-complexity pruning (in the script) tells
+          — seven points <em>better</em> than the 227-leaf giant. Cost-complexity pruning tells
           the same story from the other direction: sweeping <code>ccp_alpha</code> over its 106-step path
           collapses the tree to 5 leaves. Both routes agree: almost all of those 227 leaves were noise.
         </p>

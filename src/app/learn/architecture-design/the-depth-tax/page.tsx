@@ -76,7 +76,6 @@ export default function TheDepthTaxPage() {
         </div>
         <p style={{ fontSize: 13, color: "var(--muted)" }}>
           Width 16, ReLU, He init. Ratio = ||grad at last layer|| / ||grad at first layer||.
-          From <code>scripts/architecture_cases.py</code>.
         </p>
 
         <p>

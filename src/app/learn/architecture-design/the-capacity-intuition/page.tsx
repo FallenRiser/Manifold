@@ -1,7 +1,10 @@
 import Link from "next/link";
 import { LessonHeader, Callout, Proof, PrevNext } from "@/components/lesson";
 import { M, MathBlock } from "@/components/Math";
+import { CodeBlock } from "@/components/CodeBlock";
+import { PredictPrompt } from "@/components/PredictPrompt";
 import { Quiz } from "@/components/Quiz";
+import { ARCH_SETUP } from "@/lib/runtimeSetup";
 
 export const metadata = {
   title: "The capacity intuition — Manifold",
@@ -13,12 +16,27 @@ const CORAL = "var(--c-neural)";
 const link: React.CSSProperties = { color: "var(--brand)", textDecoration: "none" };
 
 export default function CapacityIntuitionPage() {
+  const fromScratch = `# Classical statistical learning theory draws a red line at P = n:
+# more parameters than training points, it warns, means catastrophic overfit.
+P = count_params((32, 32))
+n = len(X_tr)
+print(f"parameters P = {P}")
+print(f"train samples n = {n}")
+print(f"P / n = {P / n:.1f}   -> classical theory predicts memorisation, zero generalisation")`;
+
+  const withLibrary = `# What actually happens when you cross that line?
+tr, te = fit_mlp((32, 32))
+print(f"depth-2, width-32:  train={tr}  test={te}  gap={round(tr - te, 4)}")
+# P is roughly 2x the sample count, yet the train-test gap is a rounding error.
+# This is double descent, not catastrophe -- gradient descent finds a smooth,
+# low-complexity solution, not the worst-case memoriser the bound assumes.`;
+
   return (
     <article>
       <LessonHeader
         chips={[
-          { label: "The question", color: CORAL },
-          { label: "Tier 1 · intuition", color: CORAL },
+          { label: "Neural networks", color: CORAL },
+          { label: "Core idea", color: "var(--c-fundamentals)" },
         ]}
         time="about 8 minutes"
         title={<>The capacity intuition</>}
@@ -96,13 +114,27 @@ export default function CapacityIntuitionPage() {
 
         <MathBlock>{String.raw`\underbrace{P \gg n}_{\text{classical: catastrophic overfit}} \quad\longrightarrow\quad \underbrace{\text{test error continues to decrease}}_{\text{observed: double descent}}`}</MathBlock>
 
+        <PredictPrompt
+          prompt={<>The depth-2, width-32 network has more parameters than it has training points to fit.
+            Classical theory says it should memorise the training set and generalise to nothing. What is
+            the actual train-test gap?</>}
+          options={[
+            "Huge — train near 1.0, test near chance, exactly as warned",
+            "Tiny — a few thousandths; it generalises fine despite P > n",
+            "The network refuses to train at all in the over-parameterised regime",
+          ]}
+          nudge={<>Locked in. Count the parameters, then train it and subtract.</>}
+        />
+
         <p>
           On the running problem, the depth-2, width-32 network has 1,185 parameters and 1,000 training
           samples — already in the <M>{String.raw`P > n`}</M> regime. Its test accuracy is 0.953, the
           best on the grid. The depth-8, width-64 network has 29,377 parameters, nearly thirty times the
           sample count, and still achieves 0.932. Neither catastrophically overfits. The classical bound
-          is not just loose — it predicts the wrong direction.
+          is not just loose — it predicts the wrong direction. Cross the red line yourself:
         </p>
+
+        <CodeBlock setup={ARCH_SETUP} fromScratch={fromScratch} withLibrary={withLibrary} />
 
         <h2>But the practical message holds</h2>
         <p>

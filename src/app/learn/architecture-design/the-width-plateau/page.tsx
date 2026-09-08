@@ -75,7 +75,7 @@ export default function TheWidthPlateauPage() {
           </table>
         </div>
         <p style={{ fontSize: 13, color: "var(--muted)" }}>
-          Depth-2 width sweep from <code>scripts/architecture_cases.py</code>.
+          Depth-2 width sweep, measured.
         </p>
 
         <p>

@@ -87,7 +87,7 @@ export default function ActivationsHub() {
           sigmoid and changing only the <em>initialisation scale</em> moves that same 29 million down to{" "}
           <strong>65</strong>. The activation is one factor in a product. It is not the only one.
           <br /><br />
-          Every figure on this track comes from <code>scripts/activation_cases.py</code>.
+          Every figure on this track is measured, not asserted.
         </Callout>
 
         <h2>What this track will not do</h2>

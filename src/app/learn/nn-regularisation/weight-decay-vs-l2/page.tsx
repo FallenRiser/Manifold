@@ -113,7 +113,7 @@ export default function WeightDecayVsL2Page() {
           </table>
         </div>
         <p style={{ fontSize: 13, color: "var(--muted)" }}>
-          3&times;256 MLP, 250 points, 10% label noise. From <code>scripts/regularisation_cases.py</code>.
+          3&times;256 MLP, 250 points, 10% label noise.
         </p>
 
         <p>

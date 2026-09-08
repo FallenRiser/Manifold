@@ -1,7 +1,10 @@
 import Link from "next/link";
 import { LessonHeader, Callout, Proof, PrevNext } from "@/components/lesson";
 import { M, MathBlock } from "@/components/Math";
+import { CodeBlock } from "@/components/CodeBlock";
+import { PredictPrompt } from "@/components/PredictPrompt";
 import { Quiz } from "@/components/Quiz";
+import { ARCH_SETUP } from "@/lib/runtimeSetup";
 
 export const metadata = {
   title: "Parameters, and what they cost — Manifold",
@@ -13,12 +16,26 @@ const CORAL = "var(--c-neural)";
 const link: React.CSSProperties = { color: "var(--brand)", textDecoration: "none" };
 
 export default function ParametersAndCostPage() {
+  const fromScratch = `# The parameter formula, written out directly: input block + hidden
+# blocks + output block, for a network with n inputs and m outputs.
+def params_by_formula(D, W, n=2, m=1):
+    return (n*W + W) + (D-1)*(W*W + W) + (W*m + m)
+
+for D, W in [(2, 32), (8, 4), (8, 64)]:
+    print(f"depth {D}, width {W:>2}:  formula={params_by_formula(D, W):>6}   count_params={count_params((W,)*D):>6}")`;
+
+  const withLibrary = `# The formula is not an estimate -- it is exactly the number of weights
+# and biases a real network allocates. Fit one briefly and count them.
+clf = MLPClassifier(hidden_layer_sizes=(32, 32), max_iter=1, random_state=0).fit(X_tr, y_tr)
+real = sum(w.size for w in clf.coefs_) + sum(b.size for b in clf.intercepts_)
+print("real network parameters:", real, " | formula:", count_params((32, 32)))`;
+
   return (
     <article>
       <LessonHeader
         chips={[
-          { label: "The question", color: CORAL },
-          { label: "Tier 1 · intuition", color: CORAL },
+          { label: "Neural networks", color: CORAL },
+          { label: "Core idea", color: "var(--c-fundamentals)" },
         ]}
         time="about 8 minutes"
         title={<>Parameters, and what they cost</>}
@@ -55,11 +72,24 @@ export default function ParametersAndCostPage() {
 
         <p>
           Plug in depth 2, width 32: <M>{String.raw`P = 1 \times 32^2 + 4 \times 32 + 1 = 1024 + 128 + 1 = 1{,}153`}</M>.
-          The measured count from <code>scripts/architecture_cases.py</code> is 1,185 — the difference is
+          The measured count is 1,185 — the difference is
           32 biases from the second hidden layer, which the simplified formula accounts for once you expand
           the terms carefully. The exact count is 1,185; the formula gives you the right order and the
-          right scaling.
+          right scaling. Check the formula against the real thing:
         </p>
+
+        <CodeBlock setup={ARCH_SETUP} fromScratch={fromScratch} withLibrary={withLibrary} />
+
+        <PredictPrompt
+          prompt={<>You double the width of every hidden layer, 32 → 64, keeping the depth fixed. By what
+            factor does the hidden-to-hidden parameter count grow?</>}
+          options={[
+            "It doubles — you doubled the width",
+            "It quadruples — the weight matrices are W × W",
+            "It grows eightfold",
+          ]}
+          nudge={<>Locked in. The next section works the arithmetic; the code above lets you check it.</>}
+        />
 
         <h2>Why width is expensive</h2>
         <p>

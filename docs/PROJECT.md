@@ -607,6 +607,12 @@ The capstone must simulate *being* the senior DS, not just reading one:
 - EDA/diagnostics pages should carry at least one interactive figure (residual-map explorer,
   hoverable correlation matrix), not only static ones.
 
+> **RL capstones have their own doctrine — see §13** (planned 2026-09-08: tabular control, a Hill
+> Climb Racing neuroevolution clone, and a Lies-of-P imitation-learning *field report*). §13 also
+> introduces a **second capstone genre**, the **field report / build log** — documents a real project
+> built off-site, links to GitHub/HuggingFace artifacts, and ships its results only after the real
+> model exists (the honest-numbers rule still binds).
+
 ### 10.5 UI / code-health rules
 
 - **Extract shared lesson primitives BEFORE the recolour**: `<LessonHeader>` (chips + h1 + intro),
@@ -1100,6 +1106,15 @@ When deciding what to polish, apply in order:
 > close the Neural networks family, three of six tracks are done, and the numbers for the next two
 > are already measured. The numbered items below keep their original labels as historical anchors;
 > read 4b first, then 1.
+>
+> **Update 2026-09-08 (this log is behind the live state — trust the auto-memory index over the
+> numbered items below):** Neural networks family is **COMPLETE** (all 6 tracks, `neural-networks-family.md`)
+> and the **Reinforcement learning family** now has **3 tracks live** — MDP, Planning, Learning
+> (`rl-family-mdp-track.md`, `planning-track.md`, `learning-track.md`) — plus a **6-lab interactivity
+> sweep** (`rl-interactivity-sweep.md`). **Next RL build direction agreed with the user:**
+> **RL capstones — see the new §13 for the full in-depth plan** (A: tabular control, buildable now;
+> B: Hill Climb Racing neuroevolution clone; C: Lies of P imitation-learning field report). Also
+> still open in RL: Function approximation, then policy gradients + actor–critic (confirmed coming).
 
 1. **LR static-page upgrades** — the §9 item-2 list (residual diagnostics shared lab, Q–Q,
    CV/bias–variance) is the oldest unpaid debt in the best track. **The top *polish* priority**, and
@@ -1150,3 +1165,140 @@ imbalance, saturation drift, radius inconsistency, cream-tinted surfaces, low-co
 and anything that smells template. They value depth and beauty *equally* — a gorgeous shallow
 page and an ugly deep page are both rejections. When they say "make it better", run §12.5's
 three passes and bring findings, not questions.
+
+---
+
+## 13. Capstone roadmap — RL capstones (PLANNING, 2026-09-08 · NOT yet built)
+
+Two capstones are live (`California housing` regression, `Asteroid hazard` classification), both
+supervised. The user wants **multiple dedicated RL capstones**. Session 2026-09-08 scoped **three**,
+spanning the RL family's arc from "apply the finished tracks" through "watch it learn a game over
+generations" to "a real-world engineering field report." **Nothing here is built yet — this is the
+agreed plan, not a log of work done.** (Prompted by the RL interactivity sweep that same day; see
+§6.7 of `curriculum-map.md` and the auto-memory note `rl-capstones-plan.md`.)
+
+### 13.0 Shared doctrine (extends §10.4)
+Every RL capstone still keeps its own identity/accent, transferable-thinking framing, and the
+**honest-numbers rule**. Two hard realities shape all of them:
+- **Runtime constraint.** Pyodide has **numpy only** — no `gym`, no game engine, no GPU. Every
+  environment/physics/mechanic must be **hand-implemented** (this is why the RL tracks use
+  `GRIDWORLD_SETUP` / `LEARNING_SETUP`). Rules out "load a real game" for anything running on the site.
+- **Two capstone genres now:**
+  - **Runnable-notebook capstone** (like the two live ones) — self-contained, in-browser labs,
+    numbers verified before the prose, downloadable reproduction notebook.
+  - **Field report / build log (NEW genre)** — documents a real project built **off the site** (on
+    the user's own machine) and **links out** to external artifacts (GitHub / HuggingFace). Its
+    results section ships **only after the real model exists** — the honest-numbers rule forbids
+    documenting results that haven't been produced.
+- **Method note.** The two game capstones use **neuroevolution** and **imitation learning**, which are
+  *cousins* of the tabular value/policy RL the tracks teach, not the same thing. Each capstone must
+  teach its own method (or lean on a short primer). A nice recurring contrast: *evolution vs gradient
+  RL vs imitation — three ways to search policy space.*
+
+### 13.1 Capstone A — Tabular control ("the RL capstone proper")
+- **Caps:** MDP + Planning + Learning (**all three DONE**). **Buildable NOW**, self-contained
+  numpy/JS, needs no new track.
+- **Environment:** a hand-built world bigger/messier than the 4×4 teaching grid — Windy Gridworld,
+  Taxi, or a "warehouse-robot" delivery world.
+- **The arc:** frame the MDP → choose **SARSA vs Q-learning vs Expected SARSA** → tune α/ε/γ →
+  evaluate → the on-policy-safety vs off-policy-optimality decision (reuse the cliff insight).
+  Decision-point widgets + predict-the-number reveals, per §10.4.
+- **Flagship lab:** live training + policy visualisation — reuse the `AnimatedRolloutLab` pattern
+  (`rl-interactivity-sweep.md`). Honest numbers = real learning curves run before writing.
+- **Why first:** completes the RL family's "theory → applied" arc the way the supervised capstones
+  do, and proves the RL-capstone format.
+
+### 13.2 Capstone B — "Evolving a driver" (Hill Climb Racing clone via neuroevolution)
+- **The CodeBullet HCR project, reproduced.** Evolve a population of small NN controllers over
+  **generations** on a **hand-built 2D car physics** (terrain heightfield, chassis + 2 wheels,
+  gas/brake, fuel, flip = death).
+- **Method:** **neuroevolution / genetic algorithm** — searches policy space by mutation + selection,
+  no backprop. Capstone teaches the GA itself (fixed-topology MLP + GA is cleaner to teach than
+  NEAT). Contrast page: evolution vs gradient RL.
+- **Feasibility:** feasible, **high effort, high payoff**, fully **on-site** (it's a simulation).
+- **The spectacle:** an in-browser lab watching the population evolve — generation counter,
+  best-distance curve climbing live.
+- **Hard parts:** the mini rigid-body car physics (hand-written — no Box2D); actually running the GA
+  to report real generation-vs-fitness numbers.
+- **Sequencing:** build **after A**, so it inherits the "hand-built sim + live-run lab" pattern.
+
+### 13.3 Capstone C — "Learning to parry" (Lies of P imitation-learning FIELD REPORT)
+- **Reframed 2026-09-08:** the user can play **Lies of P (offline, single-player)** on their own PC
+  and screen-grab **their own** gameplay — legitimate (own recordings, offline, personal use). This
+  moves it from "impossible on the site" to a real project the user builds on their machine,
+  **documented here as a field report** (§13.0 genre 2).
+- **Method: imitation learning / behavioral cloning** — NOT from-scratch RL. From-scratch RL on a
+  real Soulslike won't converge (real-time, expensive deaths, brutal reward shaping); BC from human
+  demos is how this is actually done. Honest framing: *"an agent that learns to play by watching me
+  play,"* optionally + DAgger / a little RL later. **Never** frame it as "self-taught from scratch"
+  or "our AI beats Lies of P" beyond the documented reality.
+- **Pipeline (built on the user's PC, documented step-by-step on the site):**
+  1. **Capture** — high-FPS screen grab (`dxcam` / OBS) **time-synced** with **keyboard+mouse** input
+     logging (`pynput` — the user plays **KBM**, confirmed). Downsample (~160×90), **frame-stack** so
+     timing is visible to the model.
+  2. **Dataset** — label = keys/mouse-buttons held per frame (**multi-label**). Severe class
+     imbalance (parry/dodge frames are rare) → weight / resample those classes.
+  3. **Model** — a **small** CNN (or a pretrained vision backbone + small head), frame-stacked or with
+     a small LSTM (parry timing is temporal).
+  4. **Control loop** — inference → synthesize inputs. ⚠️ For a **KBM** setup, synthetic keystrokes
+     (`pydirectinput`) may or may not register in the game — **validate early**; the
+     capture→infer→act **latency** is the make-or-break (parry windows are ~tens of ms).
+  5. **Artifacts** — code on GitHub, weights + model card on HuggingFace, a demo GIF/video; Manifold
+     links out. Results section ships only once these exist.
+- **Hardware (confirmed):** **GTX 1660 Ti Mobile, 6 GB VRAM.** Enough for a modest CNN at low
+  resolution — keep the backbone small (≤ ResNet-18-class), use mixed precision and a small batch.
+  6 GB is the ceiling: no large backbones, no high-res frames, no big frame-stacks.
+- **Training route (confirmed 2026-09-08 — no GPU purchase needed):** **decouple the two workloads.**
+  The **local 1660 Ti** does capture + the live agent loop (it must — the game runs there); **training
+  goes to Kaggle's free weekly GPU** (~30 h/week; **T4 or P100 16 GB — NOT the TPU**: a small CNN
+  under-utilises a TPU and fights `torch_xla` for no gain). Kaggle is headless — it can't run the game
+  or the loop, training only. **Data-transfer gotcha:** raw footage is huge and Kaggle datasets are
+  size-capped → **downsample/compress at capture time** (resize to ~160×90, store as encoded video or
+  packed `.npz`/webdataset shards, never a folder of raw PNGs); upload as a private Kaggle Dataset,
+  train, push weights to HuggingFace. (Cloud alternatives if quota is tight: Colab free T4, or rent an
+  A10/3090/4090 on vast.ai / RunPod.)
+- **Honest expectations (must appear in the article):** BC imitates *average* play, won't exceed the
+  user's own skill, and fails in states the user rarely visited (**distribution shift** → DAgger
+  mitigates). Realistic scope = **one boss / one arena**, not the whole game. It may **dodge-tank**
+  rather than clean-parry because of loop latency.
+- **Deep-RL option (the ambitious follow-up, not the baseline).** "Going Deep RL" on Lies of P adds
+  ONE big requirement BC doesn't have: a **reward signal**, which on a real game means **reading game
+  state from pixels in real time** — boss/player HP bars, stamina, death/victory — via OpenCV
+  template-matching or OCR on the HUD. That HUD parser is the crux new engineering piece, plus a
+  gym-like wrapper (`reset()` = reload/walk back to the boss — *expensive* in a Soulslike; `step()` =
+  send input → next frame, reward, done). Realistic menu, easiest → hardest:
+  1. **BC → RL fine-tune** ⭐ — pretrain on demos, then fine-tune with RL against the HUD reward. The
+     BC warm-start kills the exploration problem; **this is the recommended Deep-RL path.**
+  2. **Offline RL** — learn a better-than-demo policy from the recorded frames + reward labels, no live
+     loop (CQL / IQL / Decision Transformer). Reuses the data, dodges the brutal real-time loop.
+  3. **Online DQN / PPO from scratch** — research-grade slog; real-time = no fast-forward, each death
+     costs seconds, wants ~millions of frames, may never converge. The bottleneck is game wall-clock,
+     not the GPU. **Not recommended as the deliverable.**
+  Algorithm fit: **DQN** (+ replay + target net) for the discrete button set, **PPO** for multi-button.
+  **Framing:** ship **BC as the deliverable, Deep RL (path 1 or 2) as the labelled stretch/sequel** —
+  keeps the field report honest at every stage. NOTE: this is the *off-site* Deep-RL story; the
+  *on-site* reproducible Deep-RL home is a DQN-on-a-hand-built-env capstone (see §13.4, 4th capstone).
+- **Staging:** the **methodology / architecture article may be drafted now** (planning); the
+  **results + external links go in only after the user's real model exists.** Longest tail of the
+  three (weeks of the user's own off-site work).
+
+### 13.4 Sequencing & prerequisites
+1. **A (tabular control)** — first; caps finished tracks, self-contained, proves the format.
+2. **B (Hill Climb / neuroevolution)** — next; proves the hand-built-sim + live-run pattern.
+3. **C (Lies of P / imitation)** — field report; draft methodology anytime, ship results after the
+   user's model exists.
+
+None of the three require the still-unbuilt **Function approximation** or **policy-gradient** tracks.
+A **4th** capstone later — **the on-site Deep-RL home: DQN (value-based) or actor–critic (policy-based)
+on a hand-built environment** (CartPole / Mountain Car / a simple game we code in numpy) — would cap
+those tracks once they exist. B optionally wants a short **neuroevolution primer**; C needs the
+user's off-site build. All three still obey the reproducibility discipline of §10.4 / §11 (a
+runnable-notebook capstone ships its notebook + repro guard; a field report ships links to real,
+runnable external artifacts instead).
+
+> **On "why isn't Deep RL a track?"** It is — under different names, sequenced bottom-up on purpose.
+> **Deep RL = the Function-approximation track (value-based: DQN, target nets, replay, the deadly
+> triad) + the policy-gradient/actor–critic track (REINFORCE → A2C → PPO).** You can't teach DQN
+> honestly before function approximation + the deadly triad, which need tabular Q-learning first — so
+> Deep RL is the *destination* of the family, not an omission. Building it before the foundations
+> would be the black box the site refuses to ship (§12.2).

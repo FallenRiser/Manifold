@@ -74,7 +74,7 @@ export default function TheInteractionPage() {
         </div>
         <p style={{ fontSize: 13, color: "var(--muted)" }}>
           Depth 8, width 32, no normalisation. Gradient ratio = first-layer gradient norm ÷ last-layer
-          gradient norm at initialisation. From <code>scripts/init_norm_cases.py</code> (section 7).
+          gradient norm at initialisation.
         </p>
 
         <h2>Reading the grid: a strict hierarchy</h2>

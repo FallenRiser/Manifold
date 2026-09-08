@@ -93,7 +93,7 @@ export default function BiasVariancePage() {
         </Callout>
 
         <h2>Measure the U-curve yourself</h2>
-        <CodeBlock setup={REGRESSION_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
+        <CodeBlock setup={REGRESSION_SETUP} labels={["Trace the U-curve", "RidgeCV"]} fromScratch={codeScratch} withLibrary={codeLib} />
 
         <PrevNext prev={{ href: "/learn/regularized-regression", label: <>← Why regularize?</> }} next={{ href: "/learn/regularized-regression/shrinkage-the-core-idea", label: <>Next up · Shrinkage: the core idea →</> }} />
       </div>

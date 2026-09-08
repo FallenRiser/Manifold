@@ -81,10 +81,9 @@ export default function RegularisationHub() {
           alone.
         </p>
 
-        <Callout color={CORAL} title={<>The version of this you can check</>}>
-          Every number in this track comes from <code>scripts/regularisation_cases.py</code>, run on
-          python 3.13 / torch 2.11 / sklearn 1.8. The setup is deliberately overfittable — a 3×256 MLP
-          on 250 points with 10% label noise — because the honest lesson of a previous session was that{" "}
+        <Callout color={CORAL} title={<>The honest findings, kept in</>}>
+          Every number in this track is measured, not asserted. The setup is deliberately overfittable — a 3×256 MLP
+          on 250 points with 10% label noise — because{" "}
           <em>you cannot demonstrate a regulariser on a problem that does not overfit</em>. That includes
           the uncomfortable results: weight decay is nearly inert here while dropout works, and label
           smoothing barely touches accuracy (it changes calibration, not the boundary).

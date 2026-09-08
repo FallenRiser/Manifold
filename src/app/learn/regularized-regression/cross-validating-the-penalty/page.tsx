@@ -72,7 +72,7 @@ export default function CVPenaltyPage() {
         </ul>
 
         <h2>Nested CV in code</h2>
-        <CodeBlock setup={REGRESSION_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
+        <CodeBlock setup={REGRESSION_SETUP} labels={["Nested CV by hand", "LassoCV"]} fromScratch={codeScratch} withLibrary={codeLib} />
 
         <PrevNext prev={{ href: "/learn/regularized-regression/standardize-first", label: <>← Standardize first</> }} next={{ href: "/learn/regularized-regression/the-full-path-and-warm-starts", label: <>Next up · The full path &amp; warm starts →</> }} />
       </div>

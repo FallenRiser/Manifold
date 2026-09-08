@@ -68,7 +68,7 @@ export default function ChoosingKByCVPage() {
           it&rsquo;s refit on each fold&rsquo;s training portion — the point of the next section, and the most common
           way a k-NN validation score gets quietly inflated.
         </p>
-        <CodeBlock setup={KNN_SETUP} fromScratch={codeManual} withLibrary={codeGrid} />
+        <CodeBlock setup={KNN_SETUP} labels={["Explicit loop", "GridSearchCV"]} fromScratch={codeManual} withLibrary={codeGrid} />
 
         <Callout color="var(--c-classification)" title={<>The leakage trap, in one sentence</>}>
           If you scale (or select features, or impute) using the <em>whole</em> training set before

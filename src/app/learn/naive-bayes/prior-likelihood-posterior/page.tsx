@@ -15,16 +15,27 @@ const TEAL = "var(--c-classification)";
 const link: React.CSSProperties = { color: "var(--brand)", textDecoration: "none" };
 
 export default function PriorLikelihoodPosteriorPage() {
-  const fromScratch = `# the same 2-feature problem; fitting is just tallying statistics
+  const fromScratch = `# the same 2-feature problem; "fitting" is just tallying statistics
 X, y = make_classification(n_samples=600, n_features=2, n_informative=2,
                            n_redundant=0, n_clusters_per_class=1,
                            class_sep=1.3, random_state=0)
-nb = GaussianNB().fit(X, y)
 
-# there is no training loop here -- these are the three tables it stored:
-print("prior  P(y)          :", nb.class_prior_.round(3))   # class frequencies
-print("means  (class,feature):\\n", nb.theta_.round(3))       # sample means
-print("vars   (class,feature):\\n", nb.var_.round(3))         # sample variances`;
+# no training loop -- estimate the three tables straight from the data
+classes = np.unique(y)
+prior = np.array([(y == c).mean()        for c in classes])   # class frequencies
+means = np.array([X[y == c].mean(axis=0) for c in classes])   # sample means
+varis = np.array([X[y == c].var(axis=0)  for c in classes])   # sample variances
+print("prior  P(y)           :", prior.round(3))
+print("means  (class,feature):\\n", means.round(3))
+print("vars   (class,feature):\\n", varis.round(3))`;
+
+  const withLibrary = `X, y = make_classification(n_samples=600, n_features=2, n_informative=2,
+                           n_redundant=0, n_clusters_per_class=1,
+                           class_sep=1.3, random_state=0)
+nb = GaussianNB().fit(X, y)                 # stores exactly those three tables
+print("prior  P(y)           :", nb.class_prior_.round(3))
+print("means  (class,feature):\\n", nb.theta_.round(3))
+print("vars   (class,feature):\\n", nb.var_.round(3))`;
 
   return (
     <article>
@@ -88,7 +99,7 @@ print("vars   (class,feature):\\n", nb.var_.round(3))         # sample variances
           computed in a single pass:
         </p>
 
-        <CodeBlock setup={NB_SETUP} fromScratch={fromScratch} />
+        <CodeBlock setup={NB_SETUP} fromScratch={fromScratch} withLibrary={withLibrary} />
 
         <Callout color={TEAL} title={<>Fitting is estimation, not optimisation</>}>
           This is the quiet surprise of Naive Bayes. Where logistic regression runs an iterative solver to

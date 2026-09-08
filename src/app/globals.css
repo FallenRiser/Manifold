@@ -37,6 +37,7 @@
   --c-metrics: #6e6e78;
   --c-space: #4b3fd1;         /* deep-space indigo — asteroid-hazard capstone accent */
   --c-housing: #b0542f;       /* California terracotta — housing capstone accent */
+  --c-warehouse: #5f7d0a;     /* hi-vis olive — warehouse-robot RL capstone accent */
 
   /* Always-dark "sky" palette for the asteroid capstone's special sections.
      Theme-independent (the sky is dark in light mode too), so defined once. */
@@ -109,6 +110,7 @@
   --c-metrics: #a1a19a;
   --c-space: #9385ff;         /* deep-space indigo → periwinkle in dark */
   --c-housing: #e5936a;       /* California terracotta, lifted for dark */
+  --c-warehouse: #a9cb2e;     /* hi-vis olive → safety lime in dark */
 
   --good: #2ecc8f;
   --warn: #f0b429;

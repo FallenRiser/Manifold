@@ -58,8 +58,8 @@ export default function LearningCurvesPage() {
         </LabFrame>
 
         <p>
-          Both curves in the lab are real 5-fold cross-validated accuracies on the digits dataset from{" "}
-          <code>scripts/model_selection_cases.py</code> — not idealized shapes, which is why the tree&rsquo;s
+          Both curves in the lab are real 5-fold cross-validated accuracies on the digits dataset — not
+          idealized shapes, which is why the tree&rsquo;s
           validation curve even dips slightly at n = 1,113 before recovering. A depth-2 tree can produce at most
           four leaves, so on a ten-class problem it is structurally incapable of exceeding roughly a third
           correct. Its training accuracy is <em>also</em> 32%: it cannot even fit the data it has seen. That is

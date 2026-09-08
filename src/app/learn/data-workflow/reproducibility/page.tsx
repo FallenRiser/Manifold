@@ -133,9 +133,8 @@ export default function ReproducibilityPage() {
           in front of a stakeholder.
         </p>
         <p>
-          Every quantitative claim in this pillar comes from{" "}
-          <code>scripts/data_workflow_cases.py</code>, committed alongside the pages, with fixed seeds and stated
-          library versions. That is not decoration: it is the only reason the numbers on these pages are evidence
+          Every quantitative claim in this pillar is measured — produced with fixed seeds and a stated
+          protocol. That is not decoration: it is the only reason the numbers on these pages are evidence
           rather than assertion, and the same standard is what you should hold your own results to. The capstones
           go one step further and ship an{" "}
           <Link href="/learn/california-housing-capstone/takeaways" style={link}>executed reproduction

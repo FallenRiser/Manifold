@@ -95,7 +95,7 @@ export default function BoundsBreakPage() {
           architectures trained on real labels generalize excellently.
         </p>
         <p>
-          We reproduce this at small scale in <code>scripts/learning_theory_cases.py</code> — 4,000 random tanh
+          We reproduce this at small scale — 4,000 random tanh
           features on digits, same class and same optimiser throughout:
         </p>
         <MathBlock>{String.raw`\begin{array}{lcc} & \text{train acc} & \text{test acc} \\ \text{true labels} & 1.0000 & 0.9667 \\ \text{random labels} & 1.0000 & 0.0870 \end{array}`}</MathBlock>

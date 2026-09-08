@@ -73,8 +73,7 @@ export default function LabelSmoothingPage() {
         <h2>The measured result — and the honest reading</h2>
         <p>
           Here is where the lesson lands. On the running classifier, both techniques barely touch{" "}
-          <em>accuracy</em>, and heavy mixup slightly <em>hurts</em> it. Three seeds averaged, from{" "}
-          <code>scripts/regularisation_cases.py</code>:
+          <em>accuracy</em>, and heavy mixup slightly <em>hurts</em> it. Three seeds averaged:
         </p>
 
         <div style={{ overflowX: "auto", margin: "1.2rem 0" }}>
@@ -104,7 +103,6 @@ export default function LabelSmoothingPage() {
           </table>
         </div>
         <p style={{ fontSize: 13, color: "var(--muted)" }}>
-          From <code>scripts/regularisation_cases.py</code>.
         </p>
 
         <p>

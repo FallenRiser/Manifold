@@ -56,7 +56,7 @@ export default function WhenDepthHurtsPage() {
           </table>
         </div>
         <p style={{ fontSize: 13, color: "var(--muted)" }}>
-          Width 4, ReLU, He init. From <code>scripts/architecture_cases.py</code>.
+          Width 4, ReLU, He init.
         </p>
 
         <p>

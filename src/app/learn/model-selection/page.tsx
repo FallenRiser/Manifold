@@ -68,8 +68,7 @@ export default function ModelSelectionHub() {
           That is not a hypothetical. Take 200 &ldquo;models&rdquo; that are all literally coin flips with true
           accuracy 0.500, score each on 200 validation examples, and report the best. Averaged over 2,000 trials,
           that reported number is <strong>0.5975</strong> — nearly ten points of pure illusion, manufactured by the
-          act of choosing. (Real run:{" "}
-          <code>scripts/model_selection_cases.py</code>.) Nobody cheated, nobody overfit a model. Selection did it.
+          act of choosing. Nobody cheated, nobody overfit a model. Selection did it.
         </p>
         <p>
           Almost every bad practice in applied ML is a failure to account for that, and almost every good practice
@@ -100,8 +99,8 @@ export default function ModelSelectionHub() {
         <h2>Every number here is measured</h2>
         <p>
           This pillar makes quantitative claims — how much optimism a grid search injects, how much nested
-          cross-validation recovers, what the one-standard-error rule costs you. All of them come from real runs in{" "}
-          <code>scripts/model_selection_cases.py</code>, with seeds and protocols stated on the page. Where the
+          cross-validation recovers, what the one-standard-error rule costs you. All of them come from real
+          runs, with seeds and protocols stated on the page. Where the
           honest answer is &ldquo;the effect is small&rdquo;, we say so rather than inflating it: on a 20-point
           grid the selection optimism is <M>{String.raw`+0.006`}</M>, not a catastrophe. Knowing which
           mistakes are small is as useful as knowing which are large.

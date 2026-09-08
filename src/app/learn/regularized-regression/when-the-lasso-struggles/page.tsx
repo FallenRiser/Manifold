@@ -61,7 +61,7 @@ export default function WhenLassoStrugglesPage() {
         </Callout>
 
         <h2>Watch Lasso flip on correlated features</h2>
-        <CodeBlock setup={REGRESSION_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
+        <CodeBlock setup={REGRESSION_SETUP} labels={["The instability", "Elastic-net fix"]} fromScratch={codeScratch} withLibrary={codeLib} />
 
         <PrevNext prev={{ href: "/learn/regularized-regression/solving-the-lasso", label: <>← Solving the Lasso</> }} next={{ href: "/learn/regularized-regression/elastic-net", label: <>Next up · Elastic-net: blending L1 &amp; L2 →</> }} />
       </div>

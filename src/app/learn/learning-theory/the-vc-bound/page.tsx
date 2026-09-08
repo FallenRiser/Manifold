@@ -102,8 +102,7 @@ export default function VcBoundPage() {
         <p>
           A bound is a promise about a number, so let&rsquo;s collect the promises. Linear classifiers in{" "}
           <M>{String.raw`\mathbb R^p`}</M> have <M>{String.raw`d = p+1`}</M>. With{" "}
-          <M>{String.raw`\delta = 0.05`}</M>, evaluated directly from the formula above (real values from{" "}
-          <code>scripts/learning_theory_cases.py</code>):
+          <M>{String.raw`\delta = 0.05`}</M>, evaluated directly from the formula above:
         </p>
 
         <table style={table}>

@@ -32,8 +32,7 @@ gbm = lgb.LGBMClassifier(n_estimators=700, learning_rate=0.1, num_leaves=63,
                          n_jobs=-1, random_state=0, verbose=-1).fit(Xtr, ytr)
 print("LightGBM:    ", round(accuracy_score(yte, gbm.predict(Xte)), 3))
 
-# (XGBoost is identical but wants 0-indexed labels: fit on ytr - 1.
-#  full four-way comparison is in scripts/boosting_cases.py)`;
+# (XGBoost is identical but wants 0-indexed labels: fit on ytr - 1.)`;
 
 export default function CaseTabularPage() {
   return (

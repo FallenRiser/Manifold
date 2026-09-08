@@ -115,7 +115,7 @@ export default function WhatBatchNormDoesPage() {
           </table>
         </div>
         <p style={{ fontSize: 13, color: "var(--muted)" }}>
-          Ten-layer fully connected net, He init, ReLU. From <code>scripts/init_norm_cases.py</code>.
+          Ten-layer fully connected net, He init, ReLU.
         </p>
 
         <p>

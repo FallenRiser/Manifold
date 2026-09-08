@@ -92,7 +92,7 @@ export default function UnderfitFitOverfitPage() {
           </table>
         </div>
         <p style={{ fontSize: 13, color: "var(--muted)" }}>
-          Diagnostic configs on moons, five-seed averages. From <code>scripts/architecture_cases.py</code>.
+          Diagnostic configs on moons, five-seed averages.
         </p>
 
         <h2>Underfitting: both numbers are low</h2>

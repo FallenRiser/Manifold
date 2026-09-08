@@ -1,7 +1,10 @@
 import Link from "next/link";
 import { LessonHeader, Callout, Proof, PrevNext } from "@/components/lesson";
 import { M, MathBlock } from "@/components/Math";
+import { CodeBlock } from "@/components/CodeBlock";
+import { PredictPrompt } from "@/components/PredictPrompt";
 import { Quiz } from "@/components/Quiz";
+import { ARCH_SETUP } from "@/lib/runtimeSetup";
 
 export const metadata = {
   title: "What you are actually choosing — Manifold",
@@ -13,12 +16,24 @@ const CORAL = "var(--c-neural)";
 const link: React.CSSProperties = { color: "var(--brand)", textDecoration: "none" };
 
 export default function WhatYouAreChoosingPage() {
+  const fromScratch = `# The cost axis is pure arithmetic -- you can price an architecture
+# before you train it. A layer from a inputs to b units has a*b weights
+# plus b biases.
+for hidden in [(32, 32), (64,) * 8]:
+    print(f"{str(hidden):>26}  ->  {count_params(hidden):>6} parameters")`;
+
+  const withLibrary = `# Does 25x the parameters buy accuracy? Train both and look.
+# (Single seed, so these wobble a little around the 5-seed means in the text.)
+for hidden in [(32, 32), (64,) * 8]:
+    tr, te = fit_mlp(hidden)
+    print(f"{str(hidden):>26}  params={count_params(hidden):>6}  test={te}")`;
+
   return (
     <article>
       <LessonHeader
         chips={[
-          { label: "The question", color: CORAL },
-          { label: "Tier 1 · intuition", color: CORAL },
+          { label: "Neural networks", color: CORAL },
+          { label: "Core idea", color: "var(--c-fundamentals)" },
         ]}
         time="about 8 minutes"
         title={<>What you are actually choosing</>}
@@ -72,6 +87,17 @@ export default function WhatYouAreChoosingPage() {
           reachable; it does not tell you what will be reached.</strong>
         </Callout>
 
+        <PredictPrompt
+          prompt={<>You take the depth-2, width-32 network and grow it to depth-8, width-64 — twenty-five
+            times the parameters. What happens to test accuracy on this problem?</>}
+          options={[
+            "It climbs — more capacity, better fit",
+            "It stays about the same — the extra capacity is wasted but harmless",
+            "It drops — the bigger network is actually a little worse",
+          ]}
+          nudge={<>Locked in. Price both networks by hand, then train them and read the last column.</>}
+        />
+
         <h2>Axis 2: cost</h2>
         <p>
           Every parameter is a floating-point number that must be stored, initialised, updated, and
@@ -79,6 +105,15 @@ export default function WhatYouAreChoosingPage() {
           parameters. A depth-8, width-64 network has 29,377 — twenty-five times more. The deeper, wider
           network scores 0.932 on the test set, which is <em>lower</em> than the 0.953 achieved by the
           smaller one. You paid twenty-five times as much and got less.
+        </p>
+
+        <CodeBlock setup={ARCH_SETUP} fromScratch={fromScratch} withLibrary={withLibrary} />
+
+        <p>
+          The counter is worth sitting with: the deeper, wider network is not just a worse deal, it is a
+          worse <em>model</em> on this data. Capacity it cannot use becomes loss surface it has to navigate,
+          and the optimiser navigates it slightly less well. More is not free, and here it is not even
+          better.
         </p>
         <p>
           Parameters are the fixed cost of a network: they sit in memory whether you are training or
@@ -123,7 +158,7 @@ export default function WhatYouAreChoosingPage() {
 
         <Proof color={CORAL} title="the grid that makes this concrete">
           <p>
-            <code>scripts/architecture_cases.py</code> trains a grid of MLPs on the make_moons dataset
+            A grid of MLPs is trained on the make_moons dataset
             (1,000 samples, noise 0.25, 5-fold cross-validated, 10 seeds per cell). Each cell reports the
             mean test accuracy and its standard deviation. The grid varies depth from 1 to 8 and width
             from 4 to 64.

@@ -14,9 +14,21 @@ const TEAL = "var(--c-classification)";
 const link: React.CSSProperties = { color: "var(--brand)", textDecoration: "none" };
 
 export default function NaiveBayesForTextPage() {
-  const fromScratch = `mnb = MultinomialNB().fit(X_train, y_train)   # "training" = counting words
+  const fromScratch = `# "training" is counting: build each class's word-frequency table by hand
+classes  = np.unique(y_train)
+counts   = np.array([X_train[y_train == c].sum(axis=0) + 1.0 for c in classes])
+logtheta = np.log(counts / counts.sum(axis=1, keepdims=True))
 
-# peek inside: which word indices does each class most favour?
+# peek inside: which word indices does each class most favour? (log-prob gap)
+gap = logtheta[0] - logtheta[1]
+print("top class-0 words (indices):", np.argsort(gap)[-5:].tolist())
+print("top class-1 words (indices):", np.argsort(gap)[:5].tolist())
+
+logprior = np.log([(y_train == c).mean() for c in classes])
+pred = (logprior + X_test @ logtheta.T).argmax(axis=1)
+print("accuracy:", round((pred == y_test).mean(), 3))`;
+
+  const withLibrary = `mnb = MultinomialNB().fit(X_train, y_train)   # the same counts, in one call
 gap = mnb.feature_log_prob_[0] - mnb.feature_log_prob_[1]
 print("top class-0 words (indices):", np.argsort(gap)[-5:].tolist())
 print("top class-1 words (indices):", np.argsort(gap)[:5].tolist())
@@ -66,7 +78,7 @@ print("accuracy:", round(accuracy_score(y_test, mnb.predict(X_test)), 3))`;
           words whose per-class log-probabilities differ most:
         </p>
 
-        <CodeBlock setup={NB_TEXT_SETUP} fromScratch={fromScratch} />
+        <CodeBlock setup={NB_TEXT_SETUP} fromScratch={fromScratch} withLibrary={withLibrary} />
 
         <h2>Why text is where Naive Bayes shines</h2>
         <p>
@@ -102,8 +114,7 @@ print("accuracy:", round(accuracy_score(y_test, mnb.predict(X_test)), 3))`;
           </table>
         </div>
         <p style={{ fontSize: 13, color: "var(--muted)" }}>
-          Synthetic corpus: 400-word vocabulary, 1400 training documents. From{" "}
-          <code>scripts/naive_bayes_cases.py</code>.
+          Synthetic corpus: 400-word vocabulary, 1400 training documents.
         </p>
 
         <Callout color={TEAL} title={<>Fast and competitive is a rare combination</>}>

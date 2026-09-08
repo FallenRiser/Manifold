@@ -57,7 +57,7 @@ export default function DataAugmentationPage() {
         </p>
         <p>
           Here is the full sweep of jitter standard deviation against test accuracy on the 3&times;256
-          classifier, three seeds averaged, from <code>scripts/regularisation_cases.py</code>:
+          classifier, three seeds averaged:
         </p>
 
         <div style={{ overflowX: "auto", margin: "1.2rem 0" }}>
@@ -87,7 +87,6 @@ export default function DataAugmentationPage() {
           </table>
         </div>
         <p style={{ fontSize: 13, color: "var(--muted)" }}>
-          From <code>scripts/regularisation_cases.py</code>.
         </p>
 
         <p>
