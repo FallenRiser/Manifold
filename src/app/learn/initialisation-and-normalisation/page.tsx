@@ -1,6 +1,11 @@
 import Link from "next/link";
 import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 import { INIT_DONE, INIT_TOTAL } from "@/lib/initNormTrack";
+import { PredictPrompt } from "@/components/PredictPrompt";
+import { LabFrame } from "@/components/LabFrame";
+import { InitBandLab } from "@/components/labs/InitBandLab";
+import { Dumbbell } from "@/components/figures/Dumbbell";
+import { INIT_OUTCOME, MAJORITY_CLASS } from "@/components/figures/initNorm/data";
 
 export const metadata = {
   title: "Initialisation & normalisation — Manifold",
@@ -74,20 +79,76 @@ export default function InitNormHub() {
           resets it after every layer so the scale can never drift far, no matter where you started.
         </p>
         <p>
-          This is measurable, and the numbers are violent. In a plain 8-layer ReLU network, initialising
-          the weights too small collapses the pre-activation standard deviation from{" "}
-          <strong>0.001 to 0.0000 by layer 2</strong> — the signal is gone. Initialising too large sends
-          it the other way: layer 1 sits at std <strong>5.2</strong>, and by layer 8 it is{" "}
-          <strong>4,197,047,183</strong>. He initialisation, the correct one for ReLU, holds the
-          pre-activation std within a factor of two of one across all eight layers.
+          That is a claim about training, so it has to be settled by training. Take one architecture —
+          eight hidden layers of width 32, ReLU — one dataset, one optimiser, one budget of sixty
+          epochs, and change nothing except the standard deviation of the weights you start from.
         </p>
+
+        <PredictPrompt
+          accent={CORAL}
+          prompt={<>Same network, same data, same sixty epochs. The only difference is the weight
+            scale at step zero. How far apart can the finished models be?</>}
+          options={[
+            "A point or two — the optimiser sorts it out",
+            "Five points or so",
+            "Twenty points",
+            "One of them never learns anything at all",
+          ]}
+          nudge="Locked in. The measured sweep is below."
+        />
+
+        <Dumbbell
+          rows={INIT_OUTCOME.map((r) => ({ init: r.init, a: r.acc }))}
+          baseline={MAJORITY_CLASS}
+          seriesLabels={["test accuracy after 60 epochs"]}
+          caption={<>Test accuracy against the initial weight standard deviation, three seeds each.
+            The two smallest scales land at <strong>0.470</strong>, which is not a weak model — it is
+            below the majority-class line. Those networks return the identical logit for all 200 test
+            points; they are constant functions. The gradient reaching their first layer at
+            initialisation has norm <strong>1.3 × 10⁻²⁰</strong>, so there was never anything for Adam
+            to descend.</>}
+        />
+
+        <p>
+          The gap between the best and worst run of that sweep is <strong>0.475</strong> in test
+          accuracy, produced entirely by a constant. And the failure is not symmetric or gentle: at
+          scale 1.0 the network still trains, but to 0.877 with a seed-to-seed spread of ±0.069 — five
+          times Xavier&rsquo;s. Too large does not kill the network, it makes it unreliable.
+        </p>
+        <p>
+          The damage is visible long before the first gradient step. In the same 8-layer network,
+          initialising too small drives the pre-activation standard deviation from <strong>0.0010</strong>{" "}
+          at layer 1 to <strong>1.1 × 10⁻²⁰</strong> at layer 8 — halving is far too kind a word, it
+          is losing two to three decades per layer. Too large goes the other way: <strong>5.2</strong>{" "}
+          at layer 1, <strong>4.2 × 10⁹</strong> at layer 8. He initialisation, the correct one for
+          ReLU, holds the pre-activation std within a factor of two of one across all eight layers.
+        </p>
+
+        <LabFrame
+          accent={CORAL}
+          tryThis={<>Drag the weight scale. Find the two edges — the value below which the signal is
+            gone by layer 10, and the value above which it runs away — and see how much room is left
+            between them.</>}
+          insight={<>Sweep it and the verdict changes at <strong>0.18</strong> and again at{" "}
+            <strong>0.63</strong>. Everything at or below 0.03 is dead; 0.05 to 0.13 is fading; the
+            healthy band is about <strong>0.18 to 0.40</strong> — a factor of two either side of He,
+            on a knob that ranges over five orders of magnitude. Note where Xavier lands: 0.125, in
+            the fading band, which is the same verdict the measured figures reach two pages from now.
+            Note too that the two panels fail together — there is no setting where the activations are
+            healthy and the gradients are not, because they are the same product read in opposite
+            directions.</>}
+        >
+          <InitBandLab accent={CORAL} />
+        </LabFrame>
 
         <Callout color={CORAL} title={<>The honest findings, kept in</>}>
           Every number in this track is measured, not asserted. That includes the honest findings: Xavier is the{" "}
           <em>wrong</em> init for ReLU (its variance decays 0.25 → 0.0008 over ten layers while He&rsquo;s
           holds near 0.6), zero initialisation gives a network of effective width one, and normalisation
           buys its stability by making the init scale <em>almost stop mattering</em> — not by making any
-          single init better.
+          single init better. On the problem used throughout this track, BatchNorm does not improve
+          accuracy at all; it collapses that 0.475 spread to <strong>0.008</strong>. That is the
+          finding, and the track says so rather than claiming a win it did not measure.
         </Callout>
 
         <h2>The five chapters</h2>

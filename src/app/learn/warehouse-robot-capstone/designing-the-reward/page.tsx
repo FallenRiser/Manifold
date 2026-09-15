@@ -4,7 +4,7 @@ import { CodeOutput } from "@/components/CodeOutput";
 import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 import { M } from "@/components/Math";
 import { PredictPrompt } from "@/components/PredictPrompt";
-import { AnalystQuestion, TransferBox, PlaybookRule } from "@/components/capstone/pedagogy";
+import { WorkOrder, TransferBox, PlaybookRule } from "@/components/capstone/warehouse";
 import { WAREHOUSE_SETUP } from "@/lib/runtimeSetup";
 
 export const metadata = {
@@ -33,10 +33,10 @@ export default function DesigningTheReward() {
       />
 
       <div className="lesson">
-        <AnalystQuestion accent={OLIVE} label="The engineer's question" icon="🤖">
+        <WorkOrder act={1} n={4}>
           What am I actually paying for — and if the agent maximised this <em>literally</em>, without any of my
           good intentions, what would it do?
-        </AnalystQuestion>
+        </WorkOrder>
 
         <h2>Reward the outcome, not the method</h2>
         <p>
@@ -132,14 +132,14 @@ export default function DesigningTheReward() {
           that is.
         </p>
 
-        <TransferBox accent={OLIVE}>
+        <TransferBox>
           Write your reward, then attack it: ask what the <em>laziest possible</em> agent could do to collect it
           without doing your task. Any term that can be earned repeatedly without progress is a farm. And when you
           add a hint, prefer a potential-based one — or accept that you have changed the objective and re-check the
           policy, scored on the reward you actually care about.
         </TransferBox>
 
-        <PlaybookRule n={4} accent={OLIVE}>
+        <PlaybookRule n={4}>
           <strong>Reward outcomes, not methods</strong>, and stress-test the reward by imagining an adversary
           maximising it literally. Score every candidate policy on the <em>true</em> objective, never on the shaped
           one — that gap is where reward hacking hides.

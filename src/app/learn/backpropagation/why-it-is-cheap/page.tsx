@@ -91,7 +91,7 @@ export default function WhyCheapPage() {
           23× to 1,219× as the toy network grew — the numerator was rising while the denominator sat still.
         </p>
 
-        <CodeOutput>{` width   params   backprop (ms)   finite diff (ms)    ratio
+        <CodeOutput source="scripts/backprop_cases.py">{` width   params   backprop (ms)   finite diff (ms)    ratio
      4       37           0.127                2.9      23x
      8      105           0.153               12.1      79x
     16      337           0.202               62.6     310x

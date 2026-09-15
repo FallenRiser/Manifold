@@ -5,6 +5,8 @@ import { CodeBlock } from "@/components/CodeBlock";
 import { CodeOutput } from "@/components/CodeOutput";
 import { Quiz } from "@/components/Quiz";
 import { GRIDWORLD_SETUP } from "@/lib/runtimeSetup";
+import { PolicyVsValues } from "@/components/figures/planning/PlanningCharts";
+import { HOWMANY_OPTIMAL, HOWMANY_VALUE_ERROR } from "@/components/figures/planning/data.generated";
 
 export const metadata = {
   title: "How few iterations it takes — Manifold",
@@ -90,6 +92,18 @@ after 6 evaluation sweeps: greedy policy optimal? True`}</CodeOutput>
           sits in between, evaluating a few sweeps per improvement. Both are motivated by exactly the gap you just
           saw between the policy and the values.
         </Callout>
+
+        <PolicyVsValues
+          optimal={HOWMANY_OPTIMAL}
+          error={HOWMANY_VALUE_ERROR}
+          caption={<>The policy is coarser than the values, and this page&rsquo;s grid makes the point
+            more sharply than &ldquo;it settles earlier&rdquo;. The strip turns green after three sweeps
+            and never turns back. The curve above it is how far the values still are from V*, and it is
+            going <em>up</em> — because these sweeps are evaluating the random policy, so they converge
+            to Vπ, not to V*. The values are heading somewhere else entirely and the greedy policy on
+            top of them is optimal anyway. Only the ordering of the actions matters, and the ordering is
+            right long before the numbers are.</>}
+        />
 
         <h2>What the theory says</h2>
         <p>

@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { CodeBlock } from "@/components/CodeBlock";
 import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
+import { ScatterRow } from "@/components/figures/kmeans/Scatter";
+import { DIGITS_2D, PCA_SWEEP } from "@/components/figures/kmeans/data.generated";
 
 export const metadata = {
   title: "Case C: clustering embeddings — Manifold",
@@ -73,6 +75,20 @@ export default function CaseEmbeddingsPage() {
             spherical-cluster assumption holds far better than it would on the original pixels or tokens.
             The representation does the hard work; k-means does the cheap, scalable grouping.
         </Callout>
+
+        <ScatterRow
+          panels={[
+            { points: DIGITS_2D.points, labels: DIGITS_2D.truth, label: "coloured by the true class" },
+            { points: DIGITS_2D.points, labels: DIGITS_2D.labels, centroids: DIGITS_2D.centroids, label: "coloured by the clustering" },
+          ]}
+          caption={<>A worked version of the workflow on a small stand-in for an embedding space: 1,797
+            handwritten digits as 64-dimensional vectors, projected to two components for the picture
+            and clustered into ten. The lesson from the sweep on the dimensionality page applies
+            directly here — clustering the full 64 dimensions scores {PCA_SWEEP[0].ari}, and reducing
+            to 20 first scores {PCA_SWEEP[4].ari}. For real 768- or 1536-dimensional embeddings, that
+            reduction step is not an optimisation, it is how the clustering becomes meaningful at
+            all.</>}
+        />
 
         <h2>When to step beyond k-means here</h2>
         <p>

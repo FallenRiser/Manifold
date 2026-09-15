@@ -4,7 +4,7 @@ import { M } from "@/components/Math";
 import { Quiz } from "@/components/Quiz";
 import { CodeOutput } from "@/components/CodeOutput";
 import { CodeBlock } from "@/components/CodeBlock";
-import { DecisionPoint } from "@/components/capstone/DecisionPoint";
+import { DecisionPoint } from "@/components/DecisionPoint";
 
 export const metadata = {
   title: "What the perceptron guarantee does not cover — Manifold",

@@ -4,6 +4,8 @@ import { M, MathBlock } from "@/components/Math";
 import { CodeBlock } from "@/components/CodeBlock";
 import { CodeOutput } from "@/components/CodeOutput";
 import { GRIDWORLD_SETUP } from "@/lib/runtimeSetup";
+import { ValueStaircase } from "@/components/figures/planning/PlanningCharts";
+import { PI_TOTALS } from "@/components/figures/planning/data.generated";
 
 export const metadata = {
   title: "Why policy iteration reaches the optimum — Manifold",
@@ -92,6 +94,15 @@ round 3: sum of state-values = 10.108`}</CodeOutput>
           equation, whose unique solution is <M>{String.raw`V^*`}</M>. The structure of the problem rules local
           optima out entirely.
         </Callout>
+
+        <ValueStaircase
+          totals={PI_TOTALS}
+          caption={<>The monotone climb the proof guarantees, drawn. The bar for round 1 is the random
+            policy and it is below zero; round 2 is above it everywhere; round 3 is the same bar again,
+            drawn hollow — no change, which is precisely the termination condition. &ldquo;The sequence
+            climbs and there are finitely many hills&rdquo; is this picture, and the flat top is the
+            algorithm stopping.</>}
+        />
 
         <h2>How high can the ceiling actually bite?</h2>
         <p>

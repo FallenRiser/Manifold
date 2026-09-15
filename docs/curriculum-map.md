@@ -282,8 +282,24 @@ approximation-theory statements are Tier 3 and belong in `<Proof>` asides.
 - Learning — TD(0), Q-learning, SARSA, TD(λ) — **BUILT** (`/learn/learning`)
 - Large state spaces & function approximation — *next track (unbuilt)* — **this IS value-based Deep
   RL: DQN, target networks, experience replay, the deadly triad**
-- Policy gradients + actor–critic — *later track (unbuilt; actor–critic confirmed coming here)* —
-  **this IS policy-based Deep RL: REINFORCE → A2C → PPO**
+- Policy gradients, actor–critic & PPO — *later track (unbuilt; actor–critic confirmed coming here)* —
+  **this IS policy-based Deep RL: REINFORCE → A2C → PPO**. **PPO is a committed page set, not optional**
+  (user decision 2026-09-13): the Building-environments track may train Worlds 2 and 3 with PPO, and this
+  track is where PPO gets taught from first principles.
+- **Model-based RL & search** — *new track (confirmed 2026-09-11, unbuilt)*: Dyna, learned models,
+  planning-vs-learning integration, **MCTS**. Sutton & Barto Ch 8; the family would be conspicuously
+  incomplete without it, and it is what lets the Soulslike capstone run all three paradigms on one
+  problem (you know the boss's moveset, so planning against a model is natural).
+- **Building environments from scratch** — *new track (user-requested 2026-09-11, unbuilt)*: the
+  reset/step contract, turning a real system into an MDP, writing dynamics and seeding them, reward
+  design and hacking, **termination vs truncation**, and testing/debugging an env (sanity agents,
+  the solvability check, vectorising for speed). Full handholding, ending by dropping an agent into
+  the world the reader just built. **The gap under everything** — every track so far hands the reader
+  a world. Prerequisite for the Soulslike capstone.
+- **Policy search without gradients** — *new track (planned 2026-09-11, unbuilt)*: hill climbing →
+  evolution strategies → GA over fixed-topology MLPs → **NEAT**. A **branch, not a rung** — it needs
+  only the Neural-networks family, so it is unblocked independently of the two Deep-RL tracks above.
+  Capped by **Capstone B**. Full spec: `docs/neuroevolution-plan.md`.
 
 > **Note — "Deep RL" is not a separate track by design.** It's the destination of the two tracks
 > above, sequenced bottom-up (tabular → function approximation → policy gradients) because DQN can't be
@@ -295,7 +311,13 @@ approximation-theory statements are Tier 3 and belong in `<Proof>` asides.
   *Buildable now, runnable-notebook genre.*
 - **B · "Evolving a driver"** — a Hill Climb Racing clone learned by **neuroevolution** over
   generations (CodeBullet-style); hand-built 2D car physics + live-evolution lab. *On-site sim.*
-- **C · "Learning to parry"** — a **Lies of P imitation-learning field report**: the user screen-grabs
+  **Revised 2026-09-11:** teaches **both** a fixed-topology GA and **NEAT**, and races them at equal
+  environment steps; preceded by the new *Policy search without gradients* track. Its far transfer
+  evolves a policy for **Capstone A's warehouse MDP** and puts it beside Q-learning's 21.2.
+  Authority: `docs/neuroevolution-plan.md`.
+- **C · "Learning to parry"** — 🚧 **FOUNDATIONS BUILT 2026-09-11**, live at `/learn/lies-of-p-capstone`
+  (index only, 1/22; accent `--c-krat` oxblood, gaslight skin, `ParryBudget` signature figure).
+  Authority: `docs/lies-of-p-capstone-plan.md`. — a **Lies of P imitation-learning field report**: the user screen-grabs
   their own offline gameplay (KBM, GTX 1660 Ti 6 GB), trains a behavioral-cloning CNN off-site, and
   the site documents the pipeline + links to GitHub/HuggingFace artifacts. *Field-report genre;
   results ship only after the real model exists.*

@@ -4,13 +4,11 @@ import { ContinueCard } from "@/components/ContinueCard";
 import { Reveal } from "@/components/Reveal";
 import { HousingGeoMap } from "@/components/figures/HousingGeoMap";
 import { NeoField } from "@/components/figures/NeoField";
+import { WarehouseFloor } from "@/components/figures/WarehouseFloor";
 import { CapstoneCard } from "@/components/CapstoneCard";
-import { CAPSTONES } from "@/lib/siteMap";
-import { LR_TOTAL, LR_DONE } from "@/lib/linearRegressionTrack";
-import { REG_TOTAL, REG_DONE } from "@/lib/regularizationTrack";
-import { POLY_TOTAL, POLY_DONE } from "@/lib/polynomialRegressionTrack";
-import { KM_TOTAL, KM_DONE } from "@/lib/kMeansTrack";
-import { KNN_TOTAL, KNN_DONE } from "@/lib/knnTrack";
+import { Shelf } from "@/components/Shelf";
+import { CAPSTONES, FAMILIES, PILLARS, FOUNDATIONS } from "@/lib/siteMap";
+import { SITE } from "@/lib/catalog";
 
 const TIERS = [
   { n: 0, name: "Math Foundations", blurb: "the prerequisites, only when you need them" },
@@ -21,43 +19,30 @@ const TIERS = [
 
 const ARC = ["Hook", "Intuition", "Mechanics", "Math", "Code", "Levers", "When & why"];
 
-const TRACKS = [
+const FIGURES = [<HousingGeoMap key="h" wide />, <NeoField key="n" />, <WarehouseFloor key="w" />];
+
+const RULES = [
   {
-    name: "Linear regression",
-    href: "/learn/linear-regression",
-    color: "var(--c-regression)",
-    done: LR_DONE, total: LR_TOTAL,
-    blurb: "The flagship. From dragging a line by hand to gradients, diagnostics, and inference.",
+    title: "Every number is reproduced",
+    body: "No figure is quoted from memory or from a paper. Each one is produced by a script in this repository that runs the same code the page shows you — on the real dataset, with the seed written down.",
   },
   {
-    name: "Regularized regression",
-    href: "/learn/regularized-regression",
-    color: "var(--c-regression)",
-    done: REG_DONE, total: REG_TOTAL,
-    blurb: "Ridge, lasso, elastic-net — why shrinking coefficients beats trusting them.",
+    title: "Every lab runs real mathematics",
+    body: "Nothing is a pre-rendered animation. The labs solve least squares, run Lloyd's iterations and take gradient steps in your browser, on the numbers you just dragged.",
   },
   {
-    name: "Polynomial regression",
-    href: "/learn/polynomial-regression",
-    color: "var(--c-regression)",
-    done: POLY_DONE, total: POLY_TOTAL,
-    blurb: "Curves from lines: basis functions, and the overfitting cliff-edge.",
-  },
-  {
-    name: "k-Means clustering",
-    href: "/learn/k-means",
-    color: "var(--c-clustering)",
-    done: KM_DONE, total: KM_TOTAL,
-    blurb: "Structure with no labels — Lloyd's algorithm, k-means++, and how to choose k.",
-  },
-  {
-    name: "k-Nearest Neighbors",
-    href: "/learn/k-nearest-neighbors",
-    color: "var(--c-classification)",
-    done: KNN_DONE, total: KNN_TOTAL,
-    blurb: "The simplest classifier there is — and the sharpest lens on distance and dimensionality.",
+    title: "Unbuilt pages say so",
+    body: "A track that is half-written shows its real count and leaves the rest unlinked. Results that have not been measured yet are never written up as though they had been.",
   },
 ];
+
+const shelfHead: React.CSSProperties = {
+  fontFamily: "var(--font-display)",
+  fontSize: 13,
+  fontWeight: 500,
+  color: "var(--muted)",
+  margin: "34px 0 10px",
+};
 
 export default function Home() {
   return (
@@ -104,6 +89,24 @@ export default function Home() {
               Browse the whole map →
             </Link>
           </div>
+
+          {/* The size of the thing, stated once. Every figure is derived from the track
+              outlines themselves, so it cannot drift the way a hand-written claim would. */}
+          <div className="proof">
+            <span className="proof-item">
+              <span className="proof-num">{SITE.livePages}</span>
+              <span className="proof-label">pages written</span>
+            </span>
+            <span className="proof-item">
+              <span className="proof-num">{SITE.completeTracks}</span>
+              <span className="proof-label">tracks complete</span>
+            </span>
+            <span className="proof-item">
+              <span className="proof-num">{SITE.completeCapstones}</span>
+              <span className="proof-label">capstones, end to end</span>
+            </span>
+          </div>
+
           <ContinueCard />
         </div>
 
@@ -150,48 +153,29 @@ export default function Home() {
         </section>
       </Reveal>
 
-      {/* ---------- Live tracks ---------- */}
+      {/* ---------- The library, in full ---------- */}
       <Reveal>
         <section className="chapter">
           <div className="chapter-eyebrow">What&rsquo;s live</div>
           <h2 className="chapter-title">Mastery-depth tracks, not summaries.</h2>
           <p className="chapter-sub">
             One algorithm can run forty pages — every concept taught with text, a visual, and an
-            interactive lab together. Never prose alone.
+            interactive lab together, never prose alone. Here is all of it, families first, with
+            the page count each one actually has today.
           </p>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 16 }}>
-            {TRACKS.map((t) => (
-              <Link
-                key={t.name}
-                href={t.href}
-                className="gcard"
-                style={{ ["--accent" as string]: t.color, display: "block", textDecoration: "none" }}
-              >
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
-                  <span className="font-display" style={{ fontSize: 16.5, fontWeight: 500, color: t.color }}>{t.name}</span>
-                  <span
-                    style={{
-                      fontSize: 11.5,
-                      color: t.done >= t.total ? "var(--good)" : "var(--muted)",
-                      background: "var(--surface-2)",
-                      borderRadius: 999,
-                      padding: "3px 9px",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    {t.done >= t.total ? `${t.total} pages` : `${t.done} of ${t.total} live`}
-                  </span>
-                </div>
-                <p style={{ margin: 0, fontSize: 13.5, lineHeight: 1.6, color: "var(--muted)" }}>{t.blurb}</p>
-              </Link>
-            ))}
-            <Link href="/map" className="gcard" style={{ ["--accent" as string]: "var(--c-metrics)", display: "flex", flexDirection: "column", justifyContent: "center", textDecoration: "none" }}>
-              <span className="font-display" style={{ fontSize: 16.5, fontWeight: 500, color: "var(--ink)" }}>The full map →</span>
-              <p style={{ margin: "8px 0 0", fontSize: 13.5, lineHeight: 1.6, color: "var(--muted)" }}>
-                Seven algorithm families, the pillars, and the theory track — everything Manifold will teach.
-              </p>
+          <Shelf groups={FAMILIES} />
+
+          <h3 style={shelfHead}>The craft every algorithm leans on</h3>
+          <Shelf groups={PILLARS} unit="chapters" />
+
+          <h3 style={shelfHead}>The mathematics underneath, the guarantees above</h3>
+          <Shelf groups={FOUNDATIONS} unit="chapters" />
+
+          <p style={{ fontSize: 14, margin: "22px 0 0" }}>
+            <Link href="/map" style={{ color: "var(--ink)", textDecoration: "none", fontWeight: 500 }}>
+              See how the families connect →
             </Link>
-          </div>
+          </p>
         </section>
       </Reveal>
 
@@ -205,9 +189,36 @@ export default function Home() {
             senior data scientist would — framing, honest evaluation, and a justified model climb — with
             every number computed from the actual data.
           </p>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 20 }}>
-            <CapstoneCard capstone={CAPSTONES[0]} figure={<HousingGeoMap />} />
-            <CapstoneCard capstone={CAPSTONES[1]} figure={<NeoField />} />
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 300px), 1fr))", gap: 20 }}>
+            {CAPSTONES.map((cap, i) => (
+              <CapstoneCard
+                key={cap.href}
+                capstone={cap}
+                figure={FIGURES[i]}
+              />
+            ))}
+          </div>
+        </section>
+      </Reveal>
+
+      {/* ---------- The house rules — the site's actual differentiator ---------- */}
+      <Reveal>
+        <section className="chapter" style={{ marginBottom: 90 }}>
+          <div className="chapter-eyebrow">House rules</div>
+          <h2 className="chapter-title">Nothing here is hand-waved.</h2>
+          <p className="chapter-sub">
+            Three rules the whole site is held to — the reason it takes forty pages to teach one
+            algorithm, and the reason you can trust the numbers in them.
+          </p>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: 26 }}>
+            {RULES.map((r) => (
+              <div key={r.title}>
+                <div className="font-display" style={{ fontSize: 15, fontWeight: 500, color: "var(--ink)", marginBottom: 6 }}>
+                  {r.title}
+                </div>
+                <p style={{ margin: 0, fontSize: 13.5, lineHeight: 1.65, color: "var(--muted)" }}>{r.body}</p>
+              </div>
+            ))}
           </div>
         </section>
       </Reveal>

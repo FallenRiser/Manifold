@@ -3,7 +3,7 @@ import { CodeOutput } from "@/components/CodeOutput";
 import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 import { M, MathBlock } from "@/components/Math";
 import { PredictPrompt } from "@/components/PredictPrompt";
-import { AnalystQuestion, TransferBox, PlaybookRule } from "@/components/capstone/pedagogy";
+import { WorkOrder, TransferBox, PlaybookRule } from "@/components/capstone/warehouse";
 import { WAREHOUSE_SETUP } from "@/lib/runtimeSetup";
 
 export const metadata = {
@@ -31,10 +31,10 @@ export default function Sarsa() {
       />
 
       <div className="lesson">
-        <AnalystQuestion accent={OLIVE} label="The engineer's question" icon="🤖">
+        <WorkOrder act={3} n={11}>
           Do I want to learn the value of the <em>best</em> policy, or the value of the policy I am actually
           running — random exploratory mistakes included? And which one matches how this agent will be used?
-        </AnalystQuestion>
+        </WorkOrder>
 
         <h2>One symbol</h2>
         <p>
@@ -117,14 +117,14 @@ export default function Sarsa() {
           stopped exploring?&rdquo;</em> The right choice is a fact about your deployment, not about the algorithms.
         </Callout>
 
-        <TransferBox accent={OLIVE}>
+        <TransferBox>
           Decide on-policy versus off-policy from how the agent will be used, not from which one sounds more
           advanced. If it will act greedily in production, Q-learning&rsquo;s target matches; if it will keep
           exploring, SARSA&rsquo;s does. And when a theoretical difference between two methods is real but small,
           do not adjudicate it on one run — a single training seed cannot distinguish a genuine effect from luck.
         </TransferBox>
 
-        <PlaybookRule n={11} accent={OLIVE}>
+        <PlaybookRule n={11}>
           <strong>Bootstrap from the action you will actually take (on-policy, SARSA) when exploration continues in
           deployment; bootstrap from the best action (off-policy, Q-learning) when you will act greedily.</strong>{" "}
           The choice is set by your deployment, and it is one changed symbol in the target.

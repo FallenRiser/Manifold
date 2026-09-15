@@ -5,6 +5,8 @@ import { CodeBlock } from "@/components/CodeBlock";
 import { PredictPrompt } from "@/components/PredictPrompt";
 import { Quiz } from "@/components/Quiz";
 import { ARCH_SETUP } from "@/lib/runtimeSetup";
+import { SweepCurve } from "@/components/figures/SweepCurve";
+import { WIDTH_SWEEP } from "@/components/figures/arch/data";
 
 export const metadata = {
   title: "The capacity intuition — Manifold",
@@ -91,6 +93,18 @@ print(f"depth-2, width-32:  train={tr}  test={te}  gap={round(tr - te, 4)}")
           afford?&rdquo; but &ldquo;have I passed the floor?&rdquo; — because once you have, the marginal
           value of more capacity drops faster than its cost.
         </Callout>
+
+        <SweepCurve
+          points={WIDTH_SWEEP.map((p) => ({ x: p.x, a: p.y }))}
+          log
+          xlabel="hidden width (log scale), 1 hidden layer"
+          xticks={[2, 8, 32, 128, 512]}
+          caption={<>The capacity ladder as a curve rather than a table. From width 2 to width 16 the
+            model gains 18 points of test accuracy; from 16 to 512 it gains nothing and loses about
+            one. The classical rule says the right-hand end should be a cliff — 264,705 parameters
+            fitted to 600 points ought to be a catastrophe — and instead it is a gentle drift. That
+            flat right-hand end is the whole of the next section.</>}
+        />
 
         <h2>Why the classical rule is wrong</h2>
         <p>
@@ -179,6 +193,11 @@ print(f"depth-2, width-32:  train={tr}  test={te}  gap={round(tr - te, 4)}")
             passes: the gap is small enough that regularisation has nothing to do.
           </p>
         </Proof>
+
+        <p style={{ fontSize: 13, color: "var(--muted)" }}>
+          Every number in the curve above is from <code>scripts/architecture_cases.py</code>{" "}
+          section 3, five seeds per point.
+        </p>
 
         <h2>Capacity is not a single number</h2>
         <p>

@@ -2,6 +2,10 @@ import Link from "next/link";
 import { LessonHeader, Callout, Proof, PrevNext } from "@/components/lesson";
 import { M, MathBlock } from "@/components/Math";
 import { Quiz } from "@/components/Quiz";
+import { CodeBlock } from "@/components/CodeBlock";
+import { CodeOutput } from "@/components/CodeOutput";
+import { INIT_SETUP } from "@/lib/runtimeSetup";
+import { NormAxes } from "@/components/figures/initNorm/NormAxes";
 
 export const metadata = {
   title: "RMSNorm — Manifold",
@@ -26,6 +30,15 @@ export default function RmsNormPage() {
       />
 
       <div className="lesson">
+        <NormAxes
+          kind="layer"
+          caption={<>RMSNorm pools exactly the cells LayerNorm pools — a row, one sample, across the
+            features. Nothing about <em>which</em> numbers are gathered changes. The only edit is to
+            what is computed from them: LayerNorm takes a mean and a variance from the shaded row,
+            RMSNorm takes a root-mean-square and skips the mean. One statistic instead of two, and half
+            the arithmetic, on an operation that runs at every layer of every step.</>}
+        />
+
         <h2>Drop the mean, keep the scale</h2>
         <p>
           LayerNorm computes a mean and a variance over a sample&rsquo;s features, subtracts the
@@ -45,6 +58,44 @@ export default function RmsNormPage() {
           <M>{String.raw`\beta`}</M>. The root-mean-square is exactly the standard deviation you
           would get if the mean were assumed to be zero — so RMSNorm is LayerNorm under the
           assumption that re-centring is unnecessary.
+        </p>
+
+        <p>
+          The claim that dropping the mean subtraction changes little is testable in about ten lines.
+          Take a real layer&rsquo;s activations and standardise them both ways.
+        </p>
+
+        <CodeBlock
+          setup={INIT_SETUP}
+          fromScratch={`# A hidden layer's activations, He init, ReLU.
+params = init_manual([2] + [64] * 6 + [1], scale="he", seed=0)
+_, pre, _ = forward_activations(X_tr, params, act="relu")
+z = pre[4]                      # layer 5 pre-activations, (n, 64)
+
+ln  = (z - z.mean(1, keepdims=True)) / np.sqrt(z.var(1, keepdims=True) + 1e-5)
+rms = z / np.sqrt((z ** 2).mean(1, keepdims=True) + 1e-5)
+
+print("mean of z per sample : %+.4f (avg)" % z.mean(1).mean())
+print("LayerNorm  out: mean %+.4f  rms %.4f" % (ln.mean(), np.sqrt((ln ** 2).mean())))
+print("RMSNorm    out: mean %+.4f  rms %.4f" % (rms.mean(), np.sqrt((rms ** 2).mean())))
+print("max |LayerNorm - RMSNorm| = %.4f" % np.abs(ln - rms).max())
+print("correlation               = %.6f" % np.corrcoef(ln.ravel(), rms.ravel())[0, 1])`}
+        />
+        <CodeOutput>{`mean of z per sample : +0.1316 (avg)
+LayerNorm  out: mean -0.0000  rms 1.0000
+RMSNorm    out: mean +0.0860  rms 1.0000
+max |LayerNorm - RMSNorm| = 0.3257
+correlation               = 0.992082`}</CodeOutput>
+
+        <p>
+          Both put the layer on a unit scale; only LayerNorm also centres it, and the residual mean
+          RMSNorm leaves behind is small — <strong>+0.086</strong> against the raw{" "}
+          <strong>+0.132</strong>. The two outputs correlate at <strong>0.992</strong>, which is the
+          practical argument for RMSNorm in one number. Note the honest figure beside it though: the
+          largest single disagreement is <strong>0.33</strong>, on activations whose rms is 1.
+          &ldquo;Almost the same on average&rdquo; is not &ldquo;the same&rdquo;, and the reason RMSNorm
+          survives that gap is that <M>{String.raw`\beta`}</M> is still there to re-centre whatever the
+          layer actually needed re-centred.
         </p>
 
         <h2>Why it caught on</h2>

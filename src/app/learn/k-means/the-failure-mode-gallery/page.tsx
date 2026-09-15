@@ -1,4 +1,6 @@
 import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
+import { ScatterRow } from "@/components/figures/kmeans/Scatter";
+import { FAILURES } from "@/components/figures/kmeans/data.generated";
 
 export const metadata = {
   title: "The failure-mode gallery — Manifold",
@@ -107,6 +109,31 @@ export default function GalleryPage() {
             </tbody>
           </table>
         </div>
+
+        <ScatterRow
+          perRow={3}
+          sharedBounds={false}
+          panels={FAILURES.map((f) => ({
+            points: f.points,
+            labels: f.labels,
+            centroids: f.centroids,
+            label: f.title,
+            note: `ARI ${f.ari.toFixed(3)}`,
+          }))}
+          caption={<>The table, as data. Colours are what k-means decided; the score underneath is how
+            well that matches the groups the points were actually generated from (1.000 is perfect,
+            0.000 is chance). The first and last panels are controls and they matter as much as the
+            failures: k-means is not bad, it is <em>specific</em>, and on round comparable blobs it
+            scores {FAILURES[0].ari.toFixed(3)}.
+
+            The last panel is the one that corrects the table above. &ldquo;Unequal sizes&rdquo; is
+            listed as a failure mode, but three well-separated clusters of 500, 100 and 10 points are
+            recovered <strong>exactly</strong> — ARI {FAILURES[FAILURES.length - 1].ari.toFixed(3)}.
+            Size alone is not the problem. The fourth panel is: a small tight cluster sitting <em>beside</em>{" "}
+            a large loose one gets swallowed, because inertia would rather split the big cluster in two
+            than spend a centroid on twenty-five points. Proximity is doing the damage, and population
+            only decides who loses.</>}
+        />
 
         <Callout color="var(--c-clustering)" title={<>The one-question triage</>}>
           Before blaming k-means, ask: <em>did I scale the features, and are my clusters plausibly round

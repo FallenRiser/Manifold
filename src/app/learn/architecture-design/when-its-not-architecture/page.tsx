@@ -2,6 +2,7 @@ import Link from "next/link";
 import { LessonHeader, Callout, Proof, PrevNext } from "@/components/lesson";
 import { M, MathBlock } from "@/components/Math";
 import { Quiz } from "@/components/Quiz";
+import { DiagnosticPanels } from "@/components/figures/arch/ArchFigures";
 
 export const metadata = {
   title: "When the architecture is not the problem — Manifold",
@@ -74,6 +75,16 @@ export default function WhenItsNotArchitecturePage() {
             inseparable. When you are at the Bayes limit, every knob stops moving the number.
           </li>
         </ul>
+
+        <DiagnosticPanels
+          only={["lr", "good"]}
+          caption={<>The same architecture — two hidden layers of 16 — twice. On the right it is
+            trained at a learning rate of 0.01 and reaches 1.000 / 0.877. On the left the learning
+            rate is 1.0, and both curves jitter between the same two or three values for 400 epochs
+            and never settle. There is no width and no depth that repairs the left-hand panel,
+            because nothing about it is an architecture problem. Being able to recognise that shape
+            is worth more than any amount of searching, and this is what it looks like.</>}
+        />
 
         <h2>The evidence is in the marginal returns</h2>
         <p>

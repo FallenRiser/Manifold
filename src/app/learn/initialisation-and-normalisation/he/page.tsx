@@ -2,6 +2,9 @@ import Link from "next/link";
 import { LessonHeader, Callout, Proof, PrevNext } from "@/components/lesson";
 import { M, MathBlock } from "@/components/Math";
 import { Quiz } from "@/components/Quiz";
+import { PredictPrompt } from "@/components/PredictPrompt";
+import { LayerTrace } from "@/components/figures/LayerTrace";
+import { VAR_BY_LAYER_RELU } from "@/components/figures/initNorm/data";
 
 export const metadata = {
   title: "He / Kaiming — Manifold",
@@ -73,32 +76,29 @@ export default function HePage() {
           variance layer by layer shows Xavier steadily bleeding signal while He holds it flat:
         </p>
 
-        <div style={{ overflowX: "auto", margin: "1.2rem 0" }}>
-          <table style={{ borderCollapse: "collapse", fontSize: 13.5, minWidth: 380 }}>
-            <thead>
-              <tr>
-                <th style={{ textAlign: "left", padding: "6px 18px 6px 0", color: "var(--muted)", fontWeight: 500, borderBottom: "1px solid var(--border-strong)", whiteSpace: "nowrap" }}>init (ReLU)</th>
-                <th style={{ textAlign: "left", padding: "6px 18px 6px 0", color: "var(--muted)", fontWeight: 500, borderBottom: "1px solid var(--border-strong)", whiteSpace: "nowrap" }}>act var at layer 5</th>
-                <th style={{ textAlign: "left", padding: "6px 18px 6px 0", color: "var(--muted)", fontWeight: 500, borderBottom: "1px solid var(--border-strong)", whiteSpace: "nowrap" }}>act var at layer 10</th>
-              </tr>
-            </thead>
-            <tbody>
-              {([
-                { init: "Xavier (1/fan_in)", v5: "0.0216", v10: "0.0008", good: false },
-                { init: "He (2/fan_in)", v5: "0.6910", v10: "0.7988", good: true },
-              ] as const).map((r) => (
-                <tr key={r.init}>
-                  <td style={{ padding: "6px 18px 6px 0", color: "var(--ink)", fontWeight: 500, borderBottom: "1px solid var(--border)" }}>{r.init}</td>
-                  <td style={{ padding: "6px 18px 6px 0", color: r.good ? "var(--good)" : "var(--ink)", borderBottom: "1px solid var(--border)", fontVariantNumeric: "tabular-nums" }}>{r.v5}</td>
-                  <td style={{ padding: "6px 18px 6px 0", color: r.good ? "var(--good)" : "var(--muted)", borderBottom: "1px solid var(--border)", fontVariantNumeric: "tabular-nums" }}>{r.v10}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <p style={{ fontSize: 13, color: "var(--muted)" }}>
-          10 layers, width 64, ReLU.
-        </p>
+        <PredictPrompt
+          accent={CORAL}
+          prompt={<>Both schemes are derived from the same variance condition and differ by a single
+            factor of two. Over ten ReLU layers, how far apart do their activation variances end up?</>}
+          options={[
+            "A factor of two — one constant, one factor",
+            "A factor of ten or so",
+            "A factor of a thousand",
+            "They converge — depth washes the difference out",
+          ]}
+          nudge="Locked in. The measured curves are below."
+        />
+
+        <LayerTrace
+          series={VAR_BY_LAYER_RELU.filter((s) => /Xavier|He/.test(s.label))}
+          ylabel="activation variance"
+          caption={<>The factor of two compounds. Each ReLU layer keeps half the variance it is given;
+            He hands each layer twice as much to start with, and the two cancel exactly — a flat line.
+            Xavier hands over the un-doubled amount, so the halving is uncancelled and the line falls
+            at a constant rate. By layer 10 the gap is <strong>0.7988 against 0.0008</strong>, a factor
+            of roughly a thousand, produced by a constant of two.</>}
+        />
+
 
         <p>
           Read the second column. With Xavier the activation variance has fallen to{" "}

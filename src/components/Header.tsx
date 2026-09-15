@@ -23,11 +23,13 @@ export function Header() {
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
+          gap: 14,
         }}
       >
         <Link
           href="/"
-          style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}
+          className="site-brand"
+          style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none", flexShrink: 0 }}
         >
           <ManifoldMark size={30} />
           <span
@@ -38,7 +40,7 @@ export function Header() {
           </span>
         </Link>
 
-        <nav style={{ display: "flex", alignItems: "center", gap: 22 }}>
+        <nav className="site-nav" style={{ display: "flex", alignItems: "center", gap: 22 }}>
           <Link href="/learn/start-here" style={navLink}>
             Start here
           </Link>

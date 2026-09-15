@@ -2,6 +2,8 @@ import Link from "next/link";
 import { LessonHeader, Callout, Proof, PrevNext } from "@/components/lesson";
 import { M, MathBlock } from "@/components/Math";
 import { Quiz } from "@/components/Quiz";
+import { LayerTrace } from "@/components/figures/LayerTrace";
+import { VAR_BY_LAYER_TANH } from "@/components/figures/initNorm/data";
 
 export const metadata = {
   title: "Xavier / Glorot — Manifold",
@@ -152,6 +154,23 @@ export default function XavierPage() {
         </Proof>
 
         <h2>What Xavier gives you</h2>
+        <p>
+          In the regime it was designed for, it delivers. Here is the same ten-layer, width-64
+          measurement as the ReLU pages, but with <M>{String.raw`\tanh`}</M> activations — the setting
+          Glorot and Bengio actually had in front of them in 2010.
+        </p>
+
+        <LayerTrace
+          series={VAR_BY_LAYER_TANH}
+          ylabel="activation variance"
+          caption={<>Xavier under tanh drifts from <strong>0.289</strong> to <strong>0.043</strong> over
+            ten layers — a factor of about seven, and a gentle slope on a log axis. Compare that with
+            the same scheme under ReLU, where it falls by a factor of <strong>307</strong> over the same
+            ten layers. Xavier is not a bad derivation that people later fixed; it is a correct
+            derivation whose assumption — an activation that is roughly linear near the origin and
+            keeps both halves of its input — stopped holding when the field switched to ReLU.</>}
+        />
+
         <p>
           Xavier is the initialisation that made deep <M>{String.raw`\tanh`}</M> and sigmoid-adjacent
           networks trainable in the era before ReLU took over. Its logic is the template every later

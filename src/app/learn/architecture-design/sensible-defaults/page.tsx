@@ -2,6 +2,7 @@ import Link from "next/link";
 import { LessonHeader, Callout, Proof, PrevNext } from "@/components/lesson";
 import { M, MathBlock } from "@/components/Math";
 import { Quiz } from "@/components/Quiz";
+import { NetworkDiagram } from "@/components/figures/arch/NetworkDiagram";
 
 export const metadata = {
   title: "Sensible starting points — Manifold",
@@ -86,6 +87,16 @@ export default function SensibleDefaultsPage() {
           means the search is long and most of it is spent climbing out of a hole the defaults would
           have avoided.
         </Callout>
+
+        <NetworkDiagram
+          sizes={[2, 32, 32, 1]}
+          labels={["your features", "hidden", "hidden", "output"]}
+          caption={<>The default, drawn. Two hidden layers of the same moderate width, which on this
+            track&rsquo;s own grid is the cell that wins (0.9530, 1,185 parameters) and which on most
+            tabular problems is within noise of whatever you would have found by searching. The point
+            of having a default is not that it is optimal; it is that it is a starting position you
+            can measure from, and the rest of this track is about which direction to step.</>}
+        />
 
         <h2>When to start elsewhere</h2>
         <p>

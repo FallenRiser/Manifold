@@ -2,6 +2,9 @@ import Link from "next/link";
 import { LessonHeader, Callout, Proof, PrevNext } from "@/components/lesson";
 import { M, MathBlock } from "@/components/Math";
 import { Quiz } from "@/components/Quiz";
+import { DecisionPoint } from "@/components/DecisionPoint";
+import { Dumbbell } from "@/components/figures/Dumbbell";
+import { INIT_SENSITIVITY, MAJORITY_CLASS } from "@/components/figures/initNorm/data";
 
 export const metadata = {
   title: "The init & norm playbook — Manifold",
@@ -78,6 +81,52 @@ export default function ThePlaybookPage() {
           regime-dependent one comes fourth.
         </Callout>
 
+        <DecisionPoint
+          accent={CORAL}
+          question={<>A colleague&rsquo;s 30-layer network trains to 71% where a 10-layer version of the
+            same model reaches 88% — on the <em>training</em> set as well as the test set. They have He
+            initialisation, ReLU, Adam, and no normalisation anywhere. They ask whether they should
+            switch to Xavier. What do you tell them?</>}
+          options={[
+            {
+              label: "Switch to Xavier — it is the more conservative scale for a deep network",
+              verdict: "miss",
+              response: <>Backwards, and this track has the number. Xavier is the <em>smaller</em> scale,
+                and under ReLU it loses roughly half the activation variance per layer: 0.7988 against
+                0.0008 by layer 10 in the measurement two chapters back. They already have the right
+                initialisation for their activation. Making it smaller makes the exact symptom they are
+                reporting worse.</>,
+            },
+            {
+              label: "Add a normalisation layer to every hidden layer",
+              verdict: "best",
+              response: <>Right, and for the reason the ordering of this playbook encodes. He fixes the
+                scale <em>once</em>, at step zero, and nothing holds it there while the weights move.
+                On a network a third this deep the measured post-activation std still walked from 0.50
+                to 5.87 over sixty epochs. Normalisation is the only tool in this track that acts at
+                every step rather than once — which is why depth is precisely the regime where it earns
+                its keep.</>,
+            },
+            {
+              label: "Nothing yet — check whether the deep model is overfitting first",
+              verdict: "close",
+              response: <>Normally the right habit, and the architecture track&rsquo;s diagnostic loop
+                says exactly this: look at the train-test gap before reaching for a fix. But the symptom
+                rules it out here. A 30-layer network that cannot match a 10-layer one on the
+                <em> training</em> set has an optimisation problem, not a generalisation one, and every
+                regulariser in the next track would make it worse.</>,
+            },
+            {
+              label: "Lower the learning rate until the deep model is stable",
+              verdict: "close",
+              response: <>It will probably help, and it is cheap to try. But it treats the symptom: the
+                learning rate has to come down because the gradient scale is wrong, and it will have to
+                come down again at depth 40. Fixing the scale itself is the change that stops the
+                problem returning.</>,
+            },
+          ]}
+        />
+
         <h2>Why the ordering is causal, not arbitrary</h2>
         <p>
           The steps are ranked by how much they move the gradient ratio, and that ranking came straight
@@ -103,6 +152,17 @@ export default function ThePlaybookPage() {
             must be brought under control.
           </p>
         </Proof>
+
+        <Dumbbell
+          rows={INIT_SENSITIVITY.map((r) => ({ init: r.init, a: r.noBn, b: r.bn }))}
+          baseline={MAJORITY_CLASS}
+          seriesLabels={["follow step 1 only", "follow steps 1 and 2"]}
+          caption={<>The whole checklist, justified in one figure. Steps 1 and 2 — match the init to the
+            activation, then normalise — are not two independent pieces of advice. The left-hand ends
+            are what the first step alone leaves you exposed to; the right-hand ends are what the second
+            step is for. The checklist is ordered this way because the second step is what makes the
+            first one forgiving, and nothing further down the list can substitute for either.</>}
+        />
 
         <h2>What you now have</h2>
         <p>

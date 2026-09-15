@@ -5,6 +5,7 @@ import { CodeBlock } from "@/components/CodeBlock";
 import { PredictPrompt } from "@/components/PredictPrompt";
 import { Quiz } from "@/components/Quiz";
 import { ARCH_SETUP } from "@/lib/runtimeSetup";
+import { MemoryBars } from "@/components/figures/arch/ArchFigures";
 
 export const metadata = {
   title: "Parameters, and what they cost — Manifold",
@@ -132,6 +133,18 @@ print("real network parameters:", real, " | formula:", count_params((32, 32)))`;
           change to two hyperparameters can multiply the cost by an order of magnitude, and the
           improvement in accuracy may be negative.
         </p>
+
+        <MemoryBars
+          sizes={[2, 128, 128, 1]}
+          batch={256}
+          caption={<>Where the memory actually goes, for one small network. The parameter count is
+            the number everyone quotes and it is the smallest of the four bars. Gradients match it
+            exactly, one per parameter. Adam doubles it again, because it keeps a running mean and a
+            running variance for every parameter — which is why switching from SGD to Adam triples
+            resident optimiser memory before a single activation is cached. The arithmetic here is
+            plain enough to redo for your own model, and the ratio at the bottom is the one to
+            carry: inference needs one bar, training needs all four.</>}
+        />
 
         <h2>Memory: the split you need to know</h2>
         <p>

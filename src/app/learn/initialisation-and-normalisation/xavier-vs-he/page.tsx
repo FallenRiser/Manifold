@@ -2,6 +2,8 @@ import Link from "next/link";
 import { LessonHeader, Callout, Proof, PrevNext } from "@/components/lesson";
 import { M, MathBlock } from "@/components/Math";
 import { Quiz } from "@/components/Quiz";
+import { PredictPrompt } from "@/components/PredictPrompt";
+import { GradRatioBars } from "@/components/figures/initNorm/GradRatioBars";
 
 export const metadata = {
   title: "Xavier vs He, measured — Manifold",
@@ -36,6 +38,28 @@ export default function XavierVsHePage() {
           steady, not decay to zero).
         </p>
 
+        <PredictPrompt
+          accent={CORAL}
+          prompt={<>He is the scheme built for ReLU, so it wins there. Now run the other direction:
+            on <M>{String.raw`\tanh`}</M>, is He better than Xavier, the same, or worse?</>}
+          options={[
+            "Better — more signal is always safer",
+            "Indistinguishable — tanh does not care",
+            "Worse — the extra factor of two is wrong here",
+            "Catastrophic — tanh saturates immediately",
+          ]}
+          nudge="Locked in. Read the tanh pair in the figure."
+        />
+
+        <GradRatioBars
+          caption={<>Gradient ratio at initialisation, on a log axis. The two sigmoid bars are off in a
+            different world — 10⁵ to 10⁶ — and no choice of initialisation rescues them, which is the
+            first thing this grid says: <strong>init cannot fix an activation that saturates</strong>.
+            Among the two that work, the ordering flips. ReLU wants He. Tanh is slightly better under
+            Xavier (5.45 against 8.12). There is no universally correct initialisation, only one that
+            matches the activation you chose.</>}
+        />
+
         <div style={{ overflowX: "auto", margin: "1.2rem 0" }}>
           <table style={{ borderCollapse: "collapse", fontSize: 13.5, minWidth: 480 }}>
             <thead>
@@ -49,10 +73,10 @@ export default function XavierVsHePage() {
             </thead>
             <tbody>
               {([
-                { act: "sigmoid", init: "Xavier", ratio: "3,727,759", v5: "---", v10: "---", tone: "bad" },
-                { act: "sigmoid", init: "He", ratio: "351,256", v5: "---", v10: "---", tone: "bad" },
-                { act: "tanh", init: "Xavier", ratio: "5.45", v5: "---", v10: "---", tone: "ok" },
-                { act: "tanh", init: "He", ratio: "8.12", v5: "---", v10: "---", tone: "ok" },
+                { act: "sigmoid", init: "Xavier", ratio: "3,727,759", v5: "0.0152", v10: "0.0132", tone: "bad" },
+                { act: "sigmoid", init: "He", ratio: "351,256", v5: "0.0299", v10: "0.0243", tone: "bad" },
+                { act: "tanh", init: "Xavier", ratio: "5.45", v5: "0.0766", v10: "0.0428", tone: "ok" },
+                { act: "tanh", init: "He", ratio: "8.12", v5: "0.2966", v10: "0.3071", tone: "ok" },
                 { act: "relu", init: "Xavier", ratio: "2.23", v5: "0.0216", v10: "0.0008", tone: "ok" },
                 { act: "relu", init: "He", ratio: "7.58", v5: "0.6910", v10: "0.7988", tone: "good" },
               ] as const).map((r, i) => (

@@ -543,8 +543,10 @@ distinctive while being genuinely colourful. This is the identity; do not drift 
 Tailwind defaults *or* somber archive tones.
 
 The rules:
-1. **No gradient CTAs, ever.** The primary CTA is **solid riso blue** (`--cta: #0078bf` light /
-   lifted `#4da8ec` with dark text in dark mode). Solid colour only.
+1. **No gradient CTAs, ever.** The primary CTA is **solid riso blue `#0078bf` in BOTH themes**,
+   white text, no lifting (revised 2026-09-15 — the old lifted `#4da8ec` with dark text was the
+   single most generic element on the dark page; the undiluted ink reads as a printed block and
+   white on it still clears AA at 4.73:1 on the dark ground). Solid colour only.
 2. **Ink is still the brand for chrome & type** (`--brand` = ink): logo, links, sidebar highlight,
    progress, primary data lines in labs. The chroma lives in the family colours and the two
    accents: `--brand-2` riso fluorescent pink `#ff48b0` (the "signal"/moving-point accent) and
@@ -559,8 +561,21 @@ The rules:
    - Reinforcement learning: riso gold `#c28400` (text-safe) · Fundamentals: bright amber `#d97a00`
    - Semantic: good `#009155` · warn `#d97a00` · bad `#e0442c`
    References: actual risograph ink charts, Figma brand primaries, mid-century poster inks.
-4. **Dark theme stays warm-neutral** paper-at-night (`#121211` etc.), riso hues lifted — vivid on
-   warm black is fine; neon-on-blue-black is not.
+4. **Dark theme stays warm-neutral paper-at-night, and is SPACED IN L\*, not in hex**
+   (reworked 2026-09-15 — the user liked the light theme and not this one). The first version was
+   `--paper: #121211` with 8-unit hex steps to surface and surface-2, which put the entire page
+   inside L\* 5-14: cards did not lift (1.08:1), hairlines were invisible (1.32:1), and `#eceae4`
+   type glared at 15.6:1. **Perceived lightness compresses toward black, so a dark ramp needs
+   BIGGER steps than the light one, not the same steps inverted.** The ladder is now
+   paper `#1a1916` (L\* 9) · canvas `#201f1b` · panel `#23221f` · surface `#2a2926` (L\* 17,
+   1.21:1 — a real lift) · surface-2 `#353431` · border `#41403d` (1.70:1 on paper) ·
+   border-strong `#54534f`, with ink `#e9e5dc` / muted `#a9a59b` / faint `#837f75`. Two dark-only
+   overrides come with it: `--selection` uses the blue ink (a near-white wash behind near-white
+   text was unreadable) and `--shadow-lift` is a real black shadow (the light one mixes `--ink`,
+   which is near-white here, so it painted a white haze under every hovered card). Riso hues stay
+   lifted — vivid on warm dark is fine; neon-on-blue-black is not. **Bonus the lift bought:** the
+   theme-independent skins (`--space-sky #0b0b16`, `--krat-soot #0e0c0d`, the `--wh-*` concrete)
+   now sit clearly apart from the page instead of blending into it.
 5. **Code themes use the same riso hues** (violet keywords, teal strings, blue properties, pink
    classes, gold entities) — colourful but never Dracula.
 6. **Sweep rule stands:** no hardcoded accent hexes in labs/pages; everything through tokens.
@@ -572,10 +587,60 @@ The landing page must **prove the product, not describe it**. Required structure
    captioned only "drag the line". Ten seconds in, the visitor has *used* the product. This
    replaces the static `LossLandscapeArt`.
 2. **"How it teaches" band** — the 4 depth tiers + the 7-stage arc, in the book-part editorial style.
-3. **Featured tracks** — real cards for every live track with page counts and a signature visual.
-4. **Capstone showcase** — "one real dataset, framing → stacked ensemble, R² 0.653 → 0.858" + geo map.
-5. **A footer** — map links, theme toggle, and a type-nerd colophon (on-brand for Stripe Press).
+3. **The shelf, not featured cards** (revised 2026-09-15). Hand-picked track cards rotted: the
+   landing page still advertised 5 tracks and the footer 15 when the site had 30. Replaced by
+   `<Shelf>` (`src/components/Shelf.tsx`) — one editorial index row per family with its real page
+   count, the whole track list (unbuilt entries shown greyed, which is the honest version), and the
+   family colour as the only chrome. Rows for PILLARS/FOUNDATIONS pass `unit="chapters"`, because
+   there the *group* is the track and its entries are chapters. Each row carries its **signature
+   visual** (`src/components/figures/FamilyGlyph.tsx`, 88x50, inherits `--accent`). Per §12.2.4
+   these are not decoration: where the maths IS the idea the geometry is COMPUTED at module load
+   (least-squares fit, Lloyd's iterations, the covariance's leading eigenvector, Gini-optimal tree
+   cuts, gradient descent on the drawn contours, an ROC from two score distributions, and a
+   shattering dichotomy whose fills are derived from the side test). Only the network wiring, the
+   grid-world policy, the pipeline and the k-fold split are hand-laid, because those objects have
+   no data in them. Add a glyph for any new family in `GLYPH_FOR`.
+4. **Capstone showcase** — every capstone carries a signature figure of its OWN world:
+   `HousingGeoMap`, `NeoField`, `WarehouseFloor` (the real 5x8 shop floor, spill wall and two
+   crossings, with a BFS-verified 21-step dock→shelf→drop route, painted in the `--wh-*` skin).
+   Render `CAPSTONES` by `.map`, never by index, or new capstones silently never appear.
+   The headline result is **structured, not a string**: `metric` / `from` / `to` / optional `note`,
+   typeset by `CapstoneCard` as a micro-label above `from → to` with `to` large in Instrument Serif
+   in the capstone's accent. Never go back to packing it into one bold line like
+   "−816 → 21.2 (oracle 21.2)".
+   ⚠️ **Every capstone figure shares one 640x300 frame, and every blurb is ~135-160 characters.**
+   The card body ends with `marginTop: auto`, so in a stretched grid row ANY difference in figure
+   aspect or blurb length becomes dead space above the stat line. `HousingGeoMap` was square, which
+   opened a 197px hole in the asteroid card; it now takes a `wide` prop that letterboxes it for the
+   card — the map keeps its true proportions on the left and the extra width carries the value
+   histogram (binned from `GEO` at module load, so it is the map's legend as well, and it shows the
+   censored target: 18 of the 260 blocks sit exactly at the $500k cap). Match the frame and the
+   blurb length when adding a fourth capstone, or the row goes ragged again.
+5. **A footer** — derived link columns (families / deepest tracks / capstones), the numbers, and a
+   type-nerd colophon on its own rule (on-brand for Stripe Press).
 6. **No dead chrome:** header items exist only if their pages exist; family chips link to `/map`.
+7. **A closing band** — the three house rules (numbers reproduced · labs run real maths · unbuilt
+   pages say so). The page needs an ending, and that honesty *is* the differentiator.
+
+**`CurriculumAtlas` was DELETED 2026-09-15 — do not rebuild it.** `/map` used to open with a
+node-and-arc diagram: ten pastel family boxes on a 1000x520 canvas joined by seven curves. It failed
+its own brief three ways. The arcs were **unlabelled**, so the picture could show *that* two families
+were linked but never *why* — the entire payload lived in the caption underneath. The ten nodes
+**re-listed the same ten families** that the group cards ~200px below already list. And it needed
+`min-width: 760px` inside a horizontal scroller, so on a phone it was a sideways-scrolling box. Per
+§12.2 a graphic whose whole content is its own caption has not earned its ink. Replaced by
+`src/components/Throughlines.tsx`: one line per link, `A → B` in the two families' own accents with
+the crossing idea spelled out — smaller, honest, readable at every width, and it finally says the
+thing the curves were gesturing at.
+
+**LOCKED RULE (2026-09-15): no page/track/capstone count is ever typed by hand.** Everything comes
+from `src/lib/catalog.ts`, which imports every `*_TOTAL` / `*_DONE` and exposes `SITE`, `countsFor()`
+and `groupPages()`. The landing page, `/map` and the footer all read from it, so adding a page
+updates all three. ⚠️ `countsFor()` falls back to the track ROOT href, so a group whose entries are
+chapters of one track (the pillars, the foundations) will otherwise print that track's total once
+per chapter — `Shelf`, `Footer` AND the map's `GroupCard` each guard against it (gate the
+per-entry count on the group having more than one distinct track). This has now been hit three
+times; add the guard to any new consumer.
 
 ### 10.3 Lab standards
 
@@ -1209,6 +1274,16 @@ Every RL capstone still keeps its own identity/accent, transferable-thinking fra
   do, and proves the RL-capstone format.
 
 ### 13.2 Capstone B — "Evolving a driver" (Hill Climb Racing clone via neuroevolution)
+
+> ⚠️ **SUPERSEDED IN PART (2026-09-11) by `docs/neuroevolution-plan.md`** — the authority for B.
+> Three changes, made after inspecting the Code Bullet reference repo: **(1)** B is now preceded by a
+> new track, **"Policy search without gradients"** (hill climbing → ES → GA → NEAT), because a
+> capstone must cap a track and B as specced caps nothing; **(2)** the physics is a ~300-line reduced
+> heightfield-car model in numpy, NOT hand-written general rigid-body physics *and* not Box2D — the
+> reference uses Box2D only because it needs general collision, which we do not; **(3)** B teaches
+> **both** a fixed-topology GA and NEAT, and makes the honest comparison at equal environment steps
+> its spine. The bullets below stand except where they say "hand-written — no Box2D" and
+> "GA, not NEAT".
 - **The CodeBullet HCR project, reproduced.** Evolve a population of small NN controllers over
   **generations** on a **hand-built 2D car physics** (terrain heightfield, chassis + 2 wheels,
   gas/brake, fuel, flip = death).
@@ -1223,6 +1298,13 @@ Every RL capstone still keeps its own identity/accent, transferable-thinking fra
 - **Sequencing:** build **after A**, so it inherits the "hand-built sim + live-run lab" pattern.
 
 ### 13.3 Capstone C — "Learning to parry" (Lies of P imitation-learning FIELD REPORT)
+
+> 🚧 **FOUNDATIONS BUILT 2026-09-11 — authority is now `docs/lies-of-p-capstone-plan.md`.** Live at
+> `/learn/lies-of-p-capstone` (index only, 1/22). Accent `--c-krat` oxblood + the `--krat-*` gaslight
+> panel palette; `GaslightPanel.tsx` + `ParryBudget.tsx` (signature figure) built; track scaffold and
+> layout in place; **deliberately NOT in siteMap CAPSTONES yet.** Everything below still holds — the
+> plan doc adds the genre rule (results pages stay href-less until measured), the risk-first build
+> order (synthetic-input spike FIRST, it can kill the project), and the identity spec.
 - **Reframed 2026-09-08:** the user can play **Lies of P (offline, single-player)** on their own PC
   and screen-grab **their own** gameplay — legitimate (own recordings, offline, personal use). This
   moves it from "impossible on the site" to a real project the user builds on their machine,
@@ -1302,3 +1384,394 @@ runnable external artifacts instead).
 > honestly before function approximation + the deadly triad, which need tabular Q-learning first — so
 > Deep RL is the *destination* of the family, not an omission. Building it before the foundations
 > would be the black box the site refuses to ship (§12.2).
+
+---
+
+## 14. Depth audit — the chapter-by-chapter backlog (2026-09-15)
+
+**`docs/depth-audit.md` is the standing answer to "what should I improve next?"** It walks every
+chapter of all 34 tracks and 4 capstones and records, per chapter: depth to add, text to fix, pages
+worth adding, labs to add or improve, and visuals that are missing. Read it before planning any
+improvement pass; add to it rather than re-deriving it.
+
+It is built on a mechanical inventory (`scripts/inventory.js` — parses every `src/lib/*Track.ts`,
+resolves each href to its `page.tsx`, counts prose words, labs, figures, inline SVG, CodeBlocks,
+Proofs, Callouts, PredictPrompts, Quizzes and MathBlocks). Re-run it rather than guessing.
+
+**The four findings that matter most:**
+
+1. **35% of built pages (264 of 760) have no visual of any kind** — no lab, no rendered figure, no
+   inline `<svg>`. It was 49% (372) when the audit was written. The landing page claims every
+   concept is taught "with text, a visual, and an interactive lab together, never prose alone."
+   ⚠ Both numbers are on the **corrected** `inventory.js` (2026-09-15): it used to count an import
+   as a visual even when the component was never rendered, miss default imports, and treat
+   `capstone/pedagogy` — `DecisionPoint`, `GuessSlider` — as a figure. Do not compare against any
+   earlier figure, including the 370 → 323 quoted in the fix log below.
+2. **The site has three eras and they fail in opposite directions.** Early tracks (k-Means 348 w/pg,
+   math foundations 368, regularized regression 372) are thin *in words* — the lab carries the
+   teaching. Middle tracks (architecture 1281 w/pg, nn-regularisation 1126, init-norm 1100) are deep
+   in words and *blind* — architecture was 26/27 pages with nothing to look at; `init-norm` and
+   `nn-regularisation` had **zero code, zero figures, one lab between them across 42 pages**. All
+   three are fixed; the era's remaining debt is backprop 13/22, activations 9/21, perceptron→MLP
+   9/21 and the data workflow 16/28. Recent
+   work (building-environments, the warehouse and asteroid capstones) gets both right and is the
+   target.
+3. **Pedagogy primitives are built and unused.** `DecisionPoint` — the strongest one — is on 20
+   pages in 10 tracks; **24 tracks have none**. `<Term>` 24 uses on 12 pages in 3 tracks.
+   `<Backlinks>` on 23 of 760 pages. 21 of 34 tracks contain **zero `<Proof>`**, including
+   `math-foundations`.
+4. **The Optimization foundation is empty** while regression, neural networks and RL each teach their
+   own partial gradient descent. Two of `/map`'s seven throughlines point at it.
+
+
+### 14.1 Working the backlog — the fix log
+
+The audit's §0.3 lists nine cross-cutting fixes. Record each one here as it lands, so a later session
+can tell a *decided* question from an open one. **`depth-audit.md` §0.5 is the live register** — what
+is done, what is not, and the number attached to each; it is the first thing to read when picking up
+this work, and the thing to update when putting it down.
+
+**✅ The register, and a measurement correction (2026-09-15).** Added §0.5 to the audit: a status
+table for all nine cross-cutting fixes, the per-track visual debt worst-first, the unbuilt work, and
+the depth debt that is not about pictures. Writing it meant re-measuring, and the measure was wrong.
+
+- `scripts/inventory.js` counted an **import** as a visual. Three pages import a figure and never
+  render it (`function-approximation/when-td-diverges`, `.../whats-safe`,
+  `building-environments/training-the-crew`), and every capstone page carrying a `DecisionPoint`
+  counted as illustrated, because `pedagogy.tsx` sits under `components/capstone/`. It also missed
+  default imports entirely. Fixed: resolve named *and* default imports, exclude `capstone/pedagogy`,
+  and require the component to appear as a JSX tag in the body.
+- The **asteroid capstone therefore read as 0 pages without a visual when 15 of its 24 have none** —
+  the single largest error the audit contained, and it sat on the capstone the site presents as
+  genre-defining. Part four is corrected.
+- The independent check used during the figure passes was wrong in the *other* direction: it only
+  looked under `components/figures` and `components/labs`, so building-environments (27 pages) and
+  the warehouse capstone (24) counted as fully blind when their visuals live in `sail/`, `fire/` and
+  `capstone/`. **That is where the "370 → 323, 42%" reported on 2026-09-15 came from, and it is
+  wrong.** The two checks now agree exactly at **264 of 760 (35%)**.
+- Worth keeping: *the second attempt at a broken metric is not automatically right.* The first fix
+  corrected the suffix-matching bug and introduced a root-set bug in the same edit. Check a new
+  measure against tracks whose answer you already know, in **both** directions — one that is too
+  harsh and one that is too kind.
+
+The register's own conclusion, which replaces the three finished items in §0.4: **naive Bayes
+(16/20 blind), SVR (11/16) and kernel ridge (10/16)** are the worst ratios left and are one pass
+each; **math foundations** (20/34 blind, 0 proofs, 0 runnable code, 367 w/pg) fails every test in
+the audit at once and everything points at it.
+
+**◐ Fix #1 — the figure budget: planning and k-Means (2026-09-15).** 67 pages, 47 blind → 0.
+Two new measurement scripts, `scripts/planning_cases.py` and `scripts/kmeans_cases.py`, plus
+`components/figures/planning/` and `components/figures/kmeans/`. Site-wide 370 → 323 blind.
+
+*Findings, in order of how much they change what the pages say.*
+
+- **The Planning track had never had a script.** It was the only RL track whose published numbers
+  nobody could re-derive. `planning_cases.py` now recomputes every CodeOutput on all 22 pages and
+  prints PASS/FAIL against what the page claims: **34 of 34 reproduce.** Four of my first six
+  "failures" were my own counting conventions (does a policy-iteration round include the
+  confirming round? does a sweep count include the one that detects convergence?) and one was me
+  measuring the wrong MDP — *How many iterations* plans in the DEFAULT Sutton grid at γ = 1, not
+  the goal/pit grid the rest of the track uses. Match the page's own loop before believing it is
+  wrong.
+
+- **Prioritized sweeping was advertising a 22% saving for a method that saves 86%.** The page's
+  queue re-expanded every predecessor after every pop, never checked whether the backup moved the
+  value, and never replaced a stale priority — so **62 of its 76 backups recomputed a number that
+  did not change**. It still converged, which is exactly why it survived: the only symptom was the
+  headline. The textbook queue needs **14** backups, one per non-terminal state, in a wavefront out
+  from the goal. Listing, number and prose all replaced; the replacement was executed before being
+  published.
+
+- **A published Monte-Carlo estimate was a 3.5-sigma draw.** *Planning by sampling* prints four
+  rollout values and says they "land right on top of" the exact ones. Three do. The fourth is 1.4
+  off. Over 200 repetitions the estimator is unbiased to two decimals with a standard error of
+  0.39 — so the seed-0 draw is a genuine outlier, and the four printed numbers read as a strict
+  ranking when the truth is two exact ties (up = right = −21, down = left = −19). Now said out
+  loud, which makes it the page's best paragraph rather than its weakest.
+
+- **k-Means has 45 pages, 39 code blocks and zero `CodeOutput`.** Not one page commits to what its
+  own code prints. So there was almost nothing to *verify* — the job was supplying the numbers the
+  prose gestures at, and the gestures turn out to be wrong about as often as they are right.
+
+- **Elkan's acceleration does 93% less arithmetic and takes 3× longer.** The audit asked for "a
+  speed number, which is the only thing anyone wants from it". Measured: 92–94% fewer distance
+  computations (better than the 2–10× usually quoted) and slower on the clock at every size, with
+  the gap *widening* as k grows — 0.30× at k = 100, precisely where the theory says it should win
+  most. Lloyd's assign step is one matrix product in threaded BLAS across 12 cores; Elkan's bound
+  checks are a branchy per-point loop. Removing fifteen sixteenths of the operations does not pay
+  when each survivor runs an order of magnitude slower. The page also told readers scikit-learn
+  picks for them via `algorithm="auto"` — removed in 1.3, and it now raises. Both corrected.
+
+- **"Unequal cluster sizes" is not a k-means failure mode.** The construction every textbook uses —
+  three well-separated clusters of 500, 100 and 10 points — is recovered **exactly**, ARI 1.000.
+  My first failure gallery shipped it as a failure because I built the panels from reputation. Two
+  of four panels scored 0.96 and 0.80. The gallery now carries four constructions that were
+  *measured* to fail (0.257 / 0.442 / 0.583 / 0.707), guarded by `assert a < 0.75`, plus two
+  controls — and the real lesson is sharper: size alone is harmless, size **next to a big
+  neighbour** is what gets a cluster swallowed.
+
+- **`InitDistribution` nearly shipped unused.** The audit names the 100-random-vs-100-k-means++
+  inertia distribution as "the actual evidence and currently absent"; I measured it (random reaches
+  the best solution 9/100, k-means++ 82/100) and then almost left it on the floor because
+  `k-means-plus-plus` already had a lab and so never appeared in the blind count. Grep the emitted
+  data module for unused exports before calling a pass finished.
+
+*Craft notes.*
+
+- **The blind-page detector was itself wrong.** See the counting note in `depth-audit.md` §0.3 #1.
+  A metric that is generous when it is unsure is worse than no metric, because its number is the
+  one that gets reported.
+
+- **`insert.py` put imports after `const code = \`import numpy as np ...\``.** It chose the
+  insertion point as the last line starting with `import `, and most k-Means pages define their
+  Python listing *below* the component. TypeScript caught it only because the identifier then
+  happened to be out of scope; on a page whose listing came first it would have worked by luck.
+  Placement is now computed from the file's leading block, which cannot contain a template literal.
+
+- **Every clipped-SVG defect this session was a fixed box meeting content that did not fit** — a
+  panel label longer than its panel, a legend row past a constant height, six marks in a five-mark
+  frame, a baseline at y = 9 under a glyph with 11.4 units of ascent. The client-rect check (§14.1,
+  previous entry) found nine across the two tracks, including one on `SilhouetteLab`, a page this
+  pass had not otherwise touched. Derive the size from the content; a label written by a future
+  caller will eventually be longer than you assumed.
+
+- **The JSX whitespace trap is still live.** `wsscan.py` flagged 23 boundaries in these two tracks;
+  checking each against the *rendered* page confirmed **14** real collisions ("previoussweep",
+  "roughlyspherical", "beestimated") and cleared 9 that carry a deliberate leading space inside the
+  tag. All 14 were pre-existing. Verify against rendered text, not source — the scanner alone
+  over-reports by 40%.
+
+**◐ Fix #1 — the figure budget: architecture design and function approximation (2026-09-15).**
+The two largest blind tracks, 51 pages between them, **26/27 and 24/24 with nothing to look at** →
+**0 and 0**. Counted with one consistent check over the whole tree, the site went **381 → 331 pages
+with no visual (50% → 43%)**. Four tracks are now done; the remaining debts are listed in the audit.
+
+The measurement came first, and on the architecture side it did not survive contact with the pages.
+
+- **A load-bearing number was wrong on five pages.** *The depth tax*, *When depth hurts*, *The
+  gradient problem*, *The order of operations* and *The playbook* all state that a depth-20,
+  width-16 ReLU network with He init reaches **0.750** test accuracy — the result that motivates the
+  entire skip-connections chapter. `scripts/architecture_cases.py` measures **0.9400** for that
+  architecture, and 0.750 appears nowhere in its output.
+
+  `scripts/arch_depth.py` (new) settles it. It hand-rolls Linear + optional BatchNorm + ReLU + Adam
+  or SGD in numpy, because `MLPClassifier` cannot express a skip connection and replaces whatever
+  initialisation you hand it — the same defect that made `init_norm_cases.py` unable to test its own
+  headline. The finding: **0.750 is real, and it is depth 40 under plain SGD.** Under Adam there is
+  no depth wall on this problem at all (0.948 at depth 2, 0.928 at depth 40); what grows with depth
+  is the *spread between seeds*, 0.0024 → 0.0510, and the worst seed, 0.945 → 0.830. Under plain SGD
+  the wall is sharp: 0.940 at depth 20, 0.770 at 30, 0.750 at 40, with seed spreads above 0.2 —
+  meaning some runs fail outright and some are fine. Adam was hiding it, because per-parameter step
+  rescaling is itself a partial fix for the problem the chapter is about. All five pages
+  re-attributed; the depth tax is now taught as **a rise in the probability that a run is a
+  write-off**, which is the same shape of failure the init-norm track found for a bad init.
+
+- **A conclusion contradicted the numbers printed above it.** `architecture_cases.py` section 8 ends
+  with "regularising a model that is too big recovers the gap", directly under a run where L2 moved
+  the gap from 0.0150 to **0.0163** and test accuracy *down*. The cause is the dataset: 600 points of
+  two moons cannot be overfit by any architecture in the grid, which is also why that script's
+  "overfit (3×128)" row shows a *smaller* gap than its "good fit" row. Cut the training set to 40
+  points and every claim becomes testable: a 4×128 net reaches train 1.000 / held-out 0.818, L2 at
+  1e-2 takes held-out to **0.885** (+6.7 points, gap halved), 1e-1 over-corrects to 0.785, and the
+  same treatment on a 1×2 net moves held-out by **−0.005**. Those 40 points also give *Reading the
+  learning curve* — a page about reading curves, with no curve — four honest panels with a real
+  downturn in the overfit one.
+
+- **Chapter 5's real lesson was better than the one it was telling.** Measuring activation scale
+  through 20 layers at He init: a plain stack **decays ×0.1** (0.513 → 0.060), a bare residual stack
+  **explodes ×9,246** (0.513 → 4,742) because addition accumulates where multiplication decayed, and
+  only residual **+ BatchNorm inside the block** stays bounded (×7.3). Under plain SGD the bare
+  residual net scores **0.4700 from depth 12 onward — below the 0.5300 majority class**, while
+  residual+BN holds 0.9417–0.9550 flat to depth 40. A skip connection alone is not a small
+  improvement over a plain network; it is far worse. The track now teaches skip and norm as one
+  design, which is why every real ResNet block contains both.
+
+On the function-approximation side the numbers were already right — `fa_cases.py` is one of the more
+rigorous scripts in the repo — and the gap was purely visual. `scripts/fa_figures.py` (new) is its
+companion: it loads the same shipped `FA_SETUP` out of `runtimeSetup.ts` and prints the *series* a
+figure needs (the value function across all 1000 states, the weight norm at every step, the whole
+cost-to-go surface) rather than the summary statistic. `scripts/fa_emit_data.js` turns that stdout
+into `figures/fa/data.generated.ts`, so forty numeric arrays reach the components without being
+retyped. One genuinely new claim fell out: the **TD fixed point is 2.15× worse than the VE optimum**
+(0.1167 against 0.0544, disagreeing by up to 0.1711 in a single group), which *Where TD settles* had
+only as two RMSE numbers and can now show as two staircases.
+
+When mirroring an existing experiment in a companion script, mirror it *exactly*. The first version
+of the Baird section here reimplemented "on-policy" as "always take the solid action", which changes
+the transitions and diverges too (40×); `fa_cases.py` means something narrower by dropping that leg —
+same data, same transitions, importance ratio 1 — and that settles at 9.00. The script now says so in
+a comment and prints both numbers next to what `fa_cases.py` reports, so the next divergence is
+caught at the terminal.
+
+Also landed: `figures/LayerTrace` promoted out of `initNorm/` (two tracks now use it) with the
+shared `Series` type moved to `figures/series.ts`; `DecisionPoint` on the closing page of each track
+(fix #4, 4 of 34 tracks done); PredictPrompts architecture 3 → 9 and FA 21 → 25 (fix #5); and
+`MaxBiasLab` reused on *Double DQN*, giving that track its first lab, as the audit asked.
+
+Two craft notes for the next content pass, both of which cost time here:
+
+- **JSX drops newlines adjacent to tags.** `push\n<em>with</em>` renders as `pushwith`. The repo has
+  been bitten before (the 2026-08-22 trees review fixed ~51 of these). End the line with `{" "}`.
+- **Two series must never be separated by hue alone when one is `--bad` and the other
+  `--c-neural`.** They are near-twins on screen and legend swatches become indistinguishable. Give
+  the second a dash pattern as well. This is the second session in a row to hit it.
+- **Check every hand-laid-out SVG for text that falls outside its own viewBox**, rather than
+  eyeballing it. Five real defects on these two tracks got past a read-through and were caught in a
+  second by pasting this into the console on each page:
+
+  ```js
+  [...document.querySelectorAll('svg[viewBox]')].flatMap((s) => {
+    const S = s.getBoundingClientRect();
+    return [...s.querySelectorAll('text')]
+      .map((el) => [el, el.getBoundingClientRect()])
+      .filter(([, b]) => b.width && (b.left < S.left - 1 || b.top < S.top - 1 ||
+                                     b.right > S.right + 1 || b.bottom > S.bottom + 1))
+      .map(([el]) => el.textContent);
+  })
+  ```
+
+  It found: the triad diagram's "function approximation" label rendered at y = −6 and was invisible;
+  `LayerTrace`'s rotated axis name ran off the left edge as soon as a track passed it a label longer
+  than "variance"; a legend that wrapped to a second row fell below a fixed height; and two long
+  explanatory sentences inside `<svg>` elements ran off the right edge, because a single `<text>`
+  neither wraps nor shrinks. **Use `getBoundingClientRect`, not `getBBox`** — `getBBox` ignores
+  ancestor transforms, so everything inside a `<g transform>` reports a false position. My first
+  version of this check used `getBBox` and produced nothing but false positives.
+
+  The general lesson is that a figure whose height is a constant will eventually be handed content
+  that does not fit. Derive the height from the content (`heightFor(series.length)`), and keep long
+  prose in the `caption`, where it reflows, rather than in the drawing.
+
+
+**✅ Fix #8 — the detached output panel (2026-09-15).** `<CodeOutput>` now has two modes and the prop
+picks both meaning and styling:
+
+```tsx
+<CodeBlock>…</CodeBlock>
+<CodeOutput>…</CodeOutput>                            // attached: stdout of the code above
+<CodeOutput source="scripts/boosting_cases.py">…</CodeOutput>   // standalone: a measured result
+```
+
+The `source` form gets its own full border (no more detached panel) and prints a
+`reproduced by scripts/…` credit line under the numbers. That turns house rule #1 from a promise into
+something the page states. All 23 standalone panels across 20 pages were converted — activations 4,
+backprop 3, boosting 9, perceptron→MLP 5, random forests 1, housing capstone 1 — each attributed to
+the script that prints those exact headers.
+
+`node scripts/check-pages.js` enforces it, and fails on:
+
+- **R1** a `<CodeOutput>` with no `<CodeBlock>` on the page and no `source`;
+- **R2** a `source="…"` pointing at a file that does not exist in the repo.
+
+Run it alongside `npx tsc --noEmit` before shipping a content pass.
+
+**◐ Fix #5 — active recall, track by track.** Boosting done (2026-09-15): it had **23 pages and
+zero `PredictPrompt`** while publishing nine measured results. Every one of those nine now has a
+prediction above it, including the three that are honest nulls or reversals and are the whole reason
+the rule exists — row subsampling buys nothing on housing (0.815 -> 0.812), XGBoost accuracy *falls*
+monotonically as `reg_lambda` rises, and untuned histogram boosting loses to a random forest by six
+points. A reader who has committed to "a clear gain" before seeing 0.812 remembers it; a reader who
+is simply told does not.
+
+Still at zero: **kernel ridge** and **regularized regression** (both have runnable code to predict
+against), plus **init-norm** and **nn-regularisation**, whose prompts have to wait for fix #2 because
+those tracks currently publish no results at all.
+
+**✅ Fix #2 — the two blind tracks (2026-09-15).** `initialisation-and-normalisation` and
+`nn-regularisation` were 42 pages carrying **0 figures, 1 lab between them, 0 CodeBlocks and 0
+PredictPrompts**, running the identical `<Proof>`·`<Callout>`·`<Quiz>` template on every page. Both
+are now at **0 pages without a visual**. Site-wide: 372 → 342 blind pages (49% → 45%).
+
+What went in, and why none of it is decoration:
+
+- **`scripts/init_norm_train.py` (new).** `init_norm_cases.py` measures the network only *at
+  initialisation*, and leans on sklearn's `MLPClassifier`, which silently replaces whatever init you
+  hand it — so its section 1, headed *Why init matters*, reported the identical 0.9567 / 0.9440 for
+  every init scale on the list. The new file hand-rolls Linear (+ optional BatchNorm) + ReLU + Adam
+  in numpy so that the init under test is the init that trains. Same 800-sample two-moons data as
+  `init_norm_cases.py` and as `INIT_SETUP`, deliberately: one dataset runs through the whole track,
+  and "same data, same architecture, only X differs" stops being true the moment they drift.
+- **The track's thesis now has a number.** Spread of test accuracy across six init scales:
+  **0.4750 without normalisation, 0.0083 with it** — a 57× collapse. BatchNorm lifts the two dead
+  inits from 0.470, which is *below* the 0.530 majority class (they emit one constant logit,
+  −0.055570, for all 200 test points; gradient norm at layer 1 is 1.33e-20), to 0.950. Against that,
+  BatchNorm buys **at most +0.008 accuracy** and is 0.013 *behind* at depth 20. The track now says
+  both, and draws the conclusion: **normalisation is a robustness technique, not an accuracy
+  technique.** It does not make the good runs better, it stops the bad runs existing.
+- **`scripts/reg_curves.py` (new)** re-runs section 6a of `regularisation_cases.py` with the same
+  seeds and splits and keeps the trajectory instead of its endpoints — so the pages headed "the
+  validation error bottoms out and then climbs" and "reading the curve" finally have the curve. 99%
+  of that 4,000-epoch run makes the model worse.
+- **New shared figures**: `figures/Dumbbell` (the same sweep run twice, on one axis),
+  `figures/SweepCurve`, `figures/LearningCurve` (symlog x — early stopping happens inside the first
+  1% of the run, so neither a linear nor a log axis shows it alone). Track-local:
+  `figures/initNorm/{LayerTrace,NormAxes,BatchNormFlow,SymmetryFigure,GradRatioBars}` and
+  `figures/nnReg/RegFigures` (diagnostic quadrant, penalty sum, dropout masks). One new lab,
+  `labs/InitBandLab`, runs the forward and backward pass in the browser as you drag the init scale.
+- **⚠ A print format was being published as a fact.** `%.4f` turned genuine geometric decay into
+  "0.0000", and six passages across the track asserted the signal *is* zero by layer 2. It is not:
+  it is 4.31e-06, then 1.62e-08, down to 1.07e-20 — two to three decades per layer, which on a log
+  axis is a straight line and on the page was a wall of zeros. All six corrected, and three pages
+  now teach the distinction explicitly. Two related defects fixed: `init_norm_cases.py` section 8
+  printed `all outputs identical=False` for a provably identical layer (`len(np.unique(a, axis=1))`
+  counts rows, not columns) directly above a conclusion saying the opposite; and `InitScaleLab` held
+  rounded placeholders (1e-5, 1e-7, 1e-9) under a comment promising measured numbers — it now reads
+  the shared series.
+- **Fix #7, partly.** Neither track had runnable code. `INIT_SETUP` already existed in
+  `runtimeSetup.ts`, complete and correct, imported by **zero pages**; three init-norm pages now use
+  it, and the in-browser Run reproduces the published output panel byte for byte. New `NN_REG_SETUP`
+  is numpy-only — the regularisation numbers come from PyTorch, which Pyodide cannot run — and covers
+  the inverted-dropout scaling, which is the part of that track a reader is most likely to get wrong
+  in their own code and the part that needs no training loop to check.
+- **Fixes #4 and #5 advanced.** A `DecisionPoint` on each track's closing page, the first two of the
+  one-per-family-track rollout; and 0 → 11 `PredictPrompt`s across the two tracks.
+
+Helper: `node scripts/insert-blocks.js <spec.json>` splices JSX blocks into pages from a spec file.
+It refuses missing or ambiguous anchors rather than guessing, handles the repo's CRLF endings, and is
+idempotent, so a spec can be re-run safely.
+
+### 14.2 Active recall — which primitive goes where (decided 2026-09-15, fix #6)
+
+The audit found the two recall primitives had silently swapped places: the four newest bodies of work
+(building-environments, function approximation, both finished capstones) have **zero `<Quiz>`** and
+heavy `PredictPrompt`; the older tracks have the reverse (kNN 29 quizzes / 2 prompts, architecture
+26 / 3, init-norm 20 / 0). Readers were learning two different rhythms. The decision:
+
+**They are not substitutes. They sit at opposite ends of a page and do different jobs.**
+
+| | `<PredictPrompt>` | `<Quiz>` |
+|---|---|---|
+| when | **before** the answer is shown | **after** the teaching is done |
+| effect | pre-testing — commit, then get corrected | retrieval practice |
+| placement | immediately above the result it precedes | last thing on the page |
+| cadence | **every measured result** | **once per chapter**, on the chapter's last page |
+
+1. **A measured number published without a preceding `PredictPrompt` is a defect.** The prompt is what
+   turns a number from information into teaching: the reader has to own a guess before the answer
+   lands. This is the rule the recent tracks got right and it is why they read better.
+2. **`<Quiz>` closes a chapter, not a page.** Quizzing every page (kNN, architecture, init-norm) turns
+   recall into background noise and the reader starts scrolling past it. One quiz, on the last page of
+   the chapter, covering the chapter.
+3. Neither excuses the other. The predict-heavy tracks owe a chapter-end quiz; the quiz-heavy tracks
+   owe prompts before their results.
+
+Tracks currently at **zero `PredictPrompt`**: boosting, init-norm, nn-regularisation, kernel ridge,
+regularized regression. Those are the five that most need rule 1.
+
+### 14.3 `DecisionPoint` is a site-wide primitive (fix #4, 2026-09-15)
+
+Moved `src/components/capstone/DecisionPoint.tsx` -> `src/components/DecisionPoint.tsx` and repointed
+all 16 importers. The folder was the whole problem: the strongest teaching device on the site sat in a
+directory named after one genre, so it got used 16 times, 12 of them in capstones, and nowhere in the
+34 family tracks.
+
+It is fully general already — it takes an `accent`, so it wears any family colour. Use it where a
+page asks the reader to *choose*, not merely to guess a number: the reader commits to what they would
+do, then every option gets honest feedback and one is marked the senior move.
+
+**Target: one `DecisionPoint` per family track**, on the track closing page, posing the decision the
+track has just taught the reader to make. That is the cheapest large pedagogy win in the audit
+(§0.4 item 5) and it is still outstanding.
+
+`PredictPrompt` vs `DecisionPoint`: predict a **result** (a number is about to appear) vs decide an
+**action** (what would you do next). They are not interchangeable.

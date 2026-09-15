@@ -2,6 +2,7 @@ import Link from "next/link";
 import { LessonHeader, Callout, Proof, PrevNext } from "@/components/lesson";
 import { M, MathBlock } from "@/components/Math";
 import { Quiz } from "@/components/Quiz";
+import { MemoryBars } from "@/components/figures/arch/ArchFigures";
 
 export const metadata = {
   title: "Memory and compute budgets — Manifold",
@@ -207,6 +208,17 @@ export default function MemoryAndComputePage() {
             for a 100-layer network, <M>{String.raw`k = 10`}</M> stores 10 and recomputes at most 9.
           </p>
         </Proof>
+
+        <MemoryBars
+          sizes={[2, 128, 128, 1]}
+          batch={256}
+          caption={<>The four-to-one ratio this chapter keeps referring to, itemised for one network.
+            Parameters, gradients and Adam&rsquo;s two moment buffers scale together and all four are
+            fixed by the model; only the activation bar moves with batch size. That is the lever
+            worth knowing about, because it is the one you can pull at 3 a.m. without changing the
+            model — halve the batch, halve the green bar, keep the other three. It is also why
+            gradient checkpointing targets that bar specifically.</>}
+        />
 
         <h2>Inference vs training</h2>
         <p>

@@ -2,6 +2,7 @@ import { M, MathBlock } from "@/components/Math";
 import { CodeBlock } from "@/components/CodeBlock";
 import { CLUSTER_SETUP } from "@/lib/runtimeSetup";
 import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
+import { HardVsSoft } from "@/components/figures/kmeans/KmeansDiagrams";
 
 export const metadata = {
   title: "k-means as EM (link to GMM) — Manifold",
@@ -69,6 +70,15 @@ export default function KMeansAsEMPage() {
             overlaps. Relaxing each restriction gives back a GMM that fixes that specific weakness. k-means
             isn&rsquo;t a different algorithm from GMM — it&rsquo;s GMM with the dials turned to their simplest setting.
         </Callout>
+
+        <HardVsSoft
+          caption={<>The difference is one row. For points deep inside a cluster the two methods agree
+            and the responsibilities are 0.98 to 0.02 — a hard label loses nothing. For the point
+            halfway between, EM reports 0.52 / 0.48, which is the honest answer, and k-means reports
+            &ldquo;A&rdquo; with exactly the same confidence it reported for the first row. That
+            discarded uncertainty is the σ² → 0 limit, and it is where every one of the failure modes
+            in chapter 8 comes from.</>}
+        />
 
         <h2>Why ever use the hard limit?</h2>
         <p>

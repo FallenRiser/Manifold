@@ -2,6 +2,7 @@ import Link from "next/link";
 import { LessonHeader, Callout, Proof, PrevNext } from "@/components/lesson";
 import { M, MathBlock } from "@/components/Math";
 import { Quiz } from "@/components/Quiz";
+import { NormAxes } from "@/components/figures/initNorm/NormAxes";
 
 export const metadata = {
   title: "Group and instance normalisation — Manifold",
@@ -54,6 +55,15 @@ export default function GroupAndInstancePage() {
           instance normalisation.
         </p>
 
+        <NormAxes
+          kind="group"
+          caption={<>GroupNorm splits the features into <M>{String.raw`G`}</M> groups and pools within
+            each one, per sample. With <M>{String.raw`G = 1`}</M> the shaded block covers the whole row
+            and this is LayerNorm; with <M>{String.raw`G`}</M> equal to the number of features it
+            shrinks to a single cell and this is InstanceNorm. The two methods on this page are not
+            rivals of LayerNorm — they are the same method with the group size dialled.</>}
+        />
+
         <h2>Instance normalisation</h2>
         <p>
           Instance normalisation is the extreme case where the group has size one: it normalises
@@ -69,6 +79,15 @@ export default function GroupAndInstancePage() {
           while keeping its spatial structure, which is precisely what a style-transfer network
           wants before it paints a new style back on.
         </p>
+
+        <NormAxes
+          kind="instance"
+          caption={<>InstanceNorm: the group has shrunk to one cell, so each unit of each sample is
+            normalised entirely on its own. Notice what that costs — a single number standardised
+            against itself carries no information about scale at all, which is exactly why
+            InstanceNorm is useful for style transfer (where the per-channel scale <em>is</em> the
+            style you want to discard) and useless as a general-purpose layer.</>}
+        />
 
         <h2>One family, four choices of axis</h2>
         <p>

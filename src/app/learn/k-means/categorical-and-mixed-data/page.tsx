@@ -1,6 +1,8 @@
 import { CodeBlock } from "@/components/CodeBlock";
 import { CLUSTER_SETUP } from "@/lib/runtimeSetup";
 import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
+import { LineChart } from "@/components/figures/kmeans/KmeansCharts";
+import { CURSE } from "@/components/figures/kmeans/data.generated";
 
 export const metadata = {
   title: "Categorical & mixed data — Manifold",
@@ -49,6 +51,21 @@ export default function CategoricalPage() {
           </li>
         </ul>
         <p>It can work for a few low-cardinality fields, but it&rsquo;s a workaround, not the right model.</p>
+
+        <LineChart
+          x={CURSE.map((r) => r.d)}
+          logX
+          series={[{ label: "farthest point ÷ nearest point", values: CURSE.map((r) => r.ratio), color: "var(--bad)" }]}
+          xlabel="dimensions"
+          ylabel="distance ratio"
+          caption={<>One reason one-hot encoding hurts more than it looks like it should: it does not
+            just change the distances, it multiplies the number of columns. A categorical variable with
+            50 levels becomes 50 columns, and this is what happens to Euclidean distance as columns
+            accumulate — the ratio between the farthest and nearest point collapses from{" "}
+            {CURSE[0].ratio.toFixed(0)}× at two dimensions toward 1. When everything is roughly
+            equidistant from everything, &ldquo;assign each point to its nearest centroid&rdquo; is
+            deciding almost nothing.</>}
+        />
 
         <h2>The right tools</h2>
         <ul style={ul}>

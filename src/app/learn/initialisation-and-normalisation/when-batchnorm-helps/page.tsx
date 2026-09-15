@@ -2,6 +2,10 @@ import Link from "next/link";
 import { LessonHeader, Callout, Proof, PrevNext } from "@/components/lesson";
 import { M, MathBlock } from "@/components/Math";
 import { Quiz } from "@/components/Quiz";
+import { PredictPrompt } from "@/components/PredictPrompt";
+import { Dumbbell } from "@/components/figures/Dumbbell";
+import { CodeOutput } from "@/components/CodeOutput";
+import { ACC_VS_DEPTH } from "@/components/figures/initNorm/data";
 
 export const metadata = {
   title: "When BatchNorm helps, and when it does not — Manifold",
@@ -83,46 +87,52 @@ export default function WhenBatchNormHelpsPage() {
           five seeds — and <strong>no normalisation anywhere</strong>:
         </p>
 
-        <div style={{ overflowX: "auto", margin: "1.2rem 0" }}>
-          <table style={{ borderCollapse: "collapse", fontSize: 13.5, minWidth: 380 }}>
-            <thead>
-              <tr>
-                <th style={{ textAlign: "left", padding: "6px 18px 6px 0", color: "var(--muted)", fontWeight: 500, borderBottom: "1px solid var(--border-strong)", whiteSpace: "nowrap" }}>depth</th>
-                <th style={{ textAlign: "left", padding: "6px 18px 6px 0", color: "var(--muted)", fontWeight: 500, borderBottom: "1px solid var(--border-strong)", whiteSpace: "nowrap" }}>test accuracy (no norm)</th>
-                <th style={{ textAlign: "left", padding: "6px 18px 6px 0", color: "var(--muted)", fontWeight: 500, borderBottom: "1px solid var(--border-strong)", whiteSpace: "nowrap" }}>change from depth 2</th>
-              </tr>
-            </thead>
-            <tbody>
-              {([
-                { d: 2, acc: "0.953", delta: "---", best: true },
-                { d: 4, acc: "0.945", delta: "-0.008", best: false },
-                { d: 6, acc: "0.944", delta: "-0.009", best: false },
-                { d: 8, acc: "0.936", delta: "-0.017", best: false },
-                { d: 10, acc: "0.938", delta: "-0.015", best: false },
-                { d: 12, acc: "0.939", delta: "-0.014", best: false },
-                { d: 16, acc: "0.931", delta: "-0.022", best: false },
-              ] as const).map((r) => (
-                <tr key={r.d}>
-                  <td style={{ padding: "6px 18px 6px 0", color: "var(--ink)", fontWeight: 500, borderBottom: "1px solid var(--border)" }}>{r.d}</td>
-                  <td style={{ padding: "6px 18px 6px 0", color: r.best ? "var(--good)" : "var(--ink)", borderBottom: "1px solid var(--border)", fontVariantNumeric: "tabular-nums" }}>{r.acc}</td>
-                  <td style={{ padding: "6px 18px 6px 0", color: "var(--muted)", borderBottom: "1px solid var(--border)", fontVariantNumeric: "tabular-nums" }}>{r.delta}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <p style={{ fontSize: 13, color: "var(--muted)" }}>
-          Width 32, He init, Adam, 5 seeds, two-moons.
-        </p>
+        <PredictPrompt
+          accent={CORAL}
+          prompt={<>Two-moons, width 32, He init, depth swept from 2 to 20, with and without
+            BatchNorm. How much accuracy does BatchNorm buy?</>}
+          options={[
+            "Several points, growing with depth",
+            "About a point, growing with depth",
+            "Under a point, and nothing at depth 20",
+            "Nothing at any depth",
+          ]}
+          nudge="Locked in. Both columns are below, from the same trainer."
+        />
+
+        <Dumbbell
+          rows={ACC_VS_DEPTH.map((r) => ({ init: `depth ${r.depth}`, a: r.noBn, b: r.bn }))}
+          seriesLabels={["no normalisation", "with BatchNorm"]}
+          caption={<>Test accuracy against depth, three seeds, both columns from the same hand-rolled
+            trainer so the comparison is like for like. The gain is <strong>+0.008 at best</strong>,
+            it does not grow with depth, and at depth 20 BatchNorm is <strong>0.013 behind</strong>.
+            This is the honest result on this problem and the track is not going to dress it up.</>}
+        />
+        <CodeOutput source="scripts/init_norm_train.py" label="test accuracy vs depth, He init, 3 seeds">{`  depth     no BN   with BN     gain
+------------------------------------
+      2    0.9450    0.9450  +0.0000
+      4    0.9400    0.9467  +0.0067
+      8    0.9383    0.9467  +0.0083
+     12    0.9483    0.9500  +0.0017
+     16    0.9433    0.9450  +0.0017
+     20    0.9433    0.9300  -0.0133`}</CodeOutput>
 
         <p>
-          Read the decline honestly. From depth 2 (0.953) to depth 16 (0.931) the plain network loses
-          only <strong>0.022</strong> — a gentle slide, not a collapse. With He initialisation the deep
-          net degrades slowly rather than falling apart, and BatchNorm&rsquo;s job here would be to
-          recover that fraction of a percent. On a two-dimensional, shallow, single-boundary problem
-          there is simply not much for it to fix: the scale drift is small, the batch is large, and the
-          network is not deep enough for the per-layer control to earn its keep.
+          Read that honestly, because it is the opposite of the reputation. On a two-dimensional,
+          single-boundary problem with a large batch and a network that is deep but not wide, the plain
+          He-initialised network is already fine, and BatchNorm has almost nothing to fix. It does not
+          collapse at depth — it simply never had a gap to close.
         </p>
+        <p>
+          So if the accuracy column is flat, why is BatchNorm in every architecture you have ever read
+          about? Because accuracy on a well-initialised network is the wrong column to look at. The one
+          that moves is <Link href="/learn/initialisation-and-normalisation/why-norm-reduces-sensitivity" style={link}>how
+          much the initialisation still matters</Link> — and there the same sweep collapses a spread of
+          0.475 down to 0.008. BatchNorm is not buying accuracy here. It is buying the right to stop
+          thinking about the starting point, which is worth more on a real problem than a hundredth of
+          a point ever was.
+        </p>
+
         <p>
           This is the honest scoping point. BatchNorm&rsquo;s payoff <em>grows with depth</em> and with
           the convolutional, large-batch regime; it does not grow here. Do not read the deep-learning

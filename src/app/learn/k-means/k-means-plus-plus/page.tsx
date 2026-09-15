@@ -5,6 +5,8 @@ import { CodeBlock } from "@/components/CodeBlock";
 import { CLUSTER_SETUP } from "@/lib/runtimeSetup";
 import { KMeansPlusPlusLab } from "@/components/labs/KMeansPlusPlusLab";
 import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
+import { InitDistribution } from "@/components/figures/kmeans/KmeansCharts";
+import { INIT_DIST } from "@/components/figures/kmeans/data.generated";
 
 export const metadata = {
   title: "k-means++ — Manifold",
@@ -108,6 +110,27 @@ export default function KMeansPlusPlusPage() {
               explain: "With k random draws it's likely two land in one dense blob; Lloyd's then converges to a bad local minimum. Restarts paper over it; k-means++ mostly prevents it.",
             },
           ]}
+        />
+
+        <InitDistribution
+          random={INIT_DIST.random}
+          plusplus={INIT_DIST.plusplus}
+          floor={INIT_DIST.floor}
+          caption={<>The evidence, as two distributions rather than two numbers. Each histogram is 100
+            independent runs on the same 600 points and the same k = 8, differing only in how the
+            centroids were seeded, and the x-axis is where each run finally converged (log scale, lower
+            is better).
+
+            The random histogram has a long tail: its median run ends at {Math.round(INIT_DIST.random.reduce((a,b)=>a+b,0)/INIT_DIST.random.length)}{" "}
+            and its worst at {Math.max(...INIT_DIST.random)}, more than twelve times the best solution
+            anyone found. The k-means++ histogram is a spike sitting on that best solution. Counted
+            exactly: random seeding reached it <strong>{INIT_DIST.randomHits} times out of 100</strong>,
+            k-means++ <strong>{INIT_DIST.plusHits}</strong>.
+
+            Notice what this does <em>not</em> say. k-means++ has a tail too — its worst run is 45%
+            above the floor. Seeding does not remove the local minima, it makes falling into a bad one
+            uncommon instead of usual, which is why <code>n_init</code> still defaults to more than
+            one.</>}
         />
 
         <PrevNext prev={{ href: "/learn/k-means/random-restarts", label: <>← Random restarts</> }} next={{ href: "/learn/k-means/the-elbow-method", label: <>Next up · The elbow method →</> }} />

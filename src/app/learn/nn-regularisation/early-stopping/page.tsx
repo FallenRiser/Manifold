@@ -2,6 +2,9 @@ import Link from "next/link";
 import { LessonHeader, Callout, Proof, PrevNext } from "@/components/lesson";
 import { M, MathBlock } from "@/components/Math";
 import { Quiz } from "@/components/Quiz";
+import { PredictPrompt } from "@/components/PredictPrompt";
+import { LearningCurve } from "@/components/figures/LearningCurve";
+import { ES_CURVE } from "@/components/figures/nnReg/curves";
 
 export const metadata = {
   title: "Early stopping — Manifold",
@@ -94,6 +97,37 @@ export default function EarlyStoppingPage() {
           already trained well. The best model on this run existed for a moment around epoch 34 and was
           then trained away. Early stopping is the mechanism that catches and keeps it.
         </Callout>
+
+        <PredictPrompt
+          accent={CORAL}
+          prompt={<>You can only see the validation curve while training; the test curve is what you
+            actually care about and cannot look at. On this run, how well does stopping at the
+            validation minimum do against stopping at the true test minimum?</>}
+          options={[
+            "Badly — validation noise puts you in the wrong place",
+            "They land in almost the same place",
+            "Validation stops far too early",
+            "Validation stops far too late",
+          ]}
+          nudge="Locked in. Both curves are drawn below."
+        />
+
+        <LearningCurve
+          x={ES_CURVE.epochs}
+          series={[
+            { label: "validation MSE — what you can see", values: ES_CURVE.val, color: "var(--c-neural)" },
+            { label: "test MSE — what you care about", values: ES_CURVE.test, color: "var(--good)", dash: "4 3" },
+          ]}
+          markAt={ES_CURVE.bestEpochOfMeanCurve}
+          markLabel={`stop here · epoch ${ES_CURVE.bestEpochOfMeanCurve}`}
+          ylabel="MSE"
+          caption={<>The two-row table above, drawn as the trajectory it summarises. The validation
+            curve is the only one you get to watch, and it turns in the same place the test curve does
+            — which is the whole reason early stopping is allowed to work. Everything to the right of
+            the line is training that is actively undoing itself; 3,955 of the 4,000 epochs are spent
+            there. (The curves are 5-seed averages, so the minimum of the averaged curve sits at epoch
+            45 while the average of the per-seed minima, quoted above, is 34.)</>}
+        />
 
         <h2>The honest nuance: stop on the metric you care about</h2>
         <p>

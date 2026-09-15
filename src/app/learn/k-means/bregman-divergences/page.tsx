@@ -2,6 +2,8 @@ import { M, MathBlock } from "@/components/Math";
 import { CodeBlock } from "@/components/CodeBlock";
 import { CLUSTER_SETUP } from "@/lib/runtimeSetup";
 import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
+import { ScatterRow } from "@/components/figures/kmeans/Scatter";
+import { OUTLIER } from "@/components/figures/kmeans/data.generated";
 
 export const metadata = {
   title: "Bregman divergences — Manifold",
@@ -53,6 +55,18 @@ export default function BregmanPage() {
           needn&rsquo;t obey the triangle inequality. It&rsquo;s a directed notion of &ldquo;discrepancy,&rdquo; which is all
           k-means actually needs.
         </p>
+
+        <ScatterRow
+          panels={[
+            { points: OUTLIER.points, labels: OUTLIER.labels, centroids: OUTLIER.centroids, label: "squared Euclidean → the mean" },
+          ]}
+          caption={<>The theorem says the update step is not a design choice: given squared Euclidean
+            distance, the mean is the unique minimiser, so &ldquo;set each centroid to the mean of its
+            points&rdquo; is forced. The flip side is visible here — the mean is also what drags a
+            centroid onto a single outlier, and no amount of tuning fixes that while the divergence
+            stays the same. To get a different update you must change the divergence, which is exactly
+            what k-medians and k-modes do.</>}
+        />
 
         <h2>The theorem that ties it together</h2>
         <p>

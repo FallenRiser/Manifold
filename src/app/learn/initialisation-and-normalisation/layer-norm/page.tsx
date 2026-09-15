@@ -2,6 +2,7 @@ import Link from "next/link";
 import { LessonHeader, Callout, Proof, PrevNext } from "@/components/lesson";
 import { M, MathBlock } from "@/components/Math";
 import { Quiz } from "@/components/Quiz";
+import { NormAxes } from "@/components/figures/initNorm/NormAxes";
 
 export const metadata = {
   title: "Layer normalisation — Manifold",
@@ -103,6 +104,16 @@ export default function LayerNormPage() {
           activations at a controlled scale — is identical. Only the axis of pooling changes, and
           that single choice is what determines whether the method depends on the batch.
         </p>
+
+        <NormAxes
+          kind="layer"
+          caption={<>The same grid as the BatchNorm chapter, with the shading turned ninety degrees.
+            That rotation is the entire difference between the two methods — identical arithmetic,
+            different axis — and it is what buys LayerNorm every property BatchNorm lacks. A sample is
+            now normalised using only its own numbers, so there is no train/test discrepancy to patch
+            up with running averages, a batch of one works exactly like a batch of a thousand, and two
+            sequences of different lengths cannot contaminate each other.</>}
+        />
 
         <h2>Measured: LayerNorm holds the scale steady deep in the net</h2>
         <p>

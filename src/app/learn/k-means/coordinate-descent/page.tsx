@@ -2,6 +2,8 @@ import { M, MathBlock } from "@/components/Math";
 import { CodeBlock } from "@/components/CodeBlock";
 import { CLUSTER_SETUP } from "@/lib/runtimeSetup";
 import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
+import { LineChart } from "@/components/figures/kmeans/KmeansCharts";
+import { LLOYD } from "@/components/figures/kmeans/data.generated";
 
 export const metadata = {
   title: "Convergence as coordinate descent — Manifold",
@@ -58,6 +60,20 @@ export default function CoordinateDescentPage() {
           textbook definition of <strong>block coordinate descent</strong> (also called alternating
           minimisation).
         </p>
+
+        <LineChart
+          x={LLOYD.frames.map((_, i) => i)}
+          series={[{ label: "J, the objective", values: LLOYD.frames.map((f) => f.inertia), color: "var(--c-clustering)" }]}
+          xlabel="round (one assign + one update each)"
+          ylabel="J"
+          yZero
+          format={(v) => v.toFixed(0)}
+          caption={<>Block-coordinate descent on a real run. J falls at every single evaluation and
+            then stops falling, which is the entire convergence argument drawn: a sequence that never
+            increases and is bounded below must settle. What the picture cannot show — and what the
+            proof also cannot promise — is that the value it settles on is the lowest available. The
+            initialisation chapter exists because of that gap.</>}
+        />
 
         <h2>The one-line convergence proof</h2>
         <p>

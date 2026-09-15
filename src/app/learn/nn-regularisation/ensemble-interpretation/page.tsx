@@ -2,6 +2,7 @@ import Link from "next/link";
 import { LessonHeader, Callout, Proof, PrevNext } from "@/components/lesson";
 import { M, MathBlock } from "@/components/Math";
 import { Quiz } from "@/components/Quiz";
+import { DropoutMasks } from "@/components/figures/nnReg/RegFigures";
 
 export const metadata = {
   title: "The ensemble interpretation — Manifold",
@@ -43,6 +44,16 @@ export default function EnsembleInterpretationPage() {
         </p>
 
         <MathBlock>{String.raw`\text{subnetwork } = \; g\!\bigl((\mathbf{m}\odot \mathbf{h})\,;\,\theta\bigr), \qquad \mathbf{m}\sim \text{Bernoulli}(1-p)`}</MathBlock>
+
+        <DropoutMasks
+          caption={<>Four members of the ensemble. They are not four models — they are four{" "}
+            <em>subsets</em> of one set of weights, which is what makes the argument work and also what
+            makes it differ from bagging. Training a member costs one minibatch rather than a full
+            run, and every member&rsquo;s update improves every other member that shares those weights.
+            With a layer of <M>{String.raw`n`}</M> units there are <M>{String.raw`2^n`}</M> such
+            subsets, so essentially every member you sample during training is one you will never
+            sample again.</>}
+        />
 
         <h2>Test time is an approximate average</h2>
         <p>

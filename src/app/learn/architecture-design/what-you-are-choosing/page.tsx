@@ -5,6 +5,7 @@ import { CodeBlock } from "@/components/CodeBlock";
 import { PredictPrompt } from "@/components/PredictPrompt";
 import { Quiz } from "@/components/Quiz";
 import { ARCH_SETUP } from "@/lib/runtimeSetup";
+import { NetworkDiagram, NetworkPair } from "@/components/figures/arch/NetworkDiagram";
 
 export const metadata = {
   title: "What you are actually choosing — Manifold",
@@ -60,6 +61,15 @@ for hidden in [(32, 32), (64,) * 8]:
           is a question you can answer by looking at two numbers you already have: the training loss and
           the parameter count.
         </p>
+
+        <NetworkPair
+          left={{ sizes: [2, 4, 1], title: "1 hidden layer of 4", note: "17 parameters" }}
+          right={{ sizes: [2, 64, 64, 1], title: "2 hidden layers of 64", note: "4,417 parameters" }}
+          caption={<>The thing you are choosing, drawn. Everything this track discusses — capacity,
+            cost, trainability — is a consequence of these two pictures and nothing else: how many
+            columns, and how tall each one is. Both of these networks score above 0.85 on the same
+            problem; the one on the right costs 260 times as many parameters to do it.</>}
+        />
 
         <h2>Axis 1: capacity</h2>
         <p>

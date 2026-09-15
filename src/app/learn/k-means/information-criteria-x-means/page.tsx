@@ -2,6 +2,8 @@ import { Quiz } from "@/components/Quiz";
 import { M, MathBlock } from "@/components/Math";
 import { CodeBlock } from "@/components/CodeBlock";
 import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
+import { LineChart } from "@/components/figures/kmeans/KmeansCharts";
+import { BIC_BLOBS, BIC_NOISE } from "@/components/figures/kmeans/data.generated";
 
 export const metadata = {
   title: "Information criteria (X-means) — Manifold",
@@ -29,7 +31,7 @@ export default function XMeansPage() {
           More clusters always fit the data better — that&rsquo;s the recurring trap. Statistics has a
           standard cure for &ldquo;more parameters always fit better&rdquo;: an <strong>information
           criterion</strong> that adds an explicit penalty for each parameter. Score a clustering by how
-          well it explains the data <em>minus</em> a cost for its centroids, and the best <em>k</em>
+          well it explains the data <em>minus</em> a cost for its centroids, and the best <em>k</em>{" "}
           becomes a genuine maximum rather than &ldquo;as many as possible.&rdquo;
         </p>
 
@@ -47,6 +49,24 @@ export default function XMeansPage() {
           highest BIC. (AIC uses the same idea with a lighter penalty, <M>{String.raw`-p`}</M>, so it tends
           to choose more clusters.)
         </p>
+
+        <LineChart
+          x={BIC_BLOBS.k}
+          series={[
+            { label: "BIC, data with 4 real clusters", values: BIC_BLOBS.bic, color: "var(--c-clustering)" },
+            { label: "BIC, uniform noise", values: BIC_NOISE.bic, color: "var(--bad)", dash: "5 3" },
+          ]}
+          xlabel="k"
+          ylabel="BIC (higher is better)"
+          format={(v) => v.toFixed(0)}
+          caption={<>The complexity tax is what buys the ability to say <em>no</em>. On the clustered
+            data BIC peaks at k = {BIC_BLOBS.best}; on uniform noise it peaks at k = {BIC_NOISE.best} —
+            it declines to split data that has nothing in it. Inertia cannot do this at any k: on the
+            same noise it falls monotonically from {BIC_NOISE.inertia[0]} to{" "}
+            {BIC_NOISE.inertia[BIC_NOISE.inertia.length - 1]}, happily reporting that eight clusters fit
+            better than one. &ldquo;k = 1 is a valid answer&rdquo; is the single most useful thing an
+            information criterion adds.</>}
+        />
 
         <h2>X-means: search instead of sweep</h2>
         <p>

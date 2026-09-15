@@ -4,6 +4,8 @@ import { M, MathBlock } from "@/components/Math";
 import { CodeBlock } from "@/components/CodeBlock";
 import { CodeOutput } from "@/components/CodeOutput";
 import { PredictPrompt } from "@/components/PredictPrompt";
+import { Curve } from "@/components/figures/Curve";
+import { SWEEP_COST } from "@/components/figures/planning/data.generated";
 
 export const metadata = {
   title: "The cost of a sweep — Manifold",
@@ -80,6 +82,23 @@ for nstates in [16, 100, 10_000, 1_000_000]:
           nudge="Locked in. The efficiency is real; the problem is the size of |S|, which the next page attacks."
         />
 
+        <Curve
+          x={SWEEP_COST.map((r) => r.n)}
+          logX
+          logY
+          series={[
+            { label: "one sweep: |S|²|A|", values: SWEEP_COST.map((r) => r.sweep), color: "var(--c-rl)" },
+            { label: "one exact solve: |S|³", values: SWEEP_COST.map((r) => r.solve), color: "var(--bad)", dash: "5 3" },
+          ]}
+          xlabel="number of states (log scale)"
+          ylabel="operations"
+          caption={<>Both lines are straight on log axes, which is what &ldquo;polynomial&rdquo; looks
+            like — and both climb steeply enough that a million states is already out of reach. The gap
+            between them is the reason iterative sweeping beat the exact linear solve long before anyone
+            cared about reinforcement learning. The trouble is not the slope of either line; it is that
+            the next page moves you along the x-axis by twenty orders of magnitude.</>}
+        />
+
         <h2>The triumph, stated fairly</h2>
         <p>
           It is worth pausing on what DP <em>does</em> achieve. The naive route to control — enumerate all{" "}
@@ -102,7 +121,7 @@ for nstates in [16, 100, 10_000, 1_000_000]:
 
         <p>
           Everything after this in reinforcement learning is, in one way or another, a response to this cost. If you
-          cannot afford to sweep every state, you must either <em>avoid</em> most of them (real-time DP, sampling) or
+          cannot afford to sweep every state, you must either <em>avoid</em> most of them (real-time DP, sampling) or{" "}
           <em>generalise</em> across them (function approximation). The remaining pages of this track open both doors.
         </p>
 

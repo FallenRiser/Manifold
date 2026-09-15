@@ -37,7 +37,7 @@ export default function SilhouettePage() {
         <p>
           Read it directly: <M>{String.raw`s \approx 1`}</M> means the point is far snugger in its own
           cluster than any other (great); <M>{String.raw`s \approx 0`}</M> means it sits on the boundary
-          between two; <M>{String.raw`s < 0`}</M> means it&rsquo;s actually closer to a <em>different</em>
+          between two; <M>{String.raw`s < 0`}</M> means it&rsquo;s actually closer to a <em>different</em>{" "}
           cluster — it&rsquo;s probably misassigned. The score is bounded in <M>{String.raw`[-1, 1]`}</M>, so it&rsquo;s
           comparable across datasets, unlike raw inertia.
         </p>
@@ -54,7 +54,7 @@ export default function SilhouettePage() {
         <p>
           Better still, don&rsquo;t collapse to one number — draw every point&rsquo;s score as a bar, grouped by
           cluster and sorted. The shape is diagnostic: fat, even blocks all above the mean signal a
-          healthy <em>k</em>; a cluster with short or negative bars is being forced. Try each <em>k</em>
+          healthy <em>k</em>; a cluster with short or negative bars is being forced. Try each <em>k</em>{" "}
           and watch the plot fall apart away from the best value.
         </p>
         <SilhouetteLab />

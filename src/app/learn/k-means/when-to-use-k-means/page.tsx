@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
+import { ScatterRow } from "@/components/figures/kmeans/Scatter";
+import { FAILURES, NULL_CLUSTER } from "@/components/figures/kmeans/data.generated";
 
 export const metadata = {
   title: "When to use k-means — Manifold",
@@ -69,6 +71,25 @@ export default function WhenToUsePage() {
           <li><Link href="/learn/k-means/case-customer-segmentation" style={inlineLink}>Case B — customer segmentation</Link>: the full scale → choose-k → profile pipeline on tabular data.</li>
           <li><Link href="/learn/k-means/case-clustering-embeddings" style={inlineLink}>Case C — clustering embeddings</Link>: high-dimensional vectors, cosine geometry, and the modern workflow.</li>
         </ul>
+
+        <ScatterRow
+          sharedBounds={false}
+          panels={[
+            { points: FAILURES[0].points, labels: FAILURES[0].labels, centroids: FAILURES[0].centroids, label: "use it here", note: `ARI ${FAILURES[0].ari.toFixed(3)}` },
+            { points: FAILURES[1].points, labels: FAILURES[1].labels, centroids: FAILURES[1].centroids, label: "not here", note: `ARI ${FAILURES[1].ari.toFixed(3)}` },
+            { points: NULL_CLUSTER.points, labels: NULL_CLUSTER.labels, centroids: NULL_CLUSTER.centroids, label: "and be careful here", note: `silhouette ${NULL_CLUSTER.silhouette}` },
+          ]}
+          caption={<>The decision in three pictures. Round, comparable, well-separated blobs: k-means is
+            the right tool and gets {FAILURES[0].ari.toFixed(3)}. Interlocking crescents: no partition
+            by straight lines can work, and it gets {FAILURES[1].ari.toFixed(3)}.
+
+            The third panel is the one to remember, because it is the only failure that does not look
+            like one. Those are 300 uniformly random points — there is no structure of any kind — and
+            k-means has returned three tidy, roughly equal, entirely meaningless groups with a
+            silhouette of {NULL_CLUSTER.silhouette} against {NULL_CLUSTER.realSilhouette} for genuinely
+            clustered data. It will never refuse. Testing whether there is anything to find is your
+            job, not the algorithm&rsquo;s.</>}
+        />
 
         <PrevNext prev={{ href: "/learn/k-means/bregman-divergences", label: <>← Bregman divergences</> }} next={{ href: "/learn/k-means/case-image-quantization", label: <>Next up · Case A: image colour quantization →</> }} />
       </div>

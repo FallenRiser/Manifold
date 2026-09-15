@@ -1,6 +1,7 @@
 # Warehouse-Robot RL Capstone — Plan
 
-> Status: **PLANNING / IN BUILD.** Blueprint for the third flagship capstone — the first
+> Status: ✅ **COMPLETE (2026-09-11) — 24/24 pages, all 6 acts, tsc-clean, every runnable cell
+> browser-verified, downloadable notebook shipped, registered in siteMap CAPSTONES.** Blueprint for the third flagship capstone — the first
 > **control** one. Caps the three built RL tracks (MDPs · Planning · Learning) the way the
 > housing/NEO capstones cap the supervised families. Mirrors the NEO conventions
 > (`rlCapstoneTrack.ts`, `scripts/rl_capstone_cases.py`, upgrade-driven arc, transfer ladder)
@@ -47,8 +48,8 @@ Primitives: `AnalystQuestion` (accent + label overridden to "The engineer's ques
 
 ## 4. The RL Playbook the reader builds (the transferable artifact)
 
-Rules 1–14 are **shipped** (the `n=` on each page is authoritative; this list follows it). 15–17 are
-planned for Acts 4–6 and will be renumbered as they land.
+Rules 1–23 are **shipped** — the full Playbook (rendered in full on the `takeaways` page). Act 6 added
+the two transfer rules (22 keep specifics in data + re-verify; 23 trust a method only after far transfer).
 
 1. **Frame first** — the decision the agent serves + how success is measured, before any algorithm;
    bracket the problem with a floor and, if you can, a ceiling. *(index)*
@@ -65,9 +66,13 @@ planned for Acts 4–6 and will be renumbered as they land.
 12. **Replace a sampled action in the target with an expectation over the policy when you can afford it** — keeps the mean, drops target variance, steadier learning. *(expected-sarsa)*
 13. **Never trust one seed** — an RL outcome is a distribution (often multimodal); report spread + failure rate; locate a trade-off in the reward/exploration before blaming the update rule. *(the-safety-tradeoff)*
 14. **Judge added complexity by whether its benefit reproduces** — full distribution over seeds, distrust a mean in a multimodal world, verify any textbook effect on YOUR problem. *(algorithm-comparison)*
-15. ⏳ **Tune α and ε with a protocol**, not by eyeballing one run. *(Act 4)*
-16. ⏳ **Read the policy, not just the score.** *(Act 5)*
-17. ⏳ **Name what the agent can never know** — and what breaks at scale. *(Act 5)*
+15. **Treat α as a stability dial on stochastic problems** — small enough to average noise, decayed (Robbins–Monro) for early speed; too large *destroys* convergence. *(the-step-size)*
+16. **Anneal exploration high→low (GLIE)** — explore hard while estimates form, decay toward greedy; a fixed ε explores too little early, too much late, and can trap a self-fulfilling bad estimate. *(exploration-schedule)*
+17. **Initialise optimistically for randomness-free systematic exploration — but only above the max true value**; a partway-optimistic start can be worse than neutral, and optimism explores only once. *(optimism-and-initialisation)*
+18. **Tune against a distribution over many seeds, split tuning seeds from reporting seeds, quote the spread and worst case** — never the best run. *(tuning-protocol)*
+19. **Read the policy, not just the score** — render and audit the plan (main path, hazard-adjacent states, rarely-visited traps, disagreements with a reference); many policies share one score. *(reading-the-policy)*
+20. **Stress-test outside the training distribution and report the tail, not the mean** — optimal-on-training can become worst under shift; a healthy average hides catastrophic worst cases; test whether your safeguards are load-bearing. *(failure-modes)*
+21. **Name what the agent can never know, and what breaks at scale** — it knows only what the state encodes (POMDP otherwise), learns values not the model, and a table generalises nothing → state count explodes → function approximation. *(limits)*
 
 ## 5. The environment (LOCKED) — `WAREHOUSE_SETUP`
 
@@ -237,19 +242,27 @@ this session). What the seeds revealed:
 Playbook rules **10–14 shipped** here (see §4). tsc EXIT 0; all 5 pages 200; every runnable cell
 browser-Run-verified to reproduce its output character-for-character; only favicon 404.
 
-### Act 4 — Make it work: tuning
-`the-step-size` (α) · `exploration-schedule` (ε, decay, GLIE) · `optimism-and-initialisation` ·
-`tuning-protocol` (**T5** — seeds, spread, and not fooling yourself).
+### Act 4 — Make it work: tuning ✅ BUILT (2026-09-10)
+**Spine: Act 3's basin lottery is an exploration/stability problem, and it's tunable away.** All numbers
+10-seed × 15000 ep from `scripts/rl_capstone_cases.py` (`act4()`); each page also has a fast single-seed
+runnable cell, all browser-Run-verified char-for-char.
+- **`the-step-size` (α, rule 15):** 10-seed sweep — α 0.02→**mean 21.09, 10/10, 0 broken**; 0.10→17.66/7-10/1; 0.30→16.49/**0/10** (all retreat to safe basin); 0.60→11.83/2-broken; 1.00→**−133.82/9-broken**. Runnable seed-0 curves (6000ep): α0.05 climbs & locks at ceiling (21.08); α0.20 fast but stuck safe (16.34); α0.80 thrashes (−1.14). α is a *stability* dial; small α is a 2nd cure for the lottery.
+- **`exploration-schedule` (ε anneal/GLIE, rule 16):** fixed 0.1→17.66/7-10; anneal 0.5→0.01→18.59/9-10; 0.3→0.01→20.12/8-10; **1.0→0.05→21.10/10-10/0-broken** (lottery essentially SOLVED). Runnable seed-4 contrast: fixed ε → −248.34/1.1% vs anneal → 21.32/100%.
+- **`optimism-and-initialisation` (rule 17):** q0=0→17.66/7-10/1-broken; **q0=+25→13.90/7-10/1-broken (one −41.6 collapse — HALF-optimism worse than neutral!)**; q0=+50→20.10/8-10/0-broken. Only works cleanly ABOVE max true value. Runnable seed-4: q0=0 → −248 vs q0=50 → 21.05.
+- **`tuning-protocol` (**T5**, rule 18):** the "one seed lies" demo — vanilla on **seed 2 = 21.1 (looks solved)** vs vanilla over 10 seeds = **17.66 / 7-10 / 1 broken**. Vanilla-vs-tuned table (tuned = anneal 1.0→0.05: 21.10/10-10/0). Meta-trap = overfitting knobs to the tuning seeds → split tuning/reporting seeds (eval seed 999 was never a tuning seed). Act-4 checkpoint Quiz. No heavy inline compute (JSX tables).
+- **Same broken seed 4 rescued THREE ways** (small α, anneal ε, optimism) — the act's throughline.
 
-### Act 5 — Evaluate, interpret, stress-test
-`reading-the-policy` (route maps for both carrying states) · `failure-modes` (the off-path
-coverage trap we hit for real during design — see §9) · `limits` (partial observability, the table
-wall → function approximation).
+### Act 5 — Evaluate, interpret, stress-test ✅ BUILT (2026-09-11)
+All numbers verified against shipped `WAREHOUSE_SETUP` + browser-Run char-for-char; reproduced by
+`scripts/rl_capstone_cases.py` `act5()`.
+- **`reading-the-policy` (rule 19):** instant risky-vs-safe map contrast (both via dp_solve) — optimal empty leg goes DOWN the doorway (col 3), safe goes all the way right to the bypass. Static stat: a tuned learned agent (20.85/100%) **agrees with the oracle on only 84% of visited / 81% of all states** → near-optimal ≠ identical policy (disagreements = near-ties + rarely-visited off-path noise). Four-pass map audit.
+- **`failure-modes` (rule 20):** ⚠️ **The plan's original off-path-coverage-trap story DID NOT REPRODUCE** — the shipped spill-teleport-to-dock mechanic churns coverage for free, so a dock-only start also delivers 100% (verified: fixed-start & exploring-start both 100% from every start). Told honestly in a Callout ("the failure we designed around"; know which safeguards are load-bearing). Real reproduced failure modes instead: **(1) distribution shift** — risky policy 21.48 (slip .10) inverts to LOSE vs safe by slip .20 (9.35 vs 10.47), −42.80 vs −9.03 at .40 (safe never touches a hazard: 0.000 spills at every slip); **(2) the tail** — optimal policy mean 21.22 but median 26, worst episode −124, worst-1% −55.62, 13.3% below 20.
+- **`limits` (rule 21):** 4 limits — POMDP/only-knows-the-state, the table wall (80 → **2,016,000** states with 4 realistic features; coverage+generalisation not memory is the wall → function approximation = the next track, "deep" = a net in that slot), model-free never learns P, non-stationarity. Act-5 checkpoint Quiz. Bridge to the FA/Deep-RL track.
 
-### Act 6 — Conclude & transfer
-`takeaways` (the §4 Playbook + notebook) · `transfer-near` (a new warehouse: moved spills/doorway,
-different slip) · `transfer-far` (**inventory control** — a non-grid MDP: stock levels, stochastic
-demand, order costs; same Playbook, no grid intuition to lean on).
+### Act 6 — Conclude & transfer ✅ BUILT (2026-09-11)
+- **`takeaways`:** verdict + the full **23-rule Playbook** rendered as a table (grouped by act, colour-coded) + the 7-question skeleton + 5 "defend it" interview Q&As + the **downloadable notebook** (`public/capstone/warehouse-robot-capstone.ipynb`, built from `rl_capstone_cases.py` + `INVENTORY_SETUP`; runs top-to-bottom, reproduces every number; linked via `asset()`).
+- **`transfer-near` (rule 22):** point the SAME code at a new floor by reassigning `FLOOR` + derived globals (functions read globals at call time). New floor `..HHH.HH` (bypass now on the LEFT). random −494.59, oracle 32.58, **learned 32.53 = 100% of oracle** (8000 ep, anneal). Re-run the whole harness to verify transfer, don't assume it.
+- **`transfer-far` (rule 23):** **inventory control**, a NON-grid MDP — NEW `INVENTORY_SETUP` in runtimeSetup.ts (stock 0..20, order 0..20, truncated-Poisson(5) demand, price 5 / fix 4 / unit 1 / hold .5 / stockout 3, γ.95, continuing task; `Inventory` sample-only + `dp_solve` VI oracle + `evaluate` avg-reward/day). Baselines never −14.888 / random 4.093 / up-to-8 13.549 / up-to-10 13.249; **oracle 14.524 with an emergent (s,S)=(order-up-to-12, reorder-at-6) base-stock policy**; **learned Q-learning 14.306 = 99% of oracle** (200k steps, anneal), messy-but-structured policy (reading-the-policy lesson again). Same Playbook, no grid intuition.
 
 ## 7. New vs reused labs
 - **New:** `WarehouseLab` (flagship — live training on the grid, algorithm/α/ε switches, route
@@ -287,8 +300,39 @@ demand, order costs; same Playbook, no grid intuition to lean on).
   `transfer-far` is **inventory control** (recommended: non-grid, stock levels + stochastic demand,
   so no grid intuition survives) or elevator dispatch.
 
-## 10. Visual identity
-Restrained, per NEO §11: its own accent (`--c-warehouse`, hi-vis olive — the one clearly unoccupied
-hue in the riso palette, and thematically right for a warehouse), plus a **signature motif**: the
-warehouse floor plan itself, rendered as a hairline grid with spill cells in `--bad` and the two
-candidate routes drawn as overlays. No theme swap, no gradients. **Accent needs the user's yes/no.**
+## 10. Visual identity — THE SHOP FLOOR ✅ REBUILT 2026-09-11
+
+The first pass was too restrained. Shipped at 24/24 pages it read, in the user's words, "bland and
+boring": the accent (`--c-warehouse`) was doing all the work, and the SAME `AnalystQuestion` box —
+"The engineer's question 🤖" — opened all 24 pages, so the contract that was meant to feel like
+progression read as a refrain by page four. Housing has terracotta editorial; NEO has the always-dark
+sky; this one had a colour. Rebuilt as a real third identity:
+
+**Palette** — `--wh-*` in `globals.css`, theme-independent like NEO's sky and ledger (concrete is
+concrete in dark mode too): `--wh-slab`/`--wh-slab-2` sealed concrete, `--wh-seam` saw-cuts,
+`--wh-ink`/`-soft`/`--wh-faint` stencil black, `--wh-tape`/`--wh-tape-deep` hi-vis floor tape,
+`--wh-spill` warning red, `--wh-route` marked-route green. Deliberately neither dark (NEO) nor paper
+(housing): a painted industrial slab.
+
+**Kit** — `src/components/capstone/warehouse.tsx` (the capstone's own skin; it no longer imports
+`pedagogy.tsx`, whose contract it still obeys):
+- `WorkOrder({act, n})` — replaces the repeated opener. A dispatch docket: hazard-tape rail, the act
+  number set vertically, and a stencilled ticket line `WO-07/24 · LOCK THE HARNESS`. **Its label and
+  icon change per act** — the framing / measurement / learning / tuning / audit / transfer question —
+  so the page says where in the six-act job you are standing. Six identities, not one refrain.
+- `ShopFloor({stamp})` — the signature panel: concrete slab, saw-cut seams, a hazard-tape band that
+  runs ONCE on arrival (`.wh-tape-run`, motion as punctuation; the reduced-motion rule kills it), and
+  an optional rotated inspection stamp. Used sparingly — the hero bracket, the verdict, the policy maps.
+- `SlabStats` — headline numbers stencilled on floor tiles (spill-red / route-green).
+- `HazardTape({label})`, `TransferBox` (tape down the left edge, "Take it off the floor ↗"),
+  `PlaybookRule` (square crate-stamp number, not a soft pill).
+
+**Signature figures** — `FloorPlan.tsx` redrawn in the skin (concrete tiles, red-hatched spill wall,
+the doorway and bypass taped off in hi-vis) and the new `PolicyFloor.tsx`, which renders a learned
+policy as arrows painted on the floor with **the route it induces from the dock traced in tape**. It
+takes the verified ASCII grid the page already prints, verbatim, as its input — the figure is a
+rendering of the published output, never a redrawing of it (honest-numbers doctrine extends to figures).
+
+Applied: all 24 pages via the WorkOrder swap; slab moments on the index (the three-reference bracket),
+`the-warehouse` (floor plan), `reading-the-policy` (risky vs safe policy floors, side by side) and
+`takeaways` (the verdict slab + a hazard-taped "PLAYBOOK · 23 RULES" band).

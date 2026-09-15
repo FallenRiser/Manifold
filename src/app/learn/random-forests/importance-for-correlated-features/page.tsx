@@ -32,7 +32,7 @@ export default function CorrelatedImportancePage() {
           truth: <code>x1</code> and <code>x2</code> are equally, jointly important. Watch what a random
           forest&rsquo;s two importance measures say (real run):
         </p>
-        <CodeOutput label="importance of the two duplicated drivers">{`MDI  (impurity):     x1 0.354   x2 0.479     sum 0.834
+        <CodeOutput source="scripts/forest_cases.py" label="importance of the two duplicated drivers">{`MDI  (impurity):     x1 0.354   x2 0.479     sum 0.834
 permutation:         x1 0.024   x2 0.372`}</CodeOutput>
 
         <h2>Two measures, two different lies</h2>

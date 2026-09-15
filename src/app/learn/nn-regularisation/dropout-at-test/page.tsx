@@ -2,6 +2,12 @@ import Link from "next/link";
 import { LessonHeader, Callout, Proof, PrevNext } from "@/components/lesson";
 import { M, MathBlock } from "@/components/Math";
 import { Quiz } from "@/components/Quiz";
+import { Dumbbell } from "@/components/figures/Dumbbell";
+import { MC_DROPOUT } from "@/components/figures/nnReg/data";
+import { CodeBlock } from "@/components/CodeBlock";
+import { CodeOutput } from "@/components/CodeOutput";
+import { PredictPrompt } from "@/components/PredictPrompt";
+import { NN_REG_SETUP } from "@/lib/runtimeSetup";
 
 export const metadata = {
   title: "Dropout at test time — Manifold",
@@ -25,6 +31,67 @@ export default function DropoutAtTestPage() {
       />
 
       <div className="lesson">
+        <p>
+          Before the argument, the arithmetic — because this is the piece of the track most likely to
+          be got wrong in your own code, and it needs no training loop to check. Take one layer of
+          post-ReLU activations and apply dropout two ways: the inverted form, which divides the
+          survivors by <M>{String.raw`1-p`}</M>, and the naive form, which just deletes half of them.
+        </p>
+
+        <PredictPrompt
+          accent={CORAL}
+          prompt={<>Drop half the activations at random. The units that survive are then divided by
+            0.5, i.e. doubled. What does that do to the <em>mean</em> activation, and what does it do
+            to the spread?</>}
+          options={[
+            "Mean unchanged, spread unchanged",
+            "Mean unchanged, spread much larger",
+            "Mean halved, spread unchanged",
+            "Mean doubled, spread halved",
+          ]}
+          nudge="Locked in. Run it and read both columns."
+        />
+
+        <CodeBlock
+          setup={NN_REG_SETUP}
+          fromScratch={`h = relu_layer()
+p = 0.5
+inverted = h * dropout_mask(h.shape, p, inverted=True)
+naive    = h * dropout_mask(h.shape, p, inverted=False)
+
+print("                       mean      std")
+print("no dropout         %8.4f %8.4f" % (h.mean(), h.std()))
+print("inverted dropout   %8.4f %8.4f" % (inverted.mean(), inverted.std()))
+print("naive dropout      %8.4f %8.4f" % (naive.mean(), naive.std()))
+print()
+print("mean error vs no dropout -- inverted %+.5f, naive %+.5f"
+      % (inverted.mean() - h.mean(), naive.mean() - h.mean()))`}
+        />
+        <CodeOutput>{`                       mean      std
+no dropout           0.3997   0.5845
+inverted dropout     0.3997   0.9175
+naive dropout        0.1998   0.4588
+
+mean error vs no dropout -- inverted -0.00009, naive -0.19992`}</CodeOutput>
+
+        <p>
+          The first column is why dropout can simply be switched off at test time. Inverted dropout
+          leaves the mean activation <em>exactly</em> where it was — the error is 9 parts in a hundred
+          thousand — so the eval-time network, which applies no mask and no scaling, receives inputs
+          at the scale its weights were trained against. The naive form does not: it halves every
+          layer&rsquo;s mean, and a network trained that way needs its activations multiplied by{" "}
+          <M>{String.raw`1-p`}</M> at test time to compensate. Inverted dropout exists solely to move
+          that correction into the training step, where it costs nothing, and out of inference, where
+          forgetting it silently halves your model.
+        </p>
+        <p>
+          The second column is the part that is easy to miss, and it is the mechanism the{" "}
+          <Link href="/learn/nn-regularisation/why-dropout-works" style={link}>previous chapter</Link>{" "}
+          called noise injection. Preserving the mean is not free: the standard deviation goes from
+          0.5845 to <strong>0.9175</strong>, over half as much again. Training sees the right average
+          signal and a far noisier one, every step, and surviving that noise is the whole point.
+        </p>
+
         <h2>The default: dropout off</h2>
         <p>
           At test time you want a single, deterministic prediction — the same input should always give the
@@ -49,6 +116,23 @@ export default function DropoutAtTestPage() {
           silent bugs in deep learning. The mirror-image bug is forgetting <code>model.train()</code> again
           afterward, which leaves dropout <em>off</em> during training and quietly removes your
           regularisation. Whenever validation numbers look wrong, check the mode first.</Callout>
+
+        <Dumbbell
+          rows={[
+            { init: "dropout off (eval)", a: MC_DROPOUT.deterministic },
+            { init: "one MC pass", a: MC_DROPOUT.singlePassMean },
+            { init: "50 MC passes", a: MC_DROPOUT.fiftyPass },
+          ]}
+          seriesLabels={["test accuracy"]}
+          ticks={[0.72, 0.74]}
+          caption={<>Leaving dropout on at test time costs <strong>3.2 points</strong> on a single pass
+            (0.717 against 0.749) and, worse, gives a different answer every time — the spread across
+            runs is ±0.010. Average fifty stochastic passes and you land back at{" "}
+            <strong>0.749</strong>, exactly where simply turning it off puts you, for fifty times the
+            compute. That equality is the point of the page: the deterministic pass is not an
+            approximation of the ensemble that happens to be cheaper, it is what the ensemble averages
+            to.</>}
+        />
 
         <h2>What if you leave dropout on? Monte-Carlo dropout</h2>
         <p>

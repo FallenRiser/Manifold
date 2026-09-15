@@ -2,6 +2,8 @@ import Link from "next/link";
 import { LessonHeader, Callout, Proof, PrevNext } from "@/components/lesson";
 import { M, MathBlock } from "@/components/Math";
 import { Quiz } from "@/components/Quiz";
+import { GridHeatmap } from "@/components/figures/arch/ArchFigures";
+import { GRID, GRID_DEPTHS, GRID_WIDTHS } from "@/components/figures/arch/data";
 
 export const metadata = {
   title: "When depth hurts — Manifold",
@@ -116,7 +118,7 @@ export default function WhenDepthHurtsPage() {
           search for a good solution.
         </p>
 
-        <h2>Case 3: optimisation failure at extreme depth (depth 20, width 16)</h2>
+        <h2>Case 3: optimisation failure at extreme depth (depth 40, width 16)</h2>
         <p>
           The most instructive failure is the one where the gradient looks fine but the model does
           not. At depth 20 with width 16, the gradient ratio is <strong>2.23</strong> — squarely
@@ -124,11 +126,12 @@ export default function WhenDepthHurtsPage() {
           at the first layer with nearly the same magnitude it had at the last.
         </p>
         <p>
-          And yet the test accuracy is <strong>0.750</strong>. That is 0.203 below the depth-2
-          optimum, on the same problem. The network is not failing to propagate gradients; it is
-          failing to use them. The loss landscape at depth 20 is so rough — so full of saddle
-          points, sharp curvature changes, and narrow ravines — that gradient descent with a
-          standard learning rate cannot navigate it.
+          And yet, trained with plain SGD, the same family of networks reads 0.940 at depth 20,
+          0.770 at depth 30 and <strong>0.750</strong> at depth 40 — a fall of 0.190 across the back
+          half of the sweep, with the ratios unchanged. The network is not failing to propagate
+          gradients; it is failing to use them. The loss landscape at depth 40 is so rough — so full
+          of saddle points, sharp curvature changes, and narrow ravines — that gradient descent with
+          a standard learning rate cannot navigate it.
         </p>
         <p>
           This is the most important lesson in this page. Gradient preservation is necessary for
@@ -164,6 +167,18 @@ export default function WhenDepthHurtsPage() {
           </p>
         </Proof>
 
+        <GridHeatmap
+          cells={GRID}
+          depths={GRID_DEPTHS}
+          widths={GRID_WIDTHS}
+          caption={<>Two of the three failures are visible in one corner of this grid. Read down the
+            width-4 column: 0.8520, 0.8690, 0.8570, 0.9120, 0.8130, and then <strong>0.6540</strong>{" "}
+            at depth 8 — the information bottleneck, where the network is asked to carry everything
+            it knows through four units, twice over. Now read across the depth-8 row instead: it
+            recovers to 0.9440 by width 8 and never improves after that. Depth without width is the
+            failure; depth with width is merely a waste.</>}
+        />
+
         <h2>The three-failure taxonomy</h2>
         <p>
           The three cases form a clean taxonomy of how depth fails:
@@ -183,7 +198,7 @@ export default function WhenDepthHurtsPage() {
               {([
                 { cfg: "depth 8, width 4", acc: "0.654", mode: "information bottleneck", remedy: "increase width" },
                 { cfg: "depth 8, width 32", acc: "0.936", mode: "no hierarchy to exploit", remedy: "reduce depth" },
-                { cfg: "depth 20, width 16", acc: "0.750", mode: "optimisation failure", remedy: "reduce depth or add skip connections" },
+                { cfg: "depth 40, width 16, plain SGD", acc: "0.750", mode: "optimisation failure", remedy: "reduce depth, or add skip connections and normalisation" },
               ] as const).map((row) => (
                 <tr key={row.cfg}>
                   <td style={{ padding: "6px 14px 6px 0", color: "var(--ink)", fontWeight: 500, borderBottom: "1px solid var(--border)", whiteSpace: "nowrap" }}>{row.cfg}</td>
@@ -281,8 +296,8 @@ export default function WhenDepthHurtsPage() {
                 result is a model that is larger, slower, and less accurate.</>,
             },
             {
-              q: <>A network at depth 20 has a gradient ratio of 2.23 (healthy) but only reaches
-                0.750 test accuracy. Which remedy is most likely to help?</>,
+              q: <>A network at depth 40 has a healthy gradient ratio but, under plain SGD, only
+                reaches 0.750 test accuracy. Which remedy is most likely to help?</>,
               options: [
                 "Switch to a better initialisation scheme to fix the gradient ratio",
                 "Add more training data to prevent overfitting",

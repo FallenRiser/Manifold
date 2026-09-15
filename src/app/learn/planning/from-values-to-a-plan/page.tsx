@@ -6,6 +6,8 @@ import { CodeOutput } from "@/components/CodeOutput";
 import { Quiz } from "@/components/Quiz";
 import { PredictPrompt } from "@/components/PredictPrompt";
 import { GRIDWORLD_SETUP } from "@/lib/runtimeSetup";
+import { GridRow } from "@/components/figures/planning/GridField";
+import { VI_GRIDS, PI_STAR } from "@/components/figures/planning/data.generated";
 
 export const metadata = {
   title: "From values to a plan — Manifold",
@@ -89,6 +91,18 @@ extracted policy:
             "The extracted policy will be random",
           ]}
           nudge="Locked in. Policy-stability is a fast heuristic; the γδ/(1−γ) bound is the rigorous certificate."
+        />
+
+        <GridRow
+          grids={[
+            { values: VI_GRIDS[3], label: "values after 3 sweeps" },
+            { values: VI_GRIDS[6], label: "values after 6 sweeps" },
+            { policy: PI_STAR, label: "the policy greedy on either" },
+          ]}
+          caption={<>Extraction does not need the values to be finished. The two left grids hold
+            different numbers, but taking the greedy action in each gives the same arrows — so the plan
+            on the right was already available three sweeps before the values stopped moving. That gap
+            is why the two stopping rules below are different rules.</>}
         />
 
         <h2>Two stopping rules, two guarantees</h2>

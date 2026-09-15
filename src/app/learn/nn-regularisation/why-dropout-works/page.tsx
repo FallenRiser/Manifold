@@ -2,6 +2,7 @@ import Link from "next/link";
 import { LessonHeader, Callout, Proof, PrevNext } from "@/components/lesson";
 import { M, MathBlock } from "@/components/Math";
 import { Quiz } from "@/components/Quiz";
+import { DropoutMasks } from "@/components/figures/nnReg/RegFigures";
 
 export const metadata = {
   title: "Why dropout works — Manifold",
@@ -55,6 +56,14 @@ export default function WhyDropoutWorksPage() {
           robust — knock out any one unit and the pattern survives. It is the same reason distributed
           systems replicate data.
         </Callout>
+
+        <DropoutMasks
+          caption={<>Co-adaptation, seen from a unit&rsquo;s side of the wiring. Pick any unit in the
+            second layer and follow it across the four panels: the set of units feeding it is different
+            every time. A feature that only works when a particular partner is present is therefore
+            wrong on most steps, and the gradient reflects that. Nothing in the loss function forbids
+            co-adaptation — the sampling does.</>}
+        />
 
         <h2>Explanation 2: it injects noise the network must survive</h2>
         <p>

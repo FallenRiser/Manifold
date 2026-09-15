@@ -2,6 +2,8 @@ import Link from "next/link";
 import { LessonHeader, Callout, Proof, PrevNext } from "@/components/lesson";
 import { M, MathBlock } from "@/components/Math";
 import { Quiz } from "@/components/Quiz";
+import { Dumbbell } from "@/components/figures/Dumbbell";
+import { ORDER } from "@/components/figures/arch/data";
 
 export const metadata = {
   title: "The order of operations — Manifold",
@@ -63,8 +65,9 @@ export default function TheOrderOfOperationsPage() {
           <li>
             <strong>Add depth only if a hierarchy exists.</strong> Depth buys composition, which
             only helps when the problem has features-of-features to compose. Be cautious: depth is
-            taxed. On moons, depth 20 at width 16 drops to <strong>0.750</strong> despite healthy
-            gradient ratios — an optimisation failure, not a gradient one. Add one or two layers,
+            taxed. On moons under plain SGD, a width-16 net holds up to depth 20 and then drops to{" "}
+            <strong>0.750</strong> by depth 40, despite healthy gradient ratios throughout — an
+            optimisation failure, not a gradient one. Add one or two layers,
             measure, and back off the moment the depth sweep stops improving.
           </li>
           <li>
@@ -91,13 +94,27 @@ export default function TheOrderOfOperationsPage() {
           diagnosis calls for them.
         </Callout>
 
+        <Dumbbell
+          rows={ORDER.map((r) => ({ init: r.label, a: r.test, b: r.train }))}
+          seriesLabels={["held-out accuracy", "training accuracy"]}
+          ticks={[0.78, 0.85, 0.92, 1.0]}
+          caption={<>Why regularisation goes last, on 40 training points where the question is
+            actually decidable. A 4×128 network with no penalty memorises the training set exactly
+            (1.000) and generalises worst of the five (0.818). Add L2 at 1e-2 and held-out accuracy
+            rises to <strong>0.885</strong> — 6.7 points, the largest single move on this page — while
+            training accuracy gives up only 0.017. Push to 1e-1 and it over-corrects, dragging both
+            numbers down. Now the bottom two rows: the same treatment on a network that was too small
+            to begin with moves held-out accuracy by <strong>&minus;0.005</strong>. Regularisation is
+            a treatment for a gap. Apply it where there is no gap and it does nothing at all.</>}
+        />
+
         <h2>Why width before depth, and regularisation last</h2>
         <p>
           The order encodes the measured costs. Width comes before depth because the width plateau is
           cheap to find (+0.004 over a 32-fold increase) and widening never destabilises training.
           Depth comes with a warning label because the depth tax is real and can be severe: the
-          depth-20 collapse to 0.750 happens even when the gradient ratios stay in the healthy 2&ndash;5
-          range, so it is not something initialisation fixes. Regularisation comes last because it is
+          collapse to 0.750 at depth 40 happens even when the gradient ratios stay in the healthy
+          2&ndash;5 range, so it is not something initialisation fixes. Regularisation comes last because it is
           only a lever when there is a gap to close, and on this problem there barely is — the
           0.015 &rarr; 0.016 non-result is the whole argument for not regularising by reflex.
         </p>
@@ -145,14 +162,14 @@ export default function TheOrderOfOperationsPage() {
               q: <>Why does the sequence scale width before adding depth?</>,
               options: [
                 "Width always beats depth on every problem",
-                "Width's returns plateau cheaply and predictably (16 → 512 buys only +0.004) and widening introduces no new gradient bottlenecks, whereas depth is taxed — depth 20 fell to 0.750 despite healthy gradients",
+                "Width's returns plateau cheaply and predictably (16 → 512 buys only +0.004) and widening introduces no new gradient bottlenecks, whereas depth is taxed — under plain SGD, depth 40 fell to 0.750 despite healthy gradients",
                 "Depth cannot be added after width",
               ],
               answer: 1,
               explain: <>Width is the cheap, safe scaling knob: a couple of doublings finds the plateau
-                and a wrong guess costs little. Depth carries the depth tax — the depth-20 collapse to
-                0.750 with healthy gradient ratios shows the cost can appear even when nothing looks
-                wrong — so it comes later and more cautiously.</>,
+                and a wrong guess costs little. Depth carries the depth tax — the collapse to 0.750 at
+                depth 40 with healthy gradient ratios shows the cost can appear even when nothing
+                looks wrong — so it comes later and more cautiously.</>,
             },
             {
               q: <>The order places regularisation fourth, after width and depth. Which measured result

@@ -5,6 +5,7 @@ import { CodeBlock } from "@/components/CodeBlock";
 import { CodeOutput } from "@/components/CodeOutput";
 import { PredictPrompt } from "@/components/PredictPrompt";
 import { GRIDWORLD_SETUP } from "@/lib/runtimeSetup";
+import { GpiLoop } from "@/components/figures/planning/PlanningDiagrams";
 
 export const metadata = {
   title: "Generalized policy iteration — Manifold",
@@ -79,6 +80,15 @@ show(V)`;
           iteration takes big steps all the way onto the evaluation line each time; value iteration takes a tiny step
           toward it before turning. Same crossing point.
         </Callout>
+
+        <GpiLoop
+          caption={<>Two processes, each of which spoils the other&rsquo;s work. Evaluation makes the
+            values honest about the current policy, which immediately makes the policy look improvable;
+            improvement changes the policy, which immediately makes the values stale. They only stop
+            fighting at the one pair where neither has anything to do — and that pair is V* and π*. The
+            algorithms in this track differ only in how far they let each process run before handing
+            over.</>}
+        />
 
         <h2>Any schedule works</h2>
         <p>

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 import { ARCH_DONE, ARCH_TOTAL } from "@/lib/architectureTrack";
+import { NetworkPair } from "@/components/figures/arch/NetworkDiagram";
 
 export const metadata = {
   title: "Architecture design — Manifold",
@@ -97,6 +98,16 @@ export default function ArchitectureDesignHub() {
           does not help, width plateaus at 16, and regularisation does not improve a gap that is already
           0.015.
         </Callout>
+
+        <NetworkPair
+          left={{ sizes: [2, 32, 32, 1], title: "The best model in the sweep", note: "0.9530 test accuracy · 1,185 parameters" }}
+          right={{ sizes: [2, 64, 64, 64, 64, 64, 64, 64, 64, 1], title: "Twenty-five times the parameters", note: "0.9320 test accuracy · 29,377 parameters" }}
+          caption={<>Thirty architectures were trained on one dataset to produce these two. The
+            larger network is not a near-miss that needed better tuning; it has 25 times the
+            parameters, takes far longer to train, and is two points <em>worse</em>. That is what
+            makes architecture a search rather than a guess — the relationship between size and
+            accuracy is not monotone, and the only way to know where you are on it is to measure.</>}
+        />
 
         <h2>The seven chapters</h2>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(258px, 1fr))", gap: 14, margin: "1.2rem 0" }}>

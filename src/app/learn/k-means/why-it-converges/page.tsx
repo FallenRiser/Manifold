@@ -65,7 +65,7 @@ export default function WhyItConvergesPage() {
 
         <h2>And there are only finitely many states</h2>
         <p>
-          A run of k-means is fully determined by its <em>assignment</em> — which of the <em>k</em>
+          A run of k-means is fully determined by its <em>assignment</em> — which of the <em>k</em>{" "}
           clusters each of the <em>n</em> points belongs to. There are at most <em>k</em><sup>n</sup>
           {" "}such assignments: a big number, but a <strong>finite</strong> one. Since inertia
           strictly drops whenever the assignment changes and can&rsquo;t cycle (it never increases),

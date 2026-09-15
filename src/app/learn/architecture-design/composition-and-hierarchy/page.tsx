@@ -2,6 +2,7 @@ import Link from "next/link";
 import { LessonHeader, Callout, Proof, PrevNext } from "@/components/lesson";
 import { M, MathBlock } from "@/components/Math";
 import { Quiz } from "@/components/Quiz";
+import { NetworkDiagram, NetworkPair } from "@/components/figures/arch/NetworkDiagram";
 
 export const metadata = {
   title: "Composition and feature hierarchy — Manifold",
@@ -113,6 +114,18 @@ export default function CompositionAndHierarchyPage() {
           interactions. Beyond that, the problem usually has no further hierarchy to exploit, and
           depth becomes overhead.
         </p>
+
+        <NetworkDiagram
+          sizes={[2, 16, 16, 16, 1]}
+          labels={["input", "edges", "parts", "objects", "output"]}
+          highlight={[2]}
+          caption={<>The hierarchy story, drawn with the names it is usually told with. Each column
+            can only build from what the column before it produced, which is the actual content of
+            &ldquo;composition&rdquo;: layer three cannot see the input, only layer two&rsquo;s
+            description of it. This is a real and important mechanism — and it buys nothing on two
+            moons, because a problem with no parts has no parts-of-parts. The labels on this diagram
+            are an aspiration about the data, not a property of the wiring.</>}
+        />
 
         <h2>The honest finding on moons</h2>
         <p>

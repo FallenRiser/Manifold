@@ -2,6 +2,8 @@ import Link from "next/link";
 import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 import { M } from "@/components/Math";
 import { PLANNING_DONE, PLANNING_TOTAL } from "@/lib/planningTrack";
+import { GridRow } from "@/components/figures/planning/GridField";
+import { V_STAR, PI_STAR } from "@/components/figures/planning/data.generated";
 
 export const metadata = {
   title: "Planning — Manifold",
@@ -52,6 +54,18 @@ export default function PlanningHub() {
           policies, you reach the best one in finite time. That loop, in its two famous forms, is the entire
           content of classical reinforcement learning.
         </p>
+
+        <GridRow
+          grids={[
+            { values: V_STAR, policy: PI_STAR, label: "V* and π*, the answer this track computes" },
+          ]}
+          caption={<>The end of the track, on the board it is computed on. Every number is what that
+            cell is worth under optimal play; every arrow is the move that achieves it. The value rises
+            smoothly toward the goal in the bottom-right and dips away from the pit in the top-right, and
+            the arrows are simply &ldquo;walk uphill&rdquo;. Getting from an empty grid to this picture is
+            what policy iteration and value iteration each do — measured by{" "}
+            <code>scripts/planning_cases.py</code>.</>}
+        />
 
         <Callout color={GOLD} title={<>Two algorithms, one idea</>}>
           <strong>Policy iteration</strong> evaluates each policy fully before improving it — big, careful steps.

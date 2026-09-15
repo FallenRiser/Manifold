@@ -1,6 +1,7 @@
 import { CodeBlock } from "@/components/CodeBlock";
 import { CLUSTER_SETUP } from "@/lib/runtimeSetup";
 import { LessonHeader, PrevNext } from "@/components/lesson";
+import { EmptyCluster } from "@/components/figures/kmeans/KmeansDiagrams";
 
 export const metadata = {
   title: "Empty clusters & edge cases — Manifold",
@@ -46,6 +47,14 @@ export default function EdgeCasesPage() {
           Either way the cluster count is preserved and inertia still won&rsquo;t increase. Good
           initialisation (k-means++) makes empty clusters rare in the first place.
         </p>
+
+        <EmptyCluster
+          caption={<>A centroid can be nearest to nothing. It is not a rare pathology — it happens
+            whenever a centroid is initialised out in empty space, or squeezed out between two others
+            that have grown — and the update step then asks for the mean of an empty set. Every
+            implementation has to choose a repair, and the choice is invisible in the API: scikit-learn
+            silently re-seeds the orphan on the point furthest from any centroid and carries on.</>}
+        />
 
         <h2>Ties in assignment</h2>
         <p>

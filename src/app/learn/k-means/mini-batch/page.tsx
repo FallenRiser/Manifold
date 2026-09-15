@@ -3,6 +3,8 @@ import Link from "next/link";
 import { CodeBlock } from "@/components/CodeBlock";
 import { CLUSTER_SETUP } from "@/lib/runtimeSetup";
 import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
+import { GroupedBars } from "@/components/figures/kmeans/KmeansCharts";
+import { SPEED } from "@/components/figures/kmeans/data.generated";
 
 export const metadata = {
   title: "Mini-batch k-means — Manifold",
@@ -47,6 +49,26 @@ export default function MiniBatchPage() {
             (worse clusters), but often runs <strong>an order of magnitude faster</strong> and streams
             data that never has to fit in memory at once. At large <em>n</em> that&rsquo;s usually a bargain.
         </Callout>
+
+        <GroupedBars
+          ylabel="seconds to fit (median of 5)"
+          format={(v) => v.toFixed(3)}
+          groups={SPEED.map((r) => ({
+            label: `n = ${r.n.toLocaleString()}`,
+            values: [r.lloyd, r.minibatch],
+          }))}
+          series={[
+            { name: "full Lloyd", color: "var(--c-clustering)" },
+            { name: "mini-batch", color: "var(--c-rl)" },
+          ]}
+          caption={<>&ldquo;An order of magnitude faster&rdquo; has a crossover, and it is worth knowing
+            where. At 20,000 points mini-batch is <strong>{(1 / SPEED[0].mbSpeedup).toFixed(1)}× slower</strong>{" "}
+            than simply clustering everything — the per-batch overhead is larger than the work it
+            saves. At 200,000 it is <strong>{SPEED[1].mbSpeedup}× faster</strong>. What it costs in
+            quality, at both sizes, is almost nothing: inertia lands{" "}
+            {SPEED[0].mbInertiaCost}% and {SPEED[1].mbInertiaCost}% above full k-means. The speed is
+            conditional; the quality hit genuinely is small.</>}
+        />
 
         <h2>When to reach for it</h2>
         <ul style={ul}>

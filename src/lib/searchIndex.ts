@@ -29,6 +29,9 @@ import { LEARNING_TRACK } from "./learningTrack";
 import { CAP_TRACK } from "./housingCapstoneTrack";
 import { NEO_TRACK } from "./neoCapstoneTrack";
 import { RL_CAP_TRACK } from "./rlCapstoneTrack";
+import { LOP_CAP_TRACK } from "./lopCapstoneTrack";
+import { FA_TRACK } from "./functionApproximationTrack";
+import { ENV_TRACK } from "./envBuildingTrack";
 import type { TrackChapter } from "./linearRegressionTrack";
 
 // Flat, static search index over every live lesson page, built from the track
@@ -74,6 +77,9 @@ const TRACKS: { name: string; accent: string; chapters: TrackChapter[] }[] = [
   { name: "Housing capstone", accent: "var(--c-regression)", chapters: CAP_TRACK },
   { name: "Asteroid-hazard capstone", accent: "var(--c-space)", chapters: NEO_TRACK },
   { name: "Warehouse-robot capstone", accent: "var(--c-warehouse)", chapters: RL_CAP_TRACK },
+  { name: "Learning to parry (field report)", accent: "var(--c-krat)", chapters: LOP_CAP_TRACK },
+  { name: "Function approximation", accent: "var(--c-rl)", chapters: FA_TRACK },
+  { name: "Building environments", accent: "var(--c-rl)", chapters: ENV_TRACK },
 ];
 
 export const SEARCH_INDEX: SearchEntry[] = TRACKS.flatMap((t) =>

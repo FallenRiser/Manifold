@@ -2,6 +2,7 @@ import Link from "next/link";
 import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 import { M, MathBlock } from "@/components/Math";
 import { CodeOutput } from "@/components/CodeOutput";
+import { PredictPrompt } from "@/components/PredictPrompt";
 
 export const metadata = {
   title: "Loss functions & robustness — Manifold",
@@ -63,7 +64,13 @@ export default function LossFunctionsPage() {
           labels</strong> (multiply their target by 8 — think fat-fingered data entry), then evaluate on the
           clean test set. Same model, three losses:
         </p>
-        <CodeOutput label="R² on clean test data after 3% of training labels corrupted">{`  loss = squared_error    test R²  0.226
+        <PredictPrompt
+          accent={TREES}
+          prompt={<>Corrupt 3% of the training labels — just 3% — and score on clean test data. Squared error, absolute error, Huber: how far apart do they finish?</>}
+          options={["Within a point or two of each other", "Squared error barely notices; it is the robust losses that suffer", "Squared error collapses; absolute and Huber hold", "Absolute error is worst — it ignores how big an error is"]}
+          nudge="Locked in. The measured answer is right below."
+        />
+        <CodeOutput source="scripts/boosting_cases.py" label="R² on clean test data after 3% of training labels corrupted">{`  loss = squared_error    test R²  0.226
   loss = absolute_error   test R²  0.794
   loss = huber            test R²  0.811`}</CodeOutput>
         <p>

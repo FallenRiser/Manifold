@@ -2,9 +2,13 @@
 
 import { useState } from "react";
 
-// A capstone decision point (PROJECT.md §10.4): the reader chooses what they'd
-// do next BEFORE seeing what we did. Every option gets honest feedback — some
-// choices are defensible, one is the senior move.
+// A decision point (PROJECT.md §10.4): the reader chooses what they would do next
+// BEFORE seeing what we did. Every option gets honest feedback — some choices are
+// defensible, one is the senior move.
+//
+// This is a SITE-WIDE primitive, not a capstone one. It used to live under
+// components/capstone/, which is exactly why it went unused outside them: the
+// strongest teaching device on the site existed in six places. See PROJECT.md §14.3.
 
 export type DPOption = {
   label: string;

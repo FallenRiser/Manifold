@@ -2,6 +2,9 @@ import Link from "next/link";
 import { LessonHeader, Callout, Proof, PrevNext } from "@/components/lesson";
 import { M, MathBlock } from "@/components/Math";
 import { Quiz } from "@/components/Quiz";
+import { PredictPrompt } from "@/components/PredictPrompt";
+import { SweepCurve } from "@/components/figures/SweepCurve";
+import { DROPOUT } from "@/components/figures/nnReg/data";
 
 export const metadata = {
   title: "Dropout rate and where to apply it — Manifold",
@@ -62,6 +65,30 @@ export default function DropoutRatePage() {
         <p style={{ fontSize: 13, color: "var(--muted)" }}>
           Train accuracy 1.000 at every rate.
         </p>
+
+        <PredictPrompt
+          accent={CORAL}
+          prompt={<>Sweeping the drop rate from 0 to 0.7 on this network: where does test accuracy
+            peak, and how sharp is the peak?</>}
+          options={[
+            "A sharp peak around 0.2 — more than that destroys the network",
+            "A broad plateau from about 0.2 upward, peaking near 0.5",
+            "Rising all the way to 0.7",
+            "Flat — the rate does not matter",
+          ]}
+          nudge="Locked in. The curve is below."
+        />
+
+        <SweepCurve
+          points={DROPOUT}
+          xlabel="drop rate p"
+          caption={<>The shallow inverted U, drawn. Almost all of the available gain arrives by{" "}
+            <M>{String.raw`p = 0.2`}</M>; the peak at 0.5 is worth another six thousandths over that,
+            and 0.7 gives most of it back. The operational reading is the flatness rather than the
+            peak: anywhere in 0.2–0.7 is within 0.006 of the best, so this is a knob worth setting
+            once and not tuning. Note also the left end — <M>{String.raw`p = 0.1`}</M> buys almost
+            nothing (0.754 against 0.751), so a timid dropout rate is close to no dropout at all.</>}
+        />
 
         <h2>Reading the curve</h2>
         <p>

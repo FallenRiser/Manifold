@@ -38,6 +38,10 @@
   --c-space: #4b3fd1;         /* deep-space indigo — asteroid-hazard capstone accent */
   --c-housing: #b0542f;       /* California terracotta — housing capstone accent */
   --c-warehouse: #5f7d0a;     /* hi-vis olive — warehouse-robot RL capstone accent */
+  --c-krat: #8f1d2f;          /* oxblood crimson — Lies-of-P imitation capstone accent.
+                                 Red was the one unclaimed family hue. Kept deeper and cooler
+                                 than --bad (#e0442c) so the two never read as the same ink;
+                                 never put both on one figure. */
 
   /* Always-dark "sky" palette for the asteroid capstone's special sections.
      Theme-independent (the sky is dark in light mode too), so defined once. */
@@ -74,26 +78,66 @@
   --bank-accent: #1f7a52;     /* term-deposit green */
   --bank-rule: #c8b78f;       /* ledger rule lines */
 
+  /* Lies-of-P capstone — the GASLIGHT skin. Theme-independent (a soot-black room is
+     soot-black in light mode too), like the sky and the ledger. Belle-Epoque gaslight:
+     soot, tarnished brass, ember. All original — no game art, no branding. */
+  --krat-soot: #0e0c0d;       /* the room */
+  --krat-panel: #1a1618;      /* an inset panel on it */
+  --krat-border: #2b2426;
+  --krat-ink: #f6efe6;        /* lamplit paper */
+  --krat-ink-soft: #d3c6b6;
+  --krat-faint: #9a8b7c;
+  --krat-brass: #c9a227;      /* the lamp, the gears, the rails */
+  --krat-brass-dim: #6f5c1c;
+  --krat-ember: #e8622c;      /* a struck spark — the perfect-guard flash */
+  --krat-blood: #b3202f;      /* damage, failure, the cost of a missed window */
+  --krat-ash: #cbbfae;        /* drifting motes */
+
+  /* Warehouse-robot capstone — the SHOP FLOOR skin. Theme-independent, like the
+     sky and the ledger above: sealed concrete is sealed concrete in either mode.
+     Deliberately neither dark (that is the asteroid capstone) nor paper (that is
+     housing): a painted industrial slab with hi-vis floor markings. */
+  --wh-slab: #c7c2b2;         /* sealed concrete */
+  --wh-slab-2: #bcb7a6;       /* a worn patch / inset panel */
+  --wh-seam: #a8a291;         /* the saw-cut seams between slabs */
+  --wh-ink: #1e2019;          /* stencil black */
+  --wh-ink-soft: #454838;
+  --wh-faint: #6d7060;
+  --wh-tape: #efc200;         /* hi-vis floor tape */
+  --wh-tape-deep: #b98f00;    /* tape in shadow / on light backgrounds */
+  --wh-spill: #b3341f;        /* the spill wall */
+  --wh-route: #3f6a10;        /* a marked, safe route */
+
   --good: #009155;
   --warn: #d97a00;
   --bad: #e0442c;            /* riso warm red */
+
+  --selection: color-mix(in srgb, var(--brand) 22%, transparent);
+  /* A raised card casts a shadow on paper. In dark it cannot — see the dark override. */
+  --shadow-lift: 0 14px 34px -20px color-mix(in srgb, var(--ink) 34%, transparent);
 }
 
-/* ----- Dark theme: warm-neutral paper-at-night, riso inks lifted ----- */
+/* ----- Dark theme: warm-neutral paper-at-night, riso inks lifted -----
+   REWORKED 2026-09-15. The first version was near-black (#121211) with 8-unit steps between
+   paper / surface / surface-2, so the whole page rendered as one flat black field: cards did not
+   lift, hairlines vanished, and #eceae4 type at 15.6:1 glared. Perceived lightness differences
+   COMPRESS toward black, so a dark ramp needs bigger steps than its light counterpart, not the
+   same ones inverted. The ground is now lifted to L*≈9 and warmed (R>G>B, mirroring the paper),
+   and every step is spaced in L* rather than in hex: 9 / 12 / 13 / 17 / 22 / 27 / 34. */
 .dark {
-  --paper: #121211;
-  --surface: #1a1a19;
-  --surface-2: #232321;
-  --border: #2b2b28;
-  --border-strong: #363631;
-  --ink: #eceae4;
-  --muted: #a3a199;
-  --faint: #6f6e66;
+  --paper: #1a1916;          /* L* 8.8 — dark stock, deliberately not black */
+  --surface: #2a2926;        /* L* 16.6 — cards genuinely lift off the page (1.21:1) */
+  --surface-2: #353431;      /* L* 21.7 — a fill inside a card */
+  --border: #41403d;         /* 1.70:1 on paper — hairlines you can actually see */
+  --border-strong: #54534f;
+  --ink: #e9e5dc;            /* 14.0:1, down from 15.6 — the lifted ground removes the glare */
+  --muted: #a9a59b;          /* 7.1:1 */
+  --faint: #837f75;          /* 4.4:1 — dark mode needs more than light's 2.7 to read as quiet */
 
-  --panel: #171716;
-  --canvas: #161615;
-  --cta: #4da8ec;            /* lifted riso blue, dark text */
-  --cta-text: #10131a;
+  --panel: #23221f;
+  --canvas: #201f1b;         /* plotting ground; the --border-strong frame does the separating */
+  --cta: #0078bf;            /* the SAME riso blue ink as light — white on it is 4.73:1 here */
+  --cta-text: #ffffff;
 
   --brand: #eceae4;
   --brand-2: #ff6ec0;
@@ -111,10 +155,17 @@
   --c-space: #9385ff;         /* deep-space indigo → periwinkle in dark */
   --c-housing: #e5936a;       /* California terracotta, lifted for dark */
   --c-warehouse: #a9cb2e;     /* hi-vis olive → safety lime in dark */
+  --c-krat: #e2596e;          /* oxblood → rose-crimson in dark (cooler than --bad #ff6b75) */
 
   --good: #2ecc8f;
   --warn: #f0b429;
   --bad: #ff6b75;
+
+  /* A near-white selection wash behind near-white text is unreadable; use the blue ink. */
+  --selection: color-mix(in srgb, var(--c-regression) 34%, transparent);
+  /* The light shadow mixes --ink, which is near-white here — it painted a white haze under
+     every hovered card. Now that --surface sits well above --paper a real shadow works. */
+  --shadow-lift: 0 16px 36px -20px rgba(0, 0, 0, 0.8);
 }
 
 @theme inline {
@@ -161,7 +212,7 @@ body {
 }
 
 ::selection {
-  background: color-mix(in srgb, var(--brand) 22%, transparent);
+  background: var(--selection);
 }
 
 /* ----- Lesson prose ----- */
@@ -238,7 +289,7 @@ body {
 .gcard:hover {
   transform: translateY(-3px);
   border-color: color-mix(in srgb, var(--accent) 55%, var(--border));
-  box-shadow: 0 14px 34px -20px color-mix(in srgb, var(--ink) 34%, transparent);
+  box-shadow: var(--shadow-lift);
 }
 .gtrack {
   display: flex;
@@ -255,6 +306,91 @@ body {
 a.gtrack { color: var(--ink); }
 a.gtrack:hover { color: var(--accent); padding-left: 5px; }
 .gtrack--soon { color: var(--faint); }
+
+/* ----- The shelf: one index row per family, the way a book lists its parts -----
+   Used on the landing page and the map. Deliberately NOT another card grid: the
+   point is to show the size of the library at a glance, so the rows are dense,
+   the page count is the loudest thing in the row, and the family colour is the
+   only chrome. Counts come from src/lib/catalog.ts, never typed by hand. */
+.shelf { border-top: 1px solid var(--border); }
+.shelf-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 2px 18px;
+  align-items: baseline;
+  padding: 15px 4px 16px 17px;
+  border-bottom: 1px solid var(--border);
+  box-shadow: inset 2px 0 0 var(--accent);
+  transition: background 0.2s ease;
+}
+.shelf-row:hover { background: color-mix(in srgb, var(--accent) 6%, transparent); }
+/* the signature visual spans the whole row and is vertically centred against it */
+.shelf-glyph {
+  grid-column: 1;
+  grid-row: 1 / span 3;
+  align-self: center;
+  display: block;
+  opacity: 0.92;
+}
+.shelf-glyph svg { width: 88px; height: 50px; }
+.shelf-name {
+  grid-column: 2;
+  grid-row: 1;
+  font-family: var(--font-display);
+  font-size: 17.5px;
+  font-weight: 500;
+  color: var(--accent);
+  letter-spacing: -0.005em;
+}
+.shelf-figure { grid-column: 3; grid-row: 1; text-align: right; white-space: nowrap; }
+.shelf-num { font-family: var(--font-serif); font-size: 23px; color: var(--ink); line-height: 1; }
+.shelf-unit { font-size: 11.5px; color: var(--muted); margin-left: 5px; }
+.shelf-meta { grid-column: 2; grid-row: 2; font-size: 12.5px; color: var(--muted); margin-top: 1px; }
+.shelf-submeta {
+  grid-column: 3;
+  grid-row: 2;
+  text-align: right;
+  font-size: 11.5px;
+  color: var(--faint);
+  white-space: nowrap;
+}
+.shelf-tracks {
+  grid-column: 2 / -1;
+  grid-row: 3;
+  margin-top: 9px;
+  font-size: 13.5px;
+  line-height: 1.7;
+  color: var(--faint);
+}
+.shelf-tracks a { color: var(--muted); text-decoration: none; }
+.shelf-tracks a:hover { color: var(--accent); }
+.shelf-sep { color: var(--faint); padding: 0 7px; }
+
+/* ----- The proof strip: the site's real size, stated once, under the hero ----- */
+.proof {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 26px;
+  margin-top: 30px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+.proof-item { display: flex; align-items: baseline; gap: 6px; }
+.proof-num { font-family: var(--font-serif); font-size: 25px; color: var(--ink); line-height: 1.1; }
+.proof-label { font-size: 12.5px; color: var(--muted); }
+
+@media (max-width: 620px) {
+  /* the glyph keeps its meaning at half size; the row would be unreadable if it kept full width */
+  .shelf-row { padding-left: 14px; gap: 2px 12px; }
+  .shelf-glyph svg { width: 56px; height: 32px; }
+  .shelf-num { font-size: 20px; }
+  .proof { gap: 0 18px; }
+  .proof-num { font-size: 21px; }
+}
+@media (max-width: 420px) {
+  .shelf-glyph { display: none; }
+}
 
 /* ----- Editorial chapter headers ----- */
 .chapter { border-top: 1px solid var(--border); margin-top: 48px; padding-top: 24px; }
@@ -379,6 +515,9 @@ a.gtrack:hover { color: var(--accent); padding-left: 5px; }
 .lesson-drawer { display: none; }
 
 @media (max-width: 900px) {
+  /* four footer columns are too many here, but one is too few — pair them up */
+  .footer-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px 32px; }
+
   .lesson-shell {
     grid-template-columns: minmax(0, 1fr);
     padding: 20px 16px 96px;
@@ -458,6 +597,28 @@ a.gtrack:hover { color: var(--accent); padding-left: 5px; }
 }
 
 /* ----- Responsive collapses ----- */
+/* the nav crowds the wordmark on a phone — tighten it and stop the labels wrapping mid-word */
+@media (max-width: 620px) {
+  .site-nav { gap: 13px !important; }
+  .site-nav a { font-size: 13px; white-space: nowrap; }
+}
+/* Below ~430px the wordmark + three nav labels + two icon buttons do not fit on one line: the nav
+   overflowed the layout viewport by ~18px at 390px (the toggle ran off the right edge). Hiding
+   "Start here" alone was not enough, so the brand shrinks and every gutter tightens with it. */
+@media (max-width: 430px) {
+  .site-nav a[href$="/learn/start-here"] { display: none; }
+  .site-nav { gap: 10px !important; }
+  .site-brand { gap: 7px !important; }
+  .site-brand span { font-size: 16px; }
+  .site-brand svg { width: 24px; height: 24px; }
+  header > div { padding-left: 16px !important; padding-right: 16px !important; }
+}
+/* Narrower still (360px and down) even the shrunken wordmark does not fit — the mark alone
+   carries the brand, which is what it is for. */
+@media (max-width: 400px) {
+  .site-brand span { display: none; }
+}
+
 @media (max-width: 760px) {
   .hero-grid { grid-template-columns: 1fr !important; }
   .footer-grid { grid-template-columns: 1fr !important; gap: 28px !important; }
@@ -498,6 +659,37 @@ a.gtrack:hover { color: var(--accent); padding-left: 5px; }
 @keyframes neoSkyIn { from { opacity: 0; } to { opacity: 0.9; } }
 .neo-sky { opacity: 0.9; animation: neoSkyIn 1100ms ease-out both; }
 
+/* Lies-of-P capstone: the gaslight comes up ONCE on arrival — ash motes fade in and
+   the lamp warms. Punctuation, never a loop; the reduced-motion rule above kills it. */
+@keyframes kratAshIn { from { opacity: 0; } to { opacity: 0.55; } }
+.krat-ash { opacity: 0.55; animation: kratAshIn 1400ms ease-out both; }
+@keyframes kratLampIn { from { opacity: 0; } to { opacity: 1; } }
+.krat-lamp { animation: kratLampIn 1800ms ease-out both; }
+
+/* Warehouse capstone: hi-vis hazard tape, drawn in CSS so it can band any edge.
+   The chevrons travel ONCE on arrival, like a conveyor starting up — punctuation,
+   never a loop. The reduced-motion rule above neutralises it. */
+.wh-tape {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    var(--wh-tape) 0 10px,
+    var(--wh-ink) 10px 20px
+  );
+}
+@keyframes whConveyor { from { background-position: -56px 0; } to { background-position: 0 0; } }
+.wh-tape-run { animation: whConveyor 900ms cubic-bezier(0.2, 0.7, 0.3, 1) both; }
+
+/* The concrete slab itself: saw-cut seams on a 46px grid, plus a faint sheen so
+   the panel does not read as flat card stock. */
+.wh-slab {
+  background-color: var(--wh-slab);
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--wh-seam) 55%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--wh-seam) 55%, transparent) 1px, transparent 1px),
+    radial-gradient(120% 90% at 18% 0%, rgba(255, 255, 255, 0.22), rgba(0, 0, 0, 0.06) 70%);
+  background-size: 46px 46px, 46px 46px, 100% 100%;
+}
+
 /* ----- sugar-high syntax tokens — restrained print pigments in both modes
    (no Dracula / neon: PROJECT.md §10.1 rule 5) ----- */
 .sh-block {
@@ -520,7 +712,7 @@ a.gtrack:hover { color: var(--accent); padding-left: 5px; }
   color: var(--ink);
   --sh-keyword: #a98fd6;      /* lifted riso violet */
   --sh-string: #2bb8c0;       /* lifted riso teal */
-  --sh-comment: #6f6e66;      /* warm faint */
+  --sh-comment: #837f75;      /* warm faint */
   --sh-class: #ff6ec0;        /* lifted riso pink */
   --sh-entity: #f0b429;       /* lifted riso gold */
   --sh-property: #4da8ec;     /* lifted riso blue */
@@ -530,3 +722,40 @@ a.gtrack:hover { color: var(--accent); padding-left: 5px; }
 
 
 
+
+/* ----- Throughlines: the cross-family links, as a set of lines rather than a node graph ----- */
+.throughlines {
+  margin-top: 26px;
+  border-top: 1px solid var(--border);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+  column-gap: 34px;
+}
+.throughline {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 11px 2px 12px;
+  border-bottom: 1px solid var(--border);
+}
+.throughline-pair {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 7px;
+  flex-shrink: 0;
+}
+.throughline-fam {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  white-space: nowrap;
+}
+a.throughline-fam:hover { text-decoration: underline; text-underline-offset: 3px; }
+.throughline-arrow { color: var(--faint); font-size: 12px; }
+.throughline-why { font-size: 13px; color: var(--muted); line-height: 1.5; }
+
+@media (max-width: 560px) {
+  .throughlines { grid-template-columns: 1fr; }
+  .throughline-why { font-size: 12.5px; }
+}

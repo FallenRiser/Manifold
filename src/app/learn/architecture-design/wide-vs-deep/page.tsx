@@ -2,6 +2,9 @@ import Link from "next/link";
 import { LessonHeader, Callout, Proof, PrevNext } from "@/components/lesson";
 import { M, MathBlock } from "@/components/Math";
 import { Quiz } from "@/components/Quiz";
+import { Dumbbell } from "@/components/figures/Dumbbell";
+import { BUDGET } from "@/components/figures/arch/data";
+import { PredictPrompt } from "@/components/PredictPrompt";
 
 export const metadata = {
   title: "Wide-shallow vs deep-narrow — Manifold",
@@ -93,6 +96,19 @@ export default function WideVsDeepPage() {
           Five seeds, 100 epochs each.
         </p>
 
+        <PredictPrompt
+          accent={CORAL}
+          prompt={<>A fixed budget of roughly a thousand parameters, spent six ways — from one
+            hidden layer of 333 units to eight layers of 10. Which shape wins, and by how much?</>}
+          options={[
+            "The deepest — depth is what makes networks powerful",
+            "A middle shape, 3 or 4 layers",
+            "The shallowest, but by barely more than the seed noise",
+            "The shallowest, and by a wide margin",
+          ]}
+          nudge="Locked in. The six shapes are plotted below."
+        />
+
         <h2>Reading the result</h2>
         <p>
           The wide-shallow configuration — one hidden layer of 333 units — wins on test accuracy (0.953),
@@ -107,6 +123,18 @@ export default function WideVsDeepPage() {
           0.943). After that it flatlines: 4, 6, and 8 layers all sit in the 0.943--0.944 band, having already
           paid the depth tax and gained nothing further from it.
         </p>
+
+        <Dumbbell
+          rows={BUDGET.map((r) => ({ init: r.label, a: r.test }))}
+          seriesLabels={["test accuracy at a fixed parameter budget"]}
+          ticks={[0.94, 0.95, 0.96]}
+          caption={<>One budget of roughly 600–1,300 parameters, spent six ways. The ordering is
+            monotone in the direction the chapter claims — shallower is better — but look at the
+            axis before drawing a strong conclusion: the whole spread is 1.2 points, and the
+            per-shape seed spread reaches 0.0066. The honest reading is that shape is a second-order
+            effect at a fixed budget on this problem, and that the safe default is therefore the
+            cheap one.</>}
+        />
 
         <h2>Why depth costs here</h2>
         <p>

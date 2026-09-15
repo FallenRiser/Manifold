@@ -2,6 +2,8 @@ import Link from "next/link";
 import { LessonHeader, Callout, Proof, PrevNext } from "@/components/lesson";
 import { M, MathBlock } from "@/components/Math";
 import { Quiz } from "@/components/Quiz";
+import { SweepCurve } from "@/components/figures/SweepCurve";
+import { DECAY_SGD, DECAY_ADAMW } from "@/components/figures/nnReg/data";
 
 export const metadata = {
   title: "How much decay — Manifold",
@@ -83,6 +85,18 @@ export default function HowMuchDecayPage() {
           much the over-wide network overfits the noise, so turning the knob moves the result.
         </p>
 
+        <SweepCurve
+          points={DECAY_SGD}
+          log
+          xlabel="weight decay (log scale) — SGD + momentum"
+          xticks={[0.0001, 0.001, 0.005, 0.01, 0.05]}
+          caption={<>The search done properly: a log-spaced sweep, read on validation. This is what a
+            <em> mild</em> effect looks like — a rise of three thousandths from 0.768 to 0.771, a peak
+            at 1e-2, and a fall after it. The peak is real and reproducible, and it is also small
+            enough that a reader should be asking whether it survives a different seed. Hold that
+            thought for the next case.</>}
+        />
+
         <h2>Case two: a problem where decay barely matters</h2>
         <p>
           Now the classifier this track is built around — the 3&times;256 MLP on 250 noisy points — swept
@@ -127,6 +141,22 @@ export default function HowMuchDecayPage() {
           0.02-point gain that dropout will hand you in the next chapter. On this problem, weight decay is
           simply not the binding regulariser.
         </p>
+
+        <SweepCurve
+          points={DECAY_ADAMW}
+          log
+          markBest={false}
+          xlabel="weight decay (log scale) — full-batch AdamW"
+          xticks={[0.01, 0.1]}
+          caption={<>The same knob, the same network, a different optimiser and batching — and the
+            curve is flat within noise across four orders of magnitude, with the largest decay ending
+            marginally <em>below</em> the smallest. Two reasons, and both are in the setup rather than
+            in the idea of weight decay: full-batch training gives only ~400 steps, so the per-step
+            shrinkage never compounds; and the network memorises these 250 points with small weights
+            anyway, so there is no large weight for the penalty to find. A regulariser that does
+            nothing is not a broken regulariser — it is a regulariser aimed at a failure this run does
+            not have.</>}
+        />
 
         <h2>Why the two problems differ</h2>
         <p>

@@ -1,6 +1,8 @@
 import { CodeBlock } from "@/components/CodeBlock";
 import { CLUSTER_SETUP } from "@/lib/runtimeSetup";
 import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
+import { ScatterRow } from "@/components/figures/kmeans/Scatter";
+import { OUTLIER } from "@/components/figures/kmeans/data.generated";
 
 export const metadata = {
   title: "k-medians & k-modes — Manifold",
@@ -43,6 +45,19 @@ export default function KMediansModesPage() {
           a different route to robustness than k-medoids, via the L1 norm rather than restricting centers
           to real points. It&rsquo;s a natural choice when your features are heavy-tailed.
         </p>
+
+        <ScatterRow
+          panels={[
+            { points: OUTLIER.points, labels: OUTLIER.labels, centroids: OUTLIER.centroids, ghosts: OUTLIER.cleanCentroids, label: "one outlier added, k = 3" },
+          ]}
+          caption={<>Why the L1 centre is worth the trouble. These are three clean blobs of fifty points
+            plus a single point out at (18, 18). The dashed rings are where the three centroids sat
+            before that one point was added. k-means spends an entire centroid on the outlier — its
+            cluster holds exactly one point — which forces the other two centroids to cover three real
+            blobs between them, and the agreement with the true groups collapses from{" "}
+            {OUTLIER.cleanAri} to {OUTLIER.dirtyAri}. The median has a breakdown point of 50%; the mean
+            has a breakdown point of one point, and this is that one point.</>}
+        />
 
         <h2>k-modes — built for categories</h2>
         <p>

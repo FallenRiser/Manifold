@@ -5,6 +5,8 @@ import { CodeBlock } from "@/components/CodeBlock";
 import { CodeOutput } from "@/components/CodeOutput";
 import { PredictPrompt } from "@/components/PredictPrompt";
 import { GRIDWORLD_SETUP } from "@/lib/runtimeSetup";
+import { GridRow, TERMINALS_ONLY } from "@/components/figures/planning/GridField";
+import { SWEEP_SCHEDULES } from "@/components/figures/planning/data.generated";
 
 export const metadata = {
   title: "Asynchronous dynamic programming — Manifold",
@@ -47,7 +49,7 @@ print("in-place, reverse 15..0   :", in_place(range(nS - 1, -1, -1)), "sweeps")`
         chips={[{ label: "Reinforcement learning", color: GOLD }, { label: "Practitioner", color: GOLD }]}
         time="about 8 minutes"
         title={<>Asynchronous dynamic programming</>}
-        intro={<>Every algorithm so far updated all states together, each sweep reading only the <em>previous</em>
+        intro={<>Every algorithm so far updated all states together, each sweep reading only the <em>previous</em>{" "}
           sweep&rsquo;s values. That lockstep is a convenience, not a requirement. If you update states one at a time
           and let each read the freshest values available, information races across the grid far faster — and the
           order you choose can make the difference between seven sweeps and two.</>}
@@ -84,6 +86,22 @@ in-place, reverse 15..0   : 2 sweeps`}</CodeOutput>
             "Order never matters for correctness",
           ]}
           nudge="Locked in. The win came from matching the order to where value originates — that's problem-specific."
+        />
+
+        <GridRow
+          mode="count"
+          scale={7}
+          grids={SWEEP_SCHEDULES.map((s) => ({
+            values: s.settled.map((v) => (v < 0 ? 0 : v)),
+            policy: TERMINALS_ONLY,
+            label: `${s.name} · ${s.sweeps} sweeps`,
+          }))}
+          caption={<>The same backups in three orders, with each cell labelled by the sweep on which its
+            value last moved. Jacobi and forward in-place both crawl: information leaves the goal one
+            ring per sweep, so the far corner is still changing on sweep 6. Reverse order sweeps{" "}
+            <em>from</em> the goal, so a single pass carries the goal&rsquo;s value all the way across the
+            board and every cell is finished at 1. Same arithmetic, same answer, one third of the
+            work — and nothing about the order was allowed to change the fixed point.</>}
         />
 
         <h2>The freedom, and its one rule</h2>

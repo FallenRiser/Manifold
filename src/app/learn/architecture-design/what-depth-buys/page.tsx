@@ -2,6 +2,8 @@ import Link from "next/link";
 import { LessonHeader, Callout, Proof, PrevNext } from "@/components/lesson";
 import { M, MathBlock } from "@/components/Math";
 import { Quiz } from "@/components/Quiz";
+import { SweepCurve } from "@/components/figures/SweepCurve";
+import { DEPTH_SWEEP } from "@/components/figures/arch/data";
 
 export const metadata = {
   title: "What depth buys — Manifold",
@@ -127,6 +129,16 @@ export default function WhatDepthBuysPage() {
           compose and instead adds optimisation difficulty. On a problem with genuine hierarchy — images,
           audio, language — the crossover can happen at depth 50 or 150, not at depth 2.
         </Callout>
+
+        <SweepCurve
+          points={DEPTH_SWEEP.map((p) => ({ x: p.x, a: p.y }))}
+          xlabel="hidden layers, width 32"
+          caption={<>Depth, swept the same way width was, and the contrast is the point. Width bought
+            18 points before it plateaued. Depth buys 3.5 points going from one layer to two — and
+            then nothing: every depth from 2 to 20 sits inside a 1.2-point band, with the best row at
+            depth 2. Twenty layers and 20,193 parameters score 0.9430 against two layers and
+            1,185 parameters at 0.9530. On this problem depth is not a capacity knob at all.</>}
+        />
 
         <h2>Why the first hidden layer does most of the work</h2>
         <p>

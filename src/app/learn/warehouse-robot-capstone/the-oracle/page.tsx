@@ -5,7 +5,7 @@ import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 import { M } from "@/components/Math";
 import { Quiz } from "@/components/Quiz";
 import { PredictPrompt } from "@/components/PredictPrompt";
-import { AnalystQuestion, TransferBox, PlaybookRule } from "@/components/capstone/pedagogy";
+import { WorkOrder, TransferBox, PlaybookRule } from "@/components/capstone/warehouse";
 import { WAREHOUSE_SETUP } from "@/lib/runtimeSetup";
 
 export const metadata = {
@@ -34,10 +34,10 @@ export default function TheOracle() {
       />
 
       <div className="lesson">
-        <AnalystQuestion accent={OLIVE} label="The engineer's question" icon="🤖">
+        <WorkOrder act={2} n={9}>
           How much headroom is there? If my agent scores 18, is that 85% of what is possible or 40% — and do I
           have any way of knowing?
-        </AnalystQuestion>
+        </WorkOrder>
 
         <h2>The privilege we are about to use once</h2>
         <p>
@@ -257,7 +257,7 @@ zero-risk         |   16.44   0.0000    33.6`}</CodeOutput>
           ]}
         />
 
-        <TransferBox accent={OLIVE}>
+        <TransferBox>
           Get a ceiling however you can — exact solution, human expert, relaxed problem, or an oracle on a
           scaled-down twin — before you start optimising. Without one, &ldquo;we improved 5%&rdquo; is unreadable:
           it might be the last 5% available or the first of eighty. And when you do have an oracle, inspect its
@@ -265,7 +265,7 @@ zero-risk         |   16.44   0.0000    33.6`}</CodeOutput>
           reward function actually asked for.
         </TransferBox>
 
-        <PlaybookRule n={9} accent={OLIVE}>
+        <PlaybookRule n={9}>
           <strong>Establish the ceiling before you optimise</strong>, keep the discounted{" "}
           <M>{String.raw`V^*`}</M> and the undiscounted scoreboard clearly separate, and read the optimal
           policy&rsquo;s risk appetite as a review of your reward function.

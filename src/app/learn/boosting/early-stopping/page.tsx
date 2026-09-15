@@ -2,6 +2,7 @@ import Link from "next/link";
 import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 import { M } from "@/components/Math";
 import { CodeOutput } from "@/components/CodeOutput";
+import { PredictPrompt } from "@/components/PredictPrompt";
 import { Quiz } from "@/components/Quiz";
 import { LabFrame } from "@/components/LabFrame";
 import { BoostingEarlyStopLab } from "@/components/labs/BoostingEarlyStopLab";
@@ -38,7 +39,13 @@ export default function EarlyStoppingPage() {
           modelling noise. The test-error curve is a <strong>hump</strong>: down, then a minimum, then slowly back
           up.
         </p>
-        <CodeOutput label="deep GBM (lr 0.1, depth 5) on housing — train vs test R²">{`   50 trees   train R² 0.837   test R² 0.797
+        <PredictPrompt
+          accent={TREES}
+          prompt={<>A deep GBM (learning rate 0.1, depth 5) on housing, taken from 50 trees to 3,000. Train R&sup2; climbs from 0.837 to 0.995 — it is memorising. What does test R&sup2; do over the same sweep?</>}
+          options={["Collapses once training R² passes ~0.95", "Rises to a peak, then drifts down slightly", "Rises the whole way — more trees never hurt", "Flat from about 300 trees on"]}
+          nudge="Locked in. The measured answer is right below."
+        />
+        <CodeOutput source="scripts/boosting_cases.py" label="deep GBM (lr 0.1, depth 5) on housing — train vs test R²">{`   50 trees   train R² 0.837   test R² 0.797
   100 trees   train R² 0.873   test R² 0.822
   300 trees   train R² 0.923   test R² 0.840
   700 trees   train R² 0.956   test R² 0.845
@@ -82,7 +89,13 @@ export default function EarlyStoppingPage() {
           scoring per round and removes the need to guess the tree count at all — you set{" "}
           <code>n_estimators</code> generously high and let the data decide.
         </p>
-        <CodeOutput label="GBM with a validation fraction, patience 10 (housing)">{`n_estimators set to 3000, learning_rate 0.05
+        <PredictPrompt
+          accent={TREES}
+          prompt={<>Now stop guessing: set <code>n_estimators=3000</code>, hold out a validation fraction, and let patience decide. The hand-tuned 300-tree model reached 0.815. Where does the automatic one land?</>}
+          options={["It overshoots and overfits", "Within a few thousandths of the hand-tuned model", "Two or three points worse — automation costs you", "Better — it finds a setting you would not have tried"]}
+          nudge="Locked in. The measured answer is right below."
+        />
+        <CodeOutput source="scripts/boosting_cases.py" label="GBM with a validation fraction, patience 10 (housing)">{`n_estimators set to 3000, learning_rate 0.05
 -> stopped at 543 trees   test R² 0.813
 (vs 0.815 for the hand-tuned 300 — essentially free, no guessing)`}</CodeOutput>
 

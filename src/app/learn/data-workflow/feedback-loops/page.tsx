@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
-import { DecisionPoint } from "@/components/capstone/DecisionPoint";
+import { DecisionPoint } from "@/components/DecisionPoint";
 
 export const metadata = {
   title: "Feedback loops — Manifold",

@@ -1,6 +1,8 @@
 import { CodeBlock } from "@/components/CodeBlock";
 import { CLUSTER_SETUP } from "@/lib/runtimeSetup";
 import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
+import { ScatterRow } from "@/components/figures/kmeans/Scatter";
+import { OUTLIER } from "@/components/figures/kmeans/data.generated";
 
 export const metadata = {
   title: "k-medoids (PAM) — Manifold",
@@ -51,6 +53,18 @@ export default function KMedoidsPage() {
             real document), which is often more useful than an average.
           </li>
         </ul>
+
+        <ScatterRow
+          panels={[
+            { points: OUTLIER.points, labels: OUTLIER.labels, centroids: OUTLIER.centroids, label: "k-means: the centre can be anywhere" },
+          ]}
+          caption={<>The failure a medoid cannot have. A centroid is a computed point and is free to sit
+            wherever the arithmetic drags it — here, out on top of a single outlier, which costs the
+            clustering its agreement with the real groups ({OUTLIER.cleanAri} → {OUTLIER.dirtyAri}). A
+            medoid must be one of your actual data points, so the worst it can do is pick an unhelpful
+            member; it can never invent a location out in empty space. That constraint is also what
+            makes it applicable when your objects have distances but no coordinates to average.</>}
+        />
 
         <h2>PAM and its faster cousins</h2>
         <p>

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 import { M } from "@/components/Math";
 import { CodeOutput } from "@/components/CodeOutput";
+import { PredictPrompt } from "@/components/PredictPrompt";
 
 export const metadata = {
   title: "Histogram boosting: LightGBM & speed — Manifold",
@@ -94,7 +95,13 @@ export default function HistogramPage() {
         </ul>
 
         <Callout color={TREES} title={<>Speed, measured</>}>
-          <CodeOutput label="covtype 25k — accuracy and fit time, 700 rounds">{`  RandomForest(300)      acc 0.842    1.5 s
+          <PredictPrompt
+            accent={TREES}
+            prompt={<>The random forest scores 0.842 in 1.5 seconds. Seven hundred rounds of histogram boosting will cost roughly ten times that. What does the extra compute buy in accuracy?</>}
+            options={["Nothing — the forest is already at the ceiling", "About one point", "About two points", "Five points or more"]}
+            nudge="Locked in. The measured answer is right below."
+          />
+          <CodeOutput source="scripts/boosting_cases.py" label="covtype 25k — accuracy and fit time, 700 rounds">{`  RandomForest(300)      acc 0.842    1.5 s
   XGBoost(700)           acc 0.854   15.7 s
   LightGBM(700)          acc 0.865    9.7 s`}</CodeOutput>
           On this task LightGBM is both the most accurate <em>and</em> ~1.6× faster than XGBoost, thanks to

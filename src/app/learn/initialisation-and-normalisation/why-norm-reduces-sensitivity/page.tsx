@@ -2,6 +2,10 @@ import Link from "next/link";
 import { LessonHeader, Callout, Proof, PrevNext } from "@/components/lesson";
 import { M, MathBlock } from "@/components/Math";
 import { Quiz } from "@/components/Quiz";
+import { PredictPrompt } from "@/components/PredictPrompt";
+import { Dumbbell } from "@/components/figures/Dumbbell";
+import { CodeOutput } from "@/components/CodeOutput";
+import { INIT_SENSITIVITY, SENSITIVITY_SPREAD, MAJORITY_CLASS } from "@/components/figures/initNorm/data";
 
 export const metadata = {
   title: "Why normalisation reduces init sensitivity — Manifold",
@@ -39,7 +43,7 @@ export default function WhyNormReducesSensitivityPage() {
         </p>
         <p>
           We saw both failure modes measured directly. Initialise the weights a touch too small and the
-          activation scale collapses — by layer 2 it is already <strong>0.0000</strong>, and the
+          activation scale collapses — by layer 8 it is down to <strong>1.07 &times; 10<sup>-20</sup></strong>, and the
           gradient that flows back through it is dead. Initialise a touch too large and the scale
           explodes — by layer 8 the activations reach <strong>4.20 × 10<sup>9</sup></strong>, and the
           gradient overflows. There is only a narrow band of initial scales for which{" "}
@@ -61,7 +65,7 @@ export default function WhyNormReducesSensitivityPage() {
         <p>
           Insert a normalisation layer after each linear layer and the compounding chain is broken.
           Normalisation subtracts the mean and divides by the standard deviation of its input, so
-          whatever scale arrives — 0.0000, 4.20 × 10<sup>9</sup>, anything — leaves as roughly unit
+          whatever scale arrives — 10<sup>-20</sup>, 4.20 × 10<sup>9</sup>, anything — leaves as roughly unit
           variance. The factor <M>{String.raw`c`}</M> for the <em>normalised</em> output is forced back
           to 1 at every single layer, so it can never accumulate into <M>{String.raw`c^{D}`}</M>.
         </p>
@@ -70,7 +74,7 @@ export default function WhyNormReducesSensitivityPage() {
           std 0.61 to 0.39 — a slow leak, because even a well-chosen <M>{String.raw`c`}</M> is not
           exactly 1. The LayerNorm-simulated version holds between 0.48 and 0.65 across all ten layers:
           the scale is pinned, not drifting. And the pathological cases cannot happen at all with
-          normalisation after each layer: the too-small init cannot vanish to 0.0000 because the scale
+          normalisation after each layer: the too-small init cannot decay away because the scale
           is divided back up, and the too-large init cannot explode to 4.20 × 10<sup>9</sup> because the
           scale is divided back down. The error is corrected before it has a chance to compound.
         </p>
@@ -83,6 +87,64 @@ export default function WhyNormReducesSensitivityPage() {
           normalised networks train across a wide range of learning rates and initial scales that would
           break an un-normalised net — the scale is a guarantee, not a lucky starting condition.
         </Callout>
+
+        <p>
+          Everything so far has been an argument about mechanism. Here is the measurement it predicts.
+          The sweep from the first page of this track — eight hidden layers, six init scales, three
+          seeds — run twice: once plain, once with BatchNorm at every hidden layer.
+        </p>
+
+        <PredictPrompt
+          accent={CORAL}
+          prompt={<>Without normalisation, an init of 0.001 produced a constant function: 0.470, below
+            the majority class. Put BatchNorm in the same network and start it from those same dead
+            weights. What comes out?</>}
+          options={[
+            "Still dead — normalising zero gives zero",
+            "It trains, but clearly worse than a good init",
+            "It trains to roughly the same place as a good init",
+            "It beats every plain network",
+          ]}
+          nudge="Locked in. Both columns are below."
+        />
+
+        <Dumbbell
+          rows={INIT_SENSITIVITY.map((r) => ({ init: r.init, a: r.noBn, b: r.bn }))}
+          baseline={MAJORITY_CLASS}
+          seriesLabels={["no normalisation", "with BatchNorm"]}
+          caption={<>The same six initialisations, with and without BatchNorm. The connector is what
+            normalisation is worth: the two dead runs are pulled from below the majority-class line all
+            the way up to <strong>0.950</strong>, and the two over-large ones recover their lost points
+            as well. The right-hand ends form almost a straight vertical — every initialisation arrives
+            at the same place.</>}
+        />
+        <CodeOutput source="scripts/init_norm_train.py" label="test accuracy by init, with and without BatchNorm (depth 8, 3 seeds)">{`      init     no BN   with BN
+------------------------------
+     0.001    0.4700    0.9500
+      0.01    0.4700    0.9500
+    xavier    0.9450    0.9433
+        he    0.9383    0.9467
+       1.0    0.8767    0.9467
+       5.0    0.8433    0.9417
+------------------------------
+    spread    0.4750    0.0083`}</CodeOutput>
+
+        <p>
+          The last line is the whole track in two numbers. The <strong>spread</strong> — best minus
+          worst across the six initialisations — is <strong>{SENSITIVITY_SPREAD.noBn.toFixed(4)}</strong>{" "}
+          without normalisation and <strong>{SENSITIVITY_SPREAD.bn.toFixed(4)}</strong> with it: a
+          collapse of roughly <strong>57×</strong>.
+        </p>
+        <p>
+          Read it next to the honest null from two chapters ago. On this problem BatchNorm buys at most{" "}
+          <strong>0.008</strong> of accuracy, and at depth 20 it buys less than nothing. Both facts come
+          from the same trainer on the same data, and together they say something sharper than either
+          says alone. <strong>Normalisation is not an accuracy technique. It is a robustness
+          technique.</strong> It does not make the good runs better; it stops the bad runs from
+          existing. That is worth far more than a hundredth of a point on any problem where you cannot
+          afford to discover, six hours into a training run, that the constant you picked at step zero
+          was the wrong one.
+        </p>
 
         <h2>Why this widens the trainable range</h2>
         <p>
@@ -131,7 +193,7 @@ export default function WhyNormReducesSensitivityPage() {
           title="Checkpoint"
           questions={[
             {
-              q: <>Without normalisation, a too-small init drives the activation scale to 0.0000 by
+              q: <>Without normalisation, a too-small init drives the activation scale to 10<sup>-20</sup> by
                 layer 2 and a too-large init to 4.20 × 10⁹ by layer 8. What is the underlying
                 mechanism?</>,
               options: [
@@ -145,7 +207,7 @@ export default function WhyNormReducesSensitivityPage() {
                 by the far end. Only a narrow band of initial scales keeps cᴰ near 1.</>,
             },
             {
-              q: <>Why can the vanish-to-0.0000 and explode-to-4.20 × 10⁹ failures not happen when a
+              q: <>Why can the vanish-to-10⁻²⁰ and explode-to-4.20 × 10⁹ failures not happen when a
                 normalisation layer follows each linear layer?</>,
               options: [
                 "Normalisation resets the activation scale toward unit variance every layer, so the factor c is forced back to 1 and cannot accumulate into cᴰ",

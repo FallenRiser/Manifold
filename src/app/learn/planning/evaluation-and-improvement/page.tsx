@@ -5,6 +5,8 @@ import { CodeBlock } from "@/components/CodeBlock";
 import { CodeOutput } from "@/components/CodeOutput";
 import { PredictPrompt } from "@/components/PredictPrompt";
 import { GRIDWORLD_SETUP } from "@/lib/runtimeSetup";
+import { GridRow } from "@/components/figures/planning/GridField";
+import { V_RANDOM, PI_GREEDY_FROM_RANDOM, V_AFTER_ONE_IMPROVEMENT, PI_STAR } from "@/components/figures/planning/data.generated";
 
 export const metadata = {
   title: "Evaluation and improvement — Manifold",
@@ -94,6 +96,19 @@ improved value >= old, everywhere: True`}</CodeOutput>
           into one worth <M>{String.raw`+10.1`}</M> — and, exactly as the theorem promises, not a single state got
           worse. That is the entire engine. Repeat and you climb.
         </p>
+
+        <GridRow
+          grids={[
+            { values: V_RANDOM, policy: PI_GREEDY_FROM_RANDOM, label: "evaluate: Vπ for the random policy" },
+            { values: V_AFTER_ONE_IMPROVEMENT, policy: PI_STAR, label: "improve once, then evaluate again" },
+          ]}
+          caption={<>One turn of the two levers, on one colour scale. Every cell goes up — that is the
+            policy improvement theorem, and it is what the total value of −3.65 → 10.11 is summarising.
+            On this small grid the improvement is dramatic for a reason worth noticing: the right-hand
+            values are already exactly V*. A single greedy pass over the random policy&rsquo;s values
+            landed on the optimal policy, which is why the next page&rsquo;s run terminates so
+            quickly.</>}
+        />
 
         <Callout color={GOLD} title={<>Why &ldquo;can&rsquo;t improve&rdquo; means &ldquo;optimal&rdquo;</>}>
           Suppose an improvement step changes nothing — the greedy policy is the one you already had. Then for every

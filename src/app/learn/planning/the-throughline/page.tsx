@@ -3,6 +3,8 @@ import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 import { M } from "@/components/Math";
 import { Quiz } from "@/components/Quiz";
 import { Backlinks } from "@/components/Backlinks";
+import { GridRow, TERMINALS_ONLY } from "@/components/figures/planning/GridField";
+import { VI_GRIDS, PI_STAR } from "@/components/figures/planning/data.generated";
 
 export const metadata = {
   title: "The throughline — Manifold",
@@ -58,6 +60,20 @@ export default function TheThroughline() {
             <em>don&rsquo;t tabulate</em> (function approximation).
           </li>
         </ol>
+
+        <GridRow
+          grids={[
+            { values: VI_GRIDS[0], label: "before: no information" },
+            { values: VI_GRIDS[1], label: "one backup from the goal" },
+            { values: VI_GRIDS[3], label: "three sweeps" },
+            { values: VI_GRIDS[7], policy: PI_STAR, label: "V* and π*" },
+          ]}
+          caption={<>The track in four frames. Value starts at zero everywhere, the goal&rsquo;s reward
+            enters through a single backup, and each further sweep carries it one ring further out until
+            the whole board knows what it is worth and the arrows follow for free. Every algorithm here
+            — policy iteration, value iteration, in-place, prioritized, real-time — is a different
+            decision about the <em>order</em> in which to run that spread.</>}
+        />
 
         <Callout color={GOLD} title={<>The one sentence to keep</>}>
           With the model in hand, optimal behaviour is computable by dynamic programming — and{" "}

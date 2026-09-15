@@ -2,6 +2,7 @@ import Link from "next/link";
 import { LessonHeader, Callout, Proof, PrevNext } from "@/components/lesson";
 import { M, MathBlock } from "@/components/Math";
 import { Quiz } from "@/components/Quiz";
+import { DiagnosticQuadrant } from "@/components/figures/nnReg/RegFigures";
 
 export const metadata = {
   title: "When to regularise, and when not to — Manifold",
@@ -67,6 +68,13 @@ export default function WhenToRegularisePage() {
           not overfitting, there is no generalisation gain to offset the loss. Both scores fall together.
           You have taken a high-bias model and added more bias.
         </p>
+
+        <DiagnosticQuadrant
+          caption={<>The one rule, drawn. Every technique in this track applies to a single cell of
+            this square. The most common mistake in practice is not choosing the wrong regulariser — it
+            is applying one from the bottom-left cell, where the model is not overfitting at all and
+            every regulariser can only make things worse.</>}
+        />
 
         <h2>The order of operations</h2>
         <p>

@@ -1,0 +1,52 @@
+{
+  "kind": "baselines",
+  "reward": "values",
+  "K": 4,
+  "rows": {
+    "random": {
+      "village_damaged": 5.58,
+      "village_saved": 0.285,
+      "burnt": 153.2,
+      "put_out": 2.6,
+      "drops": 1.52,
+      "steps": 76.6,
+      "ret": -207.4
+    },
+    "random_fire": {
+      "village_damaged": 4.4,
+      "village_saved": 0.44,
+      "burnt": 121.7,
+      "put_out": 13.3,
+      "drops": 2.33,
+      "steps": 56.5,
+      "ret": -164.9
+    },
+    "nearest": {
+      "village_damaged": 2.69,
+      "village_saved": 0.655,
+      "burnt": 85.6,
+      "put_out": 16.7,
+      "drops": 3.44,
+      "steps": 47.2,
+      "ret": -111.6
+    },
+    "guard": {
+      "village_damaged": 1.11,
+      "village_saved": 0.785,
+      "burnt": 81.7,
+      "put_out": 13.7,
+      "drops": 2.71,
+      "steps": 45.2,
+      "ret": -92.3
+    },
+    "densest": {
+      "village_damaged": 3.33,
+      "village_saved": 0.565,
+      "burnt": 96.3,
+      "put_out": 22.0,
+      "drops": 2.94,
+      "steps": 48.5,
+      "ret": -129.9
+    }
+  }
+}

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { LessonHeader, Callout, Proof, PrevNext } from "@/components/lesson";
 import { M, MathBlock } from "@/components/Math";
 import { Quiz } from "@/components/Quiz";
+import { NetworkDiagram, NetworkPair } from "@/components/figures/arch/NetworkDiagram";
 
 export const metadata = {
   title: "Universal approximation, honestly — Manifold",
@@ -89,6 +90,17 @@ export default function UniversalApproximationPage() {
           the things that actually fail in practice: optimisation, data, and generalisation. That
           narrowing is the theorem&rsquo;s real contribution to applied work.
         </p>
+
+        <NetworkPair
+          left={{ sizes: [2, 512, 1], title: "What the theorem guarantees", note: "one hidden layer, made as wide as it needs to be" }}
+          right={{ sizes: [2, 16, 16, 1], title: "What you would actually build", note: "two modest layers" }}
+          caption={<>The theorem is a statement about the left-hand picture: make that middle column
+            tall enough and it can approximate any continuous function on a compact set. It says
+            nothing about how tall, nothing about whether gradient descent will find the weights, and
+            nothing about how many examples you would need. On this problem the left-hand network has
+            264,705 parameters and scores 0.942; the right-hand one has 337 and scores 0.951.
+            Existence and reachability are different claims.</>}
+        />
 
         <h2>What it does not say</h2>
         <p>

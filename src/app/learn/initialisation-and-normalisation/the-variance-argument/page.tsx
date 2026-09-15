@@ -2,6 +2,12 @@ import Link from "next/link";
 import { LessonHeader, Callout, Proof, PrevNext } from "@/components/lesson";
 import { M, MathBlock } from "@/components/Math";
 import { Quiz } from "@/components/Quiz";
+import { CodeBlock } from "@/components/CodeBlock";
+import { CodeOutput } from "@/components/CodeOutput";
+import { PredictPrompt } from "@/components/PredictPrompt";
+import { LayerTrace } from "@/components/figures/LayerTrace";
+import { VAR_BY_LAYER_RELU } from "@/components/figures/initNorm/data";
+import { INIT_SETUP } from "@/lib/runtimeSetup";
 
 export const metadata = {
   title: "The variance argument — Manifold",
@@ -85,30 +91,83 @@ export default function TheVarianceArgumentPage() {
         <h2>The empirical confirmation — and a warning about ReLU</h2>
         <p>
           The condition was derived for a <em>linear</em> layer. Real networks put a nonlinearity
-          after the matrix multiply, and the nonlinearity changes the variance too. To see it, take a
-          10-layer network of width 64 with ReLU activations and measure the activation variance at
-          each layer under two initialisations.
-        </p>
-        <p>
-          <strong>ReLU with Xavier</strong> — the scheme built for the linear/tanh case — gives
-          activation variances of 0.2457, 0.1324, 0.0745, 0.0349, 0.0216, 0.0143, 0.0074, 0.0025,
-          0.0013, and 0.0008 across the ten layers. The variance is <em>halving</em> roughly every
-          layer. By layer 10 it is a factor of 300 below where it started. Xavier, applied to ReLU,
-          quietly vanishes the signal — slowly enough that it is not an explosion, but decisively.
-        </p>
-        <p>
-          <strong>ReLU with He</strong> — the scheme built for ReLU — gives 0.4915, 0.5296, 0.5959,
-          0.5586, 0.6910, 0.9159, 0.9531, 0.6360, 0.6472, and 0.7988. The variance wobbles around a
-          constant level for all ten layers. This is what &ldquo;preserving variance&rdquo; looks like
-          when the activation is accounted for.
-        </p>
-        <p>
-          For contrast, the two catastrophic scales from the last chapter show up here too: ReLU with
-          a raw scale of 1.0 explodes from 0.49 to <M>{String.raw`2.81 \times 10^{13}`}</M> by layer 10,
-          and ReLU with scale 0.01 reads 0.0000 at every layer. Only the scale that satisfies the
-          variance condition — with the ReLU correction — stays alive.
+          after the matrix multiply, and the nonlinearity changes the variance too. So stop arguing
+          and measure it: ten layers of width 64, ReLU, and the activation variance read off at
+          every layer under four different weight scales.
         </p>
 
+        <PredictPrompt
+          accent={CORAL}
+          prompt={<>Xavier was derived, above, to preserve variance exactly. Put it in front of a ReLU
+            and track the activation variance from layer 1 to layer 10. What does it do?</>}
+          options={[
+            "Holds constant — that is what it was derived for",
+            "Halves roughly every layer",
+            "Doubles roughly every layer",
+            "Holds for a few layers, then collapses",
+          ]}
+          nudge="Locked in. Run it and read the second column."
+        />
+
+        <CodeBlock
+          setup={INIT_SETUP}
+          fromScratch={`# Activation variance at each of 10 hidden layers, width 64, ReLU.
+sizes = [2] + [64] * 10 + [1]
+scales = ["xavier", "he", 0.01, 1.0]
+
+var = {}
+for s in scales:
+    params = init_manual(sizes, scale=s, seed=0)
+    _, _, acts = forward_activations(X_tr, params, act="relu")
+    var[str(s)] = [np.var(a) for a in acts[1:-1]]   # the 10 hidden layers
+
+print("layer " + "".join("%12s" % s for s in scales))
+for i in range(10):
+    print("%5d " % (i + 1) + "".join("%12.4g" % var[str(s)][i] for s in scales))`}
+        />
+        <CodeOutput>{`layer       xavier          he        0.01         1.0
+    1       0.2457      0.4915   4.915e-05      0.4915
+    2       0.1324      0.5296   1.695e-07       16.95
+    3      0.07449      0.5959   6.102e-10       610.2
+    4      0.03492      0.5586   1.831e-12   1.831e+04
+    5      0.02159       0.691   7.245e-15   7.245e+05
+    6      0.01431      0.9159   3.073e-17   3.073e+07
+    7     0.007446      0.9531   1.023e-19   1.023e+09
+    8     0.002484       0.636   2.185e-22   2.185e+10
+    9     0.001264      0.6472   7.116e-25   7.116e+11
+   10    0.0007801      0.7988    2.81e-27    2.81e+13`}</CodeOutput>
+
+        <LayerTrace
+          series={VAR_BY_LAYER_RELU}
+          ylabel="activation variance"
+          caption={<>Each line is one initialisation, and the y-axis spans forty orders of magnitude.
+            The shape is what matters: on a log axis a straight line <em>is</em> geometric decay or
+            growth. Three of these four are straight. Only He is flat, and flat is the entire design
+            goal — the variance that enters layer 1 is the variance that leaves layer 10.</>}
+        />
+
+        <p>
+          <strong>Xavier is a straight line sloping down.</strong> It loses roughly half its variance
+          per layer — 0.2457 at layer 1, 0.0008 at layer 10, a factor of 315 — and it does that while
+          being the scheme explicitly derived to preserve variance. The derivation was not wrong; it
+          was a derivation about a linear layer, applied to a layer that is not linear.
+        </p>
+        <p>
+          <strong>He is the flat one.</strong> It wanders between 0.49 and 0.95 and ends where it
+          started. Nothing about the network is different except a constant factor on the initial
+          weights.
+        </p>
+        <p>
+          The two extreme scales make the same point twice. Scale 1.0 climbs by a factor of roughly 30
+          per layer and reaches <M>{String.raw`2.8 \times 10^{13}`}</M>. Scale 0.01 falls by the same
+          kind of factor and reaches <M>{String.raw`2.8 \times 10^{-27}`}</M>. That second one is worth
+          dwelling on: printed to four decimal places it reads <code>0.0000</code> at every layer and
+          looks like a network that has simply switched off. It has not. It is decaying by two to
+          three decades per layer under exactly the same geometric law as Xavier — the same straight
+          line, drawn steeper. There is no separate &ldquo;vanishing&rdquo; mechanism to learn. There
+          is one mechanism, a per-layer scale factor, and every one of these four lines is that factor
+          raised to the power of the depth.
+        </p>
         <h2>Why ReLU needs a factor of two</h2>
         <p>
           Why does Xavier decay under ReLU when it was designed to preserve variance? Because ReLU

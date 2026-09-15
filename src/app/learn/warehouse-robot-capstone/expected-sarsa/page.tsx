@@ -3,7 +3,7 @@ import { CodeOutput } from "@/components/CodeOutput";
 import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 import { M, MathBlock } from "@/components/Math";
 import { PredictPrompt } from "@/components/PredictPrompt";
-import { AnalystQuestion, TransferBox, PlaybookRule } from "@/components/capstone/pedagogy";
+import { WorkOrder, TransferBox, PlaybookRule } from "@/components/capstone/warehouse";
 import { WAREHOUSE_SETUP } from "@/lib/runtimeSetup";
 
 export const metadata = {
@@ -31,10 +31,10 @@ export default function ExpectedSarsa() {
       />
 
       <div className="lesson">
-        <AnalystQuestion accent={OLIVE} label="The engineer's question" icon="🤖">
+        <WorkOrder act={3} n={12}>
           My update target depends on a random action I sampled. Can I compute the <em>expectation</em> over that
           randomness directly, instead of paying for it as noise?
-        </AnalystQuestion>
+        </WorkOrder>
 
         <h2>The noise hiding in SARSA&rsquo;s target</h2>
         <p>
@@ -112,14 +112,14 @@ At state (1,3) empty, action=down, most-likely next state:
           warehouse robot with four moves, always pay it.
         </Callout>
 
-        <TransferBox accent={OLIVE}>
+        <TransferBox>
           Whenever an update target depends on a quantity you sampled but whose distribution you actually know,
           check whether you can take the expectation in closed form instead. It keeps the target&rsquo;s mean and
           deletes its variance, which almost always buys steadier learning and a safer step size. Reach back for
           sampling only when the expectation is too expensive to compute — many actions, or a continuous space.
         </TransferBox>
 
-        <PlaybookRule n={12} accent={OLIVE}>
+        <PlaybookRule n={12}>
           <strong>Replace a sampled action in the target with an expectation over the policy when you can afford
           it</strong> — Expected SARSA keeps SARSA&rsquo;s mean, drops its target variance to zero, and trades{" "}
           <M>{String.raw`|A|\times`}</M> compute per step for steadier convergence.

@@ -5,6 +5,8 @@ import { CodeBlock } from "@/components/CodeBlock";
 import { CodeOutput } from "@/components/CodeOutput";
 import { PredictPrompt } from "@/components/PredictPrompt";
 import { GRIDWORLD_SETUP } from "@/lib/runtimeSetup";
+import { GridRow } from "@/components/figures/planning/GridField";
+import { PI_VALUES, PI_POLICIES } from "@/components/figures/planning/data.generated";
 
 export const metadata = {
   title: "Policy iteration — Manifold",
@@ -108,6 +110,19 @@ pi*:
             "The grid is deterministic",
           ]}
           nudge="Locked in. Improvement is global — every state gets re-optimised at once, not one at a time."
+        />
+
+        <GridRow
+          grids={[
+            { values: PI_VALUES[0], policy: PI_POLICIES[0], label: "round 1 · evaluate the random policy" },
+            { values: PI_VALUES[1], policy: PI_POLICIES[1], label: "round 2 · evaluate the improved one" },
+            { values: PI_VALUES[2], policy: PI_POLICIES[2], label: "round 3 · nothing moves" },
+          ]}
+          caption={<>The whole run, in three pictures. Each grid shows the values of the current policy
+            and, underneath each number, the move that is greedy with respect to them. Round 1 is the
+            random policy: everything is negative, and the greedy arrows already point somewhere sensible.
+            Round 2 evaluates those arrows and the board turns positive. Round 3 produces exactly round
+            2 — the tell that the loop has terminated at the optimum.</>}
         />
 
         <h2>Why exact evaluation each round?</h2>

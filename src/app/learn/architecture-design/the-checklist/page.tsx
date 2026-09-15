@@ -2,6 +2,7 @@ import Link from "next/link";
 import { LessonHeader, Callout, Proof, PrevNext } from "@/components/lesson";
 import { M, MathBlock } from "@/components/Math";
 import { Quiz } from "@/components/Quiz";
+import { DecisionPoint } from "@/components/DecisionPoint";
 
 export const metadata = {
   title: "The architecture checklist — Manifold",
@@ -117,6 +118,50 @@ export default function TheChecklistPage() {
             logarithmic doublings wide, and the data, not the network, sets the final ceiling.
           </p>
         </Proof>
+
+        <DecisionPoint
+          accent={CORAL}
+          question={<>A tabular model reports <strong>train 0.71, held-out 0.69</strong>. A colleague
+            proposes going from 2 hidden layers to 8, on the grounds that the problem &ldquo;probably
+            has hierarchical structure&rdquo;. What do you do?</>}
+          options={[
+            {
+              label: "Widen instead — training accuracy is the number that is low",
+              verdict: "best",
+              response: <>Right, and the reasoning is the whole checklist in one step. A gap of 0.02
+                says the model is not failing to generalise, it is failing to <em>fit</em>; that is
+                the underfitting panel, and width is the cheap, safe, fast knob for it. On this
+                track&rsquo;s own sweep, width bought 18 points before plateauing while depth bought
+                3.5 and then nothing.</>,
+            },
+            {
+              label: "Add the depth — hierarchy is a real mechanism",
+              verdict: "miss",
+              response: <>Hierarchy is real, but it is a property of the <em>data</em>, not something
+                depth confers. &ldquo;Probably has hierarchical structure&rdquo; is a hypothesis
+                nobody has tested, and the cost of being wrong is not zero: depth is the knob that
+                carries the depth tax, and under plain SGD the same family of networks falls from
+                0.940 at depth 20 to 0.750 at depth 40. Turn the safe knob first.</>,
+            },
+            {
+              label: "Regularise — the gap will widen once capacity goes up",
+              verdict: "miss",
+              response: <>This is a treatment for a condition the model does not have. Regularisation
+                buys held-out accuracy by spending training accuracy, and there is 0.71 of it here,
+                none of it spare. Measured on a network with no gap, L2 moved held-out accuracy
+                by &minus;0.005.</>,
+            },
+            {
+              label: "Neither — collect more data first",
+              verdict: "close",
+              response: <>Rarely wrong as an instinct, and more data is the one intervention that
+                helps in almost every cell of the diagnostic square. But it is also the slowest and
+                most expensive thing on the list, and this particular pattern — train and held-out
+                both low, close together — is the one case where more data is least likely to help,
+                because the model cannot fit the data it already has.</>,
+            },
+          ]}
+        />
 
         <Quiz
           accent={CORAL}

@@ -78,7 +78,7 @@ k=20 eval sweeps/round -> 7 improvement rounds, 122 eval sweeps total`}</CodeOut
         <p>
           Read the table carefully, because it holds a genuine surprise. The number of <strong>improvement
           rounds</strong> is <em>the same — 7 — for every <M>k</M></em>. The problem decides how many
-          improvements are needed; evaluating more thoroughly between them does not reduce that count. All the extra
+          improvements are needed; evaluating more thoroughly between them does not reduce that count. All the extra{" "}
           <M>k</M> buys is more <strong>evaluation sweeps</strong> — pure additional work. On this world, then, the
           leanest setting, <M>k=1</M> (value iteration), reaches the optimum for the least total effort.
         </p>

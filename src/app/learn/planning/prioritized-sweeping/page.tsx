@@ -5,6 +5,9 @@ import { CodeBlock } from "@/components/CodeBlock";
 import { CodeOutput } from "@/components/CodeOutput";
 import { PredictPrompt } from "@/components/PredictPrompt";
 import { GRIDWORLD_SETUP } from "@/lib/runtimeSetup";
+import { GridRow, TERMINALS_ONLY } from "@/components/figures/planning/GridField";
+import { TotalsBar } from "@/components/figures/planning/PlanningCharts";
+import { PRIO_ORDER, BACKUP_COUNTS, PRIO_WASTED } from "@/components/figures/planning/data.generated";
 
 export const metadata = {
   title: "Prioritized sweeping — Manifold",
@@ -37,15 +40,24 @@ def uniform():                              # in-place sweeps, counting single-s
         if d < 1e-9: return backups
 
 def prioritized(theta=1e-9):                # back up the highest-error state first
-    V = np.zeros(nS); backups = 0; pq = []
+    V = np.zeros(nS); backups = 0; pq = []; pending = {}
+
+    def push(s):                             # keep only the LARGEST pending priority per state
+        e = bell_err(V, s)
+        if e > theta and e > pending.get(s, 0.0):
+            pending[s] = e; heapq.heappush(pq, (-e, s))
+
     for s in range(nS):
-        if s not in TERMS and bell_err(V, s) > theta: heapq.heappush(pq, (-bell_err(V, s), s))
+        if s not in TERMS: push(s)
     while pq:
-        _, s = heapq.heappop(pq)
-        if s in TERMS: continue
+        negp, s = heapq.heappop(pq)
+        if pending.get(s) is None or -negp < pending[s] - 1e-15: continue  # a stale entry
+        del pending[s]
+        old = V[s]
         V[s] = (R[s] + gamma * (P[s] @ V)).max(); backups += 1
-        for p in pred[s]:                    # a change at s may raise its predecessors' error
-            if p not in TERMS and bell_err(V, p) > theta: heapq.heappush(pq, (-bell_err(V, p), p))
+        if abs(V[s] - old) <= theta: continue     # nothing moved, so nothing depends on it
+        for p in pred[s]:                         # only NOW are predecessors worth revisiting
+            if p not in TERMS: push(p)
     return backups
 
 print("uniform in-place backups   :", uniform())
@@ -81,13 +93,26 @@ print("prioritized-sweeping backups:", prioritized())`;
 
         <CodeBlock setup={GRIDWORLD_SETUP} fromScratch={code} />
         <CodeOutput>{`uniform in-place backups   : 98
-prioritized-sweeping backups: 76`}</CodeOutput>
+prioritized-sweeping backups: 14`}</CodeOutput>
         <p>
-          Fewer single-state backups (76 vs 98) to reach the same optimum — a modest win on a 14-cell grid, but the
-          gap grows enormously on large, sparse problems where only a small frontier of states is &ldquo;active&rdquo;
-          at any moment. Prioritized sweeping never touches a state that is already correct, and the moment a reward
-          or a change appears, it focuses all its effort on the region that change actually affects.
+          Fourteen single-state backups against 98, for the same optimum — and 14 is not an arbitrary number.
+          This grid has exactly 14 non-terminal states, so the queue has spent <em>one</em> backup on each,
+          in an order it worked out for itself. There was no wasted work left to remove. Prioritized sweeping
+          never touches a state that is already correct, and the moment a reward or a change appears, it
+          focuses all its effort on the region that change actually affects.
         </p>
+
+        <Callout color={GOLD} title={<>The version this page used to print</>}>
+          This page shipped, for a while, with a queue that pushed every predecessor back on after{" "}
+          <em>every</em> pop — without checking whether the backup had moved the value, and without
+          replacing a state&rsquo;s stale priority when a better one arrived. It reached the same V*, which
+          is exactly why nobody noticed: the only symptom was the headline number, which came out at 76
+          instead of 14. Sixty-two of those 76 backups recomputed a value that did not change. A scheduling
+          idea whose entire claim is &ldquo;don&rsquo;t do unnecessary work&rdquo; was quietly doing five
+          times the necessary work, and still looked like a modest success. The two guards added above —{" "}
+          <code>if abs(V[s] - old) &lt;= theta: continue</code> and the <code>pending</code> dictionary —
+          are the whole difference.
+        </Callout>
 
         <PredictPrompt
           accent={GOLD}
@@ -98,6 +123,36 @@ prioritized-sweeping backups: 76`}</CodeOutput>
             "It's arbitrary — either works",
           ]}
           nudge="Locked in. Value flows backward through the Bellman equation: s's new value changes who depends on s."
+        />
+
+        <GridRow
+          mode="count"
+          scale={14}
+          grids={[
+            { values: BACKUP_COUNTS[0].counts, policy: TERMINALS_ONLY, label: "uniform: backups per cell", scale: 7 },
+            { values: PRIO_ORDER, policy: TERMINALS_ONLY, label: "prioritized: the order cells are backed up" },
+          ]}
+          caption={<>Left, the uniform schedule spends exactly seven backups on every cell, including the
+            ones that were already correct after the first. Right, the priority queue visits each cell
+            once, numbered in the order it is popped: 1 and 2 are the goal&rsquo;s two neighbours, and
+            the numbers spread outward from there in rings. The queue has reconstructed the reverse
+            sweep of the previous page without being told the geometry — it inferred it from where the
+            Bellman error was.</>}
+        />
+
+        <TotalsBar
+          unit=" backups"
+          rows={[
+            { label: "uniform sweeps", value: PRIO_WASTED.uniform, color: "var(--muted)" },
+            { label: "prioritized, as first written", value: PRIO_WASTED.pageTotal, color: "var(--bad)", note: `${PRIO_WASTED.wasted} of these changed nothing` },
+            { label: "prioritized, with the queue fixed", value: PRIO_WASTED.textbook, color: "var(--good)", note: "one backup per non-terminal state" },
+          ]}
+          caption={<>The middle bar is the version this page shipped with, and it is a cautionary tale
+            worth keeping. It re-queues every predecessor after every pop, never checks whether the
+            backup actually moved the value, and never updates a stale priority — so{" "}
+            {PRIO_WASTED.wasted} of its {PRIO_WASTED.pageTotal} backups recompute a number that does not
+            change. It still converges, which is exactly why the bug survived: the only symptom is that
+            the method appears to save 22% when it in fact saves 86%.</>}
         />
 
         <h2>Where the idea leads</h2>

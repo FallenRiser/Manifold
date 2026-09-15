@@ -4,6 +4,7 @@ import { M, MathBlock } from "@/components/Math";
 import { Quiz } from "@/components/Quiz";
 import { LabFrame } from "@/components/LabFrame";
 import { RegulariserLab } from "@/components/labs/RegulariserLab";
+import { DropoutMasks } from "@/components/figures/nnReg/RegFigures";
 
 export const metadata = {
   title: "Randomly removing units — Manifold",
@@ -63,6 +64,15 @@ export default function RandomlyRemovingUnitsPage() {
           into a configuration that depends on any particular unit being present. That instability, applied
           only during training, is the entire regularising force.
         </Callout>
+
+        <DropoutMasks
+          caption={<>Four consecutive minibatches, one set of weights. The wiring never changes; what
+            changes is which units are switched off for this step, and therefore which weights receive
+            a gradient. A unit that is dropped contributes nothing forward and receives nothing
+            backward — so from its neighbours&rsquo; point of view it was not there. Every other
+            regulariser in this track adjusts the objective; this one adjusts the architecture, freshly,
+            on every step.</>}
+        />
 
         <h2>See it against every other regulariser</h2>
         <p>

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { LessonHeader, Callout, Proof, PrevNext } from "@/components/lesson";
 import { M, MathBlock } from "@/components/Math";
 import { Quiz } from "@/components/Quiz";
+import { DiagnosticPanels } from "@/components/figures/arch/ArchFigures";
 
 export const metadata = {
   title: "When to go wider — Manifold",
@@ -88,6 +89,16 @@ export default function WhenToGoWiderPage() {
           first. If it has plateaued and training accuracy is still below where you need it, double
           the width.
         </Callout>
+
+        <DiagnosticPanels
+          only={["underfit", "good"]}
+          caption={<>The two pictures the decision rule is actually about. On the left both curves
+            flatten low and close together — a gap of 0.030 with training accuracy stuck at 0.867.
+            That model cannot represent the problem, and width is the fix. On the right training
+            accuracy has reached 1.000 and held-out has settled at 0.877. Same data, same optimiser,
+            and there is nothing left for width to buy. The rule &ldquo;widen when training error is
+            high&rdquo; is just a reading of which of these two you are looking at.</>}
+        />
 
         <h2>When not to go wider: large train-test gap</h2>
         <p>

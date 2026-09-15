@@ -2,6 +2,9 @@ import Link from "next/link";
 import { LessonHeader, Callout, Proof, PrevNext } from "@/components/lesson";
 import { M, MathBlock } from "@/components/Math";
 import { Quiz } from "@/components/Quiz";
+import { SweepCurve } from "@/components/figures/SweepCurve";
+import { WIDTH_SWEEP } from "@/components/figures/arch/data";
+import { PredictPrompt } from "@/components/PredictPrompt";
 
 export const metadata = {
   title: "What width buys — Manifold",
@@ -82,6 +85,18 @@ export default function WhatWidthBuysPage() {
           it is adding basis functions the optimiser has nothing useful to do with.
         </Callout>
 
+        <SweepCurve
+          points={WIDTH_SWEEP.map((p) => ({ x: p.x, a: p.y }))}
+          log
+          xlabel="hidden width (log scale)"
+          xticks={[2, 8, 32, 128, 512]}
+          caption={<>What width buys, and where it stops buying. The useful range is the left third
+            of this axis: 2 → 16 is worth 18 points. After that the curve is flat to within seed
+            noise for five further doublings. Width is the knob that is cheap to get wrong in the
+            generous direction and expensive to get wrong in the stingy one — which is exactly why
+            the playbook turns it first.</>}
+        />
+
         <h2>Width interacts with depth</h2>
         <p>
           The same sweep at depth 2 — two hidden layers instead of one — tells a different and more
@@ -107,6 +122,20 @@ export default function WhatWidthBuysPage() {
           is often worth more than raw feature count, which is why the depth-2 network plateaus at a
           higher accuracy than the depth-1 network ever reaches.
         </p>
+
+        <PredictPrompt
+          accent={CORAL}
+          prompt={<>Going from a hidden width of 16 to a hidden width of 512 multiplies the
+            parameter count by 785, from 337 to 264,705. How much test accuracy does that buy on
+            this problem?</>}
+          options={[
+            "Several points — capacity is the binding constraint",
+            "About a point",
+            "Nothing, and slightly less than nothing",
+            "It collapses — far too many parameters for 600 points",
+          ]}
+          nudge="Locked in. Check it against the sweep above."
+        />
 
         <h2>The parameter cost of width</h2>
         <p>

@@ -2,6 +2,8 @@ import Link from "next/link";
 import { LessonHeader, Callout, Proof, PrevNext } from "@/components/lesson";
 import { M, MathBlock } from "@/components/Math";
 import { Quiz } from "@/components/Quiz";
+import { DiagnosticPanels } from "@/components/figures/arch/ArchFigures";
+import { PredictPrompt } from "@/components/PredictPrompt";
 
 export const metadata = {
   title: "Reading the learning curve — Manifold",
@@ -50,6 +52,14 @@ export default function ReadingTheCurvePage() {
         </p>
 
         <MathBlock>{String.raw`\text{gap} = \mathcal{L}_{\text{train}} - \mathcal{L}_{\text{val}} \quad\text{or}\quad \text{acc}_{\text{train}} - \text{acc}_{\text{test}}`}</MathBlock>
+
+        <DiagnosticPanels
+          caption={<>The four patterns, measured rather than sketched: one 40-point training set, one
+            optimiser, four configurations, with train and held-out accuracy sampled every 10 epochs
+            inside a single 400-epoch run. They are drawn on a shared axis so that the differences
+            between panels are real differences and not a change of scale. Everything the rest of
+            this page says is a description of one of these four shapes.</>}
+        />
 
         <h2>Pattern 1: underfitting</h2>
         <p>
@@ -136,6 +146,20 @@ export default function ReadingTheCurvePage() {
           it correctly?). An architecture that cannot be trained is rarely too small or too large —
           it is misconfigured.
         </p>
+
+        <PredictPrompt
+          accent={CORAL}
+          prompt={<>Of the four panels above, exactly one has a held-out curve that rises and then
+            falls. Which failure does that downturn identify, and why is it the only unambiguous
+            signature on the page?</>}
+          options={[
+            "Underfitting — the model runs out of capacity",
+            "Overfitting — and it is unambiguous because no other failure makes held-out performance get worse with more training",
+            "A learning rate that is too high",
+            "All four panels turn down eventually",
+          ]}
+          nudge="Locked in. Scroll back up and check which panel has the dashed vertical rule."
+        />
 
         <h2>The loss numbers and the accuracy numbers</h2>
         <p>

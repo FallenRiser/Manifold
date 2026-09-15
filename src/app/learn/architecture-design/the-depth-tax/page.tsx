@@ -2,6 +2,8 @@ import Link from "next/link";
 import { LessonHeader, Callout, Proof, PrevNext } from "@/components/lesson";
 import { M, MathBlock } from "@/components/Math";
 import { Quiz } from "@/components/Quiz";
+import { DepthRisk } from "@/components/figures/arch/ArchFigures";
+import { SGD_DEPTH, MAJORITY_CLASS } from "@/components/figures/arch/data";
 
 export const metadata = {
   title: "The depth tax — Manifold",
@@ -91,10 +93,12 @@ export default function TheDepthTaxPage() {
 
         <Callout color={CORAL} title={<>Necessary but not sufficient</>}>
           A reasonable gradient ratio means the gradient <em>signal</em> arrives at the early layers.
-          It does not mean the model trains well. At depth 20 with width 16, the gradient ratio is a
-          healthy 2.23, but the trained test accuracy is only <strong>0.750</strong> — far below the
-          0.953 achieved at depth 2 with width 32. The gradient is arriving, but other pathologies
-          are eating the performance. Gradient preservation is a prerequisite, not a guarantee.
+          It does not mean the model trains well. The gradient ratio stays between 2 and 6 at every
+          depth measured, including the depths that fail: under plain SGD a width-16 net holds about
+          0.94 to depth 20 and then falls to <strong>0.770</strong> at depth 30 and{" "}
+          <strong>0.750</strong> at depth 40, with the ratio looking exactly as healthy at 40 as it
+          did at 2. The gradient is arriving; something else is eating the performance. Gradient
+          preservation is a prerequisite, not a guarantee.
         </Callout>
 
         <h2>Tax 2: parameters and memory</h2>
@@ -148,11 +152,13 @@ export default function TheDepthTaxPage() {
           magic fixes this because it is a property of the product structure itself.
         </p>
         <p>
-          The depth-20 result makes this concrete. The gradient ratio at depth 20 is 2.23 — well
-          within the safe range. Yet the test accuracy is <strong>0.750</strong>, down from 0.953
-          at depth 2. The gradient is arriving, but the optimiser cannot use it effectively. The
-          loss landscape at depth 20 is rough enough that SGD with a reasonable learning rate cannot
-          find a good minimum. This is not a gradient-magnitude problem; it is a landscape-geometry
+          The plain-SGD sweep makes this concrete, and it also shows why the tax is so easy to miss.
+          The gradient ratios are in the safe range at every depth. Under Adam the accuracy barely
+          moves — 0.948 at depth 2, 0.928 at depth 40 — because Adam rescales each parameter&rsquo;s
+          step by its own gradient history, which is itself a partial remedy for rough curvature.
+          Take that away and the same architectures give 0.940 at depth 20, <strong>0.770</strong> at
+          depth 30 and <strong>0.750</strong> at depth 40. The gradient is arriving; the optimiser
+          cannot use it. This is not a gradient-magnitude problem, it is a landscape-geometry
           problem, and it is the hardest of the three taxes to fix.
         </p>
 
@@ -175,6 +181,19 @@ export default function TheDepthTaxPage() {
             stopped learning.
           </p>
         </Proof>
+
+        <DepthRisk
+          rows={SGD_DEPTH as unknown as Array<Record<string, number>>}
+          keys={["plain", "resBN"]}
+          labels={["plain net", "residual + BatchNorm"]}
+          majority={MAJORITY_CLASS}
+          caption={<>The third tax, isolated. Both lines are width-16 ReLU nets with He
+            initialisation under identical plain SGD; the only difference is the wiring. The plain
+            net pays the tax in full past depth 20. The residual one, with BatchNorm inside each
+            block, does not pay it at all — 0.9467 at depth 40. That gap is the strongest argument
+            in this track that the third tax is a property of the <em>architecture</em> rather than
+            an unavoidable cost of composing functions, and chapter 5 is about why.</>}
+        />
 
         <h2>The three taxes interact</h2>
         <p>
@@ -223,11 +242,12 @@ export default function TheDepthTaxPage() {
           title="Checkpoint"
           questions={[
             {
-              q: <>The gradient ratio at depth 20 with He+ReLU is 2.23, which seems healthy. Yet
-                test accuracy drops to 0.750. What explains this gap?</>,
+              q: <>Gradient ratios with He+ReLU stay between 2 and 6 at every depth measured. Yet
+                under plain SGD, test accuracy drops from 0.940 at depth 20 to 0.750 at depth 40.
+                What explains that gap?</>,
               options: [
                 "The gradient ratio is misleading — 2.23 is actually too large",
-                "Gradient preservation is necessary but not sufficient; the loss landscape at depth 20 is rough enough that the optimiser cannot find a good minimum despite receiving the gradient signal",
+                "Gradient preservation is necessary but not sufficient; the loss landscape at depth 40 is rough enough that the optimiser cannot find a good minimum despite receiving the gradient signal",
                 "The model is overfitting because it has too many parameters at depth 20",
               ],
               answer: 1,

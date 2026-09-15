@@ -25,9 +25,9 @@ export default function NonSphericalPage() {
       <div className="lesson">
         <h2>The built-in shape bias</h2>
         <p>
-          Recall two facts from earlier. k-Means partitions space into <strong>Voronoi cells</strong>
+          Recall two facts from earlier. k-Means partitions space into <strong>Voronoi cells</strong>{" "}
           whose borders are straight perpendicular bisectors, and it minimises <strong>squared Euclidean
-          distance</strong> to a centroid. Together these bake in an assumption: clusters are roughly
+          distance</strong> to a centroid. Together these bake in an assumption: clusters are roughly{" "}
           <em>spherical</em> (isotropic), similar in size, and separable by flat boundaries. That&rsquo;s the
           only kind of cluster k-means can represent — everything else is forced into that mould.
         </p>

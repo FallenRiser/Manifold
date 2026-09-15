@@ -111,8 +111,10 @@ export function SilhouetteLab() {
         {/* mean line */}
         <line x1={sxScore(meanSil)} y1={padT} x2={sxScore(meanSil)} y2={H - padB} stroke="var(--ink)" strokeWidth={1.4} strokeDasharray="4 3" />
         <text x={sxScore(meanSil)} y={padT + 9} fontSize={10} fill="var(--ink)" textAnchor="middle">mean {meanSil.toFixed(2)}</text>
-        <text x={padL} y={H - 1} fontSize={9} fill="var(--faint)">−0.4</text>
-        <text x={W - padR} y={H - 1} fontSize={9} fill="var(--faint)" textAnchor="end">+1</text>
+        {/* Baseline at H - 1 put the glyph tops and the minus sign outside the
+            viewBox; a fontSize-9 label needs ~3 units of clearance. */}
+        <text x={padL} y={H - 3.5} fontSize={9} fill="var(--faint)">−0.4</text>
+        <text x={W - padR} y={H - 3.5} fontSize={9} fill="var(--faint)" textAnchor="end">+1</text>
       </svg>
 
       <div style={{ display: "flex", gap: 16, margin: "10px 0 2px" }}>

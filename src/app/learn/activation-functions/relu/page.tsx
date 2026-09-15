@@ -56,7 +56,7 @@ export default function ReluPage() {
           <M>{String.raw`4096\times512`}</M> array:
         </p>
 
-        <CodeOutput>{`activation   ms per call   vs relu
+        <CodeOutput source="scripts/activation_cases.py">{`activation   ms per call   vs relu
       relu          4.75      1.0x
      leaky         11.89      2.5x
       tanh         22.85      4.8x

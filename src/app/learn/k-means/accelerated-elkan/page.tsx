@@ -2,6 +2,9 @@ import { M } from "@/components/Math";
 import { CodeBlock } from "@/components/CodeBlock";
 import { CLUSTER_SETUP } from "@/lib/runtimeSetup";
 import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
+import { TriangleBound } from "@/components/figures/kmeans/KmeansDiagrams";
+import { GroupedBars } from "@/components/figures/kmeans/KmeansCharts";
+import { ELKAN_COUNTS, ELKAN_TIMES } from "@/components/figures/kmeans/data.generated";
 
 export const metadata = {
   title: "Accelerated k-means (Elkan) — Manifold",
@@ -33,6 +36,13 @@ export default function ElkanPage() {
           expensive distance entirely.
         </p>
 
+        <TriangleBound
+          caption={<>The whole idea, in one triangle. If the two centroids are further from each other
+            than twice the distance from x to the one it already belongs to, then c₂ cannot possibly be
+            closer, and the dashed distance never has to be computed. No approximation is involved —
+            the skipped comparison is one whose answer was already determined.</>}
+        />
+
         <h2>The triangle inequality, put to work</h2>
         <p>
           The whole trick rests on one geometric fact: for any three points,
@@ -56,22 +66,87 @@ export default function ElkanPage() {
         </Callout>
 
         <h2>When it helps — and when it doesn&rsquo;t</h2>
+        <p>
+          The honest answer has two halves that disagree, so it is worth separating the arithmetic from
+          the stopwatch.
+        </p>
         <ul style={ul}>
           <li>
-            <strong>Low to moderate dimensions:</strong> big wins, often 2–10× fewer distance
-            computations. The triangle-inequality bounds are tight and prune aggressively.
+            <strong>Distance computations: a large, reliable win.</strong> In low to moderate
+            dimensions the bounds are tight and prune hard — measured at <strong>92–94% fewer</strong>{" "}
+            distance evaluations in the first figure below, better than the 2–10× usually quoted.
           </li>
           <li>
-            <strong>High dimensions:</strong> the bounds loosen, pruning fails, and the extra
-            bookkeeping plus the <M>{String.raw`O(k^2)`}</M> centroid-distance step can make it{" "}
-            <em>slower</em> than plain Lloyd&rsquo;s. It also costs <M>{String.raw`O(n \cdot k)`}</M> memory for
-            the bounds.
+            <strong>High dimensions: the pruning itself degrades.</strong> The bounds loosen, fewer
+            comparisons are skipped, and the <M>{String.raw`O(k^2)`}</M> centroid-distance step plus{" "}
+            <M>{String.raw`O(n \cdot k)`}</M> memory for the bounds still has to be paid.
+          </li>
+          <li>
+            <strong>Wall-clock, on a modern machine: usually a loss.</strong> Fewer operations is not
+            the same as less time. Lloyd&rsquo;s assign step is a single matrix product that runs in
+            threaded BLAS across every core; Elkan&rsquo;s bound checks are a branchy per-point loop
+            that neither vectorises nor parallelises. In the second figure below Elkan is slower at
+            every size tested, and <em>the gap widens as k grows</em> — exactly where the theory says
+            it should win most.
           </li>
         </ul>
         <p>
-          That trade-off is exactly why scikit-learn chooses automatically: <code>algorithm="elkan"</code>
-          {" "}for dense low-dimensional data, the simpler <code>"lloyd"</code> otherwise.
+          scikit-learn used to make this choice for you, and no longer does. <code>algorithm="auto"</code>{" "}
+          was deprecated in 1.1 and removed in 1.3; in current versions it raises{" "}
+          <code>InvalidParameterError</code>, and the default is plain <code>"lloyd"</code> whatever your
+          data looks like. That change is itself the clearest evidence for the paragraph above — the
+          maintainers stopped routing anyone to Elkan because, on the hardware people actually run,
+          it stopped being the faster option.
         </p>
+        <p>
+          None of which makes the idea worthless. It is the cleanest example in this track of a
+          technique that is unambiguously better on the metric its inventor optimised, and a loss on
+          the metric you care about, because the machine underneath changed in the twenty years
+          between. Keep the triangle inequality; it reappears in nearest-neighbour search, where the
+          same trick is still decisive.
+        </p>
+
+        <GroupedBars
+          ylabel="point-to-centroid distances computed"
+          logScale
+          format={(v) => (v >= 1000 ? `${Math.round(v / 1000)}k` : String(Math.round(v)))}
+          groups={ELKAN_COUNTS.map((r) => ({
+            label: `n=${r.n}, d=${r.d}, k=${r.k}`,
+            values: [r.lloyd, r.elkan],
+          }))}
+          series={[
+            { name: "Lloyd", color: "var(--c-clustering)" },
+            { name: "Elkan", color: "var(--good)" },
+          ]}
+          caption={<>The pruning claim, counted rather than asserted, on a hand-written implementation
+            of both (log scale). Elkan computes <strong>92–94% fewer</strong> distances — better than
+            the 2–10× the literature usually quotes. The bounds work exactly as advertised.</>}
+        />
+
+        <GroupedBars
+          ylabel="seconds to fit — scikit-learn's own implementations"
+          format={(v) => v.toFixed(3)}
+          groups={ELKAN_TIMES.map((r) => ({
+            label: `n=${r.n.toLocaleString()}, k=${r.k}`,
+            values: [r.lloydTime, r.elkanTime],
+          }))}
+          series={[
+            { name: "Lloyd", color: "var(--c-clustering)" },
+            { name: "Elkan", color: "var(--good)" },
+          ]}
+          caption={<>And the same comparison on the clock, which goes the other way. Elkan is{" "}
+            <strong>slower</strong> at every size measured, and the gap gets worse as k grows —
+            {" "}{ELKAN_TIMES[2].speedup}× at k = {ELKAN_TIMES[2].k}, in precisely the regime where doing less
+            arithmetic should help most.
+
+            The explanation is not that the theory is wrong; it is that the theory counts the wrong
+            thing. Lloyd&rsquo;s assign step is a single large matrix product, which runs in threaded
+            BLAS across every core of the machine. Elkan&rsquo;s bound checks are a branchy loop over
+            one point at a time, which vectorises badly and parallelises worse. Removing fifteen
+            sixteenths of the operations does not pay if each survivor runs an order of magnitude
+            slower. Measured in <code>scripts/kmeans_cases.py</code> on a 12-thread build; on a
+            single-threaded one the comparison is much closer.</>}
+        />
 
         <h2>You rarely call it by hand</h2>
         <CodeBlock setup={CLUSTER_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />

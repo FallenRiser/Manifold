@@ -2,6 +2,7 @@ import Link from "next/link";
 import { LessonHeader, Callout, Proof, PrevNext } from "@/components/lesson";
 import { M, MathBlock } from "@/components/Math";
 import { Quiz } from "@/components/Quiz";
+import { PenaltySum } from "@/components/figures/nnReg/RegFigures";
 
 export const metadata = {
   title: "The effect on the loss landscape — Manifold",
@@ -46,6 +47,16 @@ export default function LandscapeEffectPage() {
           direction. Where the data loss is steep, the minimum barely moves; where it is flat, the bowl
           wins and the minimum slides a long way toward the origin.
         </p>
+
+        <PenaltySum
+          caption={<>The added bowl, in one dimension. The dashed grey curve is the data loss, the
+            dotted amber one is <M>{String.raw`\lambda w^2`}</M>, and the solid curve is what gradient
+            descent actually sees. Two things to read off it: the sum is <em>narrower</em> than the
+            data loss — that is the curvature going up, the same fact the Hessian section states as
+            every eigenvalue lifted by <M>{String.raw`2\lambda`}</M> — and its minimum has moved
+            toward the origin. Higher curvature and a shifted optimum are not two effects; they are
+            one parabola added to another.</>}
+        />
 
         <h2>The Hessian: every eigenvalue lifted by 2λ</h2>
         <p>

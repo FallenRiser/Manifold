@@ -369,7 +369,10 @@ def section8():
     _, pre_acts, acts = forward_activations(X_tr, p_zero)
     print("Zero init:")
     for j in range(len(pre_acts) - 1):
-        unique_rows = len(np.unique(acts[j+1], axis=1))
+        # number of DISTINCT unit outputs in this layer (columns), not rows:
+        # len() of the unique-columns array counts rows, which reported False for
+        # a layer whose units are provably identical.
+        unique_rows = np.unique(acts[j+1], axis=1).shape[1]
         all_zero = float((acts[j+1] == 0).all())
         print(f"  layer {j+1}: all outputs identical={unique_rows <= 1}, all zero={all_zero:.0f}")
     print("  -> All units compute the same thing. Gradient is identical for every unit.")

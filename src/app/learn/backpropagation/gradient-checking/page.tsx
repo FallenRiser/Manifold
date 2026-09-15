@@ -3,7 +3,7 @@ import { M, MathBlock } from "@/components/Math";
 import { Quiz } from "@/components/Quiz";
 import { CodeBlock } from "@/components/CodeBlock";
 import { CodeOutput } from "@/components/CodeOutput";
-import { DecisionPoint } from "@/components/capstone/DecisionPoint";
+import { DecisionPoint } from "@/components/DecisionPoint";
 
 export const metadata = {
   title: "Gradient checking — Manifold",

@@ -61,7 +61,7 @@ export default function BatchSizePage() {
             final loss shows it: 0.1260 against 0.2582.</>}
         />
 
-        <CodeOutput>{`  batch   steps/epoch   total steps   final loss   test acc
+        <CodeOutput source="scripts/backprop_cases.py">{`  batch   steps/epoch   total steps   final loss   test acc
       8            49          1470       0.1365     0.9048
      32            13           390       0.1260     0.9143
     128             4           120       0.1775     0.9000

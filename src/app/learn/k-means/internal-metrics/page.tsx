@@ -2,6 +2,8 @@ import { M, MathBlock } from "@/components/Math";
 import { CodeBlock } from "@/components/CodeBlock";
 import { CLUSTER_SETUP } from "@/lib/runtimeSetup";
 import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
+import { InertiaVsK } from "@/components/figures/kmeans/KmeansCharts";
+import { INERTIA_K } from "@/components/figures/kmeans/data.generated";
 
 export const metadata = {
   title: "Internal metrics — Manifold",
@@ -37,6 +39,18 @@ export default function InternalMetricsPage() {
           they combine the two — and silhouette (its own page) is one of them, working at the per-point
           level.
         </p>
+
+        <InertiaVsK
+          k={INERTIA_K.k}
+          inertia={INERTIA_K.inertia}
+          silhouette={INERTIA_K.silhouette}
+          caption={<>Why an internal metric has to be something other than the objective. Inertia (teal)
+            falls at every single k — {INERTIA_K.inertia[0]} at k = 1 down to {INERTIA_K.inertia[9]} at
+            k = 10, and it would reach exactly 0 at k = n, where every point is its own cluster. A
+            quantity that improves no matter what you do cannot choose anything. Silhouette (pink) is
+            built to be different: it charges for spread <em>and</em> rewards separation, so it has a
+            peak, and here the peak is at k = 4, which is how many blobs the data was made from.</>}
+        />
 
         <h2>Calinski–Harabasz (variance ratio)</h2>
         <p>

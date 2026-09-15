@@ -2,6 +2,7 @@ import { M, MathBlock } from "@/components/Math";
 import { CodeBlock } from "@/components/CodeBlock";
 import { CLUSTER_SETUP } from "@/lib/runtimeSetup";
 import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
+import { HardVsSoft } from "@/components/figures/kmeans/KmeansDiagrams";
 
 export const metadata = {
   title: "Fuzzy c-means — Manifold",
@@ -67,6 +68,15 @@ export default function FuzzyPage() {
 
         <h2>Soft memberships in code</h2>
         <CodeBlock setup={CLUSTER_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
+
+        <HardVsSoft
+          caption={<>Fuzzy c-means keeps the right-hand column. The membership vector is the output,
+            not an intermediate quantity thrown away at the end — so a point on a boundary is reported
+            as a point on a boundary. Whether that is worth the extra parameter m depends entirely on
+            whether anything downstream can use a number between 0 and 1; if the next step is
+            &ldquo;send this customer email A or email B&rdquo;, it cannot, and you have paid for
+            information you will discard yourself.</>}
+        />
 
         <PrevNext prev={{ href: "/learn/k-means/k-medians-and-k-modes", label: <>← k-medians &amp; k-modes</> }} next={{ href: "/learn/k-means/kernel-and-spherical", label: <>Next up · Kernel &amp; spherical k-means →</> }} />
       </div>

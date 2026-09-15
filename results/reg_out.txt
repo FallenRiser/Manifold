@@ -1,0 +1,170 @@
+
+==========================================================================
+SECTION 1: The gap -- a network that overfits
+==========================================================================
+High-capacity MLP (3x256), 250 training points, 50 feats, 10% label noise.
+This is the problem the whole track uses. It MUST overfit or nothing
+below is demonstrable.
+
+  baseline (no regularisation):  train 1.000  test 0.756  gap 0.244
+
+Capacity vs gap (no regularisation):
+  depth x width      train    test     gap
+  ----------------------------------------------
+  1 x 32           1.000   0.753   0.247
+  2 x 64           1.000   0.754   0.246
+  3 x 256          1.000   0.751   0.249
+  4 x 512          1.000   0.770   0.230
+
+==========================================================================
+SECTION 2: Weight decay -- where it works, and where it does not
+==========================================================================
+Weight decay penalises large weights. Its effect is clearest when weight
+MAGNITUDE is the thing that controls overfitting -- which is not always
+the case. Three measurements make the honest picture.
+
+2a) Regression, AdamW: the textbook bias-variance tradeoff.
+    A wide net on 60 noisy points of a smooth 1-D target. As decay rises,
+    train MSE goes UP (less fitting of noise) and test MSE goes DOWN.
+    weight_decay   train_mse   test_mse
+    ------------------------------------------
+    0.0000         0.0221     0.0535
+    0.0001         0.0220     0.0526
+    0.0010         0.0216     0.0542
+    0.0100         0.0218     0.0516
+    0.0300         0.0224     0.0511
+    0.1000         0.0227     0.0478
+    0.3000         0.0290     0.0412
+
+2b) Classification, SGD+momentum: decay closes the gap.
+    The same overfitting classifier, trained with plain SGD (batch 32).
+    weight_decay   train    test     gap
+    ------------------------------------------
+    0.0000         1.000   0.768   0.232
+    0.0001         1.000   0.766   0.234
+    0.0010         1.000   0.768   0.232
+    0.0050         1.000   0.770   0.230
+    0.0100         1.000   0.771   0.229
+    0.0500         0.999   0.767   0.232
+
+2c) Classification, full-batch AdamW: the honest null result.
+    The SAME sweep under full-batch AdamW barely moves test accuracy --
+    only ~400 steps, so per-step decay lr*wd*w never compounds enough,
+    and the net memorises the 250 points with SMALL weights anyway.
+    weight_decay   train    test     gap
+    ------------------------------------------
+    0.0000         1.000   0.755   0.245
+    0.0100         1.000   0.751   0.249
+    0.1000         1.000   0.753   0.247
+
+==========================================================================
+SECTION 3: Weight decay is not L2 (with Adam)
+==========================================================================
+For adaptive optimisers, decoupled weight decay (AdamW) and adding an
+L2 term to the loss (Adam) are NOT the same update. Measured, same net,
+same nominal strength 1e-3.
+
+  AdamW decoupled wd=1e-3 :  train 1.000  test 0.751  gap 0.249
+  Adam + L2 in loss 1e-3  :  train 1.000  test 0.770  gap 0.230
+  (The two differ because Adam scales the L2 gradient by the per-parameter
+   adaptive rate, while AdamW applies decay uniformly.)
+
+==========================================================================
+SECTION 4: Dropout -- sweeping the rate
+==========================================================================
+Dropout after each hidden ReLU, 3x256 net, no weight decay. Sweep p.
+
+  dropout p    train    test     gap
+  ----------------------------------------
+  0.00         1.000   0.751   0.249
+  0.10         1.000   0.754   0.246
+  0.20         1.000   0.771   0.229
+  0.30         1.000   0.773   0.227
+  0.50         1.000   0.777   0.223
+  0.70         1.000   0.773   0.227
+
+  best test at dropout=0.5: test 0.777 (gap 0.223)
+
+==========================================================================
+SECTION 5: Dropout at test time -- the scaling
+==========================================================================
+At test, dropout is turned OFF and activations are used at full strength
+(inverted dropout already scaled them up during training). Using dropout
+at test (MC-dropout) instead gives a NOISY, non-deterministic prediction.
+
+  eval() deterministic test acc      : 0.749
+  single MC-dropout pass (stochastic): mean 0.717 std 0.010  (varies run to run)
+  50-pass MC-dropout average         : 0.749
+
+==========================================================================
+SECTION 6: Early stopping
+==========================================================================
+Track a held-out validation error while training; keep the weights at its
+minimum. Early stopping is clearest when test error OVER-FITS OVER TIME --
+bottoms out, then climbs as training continues.
+
+6a) Regression: the clean overfitting-over-time curve.
+    The wide net on 80 noisy points, 56 train / 24 val, Adam, 4000 epochs,
+    tracking validation MSE. 5-seed average.
+    best-val epoch (avg)   : 34 of 4000
+    test MSE at best-val   : 0.0118
+    test MSE at end        : 0.0760
+    early stopping saves   : +0.0641 MSE
+
+6b) Classification: stop on the RIGHT metric.
+    On the overfitting classifier, validation LOSS and validation ACCURACY
+    disagree: the loss bottoms almost immediately (the net gets over-
+    confident on the label noise) while test accuracy keeps drifting up.
+  best validation epoch (avg)   : 3 of 600
+  test acc at best-val weights   : 0.741
+  test acc after full 600 epochs : 0.754
+  early stopping recovers        : -0.012
+
+==========================================================================
+SECTION 7: Data augmentation (input jitter)
+==========================================================================
+The tabular analogue of augmentation: add fresh Gaussian noise to inputs
+every epoch, so the network never sees the same 250 points twice.
+
+  jitter std   train    test     gap
+  ----------------------------------------
+  0.00         1.000   0.753   0.247
+  0.05         1.000   0.755   0.245
+  0.10         1.000   0.760   0.240
+  0.20         1.000   0.766   0.234
+  0.40         1.000   0.784   0.216
+
+==========================================================================
+SECTION 8: Label smoothing and mixup
+==========================================================================
+Label smoothing softens the one-hot target; mixup trains on convex blends
+of pairs of points and their labels. Both discourage overconfidence.
+
+  method              train    test     gap
+  ------------------------------------------------
+  label_smooth=0.00     1.000   0.752   0.248
+  label_smooth=0.05     1.000   0.752   0.248
+  label_smooth=0.10     1.000   0.753   0.247
+  label_smooth=0.20     1.000   0.754   0.246
+  mixup alpha=0.20      1.000   0.757   0.243
+  mixup alpha=0.40      1.000   0.749   0.251
+  mixup alpha=1.00      1.000   0.747   0.253
+
+==========================================================================
+SECTION 9: Combining regularisers + BatchNorm as implicit reg
+==========================================================================
+Do the effects stack? Best single vs a sensible combination.
+
+  config                    train    test     gap
+  ----------------------------------------------------
+  none                     1.000   0.753   0.247
+  weight_decay 1e-2        1.000   0.751   0.249
+  dropout 0.3              1.000   0.772   0.228
+  wd + dropout             1.000   0.781   0.219
+  wd + dropout + jitter    1.000   0.774   0.226
+
+BatchNorm as implicit regularisation (no other reg):
+  batchnorm=False  train 1.000  test 0.751  gap 0.249
+  batchnorm=True   train 1.000  test 0.763  gap 0.237
+
+DONE.

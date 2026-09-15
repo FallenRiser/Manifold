@@ -3,7 +3,7 @@ import { M } from "@/components/Math";
 import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 import { LabFrame } from "@/components/LabFrame";
 import { InfluenceLab } from "@/components/labs/InfluenceLab";
-import { DecisionPoint } from "@/components/capstone/DecisionPoint";
+import { DecisionPoint } from "@/components/DecisionPoint";
 
 export const metadata = {
   title: "Outliers & influence — Manifold",

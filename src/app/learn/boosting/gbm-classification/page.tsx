@@ -2,6 +2,7 @@ import Link from "next/link";
 import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 import { M, MathBlock } from "@/components/Math";
 import { CodeOutput } from "@/components/CodeOutput";
+import { PredictPrompt } from "@/components/PredictPrompt";
 import { Quiz } from "@/components/Quiz";
 
 export const metadata = {
@@ -87,7 +88,13 @@ export default function GbmClassificationPage() {
           Histogram gradient boosting on the forest-cover-type task (25k rows, 7 classes), the same data the
           random forest scored 0.847 on:
         </p>
-        <CodeOutput label="HistGradientBoostingClassifier — covtype, defaults">{`test accuracy 0.783   log-loss 0.659
+        <PredictPrompt
+          accent={TREES}
+          prompt={<>Straight out of the box, no tuning at all. Where does histogram gradient boosting land against the random forest&rsquo;s 0.847 on the same split?</>}
+          options={["Clearly ahead — boosting usually wins", "Neck and neck", "A point or two behind", "Well behind — around 0.78"]}
+          nudge="Locked in. The measured answer is right below."
+        />
+        <CodeOutput source="scripts/boosting_cases.py" label="HistGradientBoostingClassifier — covtype, defaults">{`test accuracy 0.783   log-loss 0.659
 (random forest reference: 0.847)`}</CodeOutput>
         <p>
           Read that honestly: <strong>out of the box, boosting here <em>loses</em> to the forest.</strong> Its

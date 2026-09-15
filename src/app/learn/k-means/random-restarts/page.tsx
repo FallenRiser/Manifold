@@ -2,6 +2,8 @@ import { M } from "@/components/Math";
 import { CodeBlock } from "@/components/CodeBlock";
 import { CLUSTER_SETUP } from "@/lib/runtimeSetup";
 import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
+import { LineChart } from "@/components/figures/kmeans/KmeansCharts";
+import { RESTARTS, INIT_DIST } from "@/components/figures/kmeans/data.generated";
 
 export const metadata = {
   title: "Random restarts — Manifold",
@@ -50,6 +52,24 @@ export default function RandomRestartsPage() {
             times the work — which is the whole motivation for the next page: a smarter seed that needs
             far fewer restarts.
         </Callout>
+
+        <LineChart
+          x={RESTARTS.map((r) => r.m)}
+          logX
+          series={[
+            { label: "median inertia of best-of-m", values: RESTARTS.map((r) => r.median), color: "var(--c-clustering)" },
+            { label: "worst best-of-m seen", values: RESTARTS.map((r) => r.worst), color: "var(--bad)", dash: "5 3" },
+          ]}
+          xlabel="m — number of random restarts kept the best of"
+          ylabel="final inertia"
+          format={(v) => v.toFixed(0)}
+          caption={<>Restarts work, and they work slowly. On a board of eight clusters, a single random
+            start has a median inertia of {RESTARTS[0].median} against a best-known {INIT_DIST.floor};
+            it takes <strong>ten</strong> restarts for the median to reach the floor and{" "}
+            <strong>twenty</strong> before even the worst run does. That is twenty full k-means fits to
+            buy what the next page&rsquo;s seeding gets right {INIT_DIST.plusHits}% of the time on the
+            first try.</>}
+        />
 
         <h2>Restarts vs. better seeding</h2>
         <p>

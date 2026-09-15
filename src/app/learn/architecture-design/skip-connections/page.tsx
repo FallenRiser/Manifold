@@ -2,6 +2,7 @@ import Link from "next/link";
 import { LessonHeader, Callout, Proof, PrevNext } from "@/components/lesson";
 import { M, MathBlock } from "@/components/Math";
 import { Quiz } from "@/components/Quiz";
+import { ResidualBlock, ResidualStack } from "@/components/figures/arch/ResidualBlock";
 
 export const metadata = {
   title: "Skip connections — Manifold",
@@ -54,6 +55,17 @@ export default function SkipConnectionsPage() {
           gate, no attention mechanism. It is a wire from the input of a block to the output of that
           block, carrying the identity function.
         </p>
+
+        <ResidualBlock
+          caption={<>The whole idea, and the whole difference. Everything inside the two blocks is
+            identical — same weight matrix, same normalisation, same activation. The residual block
+            has one extra arrow, carrying <M>{String.raw`x`}</M> forward unmodified and adding it
+            back at the end. The line under each diagram is the consequence: differentiating{" "}
+            <M>{String.raw`F(x)`}</M> gives you whatever <M>{String.raw`F`}</M> happens to be, while
+            differentiating <M>{String.raw`F(x) + x`}</M> gives you that <em>plus the identity</em>,
+            and the identity is a route from the loss to <M>{String.raw`x`}</M> along which nothing
+            has been multiplied.</>}
+        />
 
         <h2>What happens when F learns nothing</h2>
         <p>

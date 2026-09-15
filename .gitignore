@@ -7,3 +7,8 @@
 .env*
 !.env.example
 next-env.d.ts
+
+# Gameplay recordings for Capstone C: gigabytes per session, never committed.
+/data/lop/
+tools/**/out/
+__pycache__/

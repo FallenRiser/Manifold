@@ -1,6 +1,9 @@
 import Link from "next/link";
 import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 import { REG_NN_DONE, REG_NN_TOTAL } from "@/lib/regularisationTrack";
+import { PredictPrompt } from "@/components/PredictPrompt";
+import { LearningCurve } from "@/components/figures/LearningCurve";
+import { ES_CURVE } from "@/components/figures/nnReg/curves";
 
 export const metadata = {
   title: "Regularisation — Manifold",
@@ -88,6 +91,37 @@ export default function RegularisationHub() {
           the uncomfortable results: weight decay is nearly inert here while dropout works, and label
           smoothing barely touches accuracy (it changes calibration, not the boundary).
         </Callout>
+
+        <PredictPrompt
+          accent={CORAL}
+          prompt={<>A wide network is fitted to 80 noisy points and trained for 4,000 epochs. Its
+            held-out error reaches its minimum at some point along the way. Roughly where?</>}
+          options={[
+            "Near the end — that is what the epochs are for",
+            "Around halfway",
+            "In the first few hundred epochs",
+            "In the first fifty epochs",
+          ]}
+          nudge="Locked in. The trajectory is below."
+        />
+
+        <LearningCurve
+          x={ES_CURVE.epochs}
+          series={[
+            { label: "training error", values: ES_CURVE.train, color: "var(--muted)", dash: "4 3" },
+            { label: "held-out error", values: ES_CURVE.val, color: "var(--c-neural)" },
+          ]}
+          markAt={ES_CURVE.bestEpochOfMeanCurve}
+          markLabel={`best held-out · epoch ${ES_CURVE.bestEpochOfMeanCurve}`}
+          ylabel="MSE"
+          caption={<>The whole track in one picture. Training error falls for four thousand epochs and
+            never stops falling — that is the curve you would be watching if you only logged the
+            training loss. Held-out error bottoms out at <strong>epoch 34</strong> (averaged per seed;
+            the averaged curve drawn here turns at epoch 45) and then climbs for the remaining 99% of
+            the run, finishing at 0.183 against its minimum of 0.082 — more than twice as bad as the
+            model you already had at epoch 45. Everything in this track is a way of not spending those
+            3,966 epochs.</>}
+        />
 
         <h2>The five chapters</h2>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(258px, 1fr))", gap: 14, margin: "1.2rem 0" }}>

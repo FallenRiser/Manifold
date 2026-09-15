@@ -81,7 +81,7 @@ export default function ManyEquivalentSolutionsPage() {
 
         <MathBlock>{String.raw`\#\{\text{equivalent weight vectors}\} \;=\; \prod_{\text{layers}} n_\ell!\;\cdot\;2^{n_\ell}`}</MathBlock>
 
-        <CodeOutput>{`  a single tanh layer of width   4: 4! x 2^4 = 3.840e+02 identical copies
+        <CodeOutput source="scripts/perceptron_mlp_cases.py">{`  a single tanh layer of width   4: 4! x 2^4 = 3.840e+02 identical copies
   a single tanh layer of width  16: 16! x 2^16 = 1.371e+18 identical copies
   a single tanh layer of width  64: 64! x 2^64 = 2.341e+108 identical copies
       two layers of 32:      1.277e+90 (= 10^90)`}</CodeOutput>
@@ -107,7 +107,7 @@ export default function ManyEquivalentSolutionsPage() {
           The same architecture and the same data, trained five times with different random initialisations:
         </p>
 
-        <CodeOutput>{`  seed 0: test acc 0.9190   |w| =  10.496   first 3 weights [-0.508, -0.523, -1.631]
+        <CodeOutput source="scripts/perceptron_mlp_cases.py">{`  seed 0: test acc 0.9190   |w| =  10.496   first 3 weights [-0.508, -0.523, -1.631]
   seed 1: test acc 0.9190   |w| =  11.600   first 3 weights [-1.074, -0.424, -0.44]
   seed 2: test acc 0.9190   |w| =  10.194   first 3 weights [-0.774, -3.596, -0.533]
   seed 3: test acc 0.9238   |w| =  10.590   first 3 weights [0.12, 0.545, -0.452]
@@ -126,7 +126,7 @@ export default function ManyEquivalentSolutionsPage() {
           If two models are equally good, averaging them ought to be safe. In weight space it is not:
         </p>
 
-        <CodeOutput>{`  seed 0 alone           : 0.9190
+        <CodeOutput source="scripts/perceptron_mlp_cases.py">{`  seed 0 alone           : 0.9190
   seed 1 alone           : 0.9190
   average of the WEIGHTS  : 0.8714   <- averaging in weight space
   average of the OUTPUTS  : 0.9190   <- averaging in function space (5 models)`}</CodeOutput>

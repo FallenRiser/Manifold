@@ -2,6 +2,8 @@ import Link from "next/link";
 import { LessonHeader, Callout, Proof, PrevNext } from "@/components/lesson";
 import { M, MathBlock } from "@/components/Math";
 import { Quiz } from "@/components/Quiz";
+import { LearningCurve } from "@/components/figures/LearningCurve";
+import { ES_CURVE } from "@/components/figures/nnReg/curves";
 
 export const metadata = {
   title: "Patience and the validation curve — Manifold",
@@ -42,6 +44,23 @@ export default function PatiencePage() {
           minimum at 34, leaving accuracy on the table. The uptick that stops you must be a <em>real</em>
           {" "}reversal, not a single noisy sample. Distinguishing the two is exactly what patience buys.
         </p>
+
+        <LearningCurve
+          x={ES_CURVE.epochs.slice(0, 41)}
+          series={[
+            { label: "validation MSE", values: ES_CURVE.val.slice(0, 41), color: "var(--c-neural)" },
+          ]}
+          markAt={ES_CURVE.bestEpochOfMeanCurve}
+          markLabel={`true minimum · epoch ${ES_CURVE.bestEpochOfMeanCurve}`}
+          linearUpTo={200}
+          ylabel="validation MSE"
+          caption={<>The first two hundred epochs of the same run, on a linear axis so the texture is
+            visible. The curve does not descend smoothly and then turn; it jitters the whole way down.
+            A rule that stops at the first epoch worse than the last would fire at epoch 35 — before
+            the real minimum at 45 — purely on that jitter, and this is the <em>averaged</em> curve
+            over five seeds, so a single run is noisier still. Patience is not a safety margin bolted
+            on for comfort; without it the stopping rule is mostly measuring noise.</>}
+        />
 
         <h2>Patience: wait before you quit</h2>
         <p>

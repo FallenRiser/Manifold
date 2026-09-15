@@ -5,6 +5,7 @@ import { CodeBlock } from "@/components/CodeBlock";
 import { CodeOutput } from "@/components/CodeOutput";
 import { PredictPrompt } from "@/components/PredictPrompt";
 import { GRIDWORLD_SETUP } from "@/lib/runtimeSetup";
+import { ModelVsSample } from "@/components/figures/planning/PlanningDiagrams";
 
 export const metadata = {
   title: "Planning vs learning — Manifold",
@@ -65,6 +66,14 @@ print("TD backup at state 6 (uses one sample):  ", round(td_backup(V, 6), 2))`;
           When the model is unknown, you cannot sum over <M>P</M> — because you do not have <M>P</M>. All you can do
           is <em>act</em>, and observe what happens.
         </p>
+
+        <ModelVsSample
+          caption={<>The single edit that turns this track into the next one. Planning reads P(s′ | s, a)
+            and folds in every successor at once, weighted — that is the Σ in every equation you have
+            written. Learning cannot see the distribution, so it takes the one successor the world
+            actually handed it and treats that as a sample of the sum. Everything else — the Bellman
+            equations, the greedy improvement, the fixed point — survives untouched.</>}
+        />
 
         <h2>The one change that everything else follows from</h2>
         <p>

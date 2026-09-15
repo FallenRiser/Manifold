@@ -1,5 +1,7 @@
 import { MathBlock } from "@/components/Math";
 import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
+import { ScatterRow } from "@/components/figures/kmeans/Scatter";
+import { BLOBS } from "@/components/figures/kmeans/data.generated";
 
 export const metadata = {
   title: "The k-means idea — Manifold",
@@ -34,6 +36,18 @@ export default function TheKMeansIdeaPage() {
           k-means is fast and excellent. When it isn&rsquo;t, it fails in specific, predictable ways
           we&rsquo;ll catalogue later.
         </p>
+
+        <ScatterRow
+          panels={[
+            { points: BLOBS.points, mono: true, label: "150 points, no labels" },
+            { points: BLOBS.points, labels: BLOBS.labels, centroids: BLOBS.centroids, label: "k = 4, after k-means" },
+          ]}
+          caption={<>The entire promise of the method, left to right. Nothing in the left panel is
+            labelled and nothing about it is known; the right panel is the same 150 points with each one
+            assigned to the nearest of four centroids (the ringed crosses). The clustering recovers the
+            blobs the data was generated from with an adjusted Rand index of {BLOBS.ari} — measured in{" "}
+            <code>scripts/kmeans_cases.py</code>, on exactly the points the Run button above uses.</>}
+        />
 
         <h2>The objective: inertia</h2>
         <p>

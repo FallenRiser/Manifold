@@ -3,6 +3,8 @@ import { CodeBlock } from "@/components/CodeBlock";
 import { CLUSTER_SETUP } from "@/lib/runtimeSetup";
 import { ScalingLab } from "@/components/labs/ScalingLab";
 import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
+import { ScatterRow } from "@/components/figures/kmeans/Scatter";
+import { SCALING } from "@/components/figures/kmeans/data.generated";
 
 export const metadata = {
   title: "Why scaling matters — Manifold",
@@ -73,6 +75,24 @@ export default function ScalingPage() {
 
         <h2>Always scale before k-means</h2>
         <CodeBlock setup={CLUSTER_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
+
+        <ScatterRow
+          sharedBounds={false}
+          panels={[
+            { points: SCALING.raw.points, labels: SCALING.truth, label: "the three real groups", note: "one axis is in different units" },
+            { points: SCALING.raw.points, labels: SCALING.raw.labels, label: "clustered as-is", note: `ARI ${SCALING.raw.ari}` },
+            { points: SCALING.scaled.points, labels: SCALING.scaled.labels, label: "after StandardScaler", note: `ARI ${SCALING.scaled.ari}` },
+          ]}
+          caption={<>The same three blobs, with the second feature multiplied by 40 — the everyday case
+            of one column in metres and another in millimetres. Euclidean distance is then dominated by
+            that one column, so k-means slices the cloud into horizontal bands and scores ARI{" "}
+            {SCALING.raw.ari}. Standardising each column first, and changing nothing else, takes it to{" "}
+            {SCALING.scaled.ari}.
+
+            This is the failure worth fearing most, because the middle panel does not look broken. The
+            clusters are tidy, compact and perfectly reasonable; they are answering a question about
+            units rather than about the data.</>}
+        />
 
         <PrevNext prev={{ href: "/learn/k-means/cluster-stability", label: <>← Cluster stability</> }} next={{ href: "/learn/k-means/outliers-and-robustness", label: <>Next up · Outliers &amp; robustness →</> }} />
       </div>

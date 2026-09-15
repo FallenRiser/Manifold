@@ -2,6 +2,7 @@ import Link from "next/link";
 import { LessonHeader, Callout, Proof, PrevNext } from "@/components/lesson";
 import { M, MathBlock } from "@/components/Math";
 import { Quiz } from "@/components/Quiz";
+import { GradRatioBars } from "@/components/figures/initNorm/GradRatioBars";
 
 export const metadata = {
   title: "Init × activation × normalisation — Manifold",
@@ -76,6 +77,15 @@ export default function TheInteractionPage() {
           Depth 8, width 32, no normalisation. Gradient ratio = first-layer gradient norm ÷ last-layer
           gradient norm at initialisation.
         </p>
+
+        <GradRatioBars
+          caption={<>The same grid as a picture, on a log axis, because the hierarchy is a matter of
+            orders of magnitude and a column of decimals hides that. The activation choice moves the
+            bar by six decades; the init choice moves it by less than one. That ratio <em>is</em> the
+            hierarchy this chapter argues for — pick the activation first, then match the
+            initialisation to it, and never expect an initialisation to rescue a saturating
+            activation.</>}
+        />
 
         <h2>Reading the grid: a strict hierarchy</h2>
         <p>

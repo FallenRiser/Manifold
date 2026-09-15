@@ -2,6 +2,7 @@ import Link from "next/link";
 import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 import { M, MathBlock } from "@/components/Math";
 import { CodeOutput } from "@/components/CodeOutput";
+import { PredictPrompt } from "@/components/PredictPrompt";
 
 export const metadata = {
   title: "Newton boosting: XGBoost's second-order step — Manifold",
@@ -101,7 +102,13 @@ export default function NewtonBoostingPage() {
 
         <h2>The regularisation, measured</h2>
         <p>XGBoost on the covtype task, varying only the L2 leaf penalty <M>{String.raw`\lambda`}</M>:</p>
-        <CodeOutput label="XGBoost test accuracy vs reg_lambda (covtype)">{`  reg_lambda =  0.0    acc 0.848
+        <PredictPrompt
+          accent={TREES}
+          prompt={<><code>reg_lambda</code> sits in the Newton denominator, shrinking every leaf value. Take it from 0 to 1 to 10 on covtype. What happens to test accuracy?</>}
+          options={["Rises — that is what regularisation is for", "Peaks at 1.0, the default", "Falls, monotonically", "No measurable change"]}
+          nudge="Locked in. The measured answer is right below."
+        />
+        <CodeOutput source="scripts/boosting_cases.py" label="XGBoost test accuracy vs reg_lambda (covtype)">{`  reg_lambda =  0.0    acc 0.848
   reg_lambda =  1.0    acc 0.843
   reg_lambda = 10.0    acc 0.837`}</CodeOutput>
         <p>

@@ -2,6 +2,9 @@ import Link from "next/link";
 import { LessonHeader, Callout, Proof, PrevNext } from "@/components/lesson";
 import { M, MathBlock } from "@/components/Math";
 import { Quiz } from "@/components/Quiz";
+import { Dumbbell } from "@/components/figures/Dumbbell";
+import { NetworkDiagram, NetworkPair } from "@/components/figures/arch/NetworkDiagram";
+import { SCHEDULES } from "@/components/figures/arch/data";
 
 export const metadata = {
   title: "Funnel, constant, or inverted? — Manifold",
@@ -103,6 +106,22 @@ export default function WidthSchedulesPage() {
         <p style={{ fontSize: 13, color: "var(--muted)" }}>
           Five seeds, 100 epochs each.
         </p>
+
+        <NetworkPair
+          left={{ sizes: [2, 64, 32, 16, 1], title: "Funnel", note: "64 → 32 → 16, 2,817 parameters" }}
+          right={{ sizes: [2, 16, 32, 64, 1], title: "Inverted funnel", note: "16 → 32 → 64, 2,769 parameters" }}
+        />
+
+        <Dumbbell
+          rows={SCHEDULES.map((r) => ({ init: r.label, a: r.test }))}
+          seriesLabels={["test accuracy"]}
+          ticks={[0.94, 0.945, 0.95]}
+          caption={<>Two visibly different networks, and a result that refuses to distinguish them:
+            0.9450, 0.9440, 0.9430, against per-shape seed spreads of up to 0.0049. This is a null,
+            and it is reported as one. The funnel is conventional because it is cheap — the wide
+            layer sits where the input is largest — not because anyone has shown it to be more
+            accurate at a fixed budget.</>}
+        />
 
         <h2>All three within noise</h2>
         <p>

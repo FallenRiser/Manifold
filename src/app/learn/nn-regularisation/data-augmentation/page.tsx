@@ -2,6 +2,8 @@ import Link from "next/link";
 import { LessonHeader, Callout, Proof, PrevNext } from "@/components/lesson";
 import { M, MathBlock } from "@/components/Math";
 import { Quiz } from "@/components/Quiz";
+import { SweepCurve } from "@/components/figures/SweepCurve";
+import { JITTER } from "@/components/figures/nnReg/data";
 
 export const metadata = {
   title: "Data augmentation — Manifold",
@@ -105,6 +107,19 @@ export default function DataAugmentationPage() {
           boundary it does — you are handing the network correct information, not just a penalty. That is
           why it beats the model-space regularisers on this task.
         </Callout>
+
+        <SweepCurve
+          points={JITTER}
+          xlabel="input jitter σ"
+          caption={<>Monotone, all the way to the largest setting tested: 0.753 at no jitter rising to
+            <strong> 0.784</strong> at σ = 0.4. That is a bigger gain than dropout&rsquo;s best and far
+            bigger than weight decay&rsquo;s on this problem, from the crudest possible augmentation —
+            fresh Gaussian noise on the inputs each epoch. Read the right-hand end carefully though.
+            The curve is still climbing, which means the sweep stopped before finding the optimum, and
+            the next section is about what happens when it keeps going: at some σ the jitter is large
+            enough to move points across the decision boundary, and the augmentation starts
+            manufacturing mislabelled data.</>}
+        />
 
         <h2>The two ways it can go wrong</h2>
         <p>

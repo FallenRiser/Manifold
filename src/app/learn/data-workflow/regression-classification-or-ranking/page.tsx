@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { M } from "@/components/Math";
 import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
-import { DecisionPoint } from "@/components/capstone/DecisionPoint";
+import { DecisionPoint } from "@/components/DecisionPoint";
 
 export const metadata = {
   title: "Regression, classification or ranking? — Manifold",

@@ -95,7 +95,7 @@ export default function SmoothnessPage() {
           Not free, and the price is paid on every unit of every layer at every step:
         </p>
 
-        <CodeOutput>{`activation   ms per call   vs relu
+        <CodeOutput source="scripts/activation_cases.py">{`activation   ms per call   vs relu
       relu          4.75      1.0x
      leaky         11.89      2.5x
      swish        104.84     22.1x

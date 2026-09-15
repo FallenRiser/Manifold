@@ -63,7 +63,7 @@ export default function MomentumPage() {
           Same 2–16–16–1 network, same seed, 400 full-batch steps, two moons.
         </p>
 
-        <CodeOutput>{`      rule      lr   loss @400   test acc
+        <CodeOutput source="scripts/backprop_cases.py">{`      rule      lr   loss @400   test acc
        sgd     0.1      0.1985     0.8857
   momentum     0.1      0.0927     0.9190
       adam    0.01      0.0776     0.9143`}</CodeOutput>

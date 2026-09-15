@@ -3,8 +3,8 @@ import { CodeOutput } from "@/components/CodeOutput";
 import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 import { M } from "@/components/Math";
 import { PredictPrompt } from "@/components/PredictPrompt";
-import { DecisionPoint } from "@/components/capstone/DecisionPoint";
-import { AnalystQuestion, TransferBox, PlaybookRule } from "@/components/capstone/pedagogy";
+import { DecisionPoint } from "@/components/DecisionPoint";
+import { WorkOrder, TransferBox, PlaybookRule } from "@/components/capstone/warehouse";
 import { WAREHOUSE_SETUP } from "@/lib/runtimeSetup";
 
 export const metadata = {
@@ -33,10 +33,10 @@ export default function WhatSuccessMeans() {
       />
 
       <div className="lesson">
-        <AnalystQuestion accent={OLIVE} label="The engineer's question" icon="🤖">
+        <WorkOrder act={2} n={7}>
           What exactly is the number I will put in the table — and is it stable enough to support the claim I want
           to make with it?
-        </AnalystQuestion>
+        </WorkOrder>
 
         <h2>The scoreboard</h2>
         <p>
@@ -192,14 +192,14 @@ export default function WhatSuccessMeans() {
           the moment you make it.
         </p>
 
-        <TransferBox accent={OLIVE}>
+        <TransferBox>
           On your next RL project, write the evaluation protocol into the repo before the first agent trains, and
           make it a function every experiment calls rather than a block of code each script copies. Then check the
           noise floor: measure one fixed policy several times and confirm the spread is small compared with the
           differences you plan to claim. If it is not, you do not have a result yet — you have a sample.
         </TransferBox>
 
-        <PlaybookRule n={7} accent={OLIVE}>
+        <PlaybookRule n={7}>
           <strong>Design and freeze the evaluation harness before training</strong> — metric, start state,
           truncation cap, exploration setting, episode count, seeds. Then verify its noise floor is well below the
           effect sizes you intend to report.

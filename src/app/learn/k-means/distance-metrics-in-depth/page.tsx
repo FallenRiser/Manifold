@@ -3,6 +3,8 @@ import { M, MathBlock } from "@/components/Math";
 import { CodeBlock } from "@/components/CodeBlock";
 import { CLUSTER_SETUP } from "@/lib/runtimeSetup";
 import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
+import { ScatterRow } from "@/components/figures/kmeans/Scatter";
+import { COSINE } from "@/components/figures/kmeans/data.generated";
 
 export const metadata = {
   title: "Distance metrics in depth — Manifold",
@@ -91,6 +93,20 @@ export default function DistanceMetricsPage() {
 
         <h2>Compute several at once</h2>
         <CodeBlock setup={CLUSTER_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
+
+        <ScatterRow
+          panels={[
+            { points: COSINE.points, labels: COSINE.truth, label: "the structure that is really there" },
+            { points: COSINE.points, labels: COSINE.euclidean, label: "Euclidean" },
+            { points: COSINE.points, labels: COSINE.cosine, label: "cosine (unit-normalised)" },
+          ]}
+          caption={<>Choosing a metric is choosing what counts as similar, and the choice can matter
+            more than the algorithm. These points lie along two rays from the origin, so
+            &ldquo;similar&rdquo; means <em>same direction</em>. Euclidean distance instead sees
+            magnitude and cuts across both rays, scoring ARI {COSINE.euclideanAri}; cosine sees only
+            angle and scores {COSINE.cosineAri}. Same points, same k, same algorithm, opposite
+            answers.</>}
+        />
 
         <PrevNext prev={{ href: "/learn/k-means/similarity-and-distance", label: <>← Similarity &amp; distance</> }} next={{ href: "/learn/k-means/the-curse-of-dimensionality", label: <>Next up · The curse of dimensionality →</> }} />
       </div>

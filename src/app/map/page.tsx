@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { TIERS, FAMILIES, PILLARS, FOUNDATIONS, CAPSTONES, type Group } from "@/lib/siteMap";
+import { SITE, countsFor, groupPages } from "@/lib/catalog";
 import { Reveal } from "@/components/Reveal";
-import { CurriculumAtlas } from "@/components/CurriculumAtlas";
+import { Throughlines } from "@/components/Throughlines";
 import { CapstoneCard } from "@/components/CapstoneCard";
 
 export const metadata = {
@@ -51,6 +52,21 @@ export default function MapPage() {
             New to machine learning? Take the five-page on-ramp →
           </Link>
         </p>
+
+        <div className="proof">
+          <span className="proof-item">
+            <span className="proof-num">{SITE.livePages}</span>
+            <span className="proof-label">pages written</span>
+          </span>
+          <span className="proof-item">
+            <span className="proof-num">{SITE.completeTracks}</span>
+            <span className="proof-label">tracks complete</span>
+          </span>
+          <span className="proof-item">
+            <span className="proof-num">{SITE.plannedPages - SITE.livePages}</span>
+            <span className="proof-label">still to write</span>
+          </span>
+        </div>
       </Reveal>
 
       <Reveal delay={80}>
@@ -83,13 +99,14 @@ export default function MapPage() {
 
       <Reveal delay={120}>
         <section className="chapter">
-          <div className="chapter-eyebrow">The atlas</div>
-          <h2 className="chapter-title">One connected map</h2>
+          <div className="chapter-eyebrow">How the worlds connect</div>
+          <h2 className="chapter-title">The ideas that cross families</h2>
           <p className="chapter-sub">
-            The ten worlds and how they connect — each arc a path from one family&rsquo;s ideas into the
-            next. The full track-by-track index follows below.
+            No family is sealed off. These are the places where one world&rsquo;s idea turns up wearing
+            another world&rsquo;s name — worth knowing before you pick where to start, because learning
+            either side makes the other cheaper.
           </p>
-          <CurriculumAtlas />
+          <Throughlines />
         </section>
       </Reveal>
 
@@ -102,7 +119,7 @@ export default function MapPage() {
             each with its own identity. The place to see the whole workflow at once.
           </p>
         </Reveal>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 16 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 300px), 1fr))", gap: 16 }}>
           {CAPSTONES.map((c, i) => (
             <Reveal key={c.href} delay={i * 55} style={{ height: "100%" }}>
               <CapstoneCard capstone={c} />
@@ -133,6 +150,11 @@ export default function MapPage() {
 
 function GroupCard({ group }: { group: Group }) {
   const live = group.tracks.filter((t) => t.href).length;
+  const { pages, live: distinct } = groupPages(group);
+  // Same trap as the shelf and the footer: in PILLARS/FOUNDATIONS the group IS the track and its
+  // entries are chapters, so countsFor() resolves every one of them to the same total. Printing it
+  // per entry would put "28 pages" on all six chapters of the data workflow.
+  const perTrackCounts = distinct > 1;
   return (
     <div
       className="gcard"
@@ -160,7 +182,7 @@ function GroupCard({ group }: { group: Group }) {
           </span>
           {live > 0 && (
             <span style={{ marginLeft: "auto", fontSize: 10.5, whiteSpace: "nowrap", color: "var(--good)", background: "color-mix(in srgb, var(--good) 12%, var(--surface))", padding: "2px 8px", borderRadius: 999 }}>
-              {live} live
+              {pages} pages
             </span>
           )}
         </div>
@@ -171,12 +193,19 @@ function GroupCard({ group }: { group: Group }) {
 
       {/* track list fills the remaining height so card bottoms align */}
       <div style={{ display: "flex", flexDirection: "column", flex: 1, padding: "6px 20px 14px" }}>
-        {group.tracks.map((t) =>
-          t.href ? (
+        {group.tracks.map((t) => {
+          const k = countsFor(t.href);
+          return t.href ? (
             <Link key={t.title} href={t.href} className="gtrack">
               <span>{t.title}</span>
               <span style={{ color: "var(--accent)", fontSize: 13, whiteSpace: "nowrap" }}>
-                {t.partial ? <><span style={{ color: "var(--faint)", fontSize: 11 }}>first chapters</span> →</> : <>start →</>}
+                {t.partial && k ? (
+                  <><span style={{ color: "var(--faint)", fontSize: 11 }}>{k.done} of {k.total}</span> →</>
+                ) : k && perTrackCounts ? (
+                  <><span style={{ color: "var(--faint)", fontSize: 11 }}>{k.done} pages</span> →</>
+                ) : (
+                  <>start →</>
+                )}
               </span>
             </Link>
           ) : (
@@ -184,8 +213,8 @@ function GroupCard({ group }: { group: Group }) {
               <span>{t.title}</span>
               <span style={{ fontSize: 11 }}>soon</span>
             </div>
-          ),
-        )}
+          );
+        })}
       </div>
     </div>
   );

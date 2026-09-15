@@ -2,6 +2,10 @@ import Link from "next/link";
 import { LessonHeader, Callout, Proof, PrevNext } from "@/components/lesson";
 import { M, MathBlock } from "@/components/Math";
 import { Quiz } from "@/components/Quiz";
+import { CodeBlock } from "@/components/CodeBlock";
+import { CodeOutput } from "@/components/CodeOutput";
+import { INIT_SETUP } from "@/lib/runtimeSetup";
+import { Dumbbell } from "@/components/figures/Dumbbell";
 
 export const metadata = {
   title: "Other schemes — Manifold",
@@ -41,6 +45,75 @@ export default function OtherSchemesPage() {
           the network normalises itself without a BatchNorm layer. The initialisation and the activation
           are co-designed: use the wrong scale and the self-normalising fixed point is lost.
         </p>
+
+        <p>
+          Before the exotic ones, it is worth seeing how little separates the fan-based family. Each
+          scheme is a single number — the standard deviation to draw from — and they only disagree
+          when a layer is not square.
+        </p>
+
+        <CodeBlock
+          setup={INIT_SETUP}
+          fromScratch={`# Every fan-based scheme is one number: the std to draw the weights from.
+def stds(fan_in, fan_out):
+    return {
+        "LeCun    1/fan_in":      np.sqrt(1.0 / fan_in),
+        "Xavier   1/fan_in":      np.sqrt(1.0 / fan_in),
+        "Glorot   2/(in+out)":    np.sqrt(2.0 / (fan_in + fan_out)),
+        "He       2/fan_in":      np.sqrt(2.0 / fan_in),
+        "He-out   2/fan_out":     np.sqrt(2.0 / fan_out),
+    }
+
+for fan_in, fan_out in [(64, 64), (784, 128), (128, 784)]:
+    print("fan_in %4d -> fan_out %4d" % (fan_in, fan_out))
+    for name, s in stds(fan_in, fan_out).items():
+        print("   %-22s std %.5f" % (name, s))`}
+        />
+        <CodeOutput>{`fan_in   64 -> fan_out   64
+   LeCun    1/fan_in      std 0.12500
+   Xavier   1/fan_in      std 0.12500
+   Glorot   2/(in+out)    std 0.12500
+   He       2/fan_in      std 0.17678
+   He-out   2/fan_out     std 0.17678
+fan_in  784 -> fan_out  128
+   LeCun    1/fan_in      std 0.03571
+   Xavier   1/fan_in      std 0.03571
+   Glorot   2/(in+out)    std 0.04683
+   He       2/fan_in      std 0.05051
+   He-out   2/fan_out     std 0.12500
+fan_in  128 -> fan_out  784
+   LeCun    1/fan_in      std 0.08839
+   Xavier   1/fan_in      std 0.08839
+   Glorot   2/(in+out)    std 0.04683
+   He       2/fan_in      std 0.12500
+   He-out   2/fan_out     std 0.05051`}</CodeOutput>
+
+        <p>
+          On a square layer they collapse onto two values and the whole debate is moot. The
+          disagreement only appears when the fans differ — and notice what Glorot&rsquo;s averaging
+          does there: <strong>0.04683</strong> for both the 784→128 layer and the 128→784 layer, the
+          same number in both directions, sitting between the two one-sided answers. That symmetry is
+          the entire reason it averages rather than picking a side, and it is why a single Glorot
+          constant can be applied to an encoder and its mirror-image decoder without tuning either.
+        </p>
+
+        <Dumbbell
+          rows={[
+            { init: "LeCun / Xavier", a: 0.03571, b: 0.08839 },
+            { init: "Glorot (avg)", a: 0.04683, b: 0.04683 },
+            { init: "He (fan-in)", a: 0.05051, b: 0.125 },
+            { init: "He (fan-out)", a: 0.125, b: 0.05051 },
+          ]}
+          xlabel="weight standard deviation at init →"
+          ticks={[0.04, 0.06, 0.08, 0.1, 0.12]}
+          seriesLabels={["on a 784 → 128 layer", "on a 128 → 784 layer"]}
+          caption={<>The same four schemes applied to a layer and to its mirror image. Every one of
+            them prescribes a different number depending on which way the layer points — except Glorot,
+            which collapses to a single dot at <strong>0.04683</strong> in both directions. That is not
+            a coincidence or a rounding; averaging the two fans is <em>defined</em> to be symmetric,
+            which is why one Glorot constant can be dropped on an encoder and its decoder without
+            reasoning about either.</>}
+        />
 
         <h2>Orthogonal: preserve the norm exactly</h2>
         <p>

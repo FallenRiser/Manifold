@@ -5,6 +5,10 @@ import { CodeBlock } from "@/components/CodeBlock";
 import { CodeOutput } from "@/components/CodeOutput";
 import { PredictPrompt } from "@/components/PredictPrompt";
 import { GRIDWORLD_SETUP } from "@/lib/runtimeSetup";
+// Aliased: this page's own default export is also called PredictionVsControl.
+import { PredictionVsControl as PredictionVsControlFigure } from "@/components/figures/planning/PlanningDiagrams";
+import { GridRow } from "@/components/figures/planning/GridField";
+import { V_RANDOM, V_STAR, PI_STAR } from "@/components/figures/planning/data.generated";
 
 export const metadata = {
   title: "Prediction vs control — Manifold",
@@ -69,6 +73,13 @@ show(V)`;
           mechanical thing:
         </p>
 
+        <PredictionVsControlFigure
+          caption={<>The distinction the whole family is organised around. Prediction is handed the
+            arrows and asked what they are worth; control is handed nothing and asked for the best
+            arrows. They look like very different problems, and the last row is the reason they are
+            not: the same Bellman backup, swept to convergence, answers both.</>}
+        />
+
         <CodeBlock setup={GRIDWORLD_SETUP} fromScratch={code} />
         <CodeOutput>{`PREDICTION — value of the random policy:
  -0.40   -0.45   -0.60    0.00
@@ -91,6 +102,17 @@ show(V)`;
             "Lower the discount factor until one policy wins",
           ]}
           nudge="Locked in. Brute force is hopeless — but prediction plus one clever step will get us there efficiently."
+        />
+
+        <GridRow
+          grids={[
+            { values: V_RANDOM, label: "prediction: Vπ for the random policy" },
+            { values: V_STAR, policy: PI_STAR, label: "control: V* and π*" },
+          ]}
+          caption={<>Two answers to two questions, on one board and one colour scale. Wandering at random
+            is worth a small negative amount almost everywhere — the step costs pile up faster than the
+            goal pays out. Acting optimally is worth a positive amount everywhere. The gap between the
+            grids is the value of having a plan at all.</>}
         />
 
         <h2>Why control looks hard — and isn&rsquo;t</h2>

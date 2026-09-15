@@ -2,6 +2,9 @@ import Link from "next/link";
 import { LessonHeader, Callout, Proof, PrevNext } from "@/components/lesson";
 import { M, MathBlock } from "@/components/Math";
 import { Quiz } from "@/components/Quiz";
+import { ResidualBlock, ResidualStack } from "@/components/figures/arch/ResidualBlock";
+import { LayerTrace } from "@/components/figures/LayerTrace";
+import { GRAD_BY_LAYER } from "@/components/figures/arch/data";
 
 export const metadata = {
   title: "Why F(x) + x changes everything — Manifold",
@@ -75,6 +78,15 @@ export default function WhySkipWorksPage() {
           vanishing, not the main carrier of information.
         </Callout>
 
+        <ResidualStack
+          n={4}
+          caption={<>The gradient highway, drawn as the forward picture it comes from. Because every
+            block <em>adds</em> to the stream rather than replacing it, the stream itself is one
+            unbroken path from input to output — and a path with no weight matrices on it is a path
+            the gradient traverses without being multiplied by anything. The blocks hang off that
+            path; they do not sit in it.</>}
+        />
+
         <h2>View 2: learning the residual</h2>
         <p>
           Now look at the forward pass. If the target mapping at some block is{" "}
@@ -98,6 +110,19 @@ export default function WhySkipWorksPage() {
           approximately the right thing, and training only needs to refine it. The optimisation
           problem is strictly easier.
         </p>
+
+        <LayerTrace
+          series={GRAD_BY_LAYER}
+          ylabel="gradient norm"
+          caption={<>The same 20-layer network wired both ways, gradient norm measured at each of its
+            21 weight matrices at initialisation. Neither line is flat, and the naive reading of the
+            first-to-last ratio gets the story backwards: the plain net&rsquo;s ratio is 0.12 and the
+            residual net&rsquo;s is 0.0069, which would say the residual net is seventeen times worse.
+            Look at the axis instead. The plain net&rsquo;s early gradients are around{" "}
+            <M>{String.raw`2 \times 10^{-3}`}</M>; the residual net&rsquo;s are around 70. Its ratio
+            is poor because its <em>late</em> gradients are enormous, not because its early ones
+            vanished — and that is a problem of a different kind, which the next page is about.</>}
+        />
 
         <h2>View 3: the implicit ensemble</h2>
         <p>

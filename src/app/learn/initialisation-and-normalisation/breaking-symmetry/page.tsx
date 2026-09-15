@@ -2,6 +2,9 @@ import Link from "next/link";
 import { LessonHeader, Callout, Proof, PrevNext } from "@/components/lesson";
 import { M, MathBlock } from "@/components/Math";
 import { Quiz } from "@/components/Quiz";
+import { SymmetryFigure } from "@/components/figures/initNorm/SymmetryFigure";
+import { LayerTrace } from "@/components/figures/LayerTrace";
+import { SYMMETRY_SERIES } from "@/components/figures/initNorm/data";
 
 export const metadata = {
   title: "Breaking symmetry — Manifold",
@@ -54,14 +57,25 @@ export default function BreakingSymmetryPage() {
           just zero.
         </Callout>
 
+        <SymmetryFigure
+          caption={<>The first hidden layer of a width-16 network, one input sample, first eight
+            units. On the left every unit emits the same number, so the layer computes one function
+            sixteen times over — and because identical outputs receive identical gradients, it will
+            still be computing one function after a million steps. On the right the units differ. Three
+            of them read zero for this particular sample, which is ReLU doing its job, not symmetry:
+            those three are off for <em>this</em> input and on for others.</>}
+        />
+
         <h2>Randomness alone is not enough</h2>
         <p>
           So the fix is randomness: draw each weight independently so no two units start the same. But
           randomness at the wrong scale runs straight back into the vanishing problem from the first
           chapter. Measure the activation std of a deep ReLU network initialised with tiny random
-          weights (scale 0.001): layer 1 gives 0.000513, layer 2 gives 0.000001, and layer 3 reads
-          0.000000. Symmetry <em>is</em> broken — the units differ — but the signal has vanished, so
-          the differences are infinitesimal and the gradients they carry are too small to train on.
+          weights (scale 0.001): layer 1 gives 5.13 &times; 10<sup>-4</sup>, layer 2 gives
+          1.22 &times; 10<sup>-6</sup>, layer 3 gives 4.24 &times; 10<sup>-9</sup>, and layer 4 gives
+          1.10 &times; 10<sup>-11</sup>. Symmetry <em>is</em> broken — the units genuinely differ — but
+          the signal has vanished, so the differences are infinitesimal and the gradients they carry
+          are too small to train on.
         </p>
         <p>
           Now the He scale, which satisfies the variance condition: layer 1 activation std 0.5128,
@@ -70,6 +84,18 @@ export default function BreakingSymmetryPage() {
           broken <em>and</em> the signal survives. That is the combination you need, and it is exactly
           why an initialiser has two jobs rather than one.
         </p>
+
+        <LayerTrace
+          series={SYMMETRY_SERIES}
+          ylabel="activation std"
+          caption={<>Activation standard deviation through four layers under the three starting points.
+            The zero line is the one place in this entire track where <code>0.0000</code> means exactly
+            zero — everywhere else it was a small number rounded by a print format. The tiny-random
+            line shows why &ldquo;just break the symmetry&rdquo; is not the whole requirement: it is
+            different at every unit and still down at 10⁻¹¹ by layer 4. Both fail, and they fail for
+            unrelated reasons, which is why an initialiser has to satisfy two conditions rather than
+            one.</>}
+        />
 
         <h2>The two requirements on an initialiser</h2>
         <p>
@@ -163,8 +189,8 @@ export default function BreakingSymmetryPage() {
                 fixed point of gradient descent.</>,
             },
             {
-              q: <>Tiny random init (scale 0.001) gave layer activation stds of 0.000513, 0.000001,
-                0.000000 across three layers, while He gave 0.5128, 0.4326, 0.5300, 0.4879. Both are
+              q: <>Tiny random init (scale 0.001) gave layer activation stds of 5.13e-4, 1.22e-6,
+                4.24e-9 and 1.10e-11, while He gave 0.5128, 0.4326, 0.5300, 0.4879. Both are
                 random. What does the comparison show?</>,
               options: [
                 "Randomness alone breaks symmetry but does not preserve variance; you also need the correct scale",
@@ -173,7 +199,7 @@ export default function BreakingSymmetryPage() {
               ],
               answer: 0,
               explain: <>Both draws break symmetry — the units differ. But the tiny scale lets the
-                signal vanish (0.000000 by layer 3), so the differences are too small to train on. He
+                signal vanish (1.10e-11 by layer 4), so the differences are too small to train on. He
                 breaks symmetry <em>and</em> preserves variance. An initialiser has two jobs, and
                 randomness satisfies only the first.</>,
             },

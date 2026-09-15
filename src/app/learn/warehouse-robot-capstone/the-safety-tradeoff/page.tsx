@@ -3,7 +3,7 @@ import { CodeOutput } from "@/components/CodeOutput";
 import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 import { M } from "@/components/Math";
 import { PredictPrompt } from "@/components/PredictPrompt";
-import { AnalystQuestion, TransferBox, PlaybookRule } from "@/components/capstone/pedagogy";
+import { WorkOrder, TransferBox, PlaybookRule } from "@/components/capstone/warehouse";
 import { WAREHOUSE_SETUP } from "@/lib/runtimeSetup";
 
 export const metadata = {
@@ -32,10 +32,10 @@ export default function TheSafetyTradeoff() {
       />
 
       <div className="lesson">
-        <AnalystQuestion accent={OLIVE} label="The engineer's question" icon="🤖">
+        <WorkOrder act={3} n={13}>
           My problem has more than one good policy, differing in how much risk they accept. Does my choice of
           algorithm decide which one I get — and how would I actually know?
-        </AnalystQuestion>
+        </WorkOrder>
 
         <h2>Two good policies, not one</h2>
         <p>
@@ -151,7 +151,7 @@ Exp. SARSA   :  21.0  16.4  16.5  16.4  16.4  21.0  21.2  16.4  21.1  21.0    ri
           spread?&rdquo;</em>
         </p>
 
-        <TransferBox accent={OLIVE}>
+        <TransferBox>
           Before believing any RL comparison, ask how many seeds it averaged and how wide the outcomes were. Treat
           a result as a <em>distribution</em>: identify the basins your agent falls into, count how often it lands
           in each, and note the failures. And when a textbook effect &ldquo;should&rdquo; appear in your problem,
@@ -159,7 +159,7 @@ Exp. SARSA   :  21.0  16.4  16.5  16.4  16.4  21.0  21.2  16.4  21.1  21.0    ri
           invisible in yours.
         </TransferBox>
 
-        <PlaybookRule n={13} accent={OLIVE}>
+        <PlaybookRule n={13}>
           <strong>Never trust one seed.</strong> An RL outcome is a distribution over runs, often multi-modal; train
           several seeds, report the spread and the failure rate, and locate a trade-off in the reward and the
           exploration schedule before attributing it to the update rule.

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { LessonHeader, Callout, Proof, PrevNext } from "@/components/lesson";
 import { M, MathBlock } from "@/components/Math";
 import { Quiz } from "@/components/Quiz";
+import { NormAxes } from "@/components/figures/initNorm/NormAxes";
 
 export const metadata = {
   title: "BatchNorm at test time — Manifold",
@@ -50,6 +51,16 @@ export default function BatchNormAtTestPage() {
           <em> fixed</em> statistics that do not depend on the current batch at all. The network must
           behave as a fixed function once training is over.
         </Callout>
+
+        <NormAxes
+          kind="batch"
+          caption={<>The whole problem in one picture. Every shaded column is a statistic pooled down
+            the batch — so BatchNorm&rsquo;s output for one sample depends on the other four samples it
+            happened to travel with. That is tolerable during training and indefensible at test time,
+            where a prediction must not change because of who else was in the request. Take the batch
+            dimension away and there is nothing left to average over: the figure has no columns to
+            shade. Everything on this page follows from that.</>}
+        />
 
         <h2>The fix: running estimates</h2>
         <p>

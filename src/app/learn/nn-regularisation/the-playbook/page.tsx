@@ -2,6 +2,9 @@ import Link from "next/link";
 import { LessonHeader, Callout, Proof, PrevNext } from "@/components/lesson";
 import { M } from "@/components/Math";
 import { Quiz } from "@/components/Quiz";
+import { DecisionPoint } from "@/components/DecisionPoint";
+import { Dumbbell } from "@/components/figures/Dumbbell";
+import { COMBOS } from "@/components/figures/nnReg/data";
 
 export const metadata = {
   title: "The regularisation playbook — Manifold",
@@ -89,6 +92,62 @@ export default function ThePlaybookPage() {
             rather than memorise it.
           </span>
         </Callout>
+
+        <Dumbbell
+          rows={COMBOS.map((c) => ({ init: c.label, a: c.test }))}
+          seriesLabels={["test accuracy on the track's overfitting problem"]}
+          ticks={[0.75, 0.76, 0.77, 0.78]}
+          caption={<>The playbook is ordered by this figure, not by tradition. Weight decay — the item
+            every textbook lists first — is the flat one here. Dropout is the one that moves. The two
+            together are the best configuration measured, and adding a third regulariser on top makes
+            it worse. An ordering that put decay first would have you spending your first afternoon on
+            the row that does nothing.</>}
+        />
+
+        <DecisionPoint
+          accent={CORAL}
+          question={<>A model reports <strong>train 0.91, validation 0.88</strong>. The team wants
+            another two points and someone proposes adding dropout at 0.5, since that was the best
+            single regulariser measured in this track. What do you do?</>}
+          options={[
+            {
+              label: "Add the dropout — 0.5 was the measured optimum",
+              verdict: "miss",
+              response: <>The measured optimum for <em>a network with a 0.244 gap</em>. This one has a
+                gap of 0.03. Every regulariser in this track buys test accuracy by spending training
+                accuracy, and there is almost none here to spend — dropout at 0.5 on this model will
+                take both numbers down. The rate is not the thing that transfers between problems; the
+                diagnosis is.</>,
+            },
+            {
+              label: "Neither — the gap is small, so look for headroom instead",
+              verdict: "best",
+              response: <>Right. Three points of gap is not an overfitting problem, so nothing in this
+                track applies. The two numbers together say the model is limited by what it can
+                represent or by what it has been shown, which puts you back in the architecture
+                track&rsquo;s territory: more capacity, longer training, better features, more data.
+                This is the top-left cell of the diagnostic square, and the correct move from it is to
+                stop reading this track.</>,
+            },
+            {
+              label: "Add weight decay instead — it is the gentler option",
+              verdict: "close",
+              response: <>Gentler, and therefore less harmful, so this is a defensible instinct. But it
+                is still the wrong cell: a gentle treatment for a condition the patient does not have
+                is not a compromise, it is a delay. It also happens to be the technique that did
+                nothing at all on the problem where regularisation genuinely was the answer.</>,
+            },
+            {
+              label: "Try all of them and keep whichever validation likes best",
+              verdict: "close",
+              response: <>This will not damage the model, and on a large enough validation set it is a
+                legitimate if inelegant search. The costs are real though: you will burn the afternoon,
+                and every extra configuration scored on the same validation set is another chance to
+                fit it. Diagnosis first is cheaper and it tells you <em>why</em>, which is what you
+                need the next time the numbers look like this.</>,
+            },
+          ]}
+        />
 
         <h2>Pick the right implementation, not just the right technique</h2>
         <p>

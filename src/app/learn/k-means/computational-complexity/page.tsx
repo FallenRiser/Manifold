@@ -2,6 +2,8 @@ import { M, MathBlock } from "@/components/Math";
 import { CodeBlock } from "@/components/CodeBlock";
 import { CLUSTER_SETUP } from "@/lib/runtimeSetup";
 import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
+import { GroupedBars } from "@/components/figures/kmeans/KmeansCharts";
+import { SPEED } from "@/components/figures/kmeans/data.generated";
 
 export const metadata = {
   title: "Computational complexity — Manifold",
@@ -51,7 +53,7 @@ export default function ComplexityPage() {
           <code>max_iter</code> (sklearn defaults to 300). The unpleasant surprise is the{" "}
           <em>worst case</em>: Lloyd&rsquo;s algorithm can in theory take a number of iterations that is
           super-polynomial in <M>{String.raw`n`}</M>. Those adversarial inputs essentially never arise on
-          real data, which is why the linear-time story holds day to day — but it&rsquo;s why
+          real data, which is why the linear-time story holds day to day — but it&rsquo;s why{" "}
           <code>max_iter</code> exists as a guardrail.
         </p>
 
@@ -70,6 +72,25 @@ export default function ComplexityPage() {
           dimensions pile up (the curse of dimensionality). The standard fix is to reduce dimensions
           first — PCA, then cluster — which shrinks <M>{String.raw`d`}</M> and sharpens the geometry at once.
         </p>
+
+        <GroupedBars
+          ylabel="seconds to fit (median of 5)"
+          format={(v) => v.toFixed(3)}
+          groups={SPEED.map((r) => ({
+            label: `n = ${r.n.toLocaleString()}, k = ${r.k}, d = ${r.d}`,
+            values: [r.lloyd, r.elkan, r.minibatch],
+          }))}
+          series={[
+            { name: "Lloyd", color: "var(--c-clustering)" },
+            { name: "Elkan", color: "var(--brand-2)" },
+            { name: "mini-batch", color: "var(--c-rl)" },
+          ]}
+          caption={<>The O(nkd) per iteration is real, and the left group shows what it costs at
+            20,000 points. But notice the mini-batch bar: at 20,000 points it is the <em>slowest</em> of
+            the three, and at 200,000 it is nearly six times faster than Lloyd. An asymptotic cost tells
+            you the shape of the curve, not where the crossover is, and the crossover is the number you
+            actually need. Measured in <code>scripts/kmeans_cases.py</code>.</>}
+        />
 
         <h2>Measure it yourself</h2>
         <p>

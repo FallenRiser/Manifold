@@ -2,6 +2,9 @@ import Link from "next/link";
 import { LessonHeader, Callout, Proof, PrevNext } from "@/components/lesson";
 import { M, MathBlock } from "@/components/Math";
 import { Quiz } from "@/components/Quiz";
+import { PredictPrompt } from "@/components/PredictPrompt";
+import { Dumbbell } from "@/components/figures/Dumbbell";
+import { CAPACITY } from "@/components/figures/nnReg/data";
 
 export const metadata = {
   title: "Capacity, complexity, and generalisation — Manifold",
@@ -69,6 +72,31 @@ export default function CapacityAndGeneralisationPage() {
         <p style={{ fontSize: 13, color: "var(--muted)" }}>
           Full-batch AdamW, 400 epochs, ReLU, 3-seed averages.
         </p>
+
+        <PredictPrompt
+          accent={CORAL}
+          prompt={<>Four networks on the same overfitting problem, from 1×32 up to 4×512 — a factor of
+            about 250 in parameter count. All four reach 1.000 training accuracy. What does test
+            accuracy do as capacity grows?</>}
+          options={[
+            "Falls steadily — more capacity, more overfitting",
+            "Falls sharply once the net can memorise the data",
+            "Stays flat",
+            "Rises — the largest network is the best of the four",
+          ]}
+          nudge="Locked in. All four are below."
+        />
+
+        <Dumbbell
+          rows={CAPACITY.map((c) => ({ init: c.label, a: c.test }))}
+          seriesLabels={["test accuracy (train accuracy is 1.000 for all four)"]}
+          ticks={[0.75, 0.76, 0.77]}
+          caption={<>Every one of these networks memorises the training set perfectly, so the classical
+            story — capacity buys you the ability to overfit — has nothing left to explain. What it
+            predicts next is that test accuracy should fall as capacity rises. It does not. The 4×512
+            network, with roughly 250 times the parameters of the 1×32, is the <strong>best</strong> of
+            the four at 0.770. This is the measurement the rest of the chapter has to account for.</>}
+        />
 
         <h2>The surprise</h2>
         <p>

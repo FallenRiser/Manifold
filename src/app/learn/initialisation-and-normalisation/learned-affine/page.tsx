@@ -2,6 +2,7 @@ import Link from "next/link";
 import { LessonHeader, Callout, Proof, PrevNext } from "@/components/lesson";
 import { M, MathBlock } from "@/components/Math";
 import { Quiz } from "@/components/Quiz";
+import { BatchNormFlow } from "@/components/figures/initNorm/BatchNormFlow";
 
 export const metadata = {
   title: "The learned affine parameters — Manifold",
@@ -70,6 +71,15 @@ export default function LearnedAffinePage() {
           gradients from the loss and update by gradient descent alongside everything else. They are not
           hyperparameters you tune; they are parameters the optimiser sets for you.
         </p>
+
+        <BatchNormFlow
+          caption={<>Read the figure right to left for once. Step 4 is not a correction bolted onto
+            steps 2 and 3 — it is the point of them. Normalising alone would pin every layer&rsquo;s
+            output to mean 0 and variance 1 for ever, which forbids a layer from ever choosing a
+            different scale even when a different scale is the right answer. With{" "}
+            <M>{String.raw`\gamma`}</M> and <M>{String.raw`\beta`}</M> the layer keeps that freedom and
+            loses only the <em>route</em> by which it used to get there.</>}
+        />
 
         <h2>β absorbs the bias</h2>
         <p>

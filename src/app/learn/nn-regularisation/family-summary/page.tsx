@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 import { Quiz } from "@/components/Quiz";
+import { DiagnosticQuadrant } from "@/components/figures/nnReg/RegFigures";
 
 export const metadata = {
   title: "The neural networks family: what you now have — Manifold",
@@ -78,6 +79,15 @@ export default function FamilySummaryPage() {
           normalisation), and how to keep the trained stack honest on new data (regularisation). Six
           decisions, one object. That is the whole family.
         </Callout>
+
+        <DiagnosticQuadrant
+          caption={<>What six tracks add up to, in one square. Architecture design taught you to place
+            a model in it; initialisation and normalisation are mostly about not landing in the
+            bottom-left by accident; this track is the treatment for the top-right cell and nothing
+            else. The value of the family is not any single technique in it — it is being able to look
+            at two numbers and know which of these four situations you are in before you touch
+            anything.</>}
+        />
 
         <h2>What &ldquo;you now have&rdquo; actually means</h2>
         <p>

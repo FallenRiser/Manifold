@@ -2,6 +2,9 @@ import Link from "next/link";
 import { LessonHeader, Callout, Proof, PrevNext } from "@/components/lesson";
 import { M, MathBlock } from "@/components/Math";
 import { Quiz } from "@/components/Quiz";
+import { LayerTrace } from "@/components/figures/LayerTrace";
+import { PredictPrompt } from "@/components/PredictPrompt";
+import { RESIDUAL_STREAM } from "@/components/figures/arch/data";
 
 export const metadata = {
   title: "Residual blocks in practice — Manifold",
@@ -53,6 +56,35 @@ export default function ResidualBlocksPage() {
           can decide how much of it to add. This is the minimum structure that lets the block learn
           a nontrivial residual.
         </p>
+
+        <PredictPrompt
+          accent={CORAL}
+          prompt={<>Twenty hidden layers of width 16 at He initialisation. Track the size of the
+            activations as they pass from layer 1 to layer 20, three ways: a plain stack, a stack
+            with skip connections, and a stack with skip connections and BatchNorm inside each
+            block. What happens to the bare residual stack?</>}
+          options={[
+            "It holds steady — that is what the skip is for",
+            "It decays, but more slowly than the plain stack",
+            "It grows enormously — by four orders of magnitude",
+            "It behaves identically to the BatchNorm version",
+          ]}
+          nudge="Locked in. All three are plotted below, on a log axis."
+        />
+
+        <LayerTrace
+          series={RESIDUAL_STREAM}
+          ylabel="activation std"
+          caption={<>This is why the normalisation layer inside the block is not an optional extra.
+            The plain stack <strong>decays</strong>, 0.513 down to 0.060 — the failure a skip
+            connection is introduced to fix. But the bare residual stack{" "}
+            <strong>explodes</strong>: 0.513 to 4,742, a factor of <strong>9,246</strong>, because
+            replacing multiplication with addition means every block&rsquo;s output is added to a
+            stream that already contains every previous block&rsquo;s output, and variances add.
+            Only the third line is bounded, ending at 4.15. A skip connection and a normalisation
+            layer are not two independent good ideas that happen to appear together; the second is
+            what makes the first survivable.</>}
+        />
 
         <h2>Where to put the activation</h2>
         <p>
@@ -165,6 +197,19 @@ export default function ResidualBlocksPage() {
             shortcuts is typically under 5% of the network.
           </p>
         </Proof>
+
+        <Callout color={CORAL} title={<>The measured consequence</>}>
+          Under plain SGD, a width-16 network with bare skip connections and no normalisation scores{" "}
+          <strong>0.4700</strong> from depth 12 onward — below the 0.5300 majority class, which is to
+          say it has diverged and is predicting one class for everything. The same network with
+          BatchNorm inside each block scores 0.9483 at depth 12 and <strong>0.9467</strong> at depth
+          40. The plain network, with no skips at all, sits between them: fine to depth 20, then
+          0.7500 by depth 40.
+          <br /><br />
+          The ordering is worth stating plainly because it is the opposite of the way the idea is
+          usually introduced. On this problem, adding a skip connection on its own is not a small
+          improvement over a plain network — it is far <em>worse</em> than doing nothing.
+        </Callout>
 
         <h2>When to add skip connections</h2>
         <p>

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { LessonHeader, Callout, Proof, PrevNext } from "@/components/lesson";
 import { M, MathBlock } from "@/components/Math";
 import { Quiz } from "@/components/Quiz";
+import { DiagnosticPanels } from "@/components/figures/arch/ArchFigures";
 
 export const metadata = {
   title: "Underfit, fit, overfit — Manifold",
@@ -94,6 +95,16 @@ export default function UnderfitFitOverfitPage() {
         <p style={{ fontSize: 13, color: "var(--muted)" }}>
           Diagnostic configs on moons, five-seed averages.
         </p>
+
+        <DiagnosticPanels
+          only={["underfit", "good", "overfit"]}
+          caption={<>The three regimes, on the same axis. The distinction the page is about is not
+            the height of the curves but the distance between them and the direction the lower one
+            travels: flat and close (underfit, gap 0.030), flat and apart (a good fit, gap 0.123), or
+            apart and <em>diverging</em> (overfit, gap 0.182, with held-out accuracy peaking at
+            0.860 by epoch 20 and then falling to 0.818). Only the third panel has a curve that turns
+            down, and that turn is the only unambiguous signature of overfitting there is.</>}
+        />
 
         <h2>Underfitting: both numbers are low</h2>
         <p>

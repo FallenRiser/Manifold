@@ -2,6 +2,12 @@ import Link from "next/link";
 import { LessonHeader, Callout, Proof, PrevNext } from "@/components/lesson";
 import { M, MathBlock } from "@/components/Math";
 import { Quiz } from "@/components/Quiz";
+import { BatchNormFlow } from "@/components/figures/initNorm/BatchNormFlow";
+import { NormAxes } from "@/components/figures/initNorm/NormAxes";
+import { LayerTrace } from "@/components/figures/LayerTrace";
+import { PredictPrompt } from "@/components/PredictPrompt";
+import { CodeOutput } from "@/components/CodeOutput";
+import { ACT_STD_TRAINED } from "@/components/figures/initNorm/data";
 
 export const metadata = {
   title: "What BatchNorm actually does — Manifold",
@@ -56,6 +62,26 @@ export default function WhatBatchNormDoesPage() {
           defining choice of BatchNorm, and it is exactly what later methods (LayerNorm, GroupNorm,
           RMSNorm) change when the batch axis is unavailable or unreliable.
         </Callout>
+
+        <BatchNormFlow
+          caption={<>Four steps, and the fourth is the one that surprises people: having just forced
+            the activations to mean 0 and variance 1, the layer immediately scales and shifts them
+            again. That is not undoing the work. Steps 2 and 3 take the mean and scale away from the
+            weights; step 4 hands them to two parameters, <M>{String.raw`\gamma`}</M> and{" "}
+            <M>{String.raw`\beta`}</M>, that are trained directly. The distribution can still end up
+            anywhere — it just gets there by gradient descent on two numbers instead of by accident
+            through a product of ten matrices.</>}
+        />
+
+        <NormAxes
+          kind="batch"
+          caption={<>Which numbers are pooled. Rows are samples in the batch, columns are units, and
+            the shaded column is one statistic: those five numbers share a mean and a variance. Every
+            other column has its own pair. A unit is therefore normalised against the same unit in the
+            other samples of the batch — never against its neighbours. That single choice
+            is the whole of BatchNorm, and every alternative in the next chapter changes nothing but
+            the shape of the shading.</>}
+        />
 
         <h2>Where it sits in the layer</h2>
         <p>
@@ -129,6 +155,38 @@ export default function WhatBatchNormDoesPage() {
           and unit variance before <M>{String.raw`\gamma`}</M> and <M>{String.raw`\beta`}</M> rescale it —
           so the 0.61-to-0.39 slide flattens to a controlled 1.0 at every depth.
         </p>
+
+        <p>
+          That table is the drift <em>at initialisation</em>, before a single gradient step, and it is
+          honestly a mild effect: a slide from 0.61 to 0.39 and back. The reason BatchNorm exists is
+          what happens next. Train the same network for sixty epochs and measure again.
+        </p>
+
+        <PredictPrompt
+          accent={CORAL}
+          prompt={<>He initialisation sets the activation scale correctly at every layer at step zero.
+            After sixty epochs of Adam, what has become of it in the deeper layers?</>}
+          options={[
+            "Still held — that is what He was for",
+            "Drifted down, continuing the slide it already had",
+            "Drifted up, by roughly a factor of ten",
+            "Collapsed to zero — the deep layers switch off",
+          ]}
+          nudge="Locked in. The trained measurement is below."
+        />
+
+        <LayerTrace
+          series={ACT_STD_TRAINED}
+          ylabel="activation std, after training"
+          caption={<>The same architecture, the same He initialisation, after sixty epochs. Without
+            normalisation the activation scale has climbed from <strong>0.50</strong> to{" "}
+            <strong>5.87</strong> — a factor of twelve, in the direction the at-init table did not even
+            hint at. With BatchNorm every layer sits between <strong>0.57</strong> and{" "}
+            <strong>0.82</strong>. Initialisation controls the scale for one forward pass; this is the
+            job it cannot do, because it only gets to act once.</>}
+        />
+        <CodeOutput source="scripts/init_norm_train.py" label="post-activation std per hidden layer after training (He init, depth 10)">{`  without BN: 0.500  0.492  0.666  1.331  2.636  4.067  5.867  5.599  5.658  4.556
+  with BN   : 0.570  0.625  0.661  0.710  0.710  0.693  0.643  0.658  0.669  0.709`}</CodeOutput>
 
         <h2>What that flattening buys</h2>
         <p>

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 import { M, MathBlock } from "@/components/Math";
 import { CodeOutput } from "@/components/CodeOutput";
+import { PredictPrompt } from "@/components/PredictPrompt";
 
 export const metadata = {
   title: "Margins & resistance to overfitting — Manifold",
@@ -28,7 +29,13 @@ export default function MarginsPage() {
       <div className="lesson">
         <h2>The phenomenon, in numbers</h2>
         <p>The breast-cancer run from two pages back, laid out in full:</p>
-        <CodeOutput label="AdaBoost with stumps — train vs test error">{`  n=  1   train err 0.0678   test err 0.1111
+        <PredictPrompt
+          accent={TREES}
+          prompt={<>Training error hits exactly zero at 28 stumps. AdaBoost keeps going for another 272 rounds, adding capacity to a model that already fits the training set perfectly. What does <em>test</em> error do over those 272 rounds?</>}
+          options={["Flat — there is nothing left to learn", "Slowly rises — textbook overfitting", "Falls a little more, then rises", "Keeps falling, and nearly halves"]}
+          nudge="Locked in. The measured answer is right below."
+        />
+        <CodeOutput source="scripts/boosting_cases.py" label="AdaBoost with stumps — train vs test error">{`  n=  1   train err 0.0678   test err 0.1111
   n=  5   train err 0.0276   test err 0.0702
   n= 10   train err 0.0226   test err 0.0585
   n= 25   train err 0.0025   test err 0.0643

@@ -44,20 +44,46 @@ function priceColor(p: number): string {
   return `rgb(${r},${g},${bl})`;
 }
 
-export function HousingGeoMap({ height = 300 }: { height?: number }) {
-  const W = 300, H = height;
+
+// The value distribution of the very blocks plotted above, derived here rather than typed so it
+// cannot drift from GEO. Each bar is filled from the same ramp as the dots, which makes the
+// histogram the map's legend as well — and it shows the thing a colour ramp hides: the target is
+// CENSORED, so blocks worth more than $500k are all recorded at exactly $500k and pile into one bar.
+const NBIN = 10;
+const PMAX = 5; // $100k units — the dataset's cap
+const BINS = (() => {
+  const b: number[] = new Array(NBIN).fill(0);
+  for (const [, , p] of GEO) b[Math.min(NBIN - 1, Math.floor((p / PMAX) * NBIN))] += 1;
+  return b;
+})();
+const BMAX = Math.max(...BINS);
+const CAPPED = GEO.filter(([, , p]) => p >= PMAX).length;
+
+export function HousingGeoMap({ height = 300, wide = false }: { height?: number; wide?: boolean }) {
+  // Two frames from one projection. The square frame is the lesson figure; `wide` is the landing
+  // card, where every capstone figure shares a 640x300 box so the three cards line up — the extra
+  // width carries the distribution instead of being padding.
+  const H = wide ? 300 : height;
+  const W = wide ? 640 : 300;
+  const MAPW = wide ? 296 : W;
   const LAT0 = 32.4, LAT1 = 42.1, LON0 = -124.6, LON1 = -114.2;
   // aspect-correct equirectangular projection: scale longitude by cos(midLat) so
   // California keeps its true tall-and-narrow proportions, then centre it in the box
   const pad = 14;
   const lonScale = Math.cos(((LAT0 + LAT1) / 2) * Math.PI / 180);
   const geoW = (LON1 - LON0) * lonScale, geoH = LAT1 - LAT0;
-  const s = Math.min((W - 2 * pad) / geoW, (H - 2 * pad) / geoH);
-  const offX = pad + ((W - 2 * pad) - geoW * s) / 2;
+  const s = Math.min((MAPW - 2 * pad) / geoW, (H - 2 * pad) / geoH);
+  const offX = pad + ((MAPW - 2 * pad) - geoW * s) / 2;
   const offY = pad + ((H - 2 * pad) - geoH * s) / 2;
   const px = (lon: number) => Math.round((offX + (lon - LON0) * lonScale * s) * 100) / 100;
   const py = (lat: number) => Math.round((offY + (LAT1 - lat) * s) * 100) / 100;
   const caPath = CA_OUTLINE.map(([lat, lon], i) => `${i === 0 ? "M" : "L"} ${px(lon)} ${py(lat)}`).join(" ") + " Z";
+
+  // histogram frame (wide only): price runs up the left edge, count runs right
+  const HX = 352, HW = 206, HY0 = 262, PITCH = 21.2, BARH = 17;
+  const hy = (p: number) => HY0 - (p / 0.5) * PITCH;
+  const anchor = wide ? 11.5 : 8;
+
   return (
     <svg viewBox={`0 0 ${W} ${H}`} style={{ width: "100%", height: "auto", display: "block" }}>
       <rect x={0} y={0} width={W} height={H} rx={8} fill="var(--canvas)" stroke="var(--border-strong)" />
@@ -69,16 +95,39 @@ export function HousingGeoMap({ height = 300 }: { height?: number }) {
       ))}
       {/* city anchors */}
       {([["SF", 37.77, -122.42], ["LA", 34.05, -118.24], ["SD", 32.72, -117.16]] as [string, number, number][]).map(([n, la, lo]) => (
-        <text key={n} x={px(lo) - 8} y={py(la) + 3} fontSize={8} fill="var(--ink)" fontWeight={600}>{n}</text>
+        <text key={n} x={px(lo) - anchor} y={py(la) + 3} fontSize={anchor} fill="var(--ink)" fontWeight={600}>{n}</text>
       ))}
-      {/* legend */}
-      <g>
-        {[0, 1, 2, 3, 4, 5].map((p, i) => (
-          <rect key={p} x={W - 64 + i * 9} y={H - 20} width={9} height={7} fill={priceColor(p)} />
-        ))}
-        <text x={W - 64} y={H - 24} fontSize={7} fill="var(--faint)">low</text>
-        <text x={W - 10} y={H - 24} fontSize={7} fill="var(--faint)" textAnchor="end">high</text>
-      </g>
+
+      {wide ? (
+        <g>
+          <line x1={300} y1={34} x2={300} y2={272} stroke="var(--border-strong)" strokeWidth={1} strokeDasharray="2 5" />
+          <text x={312} y={30} fontSize={11} fill="var(--faint)" letterSpacing="0.08em">
+            MEDIAN VALUE, 260 BLOCKS PLOTTED
+          </text>
+          {BINS.map((n, i) => (
+            <rect key={i} x={HX} y={hy(0.5 * (i + 1)) + (PITCH - BARH) / 2} width={(n / BMAX) * HW} height={BARH}
+              fill={priceColor(0.5 * i + 0.25)} fillOpacity={0.85} rx={2} />
+          ))}
+          <line x1={HX - 1} y1={hy(0)} x2={HX - 1} y2={hy(5)} stroke="var(--border-strong)" strokeWidth={1} />
+          {[0, 2.5, 5].map((p) => (
+            <text key={p} x={HX - 7} y={hy(p) + 4} fontSize={12} fill="var(--faint)" textAnchor="end">
+              {p === 0 ? "$0" : `$${p * 100}k`}
+            </text>
+          ))}
+          {/* the censored top bin — the quirk that shapes the whole capstone */}
+          <text x={HX + (BINS[NBIN - 1] / BMAX) * HW + 9} y={hy(4.5) - (PITCH - BARH) / 2 - 4.5} fontSize={12} fill="var(--muted)">
+            {CAPPED} sit exactly at the $500k cap
+          </text>
+        </g>
+      ) : (
+        <g>
+          {[0, 1, 2, 3, 4, 5].map((p, i) => (
+            <rect key={p} x={W - 64 + i * 9} y={H - 20} width={9} height={7} fill={priceColor(p)} />
+          ))}
+          <text x={W - 64} y={H - 24} fontSize={7} fill="var(--faint)">low</text>
+          <text x={W - 10} y={H - 24} fontSize={7} fill="var(--faint)" textAnchor="end">high</text>
+        </g>
+      )}
     </svg>
   );
 }

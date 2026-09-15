@@ -6,6 +6,8 @@ import { CodeOutput } from "@/components/CodeOutput";
 import { Quiz } from "@/components/Quiz";
 import { PredictPrompt } from "@/components/PredictPrompt";
 import { GRIDWORLD_SETUP } from "@/lib/runtimeSetup";
+import { Curve } from "@/components/figures/Curve";
+import { ROLLOUT_CONVERGE, ROLLOUT_Q, ROLLOUT_EXACT } from "@/components/figures/planning/data.generated";
 
 export const metadata = {
   title: "Planning by sampling — Manifold",
@@ -52,7 +54,7 @@ for a in range(nA):
         <h2>Replace the sum with an average</h2>
         <p>
           A value is an expected return, <M>{String.raw`V^\pi(s) = \mathbb{E}_\pi[G_t \mid S_t = s]`}</M>, and the
-          Bellman backup computes the expectation exactly by summing over <M>P</M>. But an expectation can also be
+          Bellman backup computes the expectation exactly by summing over <M>P</M>. But an expectation can also be{" "}
           <em>estimated</em> — run the policy from <M>s</M> many times using the model as a simulator, and average
           the returns:
         </p>
@@ -70,9 +72,14 @@ rollout Q(6, down ) ~  -19.2
 rollout Q(6, left ) ~  -19.2`}</CodeOutput>
         <p>
           Compare these to the exact action-values from the MDP track — <M>{String.raw`Q(6,\cdot)`}</M> was{" "}
-          <M>{String.raw`-21, -21, -19, -19`}</M> for up/right/down/left. The sampled estimates land right on top of
-          them (down and left best), with a little Monte-Carlo noise from the finite 2000 trajectories. No sum over
-          next states was ever formed — just simulated experience, averaged.
+          <M>{String.raw`-21, -21, -19, -19`}</M> for up/right/down/left. Three of the four estimates land within
+          0.3 of the truth; <em>right</em> comes out at −19.6 against an exact −21.0. That is not a bug, and it is
+          worth sitting with: over 200 repetitions the estimator is unbiased to two decimal places, and its
+          standard error at 2000 rollouts is 0.39 — so this particular seed drew a 3.5-sigma sample. Read the four
+          numbers as a ranking and you would conclude that <em>right</em> beats <em>up</em>, when in truth they are
+          exactly equal, and that <em>down</em> beats <em>right</em> by 0.4, when in truth it beats it by 2.0.
+          Sampling replaced an exact sum with an estimate, and an estimate is a distribution. No sum over next
+          states was ever formed — just simulated experience, averaged.
         </p>
 
         <PredictPrompt
@@ -84,6 +91,21 @@ rollout Q(6, left ) ~  -19.2`}</CodeOutput>
             "Use a shorter horizon",
           ]}
           nudge="Locked in. It's plain Monte-Carlo: quadruple the rollouts to halve the error."
+        />
+
+        <Curve
+          x={[...ROLLOUT_CONVERGE.n]}
+          logX
+          series={[{ label: "sample mean of N rollouts", values: [...ROLLOUT_CONVERGE.mean], color: "var(--c-rl)" }]}
+          markY={ROLLOUT_CONVERGE.exact}
+          markYLabel="exact value, by DP"
+          xlabel="rollouts averaged (log scale)"
+          ylabel="Q(6, right)"
+          caption={<>What the four numbers above are estimates <em>of</em>. One rollout is worth almost
+            nothing; the average is still wandering by a full unit at 64 rollouts and only settles onto
+            the exact −21.0 in the high hundreds. The dashed line is what the full Bellman sum computes
+            in a single pass, exactly, with no samples at all. That is the whole trade: sampling buys
+            you freedom from the model and pays for it in variance.</>}
         />
 
         <h2>From rollouts to tree search</h2>

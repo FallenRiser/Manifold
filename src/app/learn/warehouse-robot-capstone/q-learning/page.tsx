@@ -4,7 +4,7 @@ import { CodeOutput } from "@/components/CodeOutput";
 import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 import { M, MathBlock } from "@/components/Math";
 import { PredictPrompt } from "@/components/PredictPrompt";
-import { AnalystQuestion, TransferBox, PlaybookRule } from "@/components/capstone/pedagogy";
+import { WorkOrder, TransferBox, PlaybookRule } from "@/components/capstone/warehouse";
 import { WAREHOUSE_SETUP } from "@/lib/runtimeSetup";
 
 export const metadata = {
@@ -33,10 +33,10 @@ export default function QLearning() {
       />
 
       <div className="lesson">
-        <AnalystQuestion accent={OLIVE} label="The engineer's question" icon="🤖">
+        <WorkOrder act={3} n={10}>
           I do not have the transition probabilities — only the ability to try things and see what happens. What is
           the simplest update that turns that stream of experience into a good policy?
-        </AnalystQuestion>
+        </WorkOrder>
 
         <h2>The one equation the oracle could compute and we cannot</h2>
         <p>
@@ -145,7 +145,7 @@ export default function QLearning() {
           two pages), better exploration and step sizes (Act 4), and honest evaluation of what we have (Act 5).
         </p>
 
-        <TransferBox accent={OLIVE}>
+        <TransferBox>
           When you do not have a model, do not go looking for one — sample the expectation instead. The move that
           defines model-free RL is exactly this substitution of an observed transition for an expectation you
           cannot evaluate. And read learning curves for their <em>shape</em>: a flat, terrible start followed by a
@@ -153,7 +153,7 @@ export default function QLearning() {
           is broken&rdquo; — a distinction that changes what you should do about it.
         </TransferBox>
 
-        <PlaybookRule n={10} accent={OLIVE}>
+        <PlaybookRule n={10}>
           <strong>When you lack a model, replace the Bellman expectation with sampled transitions</strong> and
           bootstrap: nudge each estimate toward <M>{String.raw`r + \gamma \max_{a'} Q(s',a')`}</M>. Keep exploring
           so every state-action pair is still visited, or the estimates you never update stay wrong.

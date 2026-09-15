@@ -2,6 +2,8 @@ import { M, MathBlock } from "@/components/Math";
 import { CodeBlock } from "@/components/CodeBlock";
 import { CLUSTER_SETUP } from "@/lib/runtimeSetup";
 import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
+import { ContingencyTable } from "@/components/figures/kmeans/KmeansCharts";
+import { CONTINGENCY } from "@/components/figures/kmeans/data.generated";
 
 export const metadata = {
   title: "External metrics (ARI, NMI) — Manifold",
@@ -32,7 +34,7 @@ export default function ExternalMetricsPage() {
           the same <strong>pairs</strong> of points together?
         </p>
         <p>
-          Frame it over pairs of points. Each pair is either in the <em>same</em> group or <em>different</em>
+          Frame it over pairs of points. Each pair is either in the <em>same</em> group or <em>different</em>{" "}
           groups, under each labelling:
         </p>
         <ul style={ul}>
@@ -75,13 +77,29 @@ export default function ExternalMetricsPage() {
         <Callout color="var(--c-clustering)" title={<>ARI vs. NMI — which to reach for</>}>
           Both are symmetric and don&rsquo;t care about label names or even the number of clusters matching
             the number of classes. ARI counts pair agreements and is intuitive; NMI/AMI measure shared
-            information and handle differing cluster counts gracefully. Prefer the <em>adjusted</em>
+            information and handle differing cluster counts gracefully. Prefer the <em>adjusted</em>{" "}
             versions (ARI, AMI) — raw RI and NMI are inflated by chance. And remember: these need ground
             truth, so they&rsquo;re for benchmarking and validation, not day-to-day unsupervised work.
         </Callout>
 
         <h2>Score against ground truth</h2>
         <CodeBlock setup={CLUSTER_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />
+
+        <ContingencyTable
+          table={CONTINGENCY.table}
+          caption={<>Both scores are summaries of this one table. Rows are the groups the data really
+            came from, columns are the ids k-means invented; a perfect clustering puts every point on a
+            single cell per row and per column, in some order. This one nearly does — the four heavy
+            cells are the clustering, and the stragglers (37 here, 35 there, a 2) are the whole of the
+            disagreement that turns into ARI {CONTINGENCY.ari} and NMI {CONTINGENCY.nmi}.
+
+            Two properties are easiest to see here. Permuting the column order changes nothing, which is
+            why these are the right metrics for labels that are arbitrary ids rather than classes. And
+            a <em>random</em> labelling of the same points scores ARI {CONTINGENCY.randomAri} against
+            NMI {CONTINGENCY.randomNmi} — ARI is corrected for chance and sits at zero, NMI is not
+            quite, which is the one practical reason to prefer ARI when you need a floor you can
+            trust.</>}
+        />
 
         <PrevNext prev={{ href: "/learn/k-means/internal-metrics", label: <>← Internal metrics</> }} next={{ href: "/learn/k-means/cluster-stability", label: <>Next up · Cluster stability →</> }} />
       </div>

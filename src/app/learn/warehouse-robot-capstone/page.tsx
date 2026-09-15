@@ -2,7 +2,7 @@ import Link from "next/link";
 import { CodeBlock } from "@/components/CodeBlock";
 import { CodeOutput } from "@/components/CodeOutput";
 import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
-import { AnalystQuestion, TransferBox, PlaybookRule } from "@/components/capstone/pedagogy";
+import { WorkOrder, TransferBox, PlaybookRule, ShopFloor, SlabStats } from "@/components/capstone/warehouse";
 import { WAREHOUSE_SETUP } from "@/lib/runtimeSetup";
 
 export const metadata = {
@@ -31,9 +31,9 @@ export default function WarehouseCapstoneIndex() {
       />
 
       <div className="lesson">
-        <AnalystQuestion accent={OLIVE} label="The engineer's question" icon="🤖">
+        <WorkOrder act={1} n={1}>
           What decision does this agent actually serve, and what would it mean for it to have <em>succeeded</em>?
-        </AnalystQuestion>
+        </WorkOrder>
 
         <h2>The brief</h2>
         <p>
@@ -75,29 +75,20 @@ random episode: 250 steps, return -1090.0, delivered=False`}</CodeOutput>
           track — delivers <strong>100%</strong> of the time and scores <strong>+21.00</strong>.
         </p>
 
-        <div style={{ overflowX: "auto", margin: "1.2rem 0" }}>
-          <table style={{ borderCollapse: "collapse", fontSize: 14, minWidth: 430 }}>
-            <thead>
-              <tr style={{ borderBottom: "2px solid var(--border-strong)" }}>
-                <th style={th}>Reference point</th><th style={thR}>Return</th><th style={thR}>Delivered</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr style={{ borderBottom: "1px solid var(--border)" }}>
-                <td style={tdc}>Acting at random</td><td style={tdR}>−817.22</td><td style={tdR}>0.7%</td>
-              </tr>
-              <tr style={{ borderBottom: "1px solid var(--border)" }}>
-                <td style={tdc}>A sensible hand-written rule</td><td style={tdR}>−3543.05</td><td style={tdR}>3.7%</td>
-              </tr>
-              <tr>
-                <td style={tdc}><strong>Oracle</strong> — value iteration, given the model</td>
-                <td style={{ ...tdR, color: OLIVE, fontWeight: 600 }}>+21.00</td><td style={tdR}>100.0%</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        <ShopFloor stamp="Bench · seed 0" pad="22px 22px 18px">
+          <div style={{ fontSize: 13.5, lineHeight: 1.5, marginBottom: 2 }}>
+            Three reference points, measured before a single line of learning code was written.
+          </div>
+          <SlabStats
+            items={[
+              { value: "−817.22", label: "Acting at random", note: "delivers 0.7% of the time", tone: "bad" },
+              { value: "−3543.05", label: "A sensible hand-written rule", note: "delivers 3.7% — and is four times worse than flailing", tone: "bad" },
+              { value: "+21.00", label: "Oracle · value iteration", note: "delivers 100% — the ceiling, given the model", tone: "good" },
+            ]}
+          />
+        </ShopFloor>
         <p>
-          Read the middle row twice. A perfectly reasonable hand-coded rule — <em>drive toward wherever you are
+          Read the middle slab twice. A perfectly reasonable hand-coded rule — <em>drive toward wherever you are
           headed</em> — scores <strong>−3543</strong>, which is more than four times <em>worse</em> than flailing at
           random. Working out why is the subject of Act 2, and it is the first genuinely useful thing this project
           will teach you.
@@ -139,13 +130,13 @@ random episode: 250 steps, return -1090.0, delivered=False`}</CodeOutput>
           that happened more than once — you get the result, and an explanation of the gap.
         </p>
 
-        <TransferBox accent={OLIVE}>
+        <TransferBox>
           Before you start any RL project, write down two numbers: what a <em>random</em> policy scores, and what
           the best conceivable policy would score. If you cannot name the second one, say so explicitly — that
           uncertainty is itself a finding, and it changes how you should read every result that follows.
         </TransferBox>
 
-        <PlaybookRule n={1} accent={OLIVE}>
+        <PlaybookRule n={1}>
           <strong>Frame first.</strong> Write the decision the agent serves and how success will be measured,
           before choosing an algorithm — and bracket the problem with a floor (random) and, if you can, a ceiling.
         </PlaybookRule>
@@ -172,7 +163,3 @@ for t in range(250):
     if done: break
 print(f"random episode: {t+1} steps, return {total:.1f}, delivered={done}")`;
 
-const th: React.CSSProperties = { textAlign: "left", padding: "8px 14px", fontFamily: "var(--font-display)", fontWeight: 600, color: "var(--ink)" };
-const thR: React.CSSProperties = { ...th, textAlign: "right" };
-const tdc: React.CSSProperties = { padding: "8px 14px", color: "var(--muted)", verticalAlign: "top", lineHeight: 1.5 };
-const tdR: React.CSSProperties = { ...tdc, textAlign: "right", fontFamily: "ui-monospace, monospace", color: "var(--ink)" };

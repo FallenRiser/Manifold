@@ -1,6 +1,8 @@
 import { CodeBlock } from "@/components/CodeBlock";
 import { ColorQuantizeLab } from "@/components/labs/ColorQuantizeLab";
 import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
+import { LineChart } from "@/components/figures/kmeans/KmeansCharts";
+import { QUANTIZE } from "@/components/figures/kmeans/data.generated";
 
 export const metadata = {
   title: "Case A: image colour quantization — Manifold",
@@ -84,6 +86,27 @@ export default function CaseImagePage() {
 
         <h2>The whole thing in scikit-learn</h2>
         <CodeBlock fromScratch={codeScratch} withLibrary={codeLib} />
+
+        <LineChart
+          x={QUANTIZE.map((r) => r.k)}
+          logX
+          series={[{ label: "RMSE per channel, out of 255", values: QUANTIZE.map((r) => r.rmse255), color: "var(--c-clustering)" }]}
+          xlabel="k — colours in the palette"
+          ylabel="reconstruction error"
+          format={(v) => v.toFixed(1)}
+          caption={<>What the compression actually costs, measured. Each point is a k-means fit over
+            every pixel of a test image treated as a point in RGB space; the palette is the centroids
+            and each pixel is replaced by the one it was assigned to.
+
+            The shape is the familiar diminishing return, and the numbers give it a scale: k = 2 stores
+            the image in {QUANTIZE[0].bitsPerPixel.toFixed(2)} bits per pixel — {QUANTIZE[0].compression}×
+            smaller than 24-bit colour — for an error of {QUANTIZE[0].rmse255} levels out of 255, which
+            is plainly visible. By k = {QUANTIZE[4].k} the error is down to {QUANTIZE[4].rmse255} and
+            the file is still {QUANTIZE[4].compression}× smaller. Doubling the palette past that buys
+            steadily less: the last doubling to {QUANTIZE[5].k} colours removes only{" "}
+            {(QUANTIZE[4].rmse255 - QUANTIZE[5].rmse255).toFixed(1)} levels of error for a whole extra
+            bit per pixel. That curve is the entire engineering decision.</>}
+        />
 
         <PrevNext prev={{ href: "/learn/k-means/when-to-use-k-means", label: <>← When to use k-means</> }} next={{ href: "/learn/k-means/case-customer-segmentation", label: <>Next up · Case B: customer segmentation →</> }} />
       </div>

@@ -2,6 +2,8 @@ import { M, MathBlock } from "@/components/Math";
 import { CodeBlock } from "@/components/CodeBlock";
 import { CLUSTER_SETUP } from "@/lib/runtimeSetup";
 import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
+import { ScatterRow } from "@/components/figures/kmeans/Scatter";
+import { COSINE } from "@/components/figures/kmeans/data.generated";
 
 export const metadata = {
   title: "Kernel & spherical k-means — Manifold",
@@ -64,6 +66,22 @@ export default function KernelSphericalPage() {
             and run ordinary k-means with cosine). Both keep the familiar alternating loop; they only swap
             in a different geometry. The embedding capstone uses the spherical idea directly.
         </Callout>
+
+        <ScatterRow
+          panels={[
+            { points: COSINE.points, labels: COSINE.truth, label: "the two groups, by direction" },
+            { points: COSINE.points, labels: COSINE.euclidean, label: "plain Euclidean k-means" },
+            { points: COSINE.points, labels: COSINE.cosine, label: "after normalising to unit length" },
+          ]}
+          caption={<>Two rays out of the origin: same two directions, very different lengths. Plain
+            k-means splits them by <em>magnitude</em>, cutting straight across both rays, and scores
+            ARI {COSINE.euclideanAri} — worse than chance, because it has recovered exactly the
+            structure nobody asked about. Normalise every point to unit length first and the same
+            algorithm scores {COSINE.cosineAri}. Nothing changed but the geometry the distance measures,
+            which is why this is a preprocessing step and not a new algorithm. For text and embeddings,
+            where length usually means &ldquo;document was longer&rdquo;, this is the difference between
+            clustering topics and clustering word counts.</>}
+        />
 
         <h2>Both, in practice</h2>
         <CodeBlock setup={CLUSTER_SETUP} fromScratch={codeScratch} withLibrary={codeLib} />

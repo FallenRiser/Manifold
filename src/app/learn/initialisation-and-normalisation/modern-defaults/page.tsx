@@ -2,6 +2,8 @@ import Link from "next/link";
 import { LessonHeader, Callout, Proof, PrevNext } from "@/components/lesson";
 import { M, MathBlock } from "@/components/Math";
 import { Quiz } from "@/components/Quiz";
+import { Dumbbell } from "@/components/figures/Dumbbell";
+import { INIT_SENSITIVITY } from "@/components/figures/initNorm/data";
 
 export const metadata = {
   title: "The modern default, and when to deviate — Manifold",
@@ -57,6 +59,15 @@ export default function ModernDefaultsPage() {
           entire value of understanding the interaction is knowing that this corner exists so you can
           start there and only leave it for cause.
         </Callout>
+
+        <Dumbbell
+          rows={INIT_SENSITIVITY.map((r) => ({ init: r.init, a: r.noBn, b: r.bn }))}
+          seriesLabels={["without normalisation", "with normalisation"]}
+          caption={<>Why this is the default. The right-hand ends are what &ldquo;He plus a
+            normalisation layer&rdquo; actually buys: not the single best number on the page, but the
+            same number from every starting point. A default is not the setting that wins a benchmark —
+            it is the setting whose outcome you can predict before you run it.</>}
+        />
 
         <h2>When to deviate — and the constraint that justifies each</h2>
         <p>

@@ -5,7 +5,7 @@ import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 import { M, MathBlock } from "@/components/Math";
 import { Quiz } from "@/components/Quiz";
 import { PredictPrompt } from "@/components/PredictPrompt";
-import { AnalystQuestion, TransferBox, PlaybookRule } from "@/components/capstone/pedagogy";
+import { WorkOrder, TransferBox, PlaybookRule } from "@/components/capstone/warehouse";
 import { WAREHOUSE_SETUP } from "@/lib/runtimeSetup";
 
 export const metadata = {
@@ -34,10 +34,10 @@ export default function ChoosingTheDiscount() {
       />
 
       <div className="lesson">
-        <AnalystQuestion accent={OLIVE} label="The engineer's question" icon="🤖">
+        <WorkOrder act={1} n={5}>
           How far into the future should consequences count — and am I sure that is a modelling decision rather
           than a default I inherited?
-        </AnalystQuestion>
+        </WorkOrder>
 
         <h2>γ as an effective horizon</h2>
         <p>
@@ -179,14 +179,14 @@ export default function ChoosingTheDiscount() {
           ]}
         />
 
-        <TransferBox accent={OLIVE}>
+        <TransferBox>
           On your next problem, estimate the number of steps between an action and the outcome it is meant to
           cause, and pick <M>\gamma</M> so that <M>{String.raw`1/(1-\gamma)`}</M> comfortably exceeds it. Then
           re-solve at two or three values and compare the <em>behaviour</em>, not just the value — if the policy
           changes character, your discount is doing more work than you assigned it.
         </TransferBox>
 
-        <PlaybookRule n={5} accent={OLIVE}>
+        <PlaybookRule n={5}>
           <strong>Choose γ from the task&rsquo;s timescale</strong> (<M>{String.raw`1/(1-\gamma)`}</M> should exceed
           the action-to-outcome delay), and remember that shrinking it does not merely shorten the horizon — it
           quietly makes the agent more risk-averse.

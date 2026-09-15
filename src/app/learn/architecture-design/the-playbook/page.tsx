@@ -2,6 +2,8 @@ import Link from "next/link";
 import { LessonHeader, Callout, Proof, PrevNext } from "@/components/lesson";
 import { M, MathBlock } from "@/components/Math";
 import { Quiz } from "@/components/Quiz";
+import { GridHeatmap } from "@/components/figures/arch/ArchFigures";
+import { GRID, GRID_DEPTHS, GRID_WIDTHS } from "@/components/figures/arch/data";
 
 export const metadata = {
   title: "The architecture playbook — Manifold",
@@ -65,7 +67,8 @@ export default function ThePlaybookPage() {
           <li>
             <strong>Add depth only for hierarchy, and respect the depth tax.</strong> Depth buys
             composition, which only helps if the problem has features-of-features. On a flat problem
-            it hurts: depth 20 at width 16 fell to 0.750 despite healthy gradients (
+            it hurts: under plain SGD a width-16 net fell to 0.750 by depth 40, despite healthy
+            gradients at every depth (
             <Link href="/learn/architecture-design/the-depth-tax" style={link}>the depth tax</Link>,{" "}
             <Link href="/learn/architecture-design/when-depth-hurts" style={link}>when depth
             hurts</Link>).
@@ -99,11 +102,25 @@ export default function ThePlaybookPage() {
 
         <MathBlock>{String.raw`\text{default} \to \text{overfit small} \to \text{width} \to \text{depth (if hierarchy)} \to \text{skips (if deep)} \to \text{regularise (if gap)}`}</MathBlock>
 
+        <GridHeatmap
+          cells={GRID}
+          depths={GRID_DEPTHS}
+          widths={GRID_WIDTHS}
+          caption={<>The playbook is a route through this grid, and it is worth seeing why the route
+            is short. The good region is a broad L covering roughly half the cells, every one of
+            them within a point of the best; the failures are confined to two corners. A search that
+            starts at depth 2, width 32 and steps outward only when a measurement tells it to will
+            land somewhere in that L on its first or second try. There is no narrow peak here to
+            hunt for, which is the real reason architecture search is not where your afternoon should
+            go.</>}
+        />
+
         <Callout color={CORAL} title={<>The headline numbers, in one place</>}>
           <ul style={{ margin: 0, lineHeight: 1.7 }}>
             <li><strong>0.953</strong> — best test accuracy, at depth 2 width 32, just 1,185 parameters.</li>
             <li><strong>25&times; the parameters, less accuracy</strong> — depth 8 width 64 spends far more and scores below the small optimum; capacity past the plateau is pure overhead.</li>
-            <li><strong>0.750</strong> — depth 20 width 16, an optimisation failure with healthy gradient ratios: depth is taxed even when the gradients look fine.</li>
+            <li><strong>0.750</strong> — depth 40 width 16 under plain SGD, an optimisation failure with healthy gradient ratios: depth is taxed even when the gradients look fine. Under Adam the same architecture reaches 0.928, which is why the tax is so easy to miss.</li>
+            <li><strong>0.9467</strong> — the same depth-40 network with skip connections and BatchNorm, under the same plain SGD. The fix is architectural, not a matter of tuning.</li>
             <li><strong>+0.004</strong> — the entire payoff of widening 16 &rarr; 512. The plateau is cheap to reach and cheap to leave.</li>
           </ul>
         </Callout>
@@ -135,7 +152,7 @@ export default function ThePlaybookPage() {
                 justifies that ordering?</>,
               options: [
                 "Depth 2 scores 0.953; depth 3 scores 0.944",
-                "Width's plateau is cheap to find (16 → 512 buys only +0.004 and adds no gradient bottleneck), while depth is taxed — depth 20 at width 16 fell to 0.750 with healthy gradients",
+                "Width's plateau is cheap to find (16 → 512 buys only +0.004 and adds no gradient bottleneck), while depth is taxed — under plain SGD, depth 40 at width 16 fell to 0.750 with healthy gradients",
                 "Width and depth are interchangeable, so order does not matter",
               ],
               answer: 1,

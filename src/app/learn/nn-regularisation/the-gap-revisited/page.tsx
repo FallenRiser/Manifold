@@ -2,6 +2,9 @@ import Link from "next/link";
 import { LessonHeader, Callout, Proof, PrevNext } from "@/components/lesson";
 import { M, MathBlock } from "@/components/Math";
 import { Quiz } from "@/components/Quiz";
+import { LearningCurve } from "@/components/figures/LearningCurve";
+import { ES_CURVE } from "@/components/figures/nnReg/curves";
+import { DiagnosticQuadrant } from "@/components/figures/nnReg/RegFigures";
 
 export const metadata = {
   title: "The train-test gap, revisited — Manifold",
@@ -46,6 +49,20 @@ export default function TheGapRevisitedPage() {
           has also learned a great deal that does not transfer. The job of this track is to figure out
           what the transferable part is and keep only that.
         </p>
+
+        <LearningCurve
+          x={ES_CURVE.epochs}
+          series={[
+            { label: "training error", values: ES_CURVE.train, color: "var(--muted)", dash: "4 3" },
+            { label: "held-out error", values: ES_CURVE.val, color: "var(--c-neural)" },
+          ]}
+          ylabel="MSE"
+          caption={<>The gap is not a number, it is a distance that opens up over time. Early in
+            training the two curves are together and both falling — nothing is wrong yet. They separate
+            at around epoch 30, and from there the training curve keeps improving while the held-out
+            curve gets worse. The vertical distance between them at any epoch is the gap; the useful
+            thing this picture adds to the number is <em>when</em> it appeared.</>}
+        />
 
         <h2>What a large gap actually means</h2>
         <p>
@@ -100,6 +117,13 @@ export default function TheGapRevisitedPage() {
           is where this gap was first named, and where you learned to read both scores before touching
           anything.
         </p>
+
+        <DiagnosticQuadrant
+          caption={<>Where a gap sits among the alternatives. Only the highlighted cell is a
+            regularisation problem. The cell below it looks similar on a test-set report — the model is
+            bad — and calls for the exact opposite treatment, which is why the next chapter&rsquo;s one
+            rule is a rule about reading <em>both</em> scores before reaching for anything.</>}
+        />
 
         <h2>Why the training score, alone, is a lie</h2>
         <p>

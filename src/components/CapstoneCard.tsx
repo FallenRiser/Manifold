@@ -29,8 +29,20 @@ export function CapstoneCard({ capstone, figure }: { capstone: Capstone; figure?
           {c.title} capstone
         </div>
         <p style={{ margin: "0 0 14px", fontSize: 13.5, lineHeight: 1.6, color: "var(--muted)" }}>{c.blurb}</p>
-        <div style={{ marginTop: "auto", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
-          <span className="font-display" style={{ fontSize: 13.5, fontWeight: 600, color: "var(--ink)", fontVariantNumeric: "tabular-nums" }}>{c.stat}</span>
+        {/* the headline result, typeset rather than printed: a quiet label, the baseline it started
+            from, and the number it reached carried in the capstone's own accent */}
+        <div style={{ marginTop: "auto", display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 12 }}>
+          <span style={{ minWidth: 0 }}>
+            <span style={{ display: "block", fontSize: 10, letterSpacing: "0.11em", textTransform: "uppercase", color: "var(--faint)", marginBottom: 4 }}>
+              {c.metric}
+            </span>
+            <span style={{ display: "flex", alignItems: "baseline", gap: 7, flexWrap: "wrap", fontVariantNumeric: "tabular-nums" }}>
+              <span style={{ fontSize: 13.5, color: "var(--muted)" }}>{c.from}</span>
+              <span style={{ fontSize: 12, color: "var(--faint)" }}>→</span>
+              <span className="font-serif" style={{ fontSize: 23, color: c.color, lineHeight: 1 }}>{c.to}</span>
+              {c.note && <span style={{ fontSize: 11, color: "var(--faint)" }}>{c.note}</span>}
+            </span>
+          </span>
           <span style={{ fontSize: 13, fontWeight: 500, color: c.color, whiteSpace: "nowrap" }}>Read →</span>
         </div>
       </div>

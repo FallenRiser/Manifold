@@ -2,6 +2,8 @@ import { M, MathBlock } from "@/components/Math";
 import { CodeBlock } from "@/components/CodeBlock";
 import { CLUSTER_SETUP } from "@/lib/runtimeSetup";
 import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
+import { ScatterRow } from "@/components/figures/kmeans/Scatter";
+import { INIT_DIST, INIT_POINTS } from "@/components/figures/kmeans/data.generated";
 
 export const metadata = {
   title: "NP-hardness of optimal clustering — Manifold",
@@ -41,6 +43,18 @@ export default function NPHardnessPage() {
           dataset of 100 points into 3 clusters that&rsquo;s already astronomically more partitions than there
           are atoms in the universe. You cannot enumerate them.
         </p>
+
+        <ScatterRow
+          panels={[
+            { points: INIT_POINTS.points, mono: true, label: "600 points, k = 8" },
+          ]}
+          caption={<>Eight clusters in 600 points. The number of ways to partition them is a Stirling
+            number with more than 500 digits, so nothing will ever enumerate it — and yet the picture is
+            obvious to you in under a second. That gap is the subject of this page. What makes the
+            problem formally hard is having to certify that <em>no</em> other partition is better;
+            what makes it easy in practice is that on data shaped like this, a good start finds the best
+            partition anyone has found {INIT_DIST.plusHits} times out of 100.</>}
+        />
 
         <h2>It&rsquo;s NP-hard — formally</h2>
         <p>

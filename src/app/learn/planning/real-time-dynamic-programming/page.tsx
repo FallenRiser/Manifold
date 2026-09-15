@@ -5,6 +5,8 @@ import { CodeBlock } from "@/components/CodeBlock";
 import { CodeOutput } from "@/components/CodeOutput";
 import { PredictPrompt } from "@/components/PredictPrompt";
 import { GRIDWORLD_SETUP } from "@/lib/runtimeSetup";
+import { GridRow, TERMINALS_ONLY } from "@/components/figures/planning/GridField";
+import { RTDP_COUNTS, RTDP_ROUTE } from "@/components/figures/planning/data.generated";
 
 export const metadata = {
   title: "Real-time dynamic programming — Manifold",
@@ -92,6 +94,23 @@ it visits 3 of 14 non-terminal states`}</CodeOutput>
             "It must eventually visit every state",
           ]}
           nudge="Locked in. Start high (optimistic) and RTDP converges on exactly the states that matter — no full enumeration needed."
+        />
+
+        <GridRow
+          mode="count"
+          grids={[
+            {
+              values: RTDP_COUNTS,
+              policy: TERMINALS_ONLY,
+              highlight: RTDP_ROUTE,
+              label: "backups per cell over 60 episodes from cell 12",
+            },
+          ]}
+          caption={<>Where the effort went. The ringed cells are the optimal route from the start, and
+            they take the overwhelming majority of the backups; the top-right corner, which no good
+            policy from cell 12 ever enters, is barely touched. On a 14-state grid that is a curiosity.
+            On a board with 10²⁰ states it is the only reason planning is possible at all — you never
+            needed the corner to be right, only the states you will actually stand in.</>}
         />
 
         <h2>Relevance beats completeness</h2>

@@ -2,6 +2,9 @@ import Link from "next/link";
 import { LessonHeader, Callout, Proof, PrevNext } from "@/components/lesson";
 import { M, MathBlock } from "@/components/Math";
 import { Quiz } from "@/components/Quiz";
+import { PenaltySum } from "@/components/figures/nnReg/RegFigures";
+import { SweepCurve } from "@/components/figures/SweepCurve";
+import { DECAY_REGRESSION } from "@/components/figures/nnReg/data";
 
 export const metadata = {
   title: "The L2 penalty on weights — Manifold",
@@ -71,6 +74,15 @@ export default function L2PenaltyPage() {
           under Adam, is the whole of the next page.)
         </p>
 
+        <PenaltySum
+          caption={<>One weight, three curves. The data loss alone is minimised at its own optimum; the
+            penalty is minimised at zero; their sum is minimised strictly between the two, and never
+            at either. That is the whole mechanism — the penalty does not forbid a large weight, it
+            charges for one, and the fitted value settles wherever the data&rsquo;s evidence stops
+            being worth the price. Raise <M>{String.raw`\lambda`}</M> and the orange curve&rsquo;s
+            minimum slides left.</>}
+        />
+
         <h2>Why smaller weights generalise better</h2>
         <p>
           A network&rsquo;s weights set how sharply its output can swing as the input moves. Large weights
@@ -85,6 +97,22 @@ export default function L2PenaltyPage() {
           the data is signal and which is noise. It simply makes wiggling expensive, and since fitting
           noise requires more wiggling than fitting signal, the noise is what gets sacrificed first.
         </p>
+
+        <SweepCurve
+          points={DECAY_REGRESSION}
+          log
+          xlabel="weight decay (log scale)"
+          ylabel="MSE"
+          seriesLabels={["test MSE", "train MSE"]}
+          markBest={false}
+          xticks={[0.0001, 0.001, 0.01, 0.1, 0.3]}
+          caption={<>The bias-variance trade in its cleanest measured form: as the penalty rises the
+            train error goes <em>up</em> (0.0221 to 0.0290) and the test error goes <em>down</em>
+            {" "}(0.0535 to 0.0412). Two curves moving in opposite directions is what a regulariser
+            looks like when it is working. Note also that the test curve is still falling at the
+            largest decay tested — the optimum is off the right-hand edge of this sweep, and an honest
+            reading is that the search should have gone further.</>}
+        />
 
         <h2>The clean demonstration: a noisy regression</h2>
         <p>

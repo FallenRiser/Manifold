@@ -2,6 +2,8 @@ import Link from "next/link";
 import { LessonHeader, Callout, Proof, PrevNext } from "@/components/lesson";
 import { M, MathBlock } from "@/components/Math";
 import { Quiz } from "@/components/Quiz";
+import { Dumbbell } from "@/components/figures/Dumbbell";
+import { WD_VS_L2 } from "@/components/figures/nnReg/data";
 
 export const metadata = {
   title: "Weight decay is not L2 regularisation — Manifold",
@@ -80,6 +82,18 @@ export default function WeightDecayVsL2Page() {
           adaptive; the shrink is uniform. That is the behaviour you almost always want, and it is the
           reason the two should never be treated as interchangeable once you leave plain SGD.
         </p>
+
+        <Dumbbell
+          rows={WD_VS_L2.map((r) => ({ init: r.label, a: r.test }))}
+          seriesLabels={["test accuracy"]}
+          ticks={[0.75, 0.76, 0.77]}
+          caption={<>Same network, same data, same seeds, and the same number typed into the same
+            slot — <code>1e-3</code>. The two runs are 1.9 points apart. If decoupled decay and an L2
+            term in the loss were the same thing, these two dots would be on top of each other; the
+            distance between them is the entire content of this page, and the direction is worth
+            noting too — the textbook L2 form happens to win here, which is the opposite of the usual
+            advice.</>}
+        />
 
         <h2>The same nominal strength, a different result</h2>
         <p>

@@ -5,6 +5,10 @@ import { CodeBlock } from "@/components/CodeBlock";
 import { CodeOutput } from "@/components/CodeOutput";
 import { Quiz } from "@/components/Quiz";
 import { GRIDWORLD_SETUP } from "@/lib/runtimeSetup";
+import { RewardBoard } from "@/components/figures/planning/PlanningDiagrams";
+import { REWARDS } from "@/components/figures/planning/data.generated";
+import { GridRow } from "@/components/figures/planning/GridField";
+import { V_STAR, PI_STAR } from "@/components/figures/planning/data.generated";
 
 export const metadata = {
   title: "A world to plan in — Manifold",
@@ -72,13 +76,24 @@ reward for an ordinary step                  : -0.04
           the shortest route is not always the safest-looking one. This is a genuine little planning problem.
         </p>
 
+        <RewardBoard
+          step={REWARDS.step}
+          goal={REWARDS.goal}
+          pit={REWARDS.pit}
+          gamma={REWARDS.gamma}
+          caption={<>Sixteen cells, four moves, two ways to finish. The numbers in the corners are state
+            indices, which every code block on this track uses to refer to cells. Nothing here is a value
+            yet — this is only the board and its payouts, the raw material every algorithm in the track
+            is handed.</>}
+        />
+
         <h2>Why not just walk toward the goal?</h2>
         <p>
           Because &ldquo;toward the goal&rdquo; is only obvious once you have the values. From the far corner, which
           way is toward the goal — and does the answer change near the pit? The point of dynamic programming is that
           you do <em>not</em> reason geometrically; you let the Bellman equation propagate the goal&rsquo;s{" "}
           <M>{String.raw`+1`}</M> and the pit&rsquo;s <M>{String.raw`-1`}</M> outward through the value function
-          until every cell knows, from its number alone, which neighbour is best. To set a baseline, here is what
+          until every cell knows, from its number alone, which neighbour is best. To set a baseline, here is what{" "}
           <em>aimless</em> behaviour is worth — the equiprobable random policy, evaluated exactly:
         </p>
         <MathBlock>{String.raw`V^{\text{random}}:\quad \begin{array}{cccc} -0.40 & -0.45 & -0.60 & \cdot \\ -0.36 & -0.36 & -0.38 & -0.43 \\ -0.30 & -0.24 & -0.10 & 0.13 \\ -0.25 & -0.13 & 0.22 & \cdot \end{array}`}</MathBlock>
@@ -96,6 +111,18 @@ reward for an ordinary step                  : -0.04
           it. You will have computed it two different ways (policy iteration and value iteration) and watched a lab
           build it sweep by sweep. Keep this baseline picture in mind; the contrast is the payoff.
         </Callout>
+
+        <GridRow
+          grids={[
+            { values: V_STAR, label: "V*: what each cell is worth" },
+            { policy: PI_STAR, label: "π*: the move that achieves it" },
+          ]}
+          caption={<>The answer, shown now so you know what you are working toward. Notice that cell 2 —
+            directly left of the pit — is still worth a positive 0.62: the optimal policy simply goes
+            down and around, and the pit costs it nothing but a detour. Reading a plan off the right-hand
+            grid is a matter of following arrows; producing the left-hand grid is the rest of this
+            track.</>}
+        />
 
         <Quiz
           accent={GOLD}

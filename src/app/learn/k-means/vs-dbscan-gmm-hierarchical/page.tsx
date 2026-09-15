@@ -2,6 +2,8 @@ import { Quiz } from "@/components/Quiz";
 import { CodeBlock } from "@/components/CodeBlock";
 import { CLUSTER_SETUP } from "@/lib/runtimeSetup";
 import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
+import { GroupedBars } from "@/components/figures/kmeans/KmeansCharts";
+import { ALTERNATIVES } from "@/components/figures/kmeans/data.generated";
 
 export const metadata = {
   title: "k-means vs DBSCAN, GMM, hierarchical — Manifold",
@@ -116,6 +118,31 @@ export default function ComparisonPage() {
               explain: "Inertia is minimised by balancing squared distances, not by respecting your idea of a cluster: carving a huge blob in half often costs less than giving a tiny blob its own centroid.",
             },
           ]}
+        />
+
+        <GroupedBars
+          ylabel="ARI against the true groups"
+          format={(v) => v.toFixed(2)}
+          groups={ALTERNATIVES.map((r) => ({
+            label: r.board,
+            values: [r["k-means"], r.GMM, r.Ward, r.DBSCAN],
+          }))}
+          series={[
+            { name: "k-means", color: "var(--c-clustering)" },
+            { name: "GMM", color: "var(--brand-2)" },
+            { name: "Ward", color: "var(--c-rl)" },
+            { name: "DBSCAN", color: "var(--c-regression)" },
+          ]}
+          caption={<>The same three boards, four methods, one score. Two things in here are worth more
+            than the table above. First, <strong>DBSCAN is not a general upgrade</strong>: it scores a
+            perfect {ALTERNATIVES[0].DBSCAN.toFixed(2)} on the crescents, where k-means is helpless, and
+            then {ALTERNATIVES[1].DBSCAN.toFixed(2)} and {ALTERNATIVES[2].DBSCAN.toFixed(2)} on the
+            other two — it is a specialist, not a replacement. Second, <strong>GMM is the best
+            all-rounder here</strong>, beating k-means on all three boards, which follows from the
+            previous chapter: it is k-means with the spherical, equal-size assumptions removed.
+
+            One caveat the bars cannot show: DBSCAN&rsquo;s ε was tuned per board. That tuning is its
+            real cost, and it is the reason k-means remains the default despite losing every column.</>}
         />
 
         <PrevNext prev={{ href: "/learn/k-means/the-failure-mode-gallery", label: <>← The failure-mode gallery</> }} next={{ href: "/learn/k-means/k-medoids", label: <>Next up · k-medoids (PAM) →</> }} />

@@ -1,7 +1,7 @@
 import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 import { M } from "@/components/Math";
 import { Quiz } from "@/components/Quiz";
-import { AnalystQuestion, TransferBox, PlaybookRule } from "@/components/capstone/pedagogy";
+import { WorkOrder, TransferBox, PlaybookRule } from "@/components/capstone/warehouse";
 
 export const metadata = {
   title: "Algorithm comparison — Manifold",
@@ -32,10 +32,10 @@ export default function AlgorithmComparison() {
       />
 
       <div className="lesson">
-        <AnalystQuestion accent={OLIVE} label="The engineer's question" icon="🤖">
+        <WorkOrder act={3} n={14}>
           Given three methods that all &ldquo;work&rdquo; on a single run, which do I actually ship — and did the
           extra machinery in the fancier ones earn its keep?
-        </AnalystQuestion>
+        </WorkOrder>
 
         <h2>The scoreboard, over ten seeds</h2>
         <p>
@@ -219,14 +219,14 @@ export default function AlgorithmComparison() {
           ]}
         />
 
-        <TransferBox accent={OLIVE}>
+        <TransferBox>
           Compare algorithms on a distribution, not a point: tabulate the mean, the fraction reaching each basin,
           the typical best, and the failure count. Watch for means that are really failure-rate summaries in
           disguise, and prefer the method whose advantage <em>reproduces</em> across seeds — here, safety — over
           the one that merely looked best on the run you happened to see first.
         </TransferBox>
 
-        <PlaybookRule n={14} accent={OLIVE}>
+        <PlaybookRule n={14}>
           <strong>Judge the added complexity by whether its benefit reproduces.</strong> Report a full distribution
           over seeds, distrust a mean in a multi-modal world, and verify any textbook effect on your own problem
           before you rely on it — the celebrated ones are real in their setting and often absent in yours.

@@ -3,8 +3,8 @@ import { CodeBlock } from "@/components/CodeBlock";
 import { CodeOutput } from "@/components/CodeOutput";
 import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 import { M } from "@/components/Math";
-import { DecisionPoint } from "@/components/capstone/DecisionPoint";
-import { AnalystQuestion, TransferBox, PlaybookRule } from "@/components/capstone/pedagogy";
+import { DecisionPoint } from "@/components/DecisionPoint";
+import { WorkOrder, TransferBox, PlaybookRule } from "@/components/capstone/warehouse";
 import { WAREHOUSE_SETUP } from "@/lib/runtimeSetup";
 
 export const metadata = {
@@ -33,10 +33,10 @@ export default function DesigningTheState() {
       />
 
       <div className="lesson">
-        <AnalystQuestion accent={OLIVE} label="The engineer's question" icon="🤖">
+        <WorkOrder act={1} n={3}>
           If I froze the agent mid-task and showed it <em>only</em> what I am calling &ldquo;the state&rdquo;,
           would that be enough for it to choose correctly?
-        </AnalystQuestion>
+        </WorkOrder>
 
         <h2>The test, in general</h2>
         <p>
@@ -153,14 +153,14 @@ position ONLY (aliased)  return  -250.00   delivered   0.0%   steps 250.0`}</Cod
           is to restore the missing information, either directly (as here) or through memory.
         </p>
 
-        <TransferBox accent={OLIVE}>
+        <TransferBox>
           Before you tune anything, run the freeze test on your own problem: name two situations that require
           different actions, and check whether your state distinguishes them. If your agent is stalling or
           oscillating, suspect aliasing <em>before</em> you touch the learning rate — and remember the diagnostic
           we used here: train once on the reduced state and once on the fuller one, and let the gap tell you.
         </TransferBox>
 
-        <PlaybookRule n={3} accent={OLIVE}>
+        <PlaybookRule n={3}>
           <strong>Design the state by asking what the agent must know to act optimally</strong>, then test for
           aliasing: if two situations needing different actions look identical, no algorithm can succeed. Fix the
           representation, not the hyperparameters.

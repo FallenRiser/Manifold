@@ -1,5 +1,6 @@
 import { CAP_TOTAL } from "./housingCapstoneTrack";
 import { NEO_TOTAL } from "./neoCapstoneTrack";
+import { RL_CAP_TOTAL } from "./rlCapstoneTrack";
 
 // `partial` = the track is live but its outline is not fully built yet; /map
 // must say so rather than present it like a finished track (PROJECT.md §10.5).
@@ -15,7 +16,13 @@ export type Capstone = {
   kind: string;
   pages: number;
   blurb: string;
-  stat: string;
+  /** The headline result, kept in pieces so the card can typeset it rather than print a string.
+   *  `from` is the honest starting point (a baseline, not zero); `note` is the ceiling if there
+   *  is one worth naming. */
+  metric: string;
+  from: string;
+  to: string;
+  note?: string;
 };
 
 export const CAPSTONES: Capstone[] = [
@@ -27,7 +34,9 @@ export const CAPSTONES: Capstone[] = [
     pages: CAP_TOTAL,
     blurb:
       "16,512 census blocks, worked the way a senior does: frame, clean, baseline — then three diagnostic-driven upgrades to a stacked ensemble.",
-    stat: "R² 0.653 → 0.858",
+    metric: "test R²",
+    from: "0.653",
+    to: "0.858",
   },
   {
     title: "Asteroid hazard",
@@ -36,8 +45,23 @@ export const CAPSTONES: Capstone[] = [
     kind: "Classification",
     pages: NEO_TOTAL,
     blurb:
-      "90,836 near-Earth approaches, taught for transfer: choose a metric and split that can't lie, then earn every rung of the model climb.",
-    stat: "PR-AUC 0.29 → 0.48",
+      "90,836 near-Earth approaches, 9.73% of them hazardous, taught for transfer: choose a metric and a split that can't lie, then earn every rung of the model climb.",
+    metric: "PR-AUC",
+    from: "0.29",
+    to: "0.48",
+  },
+  {
+    title: "Warehouse robot",
+    href: "/learn/warehouse-robot-capstone",
+    color: "var(--c-warehouse)",
+    kind: "Reinforcement learning",
+    pages: RL_CAP_TOTAL,
+    blurb:
+      "An 80-state delivery floor, solved end to end with tabular RL: design the state until it's solvable, then tune exploration until it's reliable.",
+    metric: "mean return",
+    from: "−816",
+    to: "21.2",
+    note: "matches the oracle",
   },
 ];
 
@@ -130,7 +154,11 @@ export const FAMILIES: Group[] = [
       { title: "MDPs, policies & value functions", href: "/learn/markov-decision-processes" },
       { title: "Planning (value & policy iteration)", href: "/learn/planning" },
       { title: "Learning (TD, Q-learning, SARSA)", href: "/learn/learning" },
-      { title: "Function approximation" },
+      { title: "Function approximation", href: "/learn/function-approximation" },
+      { title: "Building environments from scratch", href: "/learn/building-environments", partial: true },
+      { title: "Policy gradients, actor–critic & PPO" },
+      { title: "Model-based RL & search (Dyna, MCTS)" },
+      { title: "Policy search without gradients (neuroevolution)" },
     ],
   },
 ];

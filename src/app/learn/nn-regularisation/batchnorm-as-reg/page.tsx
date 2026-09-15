@@ -2,6 +2,8 @@ import Link from "next/link";
 import { LessonHeader, Callout, Proof, PrevNext } from "@/components/lesson";
 import { M, MathBlock } from "@/components/Math";
 import { Quiz } from "@/components/Quiz";
+import { Dumbbell } from "@/components/figures/Dumbbell";
+import { BN_AS_REG } from "@/components/figures/nnReg/data";
 
 export const metadata = {
   title: "BatchNorm as implicit regularisation — Manifold",
@@ -70,6 +72,21 @@ export default function BatchnormAsRegPage() {
           add it for that reason. It is a genuine, if mild, regularisation effect riding along inside a
           layer we included to make training well-behaved.
         </p>
+
+        <Dumbbell
+          rows={[
+            { init: "no BatchNorm", a: BN_AS_REG.off.test },
+            { init: "BatchNorm", a: BN_AS_REG.on.test },
+          ]}
+          seriesLabels={["test accuracy, no other regulariser"]}
+          ticks={[0.755, 0.76]}
+          caption={<>With no dropout, no decay and no augmentation anywhere, adding BatchNorm moves
+            test accuracy from 0.751 to <strong>0.763</strong> and closes the gap by 0.012. That is a
+            larger effect than weight decay achieved on this problem, from a layer that was not
+            installed for this purpose. It is worth being precise about what this does and does not
+            show: the effect is real and measured, but it is a side effect, and the next section is
+            about why it is one you cannot tune directly.</>}
+        />
 
         <h2>Where the effect comes from: noisy statistics</h2>
         <p>

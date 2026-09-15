@@ -3,7 +3,7 @@ import { CodeOutput } from "@/components/CodeOutput";
 import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 import { M } from "@/components/Math";
 import { GuessSlider } from "@/components/capstone/GuessSlider";
-import { AnalystQuestion, TransferBox, PlaybookRule } from "@/components/capstone/pedagogy";
+import { WorkOrder, TransferBox, PlaybookRule } from "@/components/capstone/warehouse";
 import { WAREHOUSE_SETUP } from "@/lib/runtimeSetup";
 
 export const metadata = {
@@ -31,10 +31,10 @@ export default function Baselines() {
       />
 
       <div className="lesson">
-        <AnalystQuestion accent={OLIVE} label="The engineer's question" icon="🤖">
+        <WorkOrder act={2} n={8}>
           What score do I get for free, and what score does the obvious non-learning solution get? Until I know
           both, I cannot tell whether my agent has learned anything worth having.
-        </AnalystQuestion>
+        </WorkOrder>
 
         <h2>Why two baselines, not one</h2>
         <p>
@@ -145,14 +145,14 @@ hand-coded   |  -3560.04       3.2%   110.50   246.5`}</CodeOutput>
           is what catches it, which is the entire argument for measuring baselines instead of trusting them.
         </p>
 
-        <TransferBox accent={OLIVE}>
+        <TransferBox>
           Always measure both baselines — random for scale, hand-coded for the commercial bar — and{" "}
           <em>run</em> the hand-coded one rather than estimating what it would do. In a sequential problem, a
           policy&rsquo;s worst state matters more than its average state, and only a simulation will tell you which
           state that is.
         </TransferBox>
 
-        <PlaybookRule n={8} accent={OLIVE}>
+        <PlaybookRule n={8}>
           <strong>Establish a random baseline and a hand-coded baseline before training</strong>, and remember that
           a deterministic policy repeats its mistakes forever — a heuristic can score far <em>worse</em> than
           random, and looking at the code will not tell you.

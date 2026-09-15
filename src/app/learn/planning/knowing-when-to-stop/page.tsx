@@ -5,6 +5,8 @@ import { CodeBlock } from "@/components/CodeBlock";
 import { CodeOutput } from "@/components/CodeOutput";
 import { PredictPrompt } from "@/components/PredictPrompt";
 import { GRIDWORLD_SETUP } from "@/lib/runtimeSetup";
+import { BoundVsError } from "@/components/figures/planning/PlanningCharts";
+import { VI_DELTA, VI_BOUND, VI_ERROR } from "@/components/figures/planning/data.generated";
 
 export const metadata = {
   title: "Knowing when to stop — Manifold",
@@ -82,6 +84,18 @@ sweep 7: delta=0.000  bound=0.000  (true error 0.000)`}</CodeOutput>
           another face of the effective horizon — so near-undiscounted problems need a much smaller{" "}
           <M>{String.raw`\delta`}</M> before the guarantee bites.
         </p>
+
+        <BoundVsError
+          delta={VI_DELTA}
+          bound={VI_BOUND}
+          error={VI_ERROR}
+          caption={<>The bound is a guarantee, not an estimate, and the gap is not small. Follow the red
+            line down to sweep 6, marked: the values are <em>exactly</em> V* there — the green line has
+            reached zero — while the bound still certifies only that the error is somewhere below 5.31,
+            on a board whose largest value is 1.00. The bound has done its job (it is never violated) and
+            told you almost nothing. That is the normal case, not a pathology: γ/(1−γ) is 9 at γ = 0.9,
+            and it is 99 at γ = 0.99.</>}
+        />
 
         <Callout color={GOLD} title={<>The δ trap</>}>
           Look at sweep 6: the values have actually reached <M>{String.raw`V^*`}</M> exactly (true error 0), yet{" "}

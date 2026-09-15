@@ -4,6 +4,8 @@ import { M, MathBlock } from "@/components/Math";
 import { CodeBlock } from "@/components/CodeBlock";
 import { CodeOutput } from "@/components/CodeOutput";
 import { PredictPrompt } from "@/components/PredictPrompt";
+import { CurseScale } from "@/components/figures/planning/PlanningCharts";
+import { CURSE_MARKS } from "@/components/figures/planning/data.generated";
 
 export const metadata = {
   title: "The curse of dimensionality — Manifold",
@@ -85,6 +87,15 @@ Robot joint angles: continuous -> uncountably many states`}</CodeOutput>
             "By visiting states faster",
           ]}
           nudge="Locked in. The escape is a function, not a table — the same trick supervised learning uses for unseen inputs."
+        />
+
+        <CurseScale
+          marks={CURSE_MARKS}
+          caption={<>Every tick on this axis is a factor of ten, so the distance from the grid you have
+            been planning in to the game of Go is 169 of them. The italic mark is the number of atoms in
+            the observable universe, sitting less than halfway along — a board you could not tabulate
+            with the entire universe as memory is not an exotic case, it is a 19×19 board game. Sweeping
+            a table is not slow here; it is impossible, and no faster computer changes that.</>}
         />
 
         <h2>The two doors out</h2>

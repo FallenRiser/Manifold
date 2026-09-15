@@ -2,11 +2,14 @@ import Link from "next/link";
 import { LessonHeader, Callout, Proof, PrevNext } from "@/components/lesson";
 import { M, MathBlock } from "@/components/Math";
 import { Quiz } from "@/components/Quiz";
+import { PredictPrompt } from "@/components/PredictPrompt";
+import { DepthRisk } from "@/components/figures/arch/ArchFigures";
+import { DEPTH_PLAIN, SGD_DEPTH, MAJORITY_CLASS } from "@/components/figures/arch/data";
 
 export const metadata = {
   title: "The gradient problem, revisited — Manifold",
   description:
-    "He initialisation and ReLU keep gradient ratios near 1, but depth 20 still fails at 0.750 test accuracy. The ratio is necessary but not sufficient — this chapter introduces the architecture-level fix.",
+    "He initialisation and ReLU keep gradient ratios near 1. Under Adam that is enough to depth 40; under plain SGD the same network collapses to 0.750. The ratio is necessary but not sufficient — this chapter introduces the architecture-level fix.",
 };
 
 const CORAL = "var(--c-neural)";
@@ -61,21 +64,68 @@ export default function GradientProblemPage() {
           sigmoid networks untrainable.
         </p>
 
-        <h2>But depth 20 still fails</h2>
+        <h2>So does depth still fail, or not?</h2>
         <p>
-          Here is the number that should bother you: a 20-layer, width-16 ReLU network with He init
-          reaches a test accuracy of only <strong>0.750</strong> on two-moons. The same architecture
-          at depth 2 reaches 0.945. The gradient ratio is fine — 2.23 is well within the healthy
-          range — yet the network has lost 20 points of accuracy.
+          It depends entirely on the optimiser, and the two answers are worth seeing side by side
+          before any explanation, because most writing on this subject quietly assumes one of them.
+        </p>
+
+        <PredictPrompt
+          accent={CORAL}
+          prompt={<>Width 16, He init, ReLU, swept to depth 40 on two moons. One sweep uses Adam,
+            one uses plain SGD. Which one falls off, and where?</>}
+          options={[
+            "Both hold up — He init has solved depth",
+            "Both collapse past depth 20",
+            "Adam holds all the way to 40; SGD collapses past 20",
+            "SGD holds; Adam collapses",
+          ]}
+          nudge="Locked in. Both sweeps are below."
+        />
+
+        <DepthRisk
+          rows={DEPTH_PLAIN as unknown as Array<Record<string, number>>}
+          keys={["test", "worst"]}
+          labels={["mean of 3 seeds", "worst seed"]}
+          majority={MAJORITY_CLASS}
+          caption={<>Under <strong>Adam</strong>, there is no depth wall on this problem at all. The
+            mean drifts from 0.948 at depth 2 to 0.928 at depth 40 — two points across a twentyfold
+            increase in depth. What moves is the <em>worst seed</em>: it tracks the mean almost
+            exactly up to depth 20, then separates, bottoming out at 0.830 at depth 30 while the mean
+            still reads 0.902. The seed-to-seed spread goes from 0.0024 to 0.0510, a factor of 21.
+            This is the depth tax as it actually appears here — not a loss of accuracy, a loss of
+            reliability.</>}
+        />
+
+        <DepthRisk
+          rows={SGD_DEPTH as unknown as Array<Record<string, number>>}
+          keys={["plain", "resBN"]}
+          labels={["plain net", "residual + BatchNorm"]}
+          majority={MAJORITY_CLASS}
+          caption={<>The identical sweep under <strong>plain SGD</strong>, and now the wall is
+            unmistakable: flat at about 0.94 to depth 20, then <strong>0.770</strong> at depth 30 and{" "}
+            <strong>0.750</strong> at depth 40, with seed spreads of 0.21 and 0.20 — meaning some
+            seeds fail outright while others are fine. Adam was hiding this, because rescaling every
+            parameter&rsquo;s step by its own gradient history is itself a partial fix for the problem
+            this chapter is about. The second line is where the chapter ends up, and the next three
+            pages are how it gets there.</>}
+        />
+
+        <p>
+          So the honest statement is narrower than &ldquo;deep networks do not train&rdquo;. The
+          gradient ratio at depth 20 is a healthy 2.23, and with a good optimiser that network
+          reaches 0.933. Give the same architecture, the same initialisation and the same
+          healthy-looking ratio 40 layers and plain SGD, and it lands at <strong>0.750</strong>.
         </p>
         <p>
-          This is the central puzzle of this chapter. If the gradient ratio is not the bottleneck,
-          what is?
+          That is the central puzzle of this chapter. The gradient is arriving at the right
+          magnitude, and the network still fails. If the ratio is not the bottleneck, what is?
         </p>
 
         <Callout color={CORAL} title={<>Necessary but not sufficient</>}>
           A healthy gradient ratio means every layer <em>receives</em> a learning signal of
-          comparable magnitude. It does not mean the signal is <strong>useful</strong>. Three
+          comparable magnitude. It does not mean the signal is <strong>useful</strong>, and it does
+          not mean a plain optimiser can act on it. Three
           distinct pathologies can corrupt a gradient that arrives at the right scale:
           <br /><br />
           <strong>1. Loss landscape roughness.</strong> As depth increases, the loss surface develops
@@ -96,16 +146,22 @@ export default function GradientProblemPage() {
 
         <h2>The depth wall in numbers</h2>
         <p>
-          The pattern across measured architectures is consistent: at fixed width, accuracy rises with
-          depth up to a point, then falls. The fall is not catastrophic the way sigmoid collapse is —
-          the network does not diverge, it does not produce NaN, the loss does decrease — but it
-          plateaus at a level well below what a shallower, wider network achieves.
+          The pattern is consistent once the optimiser is held fixed: at fixed width, accuracy holds
+          flat with depth up to a point, and past that point it falls while the variation between
+          runs explodes. The fall is not catastrophic the way sigmoid collapse is — the network does
+          not diverge, it does not produce NaN, the loss does decrease — but it settles well below
+          what a shallower network reaches, and it does so unpredictably.
         </p>
         <p>
-          This is the depth wall. It is not a bug in the initialisation or the activation; it is a
-          fundamental consequence of composing many nonlinear transformations in sequence. Each layer
-          must both preserve the information from below and add something new, and at depth 20 with
-          width 16, the preservation side is failing.
+          The unpredictability is the part worth holding on to. A mean of 0.770 at depth 30 with a
+          spread of 0.21 does not describe three runs that each lost seventeen points; it describes
+          runs that were fine and runs that failed, averaged together. The depth wall is not a tax
+          levied evenly on every run. It is a rise in the probability that a given run is a
+          write-off — which is exactly the shape of failure the{" "}
+          <Link href="/learn/initialisation-and-normalisation/why-norm-reduces-sensitivity" style={link}>
+            initialisation and normalisation track
+          </Link>{" "}
+          found for a badly scaled starting point, and it has the same kind of fix.
         </p>
 
         <h2>What an architectural fix looks like</h2>
@@ -155,22 +211,24 @@ export default function GradientProblemPage() {
             {
               q: (
                 <>
-                  A depth-20 ReLU network with He init has a gradient ratio of 2.23 (near 1) but
-                  reaches only 0.750 test accuracy. What does this tell us about gradient ratios?
+                  A depth-40 ReLU network with He init has a gradient ratio near 1, reaches 0.928
+                  under Adam, and 0.750 under plain SGD. What does that tell us about gradient
+                  ratios?
                 </>
               ),
               options: [
-                "The gradient ratio measurement is wrong at depth 20",
-                "A healthy gradient ratio is necessary but not sufficient for good training — other pathologies exist",
+                "The gradient ratio measurement is wrong at depth 40",
+                "A healthy gradient ratio is necessary but not sufficient — one unchanged ratio is consistent with both outcomes",
                 "He init does not work for networks deeper than 10 layers",
               ],
               answer: 1,
               explain: (
                 <>
-                  The ratio is correctly measured and He init is working as designed. But gradient
-                  magnitude is only one of several requirements for effective training — landscape
-                  roughness, dead units, and information bottlenecks can all degrade performance
-                  independently.
+                  The ratio is correctly measured and He init is working as designed — which is
+                  precisely the problem with using it as the health check. One number, unchanged, is
+                  consistent with both a 0.928 run and a 0.750 one. Gradient magnitude is one
+                  requirement among several: landscape roughness, dead units and information
+                  bottlenecks all degrade training independently of it.
                 </>
               ),
             },
@@ -178,8 +236,8 @@ export default function GradientProblemPage() {
               q: (
                 <>
                   Sigmoid at depth 12 produces a gradient ratio of{" "}
-                  <M>{String.raw`2.9 \times 10^7`}</M>. He+ReLU at depth 20 produces 2.23. Why is
-                  the He+ReLU network still underperforming despite this much better ratio?
+                  <M>{String.raw`2.9 \times 10^7`}</M>. He+ReLU at depth 20 produces 2.23. Why can
+                  the He+ReLU network still underperform despite this much better ratio?
                 </>
               ),
               options: [

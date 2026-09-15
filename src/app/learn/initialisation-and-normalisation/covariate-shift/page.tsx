@@ -2,6 +2,8 @@ import Link from "next/link";
 import { LessonHeader, Callout, Proof, PrevNext } from "@/components/lesson";
 import { M, MathBlock } from "@/components/Math";
 import { Quiz } from "@/components/Quiz";
+import { LayerTrace } from "@/components/figures/LayerTrace";
+import { ACT_STD_TRAINED } from "@/components/figures/initNorm/data";
 
 export const metadata = {
   title: "The internal covariate shift story — Manifold",
@@ -56,6 +58,18 @@ export default function CovariateShiftPage() {
           paper claimed BatchNorm accelerates training <em>because</em> it reduces this shift. That
           causal claim is the part later work put to the test.
         </Callout>
+
+        <LayerTrace
+          series={ACT_STD_TRAINED}
+          ylabel="activation std"
+          caption={<>The shift, measured. Both networks are He-initialised, so both start with the
+            activation scale set correctly at every layer; this is what the scale looks like after
+            sixty epochs of training. Without normalisation it has walked from <strong>0.50</strong> at
+            layer 1 to <strong>5.87</strong> at layer 7 — the weights moved, and the scale moved with
+            them. With BatchNorm it sits between 0.57 and 0.82 the whole way down. Note what this
+            figure does <em>not</em> settle: it shows the distributions are being held still, not that
+            holding them still is why the network trains better.</>}
+        />
 
         <h2>The correction: BatchNorm does not reduce the shift</h2>
         <p>

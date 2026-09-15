@@ -56,10 +56,15 @@ export default function WhatBadInitLooksLikePage() {
           weights. Nothing is trained; this is the untouched network at initialisation.
         </p>
         <p>
-          <strong>Too small (weight std 0.001).</strong> Layer 1 comes out with std 0.0010. By
-          layer 2 it is 0.0000, and it reads 0.0000 for every layer after that. Roughly half the
-          units are dead — outputting zero — throughout the network. The signal has completely
-          vanished by the second layer. The eight-layer network is, functionally, silent.
+          <strong>Too small (weight std 0.001).</strong> Layer 1 comes out with std 0.0010488.
+          Then 4.31 &times; 10<sup>-6</sup>, 1.62 &times; 10<sup>-8</sup>, and on down to
+          1.07 &times; 10<sup>-20</sup> at layer 8 — a loss of two to three decades per layer, every
+          layer, with the regularity of compound interest. Printed to four decimal places that whole
+          column reads <code>0.0000</code>, which is why it is tempting to say the signal &ldquo;is
+          zero&rdquo;. It is not. It is decaying geometrically, and the distinction matters, because a
+          geometric decay is exactly the kind of thing the next chapter fixes with a constant. Roughly
+          half the units are also dead — outputting zero — throughout the network. Functionally, the
+          eight-layer network is silent.
         </p>
         <p>
           <strong>He (the correct scale for ReLU).</strong> Layer 1 std is 1.0488, then 1.0781,
@@ -172,9 +177,9 @@ export default function WhatBadInitLooksLikePage() {
                 The growth is exponential in depth, not additive.</>,
             },
             {
-              q: <>With weight std 0.001 the pre-activation std reads 0.0000 from layer 2 onward and
-                about half the units are dead. Why does this specifically prevent the network from
-                learning?</>,
+              q: <>With weight std 0.001 the pre-activation std falls to 1.07 &times; 10<sup>-20</sup>
+                by layer 8 and about half the units are dead. Why does this specifically prevent the
+                network from learning?</>,
               options: [
                 "A vanished activation is zero, and its ReLU gradient is zero, so no learning signal can flow backward past it",
                 "The learning rate becomes too large for such small activations",

@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 
+import { PREACT_STD } from "@/components/figures/initNorm/data";
+
 // Measured pre-activation standard deviation per layer, from
 // scripts/init_norm_cases.py section 4: an 8-layer, width-32 ReLU network at
 // three initialisation scales. The signal either vanishes, stays stable, or
@@ -12,13 +14,14 @@ import { useState } from "react";
 
 type Scale = "small" | "he" | "large";
 
+// Read from the shared measured series so these bars cannot drift from the
+// figures on the other pages. The "small" row used to hold rounded placeholders
+// (1e-5, 1e-7, 1e-9) against real values of 4.31e-06, 1.62e-08, 6.23e-11 — the
+// comment above promised measured numbers and one row was not delivering them.
 const DATA: Record<Scale, number[]> = {
-  // too small (0.001): collapses to zero by layer 2
-  small: [0.001, 0.00001, 0.0000001, 1e-9, 1e-11, 1e-13, 1e-15, 1e-17],
-  // He (correct for ReLU): holds within a factor of two of one
-  he: [1.0488, 1.0781, 1.0128, 0.9733, 0.8933, 0.6454, 0.7319, 0.6558],
-  // too large (5.0): explodes nine orders of magnitude
-  large: [5.244, 107.81, 2025.6, 38931, 714635, 1.0326e7, 2.342e8, 4.197e9],
+  small: PREACT_STD[2].values,
+  he: PREACT_STD[1].values,
+  large: PREACT_STD[0].values,
 };
 
 const META: Record<Scale, { label: string; scaleTxt: string; verdict: string; tone: string }> = {

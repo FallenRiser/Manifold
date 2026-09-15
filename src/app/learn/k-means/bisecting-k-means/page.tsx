@@ -1,6 +1,7 @@
 import { CodeBlock } from "@/components/CodeBlock";
 import { CLUSTER_SETUP } from "@/lib/runtimeSetup";
 import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
+import { BisectTree } from "@/components/figures/kmeans/KmeansDiagrams";
 
 export const metadata = {
   title: "Bisecting k-means — Manifold",
@@ -34,6 +35,15 @@ export default function BisectingPage() {
           Each step is a tiny, cheap 2-means on a subset, and the sequence of splits forms a binary tree —
           a dendrogram you can cut at any level.
         </p>
+
+        <BisectTree
+          caption={<>Top-down, and never solving more than a 2-means problem at a time. Each round picks
+            the leaf with the worst inertia and splits it in two, so reaching k clusters takes k−1
+            splits. The reason this often beats running k-means once with k clusters is the
+            initialisation chapter again: a 2-means problem has far fewer bad local minima to fall
+            into than a k-means problem, so a sequence of easy problems lands in a better place than
+            one hard one.</>}
+        />
 
         <h2>Why it often beats plain k-means</h2>
         <ul style={ul}>

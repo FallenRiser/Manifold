@@ -5,6 +5,8 @@ import { CodeBlock } from "@/components/CodeBlock";
 import { CodeOutput } from "@/components/CodeOutput";
 import { PredictPrompt } from "@/components/PredictPrompt";
 import { GRIDWORLD_SETUP } from "@/lib/runtimeSetup";
+import { SweepSpectrum } from "@/components/figures/planning/PlanningDiagrams";
+import { MPI_DIAL } from "@/components/figures/planning/data.generated";
 
 export const metadata = {
   title: "Value iteration is truncated policy iteration — Manifold",
@@ -90,6 +92,15 @@ print("value iteration and 1-sweep policy iteration agree:", np.allclose(Va, Vb)
           One picture now organises the whole track. On a dial labelled &ldquo;evaluation sweeps per
           improvement,&rdquo; <M>k=1</M> is value iteration and <M>{String.raw`k=\infty`}</M> is policy iteration:
         </p>
+        <SweepSpectrum
+          caption={<>One dial, not two algorithms. The measured cost of each setting on this grid, from{" "}
+            <code>scripts/planning_cases.py</code>: at k = 1 the run takes {MPI_DIAL[0].rounds} rounds and{" "}
+            {MPI_DIAL[0].sweeps} sweeps; at k = {MPI_DIAL[3].k} it takes {MPI_DIAL[3].rounds} rounds but{" "}
+            {MPI_DIAL[3].sweeps} sweeps; at k = {MPI_DIAL[6].k} it is down to {MPI_DIAL[6].rounds} rounds
+            and up to {MPI_DIAL[6].sweeps} sweeps. Turning the dial right buys fewer, better-informed
+            rounds at a steadily worse total, which is the trade the spectrum is made of.</>}
+        />
+
         <MathBlock>{String.raw`\underbrace{k=1}_{\text{value iteration}} \;\longleftrightarrow\; k=2,3,\dots \;\longleftrightarrow\; \underbrace{k=\infty}_{\text{policy iteration}}.`}</MathBlock>
         <p>
           Small <M>k</M> means cheap, less-informed steps and more of them; large <M>k</M> means expensive,

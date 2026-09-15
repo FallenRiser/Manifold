@@ -2,6 +2,8 @@ import Link from "next/link";
 import { LessonHeader, Callout, Proof, PrevNext } from "@/components/lesson";
 import { M, MathBlock } from "@/components/Math";
 import { Quiz } from "@/components/Quiz";
+import { Dumbbell } from "@/components/figures/Dumbbell";
+import { COMBOS } from "@/components/figures/nnReg/data";
 
 export const metadata = {
   title: "The interaction between techniques — Manifold",
@@ -66,6 +68,19 @@ export default function InteractionsPage() {
         <p style={{ fontSize: 13, color: "var(--muted)" }}>
           Three-seed average, train accuracy 1.000 throughout.
         </p>
+
+        <Dumbbell
+          rows={COMBOS.map((c) => ({ init: c.label, a: c.test }))}
+          seriesLabels={["test accuracy"]}
+          ticks={[0.75, 0.76, 0.77, 0.78]}
+          caption={<>Five configurations on one axis. Weight decay alone is indistinguishable from
+            nothing (0.751 against 0.753). Dropout alone gains two points. The two together reach
+            <strong> 0.781</strong> — better than either, and better than the sum of their individual
+            gains, which is the one genuinely surprising row given that decay on its own does nothing.
+            Then adding jitter on top takes it back down to 0.774. Stacking is not additive and it is
+            not monotone; three regularisers is not more regularisation than two, it is a different
+            model.</>}
+        />
 
         <h2>Reading the table honestly</h2>
         <p>

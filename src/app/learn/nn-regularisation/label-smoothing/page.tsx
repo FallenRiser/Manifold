@@ -2,6 +2,8 @@ import Link from "next/link";
 import { LessonHeader, Callout, Proof, PrevNext } from "@/components/lesson";
 import { M, MathBlock } from "@/components/Math";
 import { Quiz } from "@/components/Quiz";
+import { SweepCurve } from "@/components/figures/SweepCurve";
+import { LABEL_SMOOTH, MIXUP } from "@/components/figures/nnReg/data";
 
 export const metadata = {
   title: "Label smoothing and mixup — Manifold",
@@ -69,6 +71,29 @@ export default function LabelSmoothingPage() {
           <M>{String.raw`\alpha`}</M> keeps <M>{String.raw`\lambda`}</M> near 0 or 1 (mild), large{" "}
           <M>{String.raw`\alpha`}</M> pushes it toward 0.5 (heavy blending).
         </p>
+
+        <SweepCurve
+          points={LABEL_SMOOTH}
+          xlabel="label smoothing ε"
+          caption={<>Label smoothing across its whole usable range moves test accuracy from 0.752 to
+            0.754. Two thousandths, monotone, and well inside the seed-to-seed noise of everything else
+            in this track. The honest summary is that it does nothing measurable here — which does not
+            make it a bad technique, it makes this the wrong problem to demonstrate it on. It targets
+            over-confident probabilities, and this page is scoring accuracy, which cannot see
+            confidence at all.</>}
+        />
+
+        <SweepCurve
+          points={MIXUP}
+          xlabel="mixup α"
+          markBest={false}
+          caption={<>Mixup is worse than that: 0.757 at α = 0.2, then <em>down</em> to 0.747 at α = 1.0,
+            below the 0.753 baseline. Stronger blending makes this model worse, monotonically. Mixup
+            assumes that a convex blend of two inputs deserves the matching blend of their labels — a
+            good assumption for images, where the blend of two photographs still looks like something.
+            On 50 abstract tabular features there is no such structure, so the blended points are not
+            plausible examples of anything and the network is being asked to fit noise.</>}
+        />
 
         <h2>The measured result — and the honest reading</h2>
         <p>

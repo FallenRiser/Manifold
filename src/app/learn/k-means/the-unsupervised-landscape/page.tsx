@@ -1,4 +1,5 @@
 import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
+import { UnsupervisedMap } from "@/components/figures/kmeans/KmeansDiagrams";
 
 export const metadata = {
   title: "The unsupervised landscape — Manifold",
@@ -54,6 +55,14 @@ export default function LandscapePage() {
             embeddings that make downstream tasks easier.
           </li>
         </ul>
+
+        <UnsupervisedMap
+          caption={<>The whole territory on one card, and k-means&rsquo; address inside it. The four
+            words in the bottom panel are worth memorising, because the rest of the track is organised
+            around relaxing them one at a time: k-medoids drops the centroid, fuzzy c-means drops the
+            hard assignment, spherical k-means drops the Euclidean distance, and X-means drops the fixed
+            k.</>}
+        />
 
         <h2>Where clustering itself splits</h2>
         <p>

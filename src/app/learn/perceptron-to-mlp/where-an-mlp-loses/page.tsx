@@ -38,7 +38,7 @@ export default function WhereMlpLosesPage() {
           makes the comparison far more readable:
         </p>
 
-        <CodeOutput>{`Bayes-optimal accuracy on this test set = 0.7717
+        <CodeOutput source="scripts/perceptron_mlp_cases.py">{`Bayes-optimal accuracy on this test set = 0.7717
 
 logistic regression       : 0.7067
 MLP, 64-64, standardised  : 0.7483

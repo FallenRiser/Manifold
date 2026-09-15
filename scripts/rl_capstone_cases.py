@@ -150,23 +150,26 @@ def dp_solve(gamma=GAMMA, tol=1e-12):
 # ======================================================================
 #  THE LEARNER — one skeleton, three targets (q / sarsa / exp)
 # ======================================================================
-def train(kind, episodes=15000, alpha=0.1, eps=0.1, seed=0):
+def train(kind, episodes=15000, alpha=0.1, eps=0.1, eps_end=None, q0=0.0, seed=0):
+    """kind q/sarsa/exp. eps_end!=None linearly anneals eps->eps_end (Act 4);
+       q0 sets the optimistic initial value (Act 4)."""
     e = Warehouse(seed)
-    Q = np.zeros((nS, nA))
+    Q = np.full((nS, nA), q0, dtype=float)
     for ep in range(episodes):
+        cur = eps if eps_end is None else eps + (eps_end - eps) * (ep / max(1, episodes - 1))
         s = e.reset("uniform")                    # exploring starts (Act 5)
-        a = eps_greedy(Q, s, eps, e.rng)
+        a = eps_greedy(Q, s, cur, e.rng)
         for t in range(250):
             s2, r, done = e.step(a)
             if done:
                 Q[s, a] += alpha * (r - Q[s, a]); break
-            a2 = eps_greedy(Q, s2, eps, e.rng)
+            a2 = eps_greedy(Q, s2, cur, e.rng)
             if kind == "q":
                 target = r + GAMMA * Q[s2].max()
             elif kind == "sarsa":
                 target = r + GAMMA * Q[s2, a2]
             else:  # expected sarsa
-                pi = np.full(nA, eps / nA); pi[np.argmax(Q[s2])] += 1 - eps
+                pi = np.full(nA, cur / nA); pi[np.argmax(Q[s2])] += 1 - cur
                 target = r + GAMMA * float(pi @ Q[s2])
             Q[s, a] += alpha * (target - Q[s, a])
             s, a = s2, a2
@@ -231,8 +234,107 @@ def act3():
                  rets.mean(), float(np.median(sps)), broken))
 
 
+def _sweep(label, **kw):
+    rets = np.array([evaluate(lambda s: int(np.argmax(train("q", seed=sd, **kw)[s])),
+                              n=2000, seed=999)["ret"] for sd in range(10)])
+    print("%-32s | mean %7.2f | median %7.2f | risky %2d/10 | broken %d"
+          % (label, rets.mean(), np.median(rets), int((rets > 18.5).sum()), int((rets < 0).sum())))
+
+
+def act4():
+    print("\n===== ACT 4 — tuning (10 seeds x 15000 ep each) =====")
+    print("-- the-step-size: alpha --")
+    for a in (0.02, 0.10, 0.30, 0.60, 1.00):
+        _sweep("alpha = %.2f" % a, alpha=a)
+    print("-- exploration-schedule: annealed eps --")
+    _sweep("fixed eps = 0.1", eps=0.1)
+    _sweep("anneal 0.5 -> 0.01", eps=0.5, eps_end=0.01)
+    _sweep("anneal 0.3 -> 0.01", eps=0.3, eps_end=0.01)
+    _sweep("anneal 1.0 -> 0.05", eps=1.0, eps_end=0.05)
+    print("-- optimism: initial Q --")
+    for q0 in (0.0, 25.0, 50.0):
+        _sweep("q0 = %.0f" % q0, q0=q0)
+    print("-- tuning-protocol: vanilla vs tuned --")
+    _sweep("vanilla a=0.1 fixed eps=0.1", alpha=0.1, eps=0.1)
+    _sweep("tuned   a=0.1 anneal 1.0->0.05", alpha=0.1, eps=1.0, eps_end=0.05)
+
+
+def act5():
+    print("\n===== ACT 5 — evaluate, interpret, stress-test =====")
+    V, PI = dp_solve()
+    global SPILL
+    _o = SPILL; SPILL = -300.0; _, PIsafe = dp_solve(); SPILL = _o
+
+    print("-- reading-the-policy: learned agent vs oracle agreement --")
+    Q = train("q", eps=1.0, eps_end=0.05, seed=0)      # tuned agent
+    pol = Q.argmax(1)
+    env = Warehouse(3); vis = set()
+    for _ in range(2000):
+        s = env.reset()
+        for t in range(250):
+            vis.add(s); s, r, done = env.step(int(pol[s]))
+            if done: break
+    r = evaluate(lambda s: int(np.argmax(Q[s])), n=2000, seed=999)
+    print("   learned %.2f / %.0f%%  | agrees with oracle on %.0f%% of visited, %.0f%% of all"
+          % (r["ret"], r["delivered"] * 100,
+             100 * sum(pol[s] == PI[s] for s in vis) / len(vis),
+             100 * sum(pol[s] == PI[s] for s in NONTERMINAL) / len(NONTERMINAL)))
+
+    print("-- failure-modes: distribution shift (deploy slippier than trained) --")
+
+    def at_slip(policy, slip):
+        global SLIP
+        keep = SLIP; SLIP = slip
+        out = evaluate(policy, n=4000, seed=999); SLIP = keep
+        return out
+
+    for sl in (0.10, 0.20, 0.30, 0.40):
+        a = at_slip(lambda s: PI[s], sl); b = at_slip(lambda s: PIsafe[s], sl)
+        print("   slip %.2f | risky %7.2f (%.3f) | safe %7.2f (%.3f)"
+              % (sl, a["ret"], a["spills"], b["ret"], b["spills"]))
+
+    print("-- failure-modes: the return tail (optimal policy, 5000 eps) --")
+    env = Warehouse(7); rets = []
+    for _ in range(5000):
+        s = env.reset(); tot = 0.0
+        for t in range(250):
+            s, r, done = env.step(int(PI[s])); tot += r
+            if done: break
+        rets.append(tot)
+    rets = np.array(rets)
+    print("   mean %.2f  median %.2f  worst %.0f  worst-1%% %.2f"
+          % (rets.mean(), np.median(rets), rets.min(), np.sort(rets)[:50].mean()))
+
+
+def act6():
+    print("\n===== ACT 6 — conclude & transfer =====")
+    print("-- transfer-near: relocate the spill wall, re-run the SAME pipeline --")
+    global FLOOR, NROW, NCOL, DOCK, PICK, DROP, SPILLS, nS, sid, unpack, NONTERMINAL
+    FLOOR = ["S......D", "........", "..HHH.HH", "........", "P......."]
+    NROW, NCOL = len(FLOOR), len(FLOOR[0])
+    f = lambda ch: [(r, c) for r in range(NROW) for c in range(NCOL) if FLOOR[r][c] == ch]
+    DOCK, PICK, DROP, SPILLS = f("S")[0], f("P")[0], f("D")[0], set(f("H"))
+    nS = NROW * NCOL * 2
+    sid = lambda r, c, k: (r * NCOL + c) * 2 + k
+    unpack = lambda s: ((s // 2) // NCOL, (s // 2) % NCOL, s % 2)
+    NONTERMINAL = [s for s in range(nS) if s != sid(DROP[0], DROP[1], 1)]
+    V, PI = dp_solve()
+    rng = np.random.default_rng(0)
+    rnd = evaluate(lambda s: int(rng.integers(nA)), n=2000, seed=3)
+    Q = train("q", episodes=8000, eps=1.0, eps_end=0.05, seed=0)
+    orc = evaluate(lambda s: PI[s], n=2000, seed=999)
+    lrn = evaluate(lambda s: int(np.argmax(Q[s])), n=2000, seed=999)
+    print("   random %.2f | oracle %.2f | learned %.2f (%.0f%% of oracle, %.0f%% delivered)"
+          % (rnd["ret"], orc["ret"], lrn["ret"], 100 * lrn["ret"] / orc["ret"], lrn["delivered"] * 100))
+    print("-- transfer-far: inventory control lives in its own module (INVENTORY_SETUP);")
+    print("   see the reproduction notebook's Act 6 cell for the (s,S) recovery (14.31/day, 99% of 14.52).")
+
+
 if __name__ == "__main__":
     which = sys.argv[1] if len(sys.argv) > 1 else "all"
     if which in ("all", "act1"): act1()
     if which in ("all", "act2"): act2()
     if which in ("all", "act3"): act3()
+    if which in ("all", "act4"): act4()
+    if which in ("all", "act5"): act5()
+    if which in ("all", "act6"): act6()

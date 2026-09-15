@@ -2,6 +2,8 @@ import { Quiz } from "@/components/Quiz";
 import Link from "next/link";
 import { CodeBlock } from "@/components/CodeBlock";
 import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
+import { LineChart } from "@/components/figures/kmeans/KmeansCharts";
+import { STABILITY } from "@/components/figures/kmeans/data.generated";
 
 export const metadata = {
   title: "Cluster stability — Manifold",
@@ -59,6 +61,23 @@ export default function StabilityPage() {
             cluster) can be perfectly stable yet useless, so pair stability with a quality metric, never
             use it alone.
         </Callout>
+
+        <LineChart
+          x={STABILITY[0].k}
+          series={[
+            { label: "data with 4 real clusters", values: STABILITY[0].ari, color: "var(--c-clustering)" },
+            { label: "uniform noise, no clusters", values: STABILITY[1].ari, color: "var(--bad)", dash: "5 3" },
+          ]}
+          xlabel="k"
+          ylabel="mean ARI between two resamples"
+          caption={<>The protocol, run 30 times at each k on two datasets. On data with real structure
+            the agreement peaks sharply at the true k = 4 ({STABILITY[0].ari[2]}) and falls away either
+            side. On uniform noise the curve has no peak at all — it wanders between{" "}
+            {Math.min(...STABILITY[1].ari)} and {Math.max(...STABILITY[1].ari)} with nothing to
+            distinguish one k from another. That contrast is the point: stability is not a score to
+            maximise, it is a <em>shape</em> to look for, and a flat curve is the answer &ldquo;there is
+            no k here&rdquo;.</>}
+        />
 
         <h2>A note on consensus clustering</h2>
         <p>

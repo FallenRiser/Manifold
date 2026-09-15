@@ -2,6 +2,7 @@ import Link from "next/link";
 import { LessonHeader, Callout, Proof, PrevNext } from "@/components/lesson";
 import { M, MathBlock } from "@/components/Math";
 import { Quiz } from "@/components/Quiz";
+import { NormAxesGrid } from "@/components/figures/initNorm/NormAxes";
 
 export const metadata = {
   title: "Which normalisation when — Manifold",
@@ -26,6 +27,14 @@ export default function WhichNormWhenPage() {
       />
 
       <div className="lesson">
+        <NormAxesGrid
+          caption={<>The whole family on one line. Four methods, one piece of arithmetic, four choices
+            of which cells to average — and every practical difference between them (batch-size
+            sensitivity, train/test discrepancy, whether sequences work, what gets thrown away)
+            follows from the shape of the shaded region and nothing else. If you can reconstruct this
+            picture you do not need to memorise the table below it.</>}
+        />
+
         <h2>The decision table</h2>
         <p>
           Match your regime to a row. The &ldquo;why&rdquo; column is the reasoning, not folklore —

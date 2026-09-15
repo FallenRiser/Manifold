@@ -1,6 +1,9 @@
 import { CodeBlock } from "@/components/CodeBlock";
 import { CLUSTER_SETUP } from "@/lib/runtimeSetup";
 import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
+import { LineChart } from "@/components/figures/kmeans/KmeansCharts";
+import { ScatterRow } from "@/components/figures/kmeans/Scatter";
+import { PCA_SWEEP, DIGITS_2D } from "@/components/figures/kmeans/data.generated";
 
 export const metadata = {
   title: "Clustering after dimensionality reduction — Manifold",
@@ -47,6 +50,33 @@ export default function DimReductionPage() {
             embedding aren&rsquo;t trustworthy (especially t-SNE).
           </li>
         </ul>
+
+        <LineChart
+          x={PCA_SWEEP.slice(1).map((r) => r.dims)}
+          series={[{ label: "ARI against the true digit", values: PCA_SWEEP.slice(1).map((r) => r.ari), color: "var(--c-clustering)" }]}
+          xlabel="PCA components kept"
+          ylabel="ARI"
+          markX={20}
+          markXLabel="best"
+          caption={<>Clustering 1,797 handwritten digits into ten groups, at every level of reduction.
+            The flat line to beat is the raw 64-dimensional pixels, which score {PCA_SWEEP[0].ari}.
+            Keeping 20 components scores {PCA_SWEEP[4].ari} — very slightly <em>better</em> than the raw
+            data, for a third of the columns. Keeping 2 scores {PCA_SWEEP[1].ari}, which is a real
+            loss. So the advice is not &ldquo;reduce&rdquo;: it is reduce enough to drop the noise
+            dimensions and stop well before you start dropping the signal, and the only way to find
+            that point is to sweep it.</>}
+        />
+
+        <ScatterRow
+          panels={[
+            { points: DIGITS_2D.points, labels: DIGITS_2D.truth, label: "coloured by the true digit" },
+            { points: DIGITS_2D.points, labels: DIGITS_2D.labels, centroids: DIGITS_2D.centroids, label: "coloured by k-means on 2 components" },
+          ]}
+          caption={<>And the reason two components is not enough, shown rather than scored. In the
+            projection the digits genuinely overlap — 4, 7 and 9 sit on top of one another — so no
+            partition of this plane can separate them. The clustering is doing a reasonable job of a
+            problem that has already been made unsolvable by the projection.</>}
+        />
 
         <h2>Three wins at once</h2>
         <ul style={ul}>

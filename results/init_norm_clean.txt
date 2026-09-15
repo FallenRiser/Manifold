@@ -1,0 +1,222 @@
+
+==========================================================================
+SECTION 1: Why init matters
+==========================================================================
+Same 6-layer, width-32 ReLU net, three init scales, 5 seeds each.
+
+   scale    train     test   grad_ratio   dead_frac
+----------------------------------------------------
+   0.001   0.9567   0.9440       0.7312      0.4975
+      he   0.9567   0.9440       3.9523      0.4975
+     5.0   0.9567   0.9440       1.2659      0.4975
+
+Note: sklearn uses its own init (Glorot uniform), so train/test are from
+sklearn's default init. The gradient ratios and dead fracs above are from
+the hand-rolled init at the stated scale.
+
+Gradient norms per layer at init (hand-rolled, depth=6, width=32):
+  0.001: norms = ['1.0699e-15', '9.6813e-16', '1.0983e-15', '9.9421e-16', '1.0249e-15', '8.6622e-16', '5.1020e-16']
+    ratio (last/first) = 0.4769
+  he: norms = ['3.8406e-01', '1.3689e+00', '1.5812e+00', '1.4826e+00', '1.5633e+00', '1.3088e+00', '7.9836e-01']
+    ratio (last/first) = 2.0787
+  5.0: norms = ['3.6914e+07', '3.2852e+07', '3.7999e+07', '3.6681e+07', '3.9319e+07', '3.2787e+07', '2.0529e+07']
+    ratio (last/first) = 0.5561
+
+Pre-activation statistics at init (hand-rolled, depth=6, width=32):
+  0.001 layer 1: std=0.0010, dead=0.4963
+  0.001 layer 2: std=0.0000, dead=0.5769
+  0.001 layer 3: std=0.0000, dead=0.5192
+  0.001 layer 4: std=0.0000, dead=0.5323
+  0.001 layer 5: std=0.0000, dead=0.4730
+  0.001 layer 6: std=0.0000, dead=0.3933
+  he layer 1: std=1.0488, dead=0.4963
+  he layer 2: std=1.0781, dead=0.5769
+  he layer 3: std=1.0128, dead=0.5192
+  he layer 4: std=0.9733, dead=0.5323
+  he layer 5: std=0.8933, dead=0.4730
+  he layer 6: std=0.6454, dead=0.3933
+  5.0 layer 1: std=5.2440, dead=0.4963
+  5.0 layer 2: std=107.8141, dead=0.5769
+  5.0 layer 3: std=2025.6249, dead=0.5192
+  5.0 layer 4: std=38931.0837, dead=0.5323
+  5.0 layer 5: std=714635.2895, dead=0.4730
+  5.0 layer 6: std=10326253.7318, dead=0.3933
+
+==========================================================================
+SECTION 2: The variance argument
+==========================================================================
+If each layer preserves variance, activations neither explode nor vanish.
+
+     relu xavier: var per layer = ['0.2457', '0.1324', '0.0745', '0.0349', '0.0216', '0.0143', '0.0074', '0.0025', '0.0013', '0.0008']
+     relu     he: var per layer = ['0.4915', '0.5296', '0.5959', '0.5586', '0.6910', '0.9159', '0.9531', '0.6360', '0.6472', '0.7988']
+     relu   0.01: var per layer = ['0.0000', '0.0000', '0.0000', '0.0000', '0.0000', '0.0000', '0.0000', '0.0000', '0.0000', '0.0000']
+     relu    1.0: var per layer = ['0.4915', '16.9458', '610.2299', '18305.6585', '724534.7680', '30732964.4125', '1023363727.3723', '21853524077.3291', '711598786715.8379', '28104782915230.3281']
+  sigmoid xavier: var per layer = ['0.0293', '0.0160', '0.0150', '0.0167', '0.0152', '0.0193', '0.0145', '0.0136', '0.0161', '0.0132']
+  sigmoid     he: var per layer = ['0.0479', '0.0302', '0.0288', '0.0326', '0.0299', '0.0360', '0.0279', '0.0249', '0.0293', '0.0243']
+  sigmoid   0.01: var per layer = ['0.0000', '0.0001', '0.0001', '0.0001', '0.0001', '0.0001', '0.0001', '0.0001', '0.0001', '0.0001']
+  sigmoid    1.0: var per layer = ['0.0479', '0.1688', '0.1720', '0.1973', '0.1861', '0.1847', '0.1743', '0.1564', '0.1841', '0.1774']
+     tanh xavier: var per layer = ['0.2891', '0.1783', '0.1463', '0.1131', '0.0766', '0.0600', '0.0512', '0.0522', '0.0437', '0.0428']
+     tanh     he: var per layer = ['0.4023', '0.3353', '0.3413', '0.3230', '0.2966', '0.2985', '0.2880', '0.3063', '0.2879', '0.3071']
+     tanh   0.01: var per layer = ['0.0001', '0.0000', '0.0000', '0.0000', '0.0000', '0.0000', '0.0000', '0.0000', '0.0000', '0.0000']
+     tanh    1.0: var per layer = ['0.4023', '0.8408', '0.9040', '0.8914', '0.8889', '0.8959', '0.8989', '0.8949', '0.8930', '0.8985']
+
+
+==========================================================================
+SECTION 3: Xavier vs He
+==========================================================================
+Xavier (1/fan_in) vs He (2/fan_in) on sigmoid/tanh vs ReLU.
+10 layers, width 64, gradient ratio at init.
+
+     act     init   grad_ratio   act_var_L5   act_var_L10
+-------------------------------------------------------
+ sigmoid   xavier  3727758.7939       0.0152        0.0132
+ sigmoid       he  351255.9895       0.0299        0.0243
+    tanh   xavier       5.4532       0.0766        0.0428
+    tanh       he       8.1234       0.2966        0.3071
+    relu   xavier       2.2285       0.0216        0.0008
+    relu       he       7.5839       0.6910        0.7988
+
+==========================================================================
+SECTION 4: What bad init looks like
+==========================================================================
+Pre-activation distribution stats per layer, three scales, ReLU, depth=8, width=32.
+
+  too small (0.001):
+    layer 1: mean=-0.0000, std=0.0010, dead=0.496, |z|>5=0.000
+    layer 2: mean=-0.0000, std=0.0000, dead=0.577, |z|>5=0.000
+    layer 3: mean=-0.0000, std=0.0000, dead=0.519, |z|>5=0.000
+    layer 4: mean=-0.0000, std=0.0000, dead=0.532, |z|>5=0.000
+    layer 5: mean=+0.0000, std=0.0000, dead=0.473, |z|>5=0.000
+    layer 6: mean=+0.0000, std=0.0000, dead=0.393, |z|>5=0.000
+    layer 7: mean=-0.0000, std=0.0000, dead=0.477, |z|>5=0.000
+    layer 8: mean=-0.0000, std=0.0000, dead=0.502, |z|>5=0.000
+
+  he (correct):
+    layer 1: mean=-0.0048, std=1.0488, dead=0.496, |z|>5=0.001
+    layer 2: mean=-0.1291, std=1.0781, dead=0.577, |z|>5=0.000
+    layer 3: mean=-0.1176, std=1.0128, dead=0.519, |z|>5=0.000
+    layer 4: mean=-0.1103, std=0.9733, dead=0.532, |z|>5=0.000
+    layer 5: mean=+0.0165, std=0.8933, dead=0.473, |z|>5=0.000
+    layer 6: mean=+0.1260, std=0.6454, dead=0.393, |z|>5=0.000
+    layer 7: mean=-0.0144, std=0.7319, dead=0.477, |z|>5=0.000
+    layer 8: mean=-0.0165, std=0.6558, dead=0.502, |z|>5=0.000
+
+  too large (5.0):
+    layer 1: mean=-0.0239, std=5.2440, dead=0.496, |z|>5=0.282
+    layer 2: mean=-12.9080, std=107.8141, dead=0.577, |z|>5=0.930
+    layer 3: mean=-235.2373, std=2025.6249, dead=0.519, |z|>5=0.996
+    layer 4: mean=-4411.2797, std=38931.0837, dead=0.532, |z|>5=1.000
+    layer 5: mean=+13207.1919, std=714635.2895, dead=0.473, |z|>5=1.000
+    layer 6: mean=+2016024.7881, std=10326253.7318, dead=0.393, |z|>5=1.000
+    layer 7: mean=-4607949.3434, std=234195857.1981, dead=0.477, |z|>5=1.000
+    layer 8: mean=-105337533.7834, std=4197047183.9033, dead=0.502, |z|>5=1.000
+
+
+==========================================================================
+SECTION 5: Batch normalisation effect
+==========================================================================
+Same network with and without BN, measuring activation variance stability.
+Using sklearn MLPClassifier (no native BN) -> compare accuracy at depth.
+
+Accuracy vs depth (width=32, Adam, 500 iters, 5 seeds):
+ depth     test
+----------------
+     2   0.9530
+     4   0.9450
+     6   0.9440
+     8   0.9360
+    10   0.9380
+    12   0.9390
+    16   0.9310
+
+(BatchNorm effect is demonstrated via activation variance measurements
+ on the hand-rolled MLP, since sklearn lacks native BN support.)
+
+Activation std per layer WITHOUT normalisation (He init, ReLU, depth=10):
+  layer 1: std=0.6093
+  layer 2: std=0.6390
+  layer 3: std=0.5420
+  layer 4: std=0.5914
+  layer 5: std=0.5236
+  layer 6: std=0.4227
+  layer 7: std=0.3863
+  layer 8: std=0.4003
+  layer 9: std=0.4081
+  layer 10: std=0.5148
+
+Pre-activation std per layer (He init, ReLU, depth=10):
+  layer 1: std=1.0488
+  layer 2: std=1.0781
+  layer 3: std=1.0128
+  layer 4: std=0.9733
+  layer 5: std=0.8933
+  layer 6: std=0.6454
+  layer 7: std=0.7319
+  layer 8: std=0.6558
+  layer 9: std=0.5617
+  layer 10: std=0.7390
+
+==========================================================================
+SECTION 6: Layer normalisation
+==========================================================================
+LayerNorm normalises across features (within a sample), not across batch.
+This means it works with batch size 1 and with sequences.
+
+Conceptual comparison:
+  BatchNorm: for each feature, normalise across the batch dimension
+  LayerNorm: for each sample, normalise across the feature dimension
+  GroupNorm: for each sample, normalise across groups of features
+
+Activation std per layer with LayerNorm simulation (He init, ReLU, depth=10):
+  layer 1: activation std=0.5702
+  layer 2: activation std=0.6088
+  layer 3: activation std=0.5528
+  layer 4: activation std=0.5987
+  layer 5: activation std=0.5572
+  layer 6: activation std=0.4813
+  layer 7: activation std=0.5279
+  layer 8: activation std=0.5723
+  layer 9: activation std=0.5578
+  layer 10: activation std=0.6538
+
+==========================================================================
+SECTION 7: Init x activation x normalisation interaction
+==========================================================================
+3-way grid: init (xavier/he) x activation (sigmoid/tanh/relu) x normalisation (none/BN-sim)
+Gradient ratio at init, depth=8, width=32.
+
+     act     init    norm   grad_ratio
+----------------------------------------
+ sigmoid   xavier    none  455145.5278
+ sigmoid       he    none   55072.9465
+    tanh   xavier    none       6.7953
+    tanh       he    none       4.3465
+    relu   xavier    none       1.6198
+    relu       he    none       2.7065
+
+==========================================================================
+SECTION 8: Breaking symmetry
+==========================================================================
+Why zero init fails and why random init is necessary.
+
+Zero init:
+  layer 1: all outputs identical=False, all zero=1
+  layer 2: all outputs identical=False, all zero=1
+  layer 3: all outputs identical=False, all zero=1
+  layer 4: all outputs identical=False, all zero=1
+  -> All units compute the same thing. Gradient is identical for every unit.
+  -> They remain identical forever. The network has effective width 1.
+
+Tiny random init (scale=0.001):
+  layer 1: activation std=0.000513
+  layer 2: activation std=0.000001
+  layer 3: activation std=0.000000
+  layer 4: activation std=0.000000
+  -> Different but tiny. Symmetry is broken but gradients vanish.
+
+He init:
+  layer 1: activation std=0.5128
+  layer 2: activation std=0.4326
+  layer 3: activation std=0.5300
+  layer 4: activation std=0.4879
+  -> Healthy variance. Each unit computes something different.

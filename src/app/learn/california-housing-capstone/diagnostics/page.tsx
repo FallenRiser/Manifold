@@ -1,6 +1,6 @@
 import { CodeOutput } from "@/components/CodeOutput";
 import { LessonHeader, PrevNext } from "@/components/lesson";
-import { DecisionPoint } from "@/components/capstone/DecisionPoint";
+import { DecisionPoint } from "@/components/DecisionPoint";
 
 export const metadata = {
   title: "Capstone: diagnostics — what the linear model misses — Manifold",
@@ -71,7 +71,7 @@ export default function DiagnosticsPage() {
         <h2>Where it fails: residual analysis</h2>
         <p>On a clean 20% holdout, ridge scores R² = 0.656, RMSE = 0.671 — consistent with CV. But splitting the
           residuals reveals where the error hides:</p>
-        <CodeOutput>{`holdout ridge:  R2 = 0.656   RMSE = 0.671
+        <CodeOutput source="public/capstone/california-housing-capstone.ipynb">{`holdout ridge:  R2 = 0.656   RMSE = 0.671
 
 residuals split by the 5.0 cap:
   RMSE on non-capped blocks :  0.605

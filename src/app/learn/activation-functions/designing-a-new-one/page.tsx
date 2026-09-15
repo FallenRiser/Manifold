@@ -80,7 +80,7 @@ export default function DesigningPage() {
 
         <h2>Step 3 — check the derivative and sweep the parameter</h2>
 
-        <CodeOutput>{`  x * sigmoid(beta*x), swept over beta:
+        <CodeOutput source="scripts/activation_cases.py">{`  x * sigmoid(beta*x), swept over beta:
    beta   min value   at x =     f(-1)     f(2)  shape
     0.0   unbounded       --   -0.5000   1.0000  exactly x/2 -- linear
     0.5     -0.5569   -2.557   -0.3775   1.4621  a ReLU with a dip

@@ -5,8 +5,13 @@
 //
 // Each primitive carries a capstone's own accent so the track reads as its own thing
 // without leaving the editorial surface. Defaults are the asteroid capstone's
-// (--c-space / "The analyst's question"); the warehouse-robot RL capstone passes
-// --c-warehouse and "The engineer's question". Extract-don't-copy, per PROJECT.md §10.5.
+// (--c-space / "The analyst's question").
+//
+// NOTE: the warehouse-robot RL capstone no longer uses these — an identical opener on
+// all 24 pages read as boilerplate, so it has its own skin in ./warehouse.tsx (the
+// shop floor: act-coded work-order dockets, hazard tape, concrete slabs). Extract-
+// don't-copy applies to the CONTRACT (question → transfer → rule), not the chrome:
+// each capstone earns its own identity (PROJECT.md §10.5).
 
 const SPACE = "var(--c-space)";
 

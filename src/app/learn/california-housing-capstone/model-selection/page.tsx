@@ -2,7 +2,7 @@ import { CodeBlock } from "@/components/CodeBlock";
 import { CodeOutput } from "@/components/CodeOutput";
 import { ModelLeaderboard, LearningCurveFig, ActualVsPredictedFig, CapZoneFig, SpatialCVFig } from "@/components/figures/CapstoneModelFigures";
 import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
-import { DecisionPoint } from "@/components/capstone/DecisionPoint";
+import { DecisionPoint } from "@/components/DecisionPoint";
 
 export const metadata = {
   title: "Capstone: final model selection — Manifold",

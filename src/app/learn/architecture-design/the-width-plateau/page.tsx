@@ -2,6 +2,9 @@ import Link from "next/link";
 import { LessonHeader, Callout, Proof, PrevNext } from "@/components/lesson";
 import { M, MathBlock } from "@/components/Math";
 import { Quiz } from "@/components/Quiz";
+import { SweepCurve } from "@/components/figures/SweepCurve";
+import { WIDTH_SWEEP } from "@/components/figures/arch/data";
+import { PredictPrompt } from "@/components/PredictPrompt";
 
 export const metadata = {
   title: "The width plateau — Manifold",
@@ -92,6 +95,32 @@ export default function TheWidthPlateauPage() {
           five-seed average. The network at width 16 has already learned everything it can learn at
           this depth and this data size. The extra 264,368 parameters are dead weight.
         </Callout>
+
+        <PredictPrompt
+          accent={CORAL}
+          prompt={<>A single hidden layer, swept from 2 units to 512 — a 256-fold increase, and
+            from 15 parameters to 264,705. Where does test accuracy peak, and what does the far
+            right-hand end of the sweep look like?</>}
+          options={[
+            "Rises throughout — more width is more capacity",
+            "Peaks early, then collapses as the model overfits",
+            "Peaks around width 32, then stays flat within noise",
+            "Flat throughout — width does not matter here",
+          ]}
+          nudge="Locked in. The sweep is below."
+        />
+
+        <SweepCurve
+          points={WIDTH_SWEEP.map((p) => ({ x: p.x, a: p.y }))}
+          log
+          xlabel="hidden width (log scale), depth 2"
+          xticks={[2, 8, 32, 128, 512]}
+          caption={<>The plateau, drawn. It begins at width 16 and it never ends: the best row is
+            0.9530 at width 32, and width 512 — with 223 times the parameters — reads 0.9420. The
+            two things worth reading off the shape are that the climb is finished within three
+            doublings of the smallest useful size, and that the right-hand end does not fall off a
+            cliff. Oversizing costs compute, not accuracy.</>}
+        />
 
         <h2>What causes the plateau</h2>
         <p>

@@ -3,7 +3,7 @@ import { CodeOutput } from "@/components/CodeOutput";
 import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 import { M } from "@/components/Math";
 import { GuessSlider } from "@/components/capstone/GuessSlider";
-import { AnalystQuestion, TransferBox, PlaybookRule } from "@/components/capstone/pedagogy";
+import { WorkOrder, TransferBox, PlaybookRule } from "@/components/capstone/warehouse";
 import { WAREHOUSE_SETUP } from "@/lib/runtimeSetup";
 import { FloorPlan } from "@/components/capstone/FloorPlan";
 
@@ -32,11 +32,11 @@ export default function TheWarehouse() {
       />
 
       <div className="lesson">
-        <AnalystQuestion accent={OLIVE} label="The engineer's question" icon="🤖">
+        <WorkOrder act={2} n={6}>
           Can I state my environment&rsquo;s dynamics, stochasticity and episode boundaries precisely enough that
           someone else could rebuild it — and have I checked that the costs I wrote down are the costs the agent
           actually experiences?
-        </AnalystQuestion>
+        </WorkOrder>
 
         <h2>The floor</h2>
         <p>
@@ -46,7 +46,7 @@ export default function TheWarehouse() {
           must not drive through.
         </p>
 
-        <FloorPlan accent={OLIVE} />
+        <FloorPlan />
 
         <p>
           The geometry is the whole design. The shelf is <em>below</em> the spill wall and the dropoff is{" "}
@@ -194,7 +194,7 @@ steps: 23    * = carrying the package`}</CodeOutput>
           one lucky run.
         </p>
 
-        <TransferBox accent={OLIVE}>
+        <TransferBox>
           Write the environment spec down before you train, in enough detail that a stranger could rebuild it —
           and then measure the cost of your rare, bad events end-to-end rather than trusting the constant in the
           reward function. Setbacks that reset progress (a dropped connection, a failed transaction, a restarted
@@ -202,7 +202,7 @@ steps: 23    * = carrying the package`}</CodeOutput>
           goes wrong.
         </TransferBox>
 
-        <PlaybookRule n={6} accent={OLIVE}>
+        <PlaybookRule n={6}>
           <strong>Specify the environment completely — including the truncation cap — before training anything</strong>,
           and measure the true end-to-end cost of each bad event rather than assuming it equals the penalty you
           wrote.

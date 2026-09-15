@@ -2,6 +2,7 @@ import Link from "next/link";
 import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 import { M, MathBlock } from "@/components/Math";
 import { CodeOutput } from "@/components/CodeOutput";
+import { PredictPrompt } from "@/components/PredictPrompt";
 
 export const metadata = {
   title: "The learning rate & shrinkage — Manifold",
@@ -42,7 +43,13 @@ export default function ShrinkagePage() {
 
         <h2>The rate–trees trade-off, measured</h2>
         <p>California housing again, varying the learning rate and tree count together:</p>
-        <CodeOutput label="test R² — learning rate vs number of trees">{`  lr = 1.00   300 trees    R²  0.776    <- too greedy, overshoots
+        <PredictPrompt
+          accent={TREES}
+          prompt={<>Hold the tree count at 300 and turn the learning rate all the way up to 1.0, so every tree applies its full correction. Against learning rates of 0.3, 0.1, 0.05 and 0.01, where does it finish?</>}
+          options={["Best — full-strength corrections, nothing wasted", "About level with 0.1", "Slightly behind the shrunk models", "Clearly the worst of the five"]}
+          nudge="Locked in. The measured answer is right below."
+        />
+        <CodeOutput source="scripts/boosting_cases.py" label="test R² — learning rate vs number of trees">{`  lr = 1.00   300 trees    R²  0.776    <- too greedy, overshoots
   lr = 0.30   300 trees    R²  0.829
   lr = 0.10   300 trees    R²  0.815
   lr = 0.05   600 trees    R²  0.816

@@ -47,32 +47,29 @@ export const RL_CAP_TRACK: TrackChapter[] = [
       { title: "Algorithm comparison", href: "/learn/warehouse-robot-capstone/algorithm-comparison" },
     ],
   },
-  // Acts 4-6 are outlined but NOT built yet — deliberately href-less so the sidebar
-  // greys them out rather than linking to 404s (PROJECT.md §10.5). Add each href in
-  // the same commit as its page.
   {
     title: "Make it work: tuning",
     pages: [
-      { title: "The step size α" },
-      { title: "The exploration schedule" },
-      { title: "Optimism and initialisation" },
-      { title: "Tuning without fooling yourself" },
+      { title: "The step size α", href: "/learn/warehouse-robot-capstone/the-step-size" },
+      { title: "The exploration schedule", href: "/learn/warehouse-robot-capstone/exploration-schedule" },
+      { title: "Optimism and initialisation", href: "/learn/warehouse-robot-capstone/optimism-and-initialisation" },
+      { title: "Tuning without fooling yourself", href: "/learn/warehouse-robot-capstone/tuning-protocol" },
     ],
   },
   {
     title: "Evaluate, interpret, stress-test",
     pages: [
-      { title: "Reading the learned policy" },
-      { title: "Failure modes" },
-      { title: "Limits: what it can never know" },
+      { title: "Reading the learned policy", href: "/learn/warehouse-robot-capstone/reading-the-policy" },
+      { title: "Failure modes", href: "/learn/warehouse-robot-capstone/failure-modes" },
+      { title: "Limits: what it can never know", href: "/learn/warehouse-robot-capstone/limits" },
     ],
   },
   {
     title: "Conclude & transfer",
     pages: [
-      { title: "Verdict, playbook & notebook" },
-      { title: "Transfer test I · A new warehouse (near)" },
-      { title: "Transfer test II · Inventory control (far)" },
+      { title: "Verdict, playbook & notebook", href: "/learn/warehouse-robot-capstone/takeaways" },
+      { title: "Transfer test I · A new warehouse (near)", href: "/learn/warehouse-robot-capstone/transfer-near" },
+      { title: "Transfer test II · Inventory control (far)", href: "/learn/warehouse-robot-capstone/transfer-far" },
     ],
   },
 ];

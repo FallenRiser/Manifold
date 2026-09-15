@@ -4,7 +4,7 @@ import { CodeOutput } from "@/components/CodeOutput";
 import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 import { M } from "@/components/Math";
 import { PredictPrompt } from "@/components/PredictPrompt";
-import { AnalystQuestion, TransferBox, PlaybookRule } from "@/components/capstone/pedagogy";
+import { WorkOrder, TransferBox, PlaybookRule } from "@/components/capstone/warehouse";
 import { WAREHOUSE_SETUP } from "@/lib/runtimeSetup";
 
 export const metadata = {
@@ -33,10 +33,10 @@ export default function FromTaskToMdp() {
       />
 
       <div className="lesson">
-        <AnalystQuestion accent={OLIVE} label="The engineer's question" icon="🤖">
+        <WorkOrder act={1} n={2}>
           What exactly does the agent <em>observe</em>, what can it <em>do</em>, what does the world <em>do back</em>,
           what are we <em>paying for</em>, and how far ahead do we <em>care</em>?
-        </AnalystQuestion>
+        </WorkOrder>
 
         <h2>The five questions</h2>
         <p>
@@ -123,13 +123,13 @@ gamma : 0.97
           scores exactly −250 rather than −∞. Convenient, but remember it is <em>our</em> cap, not the world&rsquo;s.
         </Callout>
 
-        <TransferBox accent={OLIVE}>
+        <TransferBox>
           On your next control problem, write the five answers down explicitly — in a comment at the top of the
           file if nowhere else. Then, for each one, write what it <em>excludes</em>. Most RL projects that fail
           quietly were mis-framed at exactly this step, and the framing is the cheapest thing to change.
         </TransferBox>
 
-        <PlaybookRule n={2} accent={OLIVE}>
+        <PlaybookRule n={2}>
           <strong>Turn the task into ⟨S, A, P, R, γ⟩ on paper first</strong>, and record what each choice throws
           away. The dynamics may exist without being readable — that gap is precisely what makes a problem
           &ldquo;reinforcement learning&rdquo; rather than planning.

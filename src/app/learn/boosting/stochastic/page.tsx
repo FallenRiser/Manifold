@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 import { CodeOutput } from "@/components/CodeOutput";
+import { PredictPrompt } from "@/components/PredictPrompt";
 
 export const metadata = {
   title: "Stochastic gradient boosting — Manifold",
@@ -48,7 +49,13 @@ export default function StochasticPage() {
 
         <h2>The effect, measured</h2>
         <p>California housing, learning rate 0.1, 300 trees, varying only the row subsample:</p>
-        <CodeOutput label="test R² vs subsample fraction">{`  subsample = 1.0    R²  0.815   (full-batch — the plain GBM)
+        <PredictPrompt
+          accent={TREES}
+          prompt={<>Row subsampling is sold as boosting&rsquo;s bagging-flavoured regulariser. On housing at learning rate 0.1 and 300 trees, drop each tree to half the rows. What does test R&sup2; do?</>}
+          options={["A clear gain — that is the whole point", "A small but real gain", "Essentially nothing", "A clear loss"]}
+          nudge="Locked in. The measured answer is right below."
+        />
+        <CodeOutput source="scripts/boosting_cases.py" label="test R² vs subsample fraction">{`  subsample = 1.0    R²  0.815   (full-batch — the plain GBM)
   subsample = 0.8    R²  0.813
   subsample = 0.5    R²  0.812`}</CodeOutput>
         <p>

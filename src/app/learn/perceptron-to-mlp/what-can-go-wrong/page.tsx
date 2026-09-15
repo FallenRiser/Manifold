@@ -3,7 +3,7 @@ import { LessonHeader, Callout, PrevNext } from "@/components/lesson";
 import { M } from "@/components/Math";
 import { Quiz } from "@/components/Quiz";
 import { CodeOutput } from "@/components/CodeOutput";
-import { DecisionPoint } from "@/components/capstone/DecisionPoint";
+import { DecisionPoint } from "@/components/DecisionPoint";
 
 export const metadata = {
   title: "What can go wrong — Manifold",
@@ -33,7 +33,7 @@ export default function WhatCanGoWrongPage() {
           fitted twice, with a single difference: whether the input columns were standardised first.
         </p>
 
-        <CodeOutput>{`MLP, 64-64, standardised  : 0.7483
+        <CodeOutput source="scripts/perceptron_mlp_cases.py">{`MLP, 64-64, standardised  : 0.7483
 MLP, 64-64, raw columns   : 0.3225   (-0.4258)`}</CodeOutput>
 
         <p>

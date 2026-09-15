@@ -80,7 +80,7 @@ export default function TanhPage() {
           the fraction of weight columns whose entries all share a sign:
         </p>
 
-        <CodeOutput>{`activation   mean activation   units forced one way
+        <CodeOutput source="scripts/activation_cases.py">{`activation   mean activation   units forced one way
    sigmoid            0.5026                 100.0%
       tanh            0.1057                   0.0%
       relu            0.1394                 100.0%
