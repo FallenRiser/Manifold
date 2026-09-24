@@ -1,0 +1,57 @@
+{
+  "kind": "shield",
+  "K": 4,
+  "worlds": 200,
+  "wet": 0.9,
+  "rows": {
+    "nearest": {
+      "village": 2.69,
+      "village_dry": 3.855,
+      "burnt": 85.6,
+      "burnt_dry": 108.5,
+      "cost": 1.165,
+      "se2": 0.397
+    },
+    "guard": {
+      "village": 1.115,
+      "village_dry": 2.935,
+      "burnt": 81.7,
+      "burnt_dry": 108.3,
+      "cost": 1.82,
+      "se2": 0.447
+    },
+    "densest": {
+      "village": 3.335,
+      "village_dry": 4.1,
+      "burnt": 96.3,
+      "burnt_dry": 116.4,
+      "cost": 0.765,
+      "se2": 0.322
+    },
+    "dqn_values_1M_s0": {
+      "village": 0.69,
+      "village_dry": 3.26,
+      "burnt": 69.5,
+      "burnt_dry": 108.5,
+      "cost": 2.57,
+      "se2": 0.505
+    },
+    "dqn_values_1M_s1": {
+      "village": 0.695,
+      "village_dry": 3.45,
+      "burnt": 70.1,
+      "burnt_dry": 116.3,
+      "cost": 2.755,
+      "se2": 0.529
+    },
+    "dqn_values_1M_s2": {
+      "village": 0.865,
+      "village_dry": 3.685,
+      "burnt": 72.7,
+      "burnt_dry": 117.8,
+      "cost": 2.82,
+      "se2": 0.518
+    }
+  },
+  "trainer": 2
+}

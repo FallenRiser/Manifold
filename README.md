@@ -113,7 +113,11 @@ The docs are the project's memory; read them before planning any work.
 - **Colours come from CSS custom properties**, never hex — `var(--c-rl)`, `var(--ink)`,
   `color-mix(in srgb, var(--x) 20%, var(--panel))`. Pages render in both themes; check both.
 - **Size a figure from its content.** Every clipped-SVG defect found so far has been a fixed box
-  meeting a label, a legend or a tick that did not fit.
+  meeting a label, a legend or a tick that did not fit — and every one of them was a constant that
+  happened to suit the first data put through it.
+- **An undefined CSS custom property fails silently.** `var(--bg)` does not exist (it is `--paper`),
+  and `color: var(--bg)` simply inherits instead — black text on a black chip, invisible to `tsc`
+  and to any text-based page check. Check computed colours, not just markup.
 - **`<Proof>`, `<PredictPrompt>`, `<Quiz>`, `<DecisionPoint>`** are the teaching primitives.
   Doctrine: a PredictPrompt before every measured result, a Quiz once per chapter on its last page.
 

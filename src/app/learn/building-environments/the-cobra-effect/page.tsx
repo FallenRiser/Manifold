@@ -59,7 +59,7 @@ export default function TheCobraEffect() {
           The environment has had the alternative in it since the day it was written. <code>Wildfire</code> takes a{" "}
           <code>reward</code> argument, and one of the three settings is the one a fire service would recognise:
         </p>
-        <pre style={{ fontSize: 13 }}><code>{`elif self.reward == "extinguish":
+        <pre style={pre}><code>{`elif self.reward == "extinguish":
     reward = put_out                    # +1 for every burning cell this drop turned back to unburnt`}</code></pre>
         <p>
           It is hard to argue with. Putting out fire is what a firefighting crew does. It is the number a crew would
@@ -537,11 +537,25 @@ export default function TheCobraEffect() {
 
         <PrevNext
           prev={{ href: "/learn/building-environments/training-the-crew", label: <>← Training the crew: DQN vs PPO</> }}
+          next={{ href: "/learn/building-environments/what-the-crew-learned", label: <>What the crew learned →</> }}
         />
       </div>
     </article>
   );
 }
+
+// Same shape as the `pre` in the-reset-step-contract and training-ground. The overflowX is the
+// point of it: without a scroll container a long line scrolls the whole page sideways instead.
+const pre: React.CSSProperties = {
+  background: "var(--code-bg, color-mix(in srgb, var(--ink) 5%, transparent))",
+  border: "1px solid var(--border)",
+  borderRadius: 8,
+  padding: "12px 14px",
+  fontSize: 13,
+  lineHeight: 1.55,
+  overflowX: "auto",
+  fontFamily: "ui-monospace, monospace",
+};
 
 const th: React.CSSProperties = { textAlign: "left", padding: "7px 12px 7px 0", fontWeight: 500, color: "var(--muted)", fontSize: 12.5 };
 const thr: React.CSSProperties = { ...th, textAlign: "right", paddingRight: 14 };

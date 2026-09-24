@@ -1,22 +1,36 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { RACE_RUNS, BAR, type RaceRun } from "./data/raceCurves";
+import { RACE_RUNS, BAR_PROBE, type RaceRun } from "./data/raceCurves";
 
-// The same six training runs, plotted twice. Every point is a held-out probe on worlds from the
-// exam block, recorded with both the simulator steps and the wall-clock minutes it had cost by then.
-// Nothing was ever selected on these probes -- no early stopping, no checkpoint picking -- so the
-// only thing the axis toggle changes is what a "budget" is bought with.
+// Six training runs -- three seeds each -- plotted twice. Every point is a held-out probe on worlds
+// from the exam block, recorded with both the simulator steps and the wall-clock minutes it had cost
+// by then. Nothing was ever selected on these probes -- no early stopping, no checkpoint picking --
+// so the only thing the axis toggle changes is what a "budget" is bought with.
+//
+// RACE_RUNS holds nine records, not six: PPO was evaluated at 1M and again at 2M. Those are two
+// 200-world scores of ONE run, because PPO is deterministic given its seed and the 2M record
+// reproduces the 1M one probe for probe. Curves are therefore drawn from the longest record per
+// (learner, seed), or a cursor reading would average three seeds twice and call it six.
 
-const W = 640, H = 300, PL = 46, PR = 14, PT = 14, PB = 34;
+// PT reserves a band for the metric label ABOVE the plot; PB reserves TWO rows below it, the tick
+// numbers and the axis title. Both used to be one row too short, so the label overlapped the top
+// tick ("vil7.77 cells lost") and the title overlapped the tick row and ran off the bottom edge.
+const W = 640, H = 300, PL = 46, PR = 14, PT = 28, PB = 42;
+const TICK_Y = H - PB + 15;     // first row below the axis line
+const TITLE_Y = H - 5;          // second row, clear of the viewBox edge
 const COL = { DQN: "var(--c-rl)", PPO: "var(--c-regression)" } as const;
 
 type Axis = "sim" | "min";
 type Metric = "village" | "burnt";
 
+// The reference lines come from BAR_PROBE, not BAR. Every point on every curve here is a probe over
+// the 40-world block, and the chiefs score better on that block than on the full 200-world exam
+// (guard 0.85 against 1.11) because those worlds are kinder to a policy that defends the village.
+// Drawing the exam bar under probe curves would flatter every crew on this chart by about a fifth.
 const METRIC = {
-  village: { label: "village cells lost", key: "village" as const, bar: BAR.guard.village, bar2: BAR.nearest.village, dp: 2 },
-  burnt: { label: "cells burnt", key: "burnt" as const, bar: BAR.guard.burnt, bar2: BAR.nearest.burnt, dp: 0 },
+  village: { label: "village cells lost", key: "village" as const, bar: BAR_PROBE.guard.village, bar2: BAR_PROBE.nearest.village, dp: 2 },
+  burnt: { label: "cells burnt", key: "burnt" as const, bar: BAR_PROBE.guard.burnt, bar2: BAR_PROBE.nearest.burnt, dp: 0 },
 };
 
 /** Where a run stands after exactly `x` of whatever the axis counts. Linear between probes;
@@ -37,19 +51,46 @@ function at(run: RaceRun, axis: Axis, x: number, key: Metric): number | null {
 
 const mean = (xs: number[]) => xs.reduce((a, b) => a + b, 0) / xs.length;
 
+/** One curve per (learner, seed): the longest record, since a shorter one is its own prefix. */
+const CURVES: RaceRun[] = Object.values(
+  RACE_RUNS.reduce<Record<string, RaceRun>>((acc, r) => {
+    const k = `${r.learner}:${r.seed}`;
+    if (!acc[k] || r.budget > acc[k].budget) acc[k] = r;
+    return acc;
+  }, {}),
+);
+
+const lastX = (r: RaceRun, axis: Axis) => {
+  const p = r.points[r.points.length - 1];
+  return axis === "sim" ? p.sim : p.min;
+};
+
+/** How far each axis runs, and how far it runs with BOTH learners still on it. A cursor past the
+ *  second number has nothing to compare, which is a fine place to end up and a poor place to open. */
+const AXIS = (["sim", "min"] as const).reduce((acc, axis) => {
+  const ends = CURVES.map((r) => lastX(r, axis));
+  const perLearner = (["DQN", "PPO"] as const).map((l) =>
+    Math.max(...CURVES.filter((r) => r.learner === l).map((r) => lastX(r, axis))));
+  acc[axis] = { max: Math.max(1, ...ends), both: Math.min(...perLearner) };
+  return acc;
+}, {} as Record<Axis, { max: number; both: number }>);
+
+const OPENS_AT = { sim: 0.985 * AXIS.sim.both / AXIS.sim.max, min: 0.985 * AXIS.min.both / AXIS.min.max };
+
 export function RaceLab() {
   const [axis, setAxis] = useState<Axis>("sim");
   const [metric, setMetric] = useState<Metric>("village");
-  const [frac, setFrac] = useState(0.5);
+  // kept per axis: "both learners still running" is 1.0M of 2.0M on one axis and 13.5 of 16.3 on
+  // the other, so one shared fraction cannot open sensibly on both.
+  const [fracs, setFracs] = useState(OPENS_AT);
+  const frac = fracs[axis];
+  const setFrac = (v: number) => setFracs((f) => ({ ...f, [axis]: v }));
 
   const M = METRIC[metric];
-  const xMax = useMemo(
-    () => Math.max(1, ...RACE_RUNS.map((r) => (axis === "sim" ? r.points[r.points.length - 1].sim : r.points[r.points.length - 1].min))),
-    [axis],
-  );
+  const xMax = AXIS[axis].max;
   const yLo = metric === "village" ? 0 : 60;
   const yHi = useMemo(() => {
-    const v = RACE_RUNS.flatMap((r) => r.points.map((p) => p[M.key]));
+    const v = CURVES.flatMap((r) => r.points.map((p) => p[M.key]));
     return Math.max(...v, M.bar2, M.bar) * 1.04;
   }, [metric, M.bar, M.bar2, M.key]);
 
@@ -58,7 +99,7 @@ export function RaceLab() {
   const cursor = frac * xMax;
 
   const now = (learner: "DQN" | "PPO") => {
-    const vs = RACE_RUNS.filter((r) => r.learner === learner)
+    const vs = CURVES.filter((r) => r.learner === learner)
       .map((r) => at(r, axis, cursor, M.key))
       .filter((v): v is number => v !== null);
     return vs.length ? { m: mean(vs), n: vs.length, lo: Math.min(...vs), hi: Math.max(...vs) } : null;
@@ -78,7 +119,7 @@ export function RaceLab() {
     <div style={box}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", flexWrap: "wrap", gap: 8, marginBottom: 10 }}>
         <span style={head}>Same runs, two bottom axes</span>
-        <span style={{ fontSize: 11.5, color: "var(--faint)" }}>held-out probes · 3 seeds each · nothing selected on them</span>
+        <span style={{ fontSize: 11.5, color: "var(--faint)" }}>40-world probes · 3 seeds each · nothing selected on them</span>
       </div>
 
       <div style={{ display: "flex", gap: 16, flexWrap: "wrap", marginBottom: 10 }}>
@@ -97,37 +138,56 @@ export function RaceLab() {
         <line x1={PL} y1={py(yLo)} x2={W - PR} y2={py(yLo)} stroke="var(--border)" />
         <line x1={PL} y1={PT} x2={PL} y2={py(yLo)} stroke="var(--border)" />
 
+        {/* the chiefs' lines go BEHIND the curves; their labels go in front, further down */}
         {[M.bar, M.bar2].map((b, i) => (
-          <g key={i}>
-            <line x1={PL} y1={py(b)} x2={W - PR} y2={py(b)} stroke="var(--faint)" strokeDasharray="3 4" strokeWidth={1} />
-            <text x={W - PR} y={py(b) - 4} textAnchor="end" fontSize={10} fill="var(--faint)">
-              {i === 0 ? "guard" : "nearest"} {fmt(b)}
-            </text>
-          </g>
+          <line key={i} x1={PL} y1={py(b)} x2={W - PR} y2={py(b)}
+            stroke="var(--faint)" strokeDasharray="3 4" strokeWidth={1} />
         ))}
 
         {ticks.map((t, i) => (
-          <text key={i} x={px(t)} y={H - 12} textAnchor="middle" fontSize={10.5} fill="var(--muted)">
+          // first and last anchored to their edge: a centred tick at x = PL reaches back into the
+          // y-tick column and one at x = W - PR reaches past the viewBox.
+          <text key={i} x={px(t)} y={TICK_Y} fontSize={10.5} fill="var(--muted)"
+            textAnchor={i === 0 ? "start" : i === ticks.length - 1 ? "end" : "middle"}>
             {axis === "sim" ? `${(t / 1e6).toFixed(1)}M` : `${t.toFixed(0)}`}
           </text>
         ))}
-        <text x={(PL + W - PR) / 2} y={H - 1} textAnchor="middle" fontSize={10.5} fill="var(--faint)">{xLabel}</text>
+        <text x={(PL + W - PR) / 2} y={TITLE_Y} textAnchor="middle" fontSize={10.5} fill="var(--faint)">{xLabel}</text>
         {[yLo, (yLo + yHi) / 2, yHi].map((v, i) => (
           <text key={i} x={PL - 7} y={py(v) + 3.5} textAnchor="end" fontSize={10.5} fill="var(--muted)">{fmt(v)}</text>
         ))}
-        <text x={12} y={PT + 8} fontSize={10.5} fill="var(--faint)">{M.label}</text>
+        <text x={12} y={11} fontSize={10.5} fill="var(--faint)">{M.label}</text>
 
-        {RACE_RUNS.map((r, i) => (
+        {CURVES.map((r, i) => (
           <polyline key={i} fill="none" stroke={COL[r.learner]} strokeWidth={1.4} strokeOpacity={0.62}
             strokeLinejoin="round"
             points={r.points.map((pt) => `${px(axis === "sim" ? pt.sim : pt.min)},${py(pt[M.key])}`).join(" ")} />
         ))}
 
+        {[M.bar, M.bar2].map((b, i) => {
+          const label = `${i === 0 ? "guard" : "nearest"} ${fmt(b)}`;
+          // ~5.3px a character at 10px plus 3px of air each side. Sized from the string, because
+          // six curves converge exactly where this text sits and the numbers can gain a digit.
+          const w = label.length * 5.3 + 6;
+          // The two chiefs are far apart on village damage (0.85 vs 2.15) and close on burnt area
+          // (75.3 vs 80.3, on an axis starting at 60). One fixed offset is only right for the first
+          // case, so when the lines crowd, drop the lower label under its own line.
+          const other = py(i === 0 ? M.bar2 : M.bar);
+          const below = Math.abs(py(b) - other) < 15 && py(b) > other;
+          const top = below ? py(b) + 2 : py(b) - 14;
+          return (
+            <g key={`lab${i}`}>
+              <rect x={W - PR - w} y={top} width={w} height={13} rx={2} fill="var(--surface)" opacity={0.94} />
+              <text x={W - PR - 3} y={top + 10} textAnchor="end" fontSize={10} fill="var(--muted)">{label}</text>
+            </g>
+          );
+        })}
+
         <line x1={px(cursor)} y1={PT} x2={px(cursor)} y2={py(yLo)} stroke="var(--ink)" strokeWidth={1.2} strokeOpacity={0.55} />
         {(["DQN", "PPO"] as const).map((l) => {
           const v = now(l);
           return v === null ? null : (
-            <circle key={l} cx={px(cursor)} cy={py(v.m)} r={4} fill={COL[l]} stroke="var(--bg)" strokeWidth={1.5} />
+            <circle key={l} cx={px(cursor)} cy={py(v.m)} r={4} fill={COL[l]} stroke="var(--paper)" strokeWidth={1.5} />
           );
         })}
       </svg>
@@ -164,7 +224,10 @@ export function RaceLab() {
         ) : (
           <>only one of the two is still running — the other spent its whole budget before this point on this axis.</>
         )}{" "}
-        Switch the axis and the same six runs are replotted against what they cost in time instead of in fire.
+        Switch the axis and the same six runs are replotted against what they cost in time instead of
+        in fire. Every point here is 40 worlds, so a single probe carries about ±0.78 on its own and
+        the chiefs&rsquo; lines are their scores on those same 40 &mdash; read the shape, and take the
+        final numbers from the table.
       </p>
     </div>
   );
@@ -180,7 +243,7 @@ function Chips<T extends string>({ label, value, set, opts }: {
         <button key={v} onClick={() => set(v)} style={{
           ...chip,
           background: value === v ? "var(--ink)" : "transparent",
-          color: value === v ? "var(--bg)" : "var(--muted)",
+          color: value === v ? "var(--paper)" : "var(--muted)",
           borderColor: value === v ? "var(--ink)" : "var(--border)",
         }}>{lab}</button>
       ))}
@@ -196,5 +259,5 @@ const chip: React.CSSProperties = {
   fontSize: 11.5, padding: "3px 9px", borderRadius: 999, border: "1px solid var(--border)", cursor: "pointer",
 };
 const card: React.CSSProperties = {
-  border: "1px solid", borderRadius: 8, padding: "7px 12px", minWidth: 118, background: "var(--bg)",
+  border: "1px solid", borderRadius: 8, padding: "7px 12px", minWidth: 118, background: "var(--paper)",
 };

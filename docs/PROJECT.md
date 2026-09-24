@@ -1424,6 +1424,311 @@ Proofs, Callouts, PredictPrompts, Quizzes and MathBlocks). Re-run it rather than
    own partial gradient descent. Two of `/map`'s seven throughlines point at it.
 
 
+### 14.0a What the crew learned — World 2 is finished (2026-09-15)
+
+**`building-environments/what-the-crew-learned` ships, and World 2 with it (28 of 40 pages, still
+0 without a visual).** The race page published a score; this page asks what the policy behind the
+score actually does, using three new trainer subcommands — `learned` (a behaviour probe), `shield`
+and `snap` (two ablations) — plus `where-won` and `figure`, which writes the numbers into the lab's
+data module the way `curves` does.
+
+*What the crew does.* Not firefighting. **On 89–96% of its decisions the target cell is not
+burning** — the chiefs are at 100% on fire by construction — and it aims 2.6–3.4 cells from the
+nearest flame. It hits 3.4–4.2 cells a drop against the guard chief's 5.1, its buckets hit nothing
+at all 11–16% of the time against 1–2%, and it puts out less fire than every hand-written rule in
+the chapter. It also loses 0.69 village cells against the chief's 1.11 and burns 70 against 82.
+
+*Why it wins, established twice.* A drop does two things — un-burns the cells under it, and wets the
+5×5 square to moisture 0.9. **`shield`**: set `WET = 0` (a plain global in the exec'd preamble, so
+the ablation is one assignment) and everybody gets worse, but the crews lose 2.57 / 2.75 / 2.82
+village cells against guard's 1.82 — and all three finish *behind* the guard chief. **`snap`**: take
+each crew's own target and slide it onto the nearest burning cell, changing nothing else, and the
+crews go 0.69 / 0.69 / 0.86 → 1.14 / 1.51 / 1.52, bracketing the chief's 1.11, with returns
+−85.6 / −92.5 / −88.4 against the chief's −92.3. The advantage is the offset, not the weights that
+produce it. The page states the limit of each: `shield` runs a crew outside its training
+distribution (a crew *retrained* in the dry world is **UNTESTED** — it needs a GPU million-step run),
+and `snap` changes the whole trajectory, so it is not a per-decision counterfactual.
+
+*The uncomfortable one.* `where-won`: **in 142–150 of the 200 exam worlds the crew and the chief
+score identically**, and 79–136% of the total gap comes from the ten best worlds (seed 2's figure is
+over 100% — its ten best are worth more than its whole advantage). The crew is worse in 14–24
+worlds, by 7–9 village cells in its worst. The headline mean is a claim about a quarter of the exam.
+This is also the concrete reason the race page paired everything.
+
+*Kept promises and one reconciliation.* The bar is guard's −92.3 as a K=4 commander and the crews
+clear it at −75.4 / −76.1 / −80.6. The cobra page's "is this number local?" question is asked again,
+of an advantage rather than a metric. And the page reconciles a visible inconsistency: the cobra
+page quotes a damage-paid DQN at 2.51 / 2.71 / 2.45, which is the *build-log* crew from trainer v1
+(1-step, 50k replay) — its comparison is internally fair and stands unrestated, but a reader
+comparing adjacent pages would otherwise see two different DQNs with no explanation.
+
+*Also measured, published, and not tidy.* The crew aims at the last flames only 42–53% of the time
+(chiefs 100%) and answers a threatened village on 51–64% of those decisions (guard 100%) — it is not
+a crisis responder and still loses fewer houses. The natural firebreak story does **not** fully
+check out: its drops that hit nothing sit on only 0.8–1.3 cells that are unburnt, flammable and
+touching a flame, so "wets the fire's edge" is not established; most of the gap between 57–66% of
+targets having no fire in the square and only 11–16% of drops landing dry is fire arriving during
+the three or four steps of the sortie, and the control that would separate anticipation from ambient
+spread has not been run. Said so on the page. And the laziest rule — park over the village and soak
+it — **beats the crew on the village column** (0.45 against 0.69) while burning 143 cells instead of
+70 and scoring −145.8: a reminder that the headline column is not the objective.
+
+### 14.0 World 2's race landed (2026-09-15)
+
+**`building-environments/training-the-crew` now has its result.** Nine runs on Colab — three seeds
+of DQN at 1M steps, three of PPO evaluated at 1M and 2M — plus `paired`, a new command that flies
+each saved network over the exam worlds one at a time so differences can be tested rather than
+eyeballed. The track is now **0 pages without a visual**.
+
+*The result.* DQN averages **0.75** village cells lost against PPO's **1.27**, burns 70.8 cells
+against 112.5, and is the first crew on this track to beat the hand-written guard chief (1.11).
+But the page's own rule — "a claim only gets made when the seeds do not overlap" — forbids saying
+DQN beats PPO: PPO's best seed is 0.78, inside DQN's 0.69–0.86 range. What the seeds *do* support
+is reliability. DQN's three runs span **0.17**; PPO's six scores span **1.55**, and not as noise —
+two seeds settle near 0.8 and one sticks near 2.1 and never moves, through two million steps.
+Paired against the guard chief on the same 200 worlds, two DQN seeds win clear of two standard
+errors (−0.42 ±0.31) and the third does not separate (−0.25 ±0.34).
+
+*Four things this cost, all worth remembering.*
+
+- **Two Colab batches came back from a stale trainer.** Both times the DQN arm had run 1-step with
+  a 50k replay — the configuration the repo already documents as the one that unlearns — because an
+  older `wildfire_train.py` was uploaded. Nothing caught it but reading the configs by hand, and a
+  tag blacklist could not have: the files were named exactly like race runs. `curves()` now checks
+  the **config**, refuses a DQN run with no `nstep`/`dueling`, and prints `INCOMPLETE` naming any
+  missing arm; `save()` stamps `trainer: 2` into every result. There is also a `version` command,
+  because the `--help | grep` check I first suggested returns nothing both when the file is stale
+  and when the shell has no grep.
+- **PPO at 1M and 2M are not six runs.** PPO is deterministic given its seed, so the 2M record
+  reproduces the 1M one probe for probe — verified identical to 0.000 village cells and 0 steps
+  across all three seeds. `RaceLab` was averaging all six at a cursor and labelling it "over 6
+  seeds"; it now plots the longest record per (learner, seed).
+- **The figure was drawing 40-world curves against a 200-world bar.** A training probe is 40 worlds
+  and the reference line was the chief's exam score. The probe block is not representative: guard
+  scores **0.85** there against 1.11 over the full 200, nearest 2.15 against 2.69 — while a flailing
+  policy finds it marginally *harder* (random_fire 4.58 vs 4.40), which says exactly what kind of
+  worlds they are. The chart was flattering every crew by about a fifth. `curves` now emits
+  `BAR_PROBE`, measured on the same block.
+- **`var(--bg)` never existed; the token is `--paper`.** Four references across `RaceLab` and
+  `CobraLab` (the two World 2 labs, written in one session). An undefined custom property is
+  dropped silently: `color: var(--bg)` on a chip with `background: var(--ink)` fell back to the
+  inherited `--ink`, so the *selected* toggle -- the control carrying the whole point of the race
+  figure -- rendered as black text on a black pill. The readout cards lost their background and the
+  cursor dots lost their halo the same way. **`tsc` cannot see this and neither can a text-based
+  page audit; it took a screenshot from the user.** Contrast is now part of the check: selected
+  chips 16.8:1, unselected 4.8:1, in both themes.
+
+- **Five more layout defects in the same figure, each invisible to the check that came before it.**
+  The metric label overlapped the top y-tick ("vil7.77 cells lost"); fixing that put the axis title
+  into the tick row, because the bottom band was one row too short and always had been; the first
+  x-tick then grazed the bottom y-tick, fixed by edge-anchoring the end ticks; the chiefs' reference
+  labels were unreadable under six converging curves, fixed with plates sized from the string; and
+  the plates did nothing at first because they were emitted *before* the polylines, so the curves
+  painted over them. On the burnt-area metric the two plates then landed on each other, since one
+  fixed offset only works while the two lines are far apart. Lesson: a text-vs-text overlap check
+  passes things a reader sees instantly, and every one of these was a constant that happened to
+  suit the first data put through it.
+
+- **The cobra-effect page scrolled sideways** at 626px: its `<pre>` was written inline as
+  `style={{ fontSize: 13 }}` while the other four bare `<pre>`s in the track share a const carrying
+  `overflowX: "auto"`. Pre-existing, found only because the `--bg` fix sent me to that page.
+
+- **I made the probe-vs-exam mistake in prose, one paragraph above the callout warning about it.** I wrote
+  that two PPO seeds beat DQN at equal wall clock, by reading PPO's 40-world probes against DQN's
+  200-world 0.75. Like for like at 13.5 minutes it is PPO 0.80 / 2.04 / 0.71 against DQN 0.45 /
+  0.05 / 0.28 — no PPO seed ahead. Two exams in one sentence is easy to do and invisible once
+  written.
+
+### 14.0b Math foundations & theory become a teaching rebuild (2026-09-15)
+
+**User instruction, recorded in full in `docs/math-pedagogy-plan.md` — which is now the authority
+for every page in `math-foundations`, `learning-theory` and `model-selection`.** The short version:
+the math pages are stuffed — one concept per *paragraph* where they should be one concept per
+*page*. Lengthen a page when it needs it, split it when it carries two ideas, and then give every
+concept **3–4 end-to-end worked examples in a teacher's voice** and **10+ problems with complete
+solutions**, in three bands: direct application · two ideas at once · the band where brute force is
+a trap and the intended route is a structural shortcut.
+
+That third band is competitive-exam style (JEE / GATE), and **the pages must never say so** — they
+name the property instead of the exam, and they teach the technique catalogue explicitly rather than
+just posing hard problems. Working band names: **Apply · Combine · Outsmart**.
+
+Three things worth knowing before picking this up:
+
+- **It absorbs the audit's separate math-foundations items.** 368 w/pg, 20/34 blind, 0 `<Proof>`,
+  0 runnable code — a page rebuilt to the new standard clears all four at once. Do not schedule them
+  as four passes.
+- **Phase 0 is the format, not the content.** Two new primitives (`<Worked>`, `<Practice>`), the
+  verification harness, and ONE pilot page. Reviewing the pilot before writing the rest is the whole
+  point, because the scope behind it is ~400 worked examples and ~1,300 problems — larger than the
+  entire neural-networks family.
+- **House rule #1 is the hard part.** Several hundred hand-written numeric answers in a subject
+  where a sign error is invisible to every check that exists today. The plan requires an independent
+  recomputation (`scripts/math_check.py`) and a new `check-pages.js` rule R3, the same way R1 guards
+  `<CodeOutput>`.
+
+### 14.0e World 3 gained a build page, a training page and a lab (2026-09-19)
+
+Three pages were added on user request — *"how to train it step by step code by code line by line,
+same for env creation... also a lab showcasing"* the trained agent. Track is **44 of 44**.
+`writing-the-duel` walks `step()`'s six sections and ends with a `MyDuel(Duel)` the reader assembles
+and checks frame for frame (largest disagreement over 6,867 frames: **0**). `the-training-loop` writes
+DQN out in numpy — one gradient step, then a complete loop — both runnable in the browser, since
+Pyodide has no torch and for a 27-float observation that is a feature. `watch-it-fight` puts the
+trained net in the 3D arena with its sixteen Q-values live.
+
+⭐⭐ **The GPU does not help here, and `boss_train.py devices` proves it.** On the loop a real run is
+made of, cpu and cuda are **1.00x** apart; for a single duel the GPU is **0.42x** — launch overhead
+beats a microsecond of arithmetic. The crossover is visible only with the environment removed: even at
+batch 256, **13x** by batch 16,384. The card is genuinely used and genuinely idle (median **19%**
+utilisation, **4341 GFLOP/s** on work big enough — 80% of the 1660 Ti's peak, and ten times beyond any
+integrated GPU). New `scripts/boss_regen.py --check --all` verifies every published block still equals
+what its cell prints, and reports clean.
+
+⚠️ Two of my own measurement bugs were caught by impossible numbers and are written up in
+`docs/env-building-plan.md`: a press-counter that undercounted attacks 7x because a decision spans
+three frames, and a cpu-vs-gpu table whose control row wandered because the two devices were timed in
+sequence rather than interleaved.
+
+### 14.0d World 3 of the env-building track started (2026-09-15)
+
+**The Boss fight world is prototyped, gated and open.** A Soulslike duel at 30 frames a second, where
+both fighters are state machines and a move is a list of `(kind, frames)` segments -- windup, an
+optional *delay* that looks exactly like windup, the active frames, and a recovery. `BOSS_SETUP` is in
+`runtimeSetup.ts`; `scripts/boss_cases.py` extracts it back out of the TypeScript and reproduces every
+published number. Page 1, `the-duel-brief`, has shipped; both of its runnable cells
+were verified in Pyodide by exact string equality.
+
+**⚠️ REBUILT the same day, from a line to a floor.** The user asked for a 3-D world the character can
+move around in. v1 was one-dimensional — only "closer" and "further" — so a three.js view of it would
+have been a picture that lies about the simulation underneath. The environment was rebuilt instead of
+the renderer: both fighters now have a position on a circular arena, the boss has a facing, and **an
+attack has a reach AND an arc** and lands only inside both. The boss tracks you while it winds up and
+stops turning the instant the active frames begin, which is what makes a late sidestep work and an
+early one fail. Every number measured on v1 — including the DQN-vs-PPO race — is marked stale in the
+plan; the lessons carried over, the figures did not.
+
+**The 3-D arena is playable, and it is the same game.** `src/components/boss/DuelArenaLab.tsx` renders
+it with three.js (WASD, attack, parry, guard, four roll directions, plus a watch mode for each scripted
+duellist); `duelSim.ts` is a TypeScript port of the shipped Python. That port is verified rather than
+assumed: `boss_cases.py port` records one duel's boss decisions and buttons, `scripts/boss_port_check.mjs`
+replays them through the port, and over 900 frames the largest disagreement in any position, angle,
+health or stamina is **5.0x10^-13** with all 14 event counters identical.
+
+**The arena got bodies and meters (2026-09-18), and that was a renderer-only change.** Both fighters
+are now posed rigs built from primitives (`fighters.ts`) in a dressed room with canvas-painted textures
+and a PMREM environment map (`arenaScene.ts`), and the HUD reads health, stamina, boss health, the
+stagger window and a live "frames until it can hurt you" straight off the simulation's own fields.
+`duelSim.ts` and `BOSS_SETUP` were not touched, so no measurement went stale. Two honesty corrections
+came out of it: the floor wedge had been colouring the *delay* differently from the windup, which hands
+the player a tell the world does not give them (they now render identically), and the "special meter"
+the brief asked for is the **riposte window** -- `bStagger` counting down -- rather than an invented
+resource, because adding a resource would change the environment.
+**Poise shipped (2026-09-18): you can stagger it by hitting it.** A landed hit takes 25 off a pool of
+50 that refills at 0.08 a frame, so two clean hits inside one engagement put the boss down for 60
+frames. This is an environment change, not a renderer one, so every figure involving a player who
+attacks was re-measured. The expert is untouched (200/200 on full health, and 0.00 breaks, because
+all of its damage is riposte damage already) and the punishers roughly double their score. Two things
+are worth knowing. **The window length hid a trap:** at 52-56 frames the ranking of the two avoiders
+REVERSES -- a resonance with the sidestepper's roll-and-swing cycle -- so the obvious choice of 55,
+matching the parry window, would have quietly inverted the arc finding the whole line-to-floor rebuild
+exists to show; 58-64 is the only flat stretch and 60 is the middle of it. **And it cost something:**
+mashing, which lost 200 duels out of 200 before poise, now wins 2. A reward for landing hits is a
+lottery ticket for the reckless player, and that is documented rather than smoothed over.
+
+**Chapters 6 and 7 drafted in full (2026-09-18): World 3 is 14 of 14 and the track is 41 of 41.** The
+user asked for a rough draft of every remaining page to iterate on one at a time, so all twelve were
+written and wired: the moveset as a state machine, hitboxes and i-frames, stamina and the parry window,
+what the agent sees, thousands of duels at once, the scripted ladder and the difficulty dial, the
+curriculum, training, the turtle, delayed attacks, sim vs the real game, and the closing throughline.
+Six new `boss_cases.py` commands (`states`, `timing`, `obs`, `curriculum`, `rewards`, `speed`) produce
+everything they publish, and `scripts/boss_train.py` is NEW -- DQN and PPO against the extracted
+environment, scored through the shipped `score()`, with `probe`, `delays` and `bench`.
+**Three findings worth carrying out of it.** (1) `Duel(moves=[i])` turns "which attack is hardest" into
+a measurement, and the answer inverts the obvious ordering: against `slam` or `heavy` alone -- the two
+long telegraphed attacks -- both avoiders finish on 100.0 hp, while `combo`, the cheapest move in the
+table, leaves the sidestepper on 8.2 and is the only move that beats the greedy expert (44% wins). The
+mechanism is an interaction nobody designed: combo's two hitboxes are 12 frames apart and the roll's
+i-frames are 10 wide, so no press covers both. (2) For BOTH delayed attacks the parry window sits
+**inside the hold** (heavy: hitbox at 28, press on 21-25, hold 20-27) -- so "wait out the delay" is
+exactly the wrong advice for a parrier, and the expert presses parry on 30% of its delay-frame
+decisions against 7% of its windup ones. (3) Under a `survive` reward with a neutral clock, `hold
+guard` scores **exactly 30.00** and a win is worth **exactly +30**: the turtle is found in arithmetic,
+before any training. ⚠️ Every published block on these pages was machine-generated from the shipped
+environment rather than transcribed, but **none has been Pyodide-verified by exact string equality
+yet**, which is the first job of the refine pass.
+
+**The training run landed (2026-09-18): DQN matches the expert's win rate, and the probe says it got
+there the wrong way.** One run, seed 0, 2,000,000 decisions, 63 min on the 1660 Ti: **200 wins from
+200 held-out duels**, no deaths, 83.6 hp left, 4.63 parries and **0.00 poise breaks** — so it found
+the parry, not the turtle and not a refusal. It takes **7.01** swings a duel against the expert's
+**7.00**, which is arithmetic rather than luck (a riposte is 36 damage and the boss has 240). The
+curve is violently non-monotone -- nothing for a million decisions, 100% at 1.3M, a collapse to 69% at
+1.6M, then 100% again -- and it visits and abandons both local optima the scripted ladder predicted,
+peaking at 1.28 poise breaks and 27.3% guard frames around 900k. ⭐⭐ **But the delay probe fails it:**
+against the two attacks that hold a finished-looking windup its median press slips from 4 frames to 6,
+its mean to 9.1 and 11.0, and the share of presses landing in the usable band falls from 59-73% to
+**45-49%**. It makes twice as many defensive presses as the expert on exactly those two moves and
+converts ~30% of them into parries against the expert's ~100%. **It did not learn to wait; it learned
+to throw a fifteen-stamina button repeatedly through the hold until one landed.** A page reporting
+only the win rate would have called that "it learned to parry" and been wrong about the one thing this
+world was built to study.
+
+**What the gating experiments found, before any prose was written:**
+
+- **Solvability with room to spare.** A hand-written duellist that reads the boss's animation clock and
+  parries five frames before the hitbox goes live wins **200 of 200** held-out duels on full health,
+  never taking a hit. Add one line of greed -- punish during recovery as well as during stagger -- and
+  it wins 195 and dies 5 times.
+- ⚠️ **The first trained agents found a hole in the physics.** The boss closed the gap only while idle
+  and more slowly than the player walks, so walking backwards was a free and permanent refusal of the
+  whole duel; PPO found it on all three seeds. The sanity ladder had no "refuse the task" row, so the
+  world's worst bug was invisible until an agent pointed it out. **That row is now permanent**, and it
+  is the same lesson World 1 learned when its boat sailed off the course.
+- ⭐ **PPO's local optimum is a one-line rule, digit for digit, on two independent seeds** (v1, the one-dimensional duel -- kept for the lesson, not the number)**:** press guard
+  on 100% of decisions, which reproduces the scripted `hold guard` row exactly (own hp 43.4, boss
+  untouched at 240.0, guard 84.3% of frames). World 2's flat pilot did the same thing in a completely
+  different world.
+- ⭐ **The decision rate is not a training-speed knob.** The parry window is five frames wide; one
+  decision every three frames costs the expert nothing, one every six drops it from 100% wins to 21.7%.
+  Below a threshold set by the tightest window in the moveset, a coarser decision rate deletes a
+  mechanic outright.
+- ⚠️ **Fixing a reward hack can flatten the reward.** Making the clock a defeat rather than a truncation
+  prices refusal out -- and squeezes every non-winning policy into a 18-point band where mashing (dead
+  in 11 s) outscores blocking (alive at 30 s). Measured on scripted players first, then confirmed on a
+  learner: the seed that had already stopped engaging did not change at all when its behaviour began
+  scoring -30 every duel.
+- **Two findings the 3-D rebuild added.** Leaving an attack's *arc* beats leaving its *reach*: rolling
+  sideways collects 2.47 attacks a duel that reach the player and miss on angle, against 0.00 for
+  rolling backwards, and ends 3 hp better off while standing 0.42 units closer. And the two bodies had to be made
+  solid — without that the boss walked through the player while closing, which the one-dimensional
+  version could not express and which watching the 3-D view exposed in about a minute.
+- ⭐⭐ **The 600k-decision race was a budget artefact** (all v1; the v2 race is unrun)**.** At that budget DQN engages on every seed and PPO
+  on none, and neither is close to the expert. One DQN run at **3M decisions reaches 100% wins** on the
+  held-out 200 -- the expert's win rate -- with 4.16 parries against the expert's 8.51. The skill the
+  world was built around is learnable and shows up about four times later than the local optima. The
+  curve is not monotone: 86.5% at 1.45M, a dip to 19.5% at 2.10M, 89.0% at 2.40M.
+
+Full log and every table: the "World 3 - Boss fight" section at the foot of `docs/env-building-plan.md`.
+
+### 14.0c Phase 0 of the maths rebuild shipped (2026-09-15)
+
+**`math-foundations/derivatives` is the reference implementation** of the standard in
+`docs/math-pedagogy-plan.md` — 350 words became 2,561 plus a content module, with 4 worked examples,
+13 problems in three bands with complete solutions, the track's first `<Proof>` and its first
+runnable `CodeBlock`. New primitives `Worked` and `Practice`; new preamble `CALCULUS_SETUP`; new
+content directory `src/content/math/`.
+
+**Two new checks, both proved by breaking them.** `scripts/math_check.py` recomputes all 35
+published answers independently with sympy — taking the long route where the page takes a shortcut —
+and `check-pages.js` gained **R3**: a page rendering `<Worked>` or `<Practice>` must be listed in
+that script's `PAGES` map. Flipping two signs produced two precise failures; removing the page from
+the map fired R3.
+
+Full pilot write-up, including three implementation traps worth reading before the second page
+(fragment keys, sympify's own symbols, and why `.katex-display.scrollWidth` lies), is §11 of
+`docs/math-pedagogy-plan.md`.
+
 ### 14.1 Working the backlog — the fix log
 
 The audit's §0.3 lists nine cross-cutting fixes. Record each one here as it lands, so a later session

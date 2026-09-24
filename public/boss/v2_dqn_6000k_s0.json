@@ -1,0 +1,123 @@
+{
+ "tag": "v2_dqn_6000k_s0",
+ "obs": 38,
+ "actions": 17,
+ "repeat": 3,
+ "world": "v2",
+ "world_sha1": "fd3243469b99",
+ "layers": [
+  {
+   "name": "f.0.weight",
+   "shape": [
+    256,
+    38
+   ]
+  },
+  {
+   "name": "f.0.bias",
+   "shape": [
+    256
+   ]
+  },
+  {
+   "name": "f.2.weight",
+   "shape": [
+    256,
+    256
+   ]
+  },
+  {
+   "name": "f.2.bias",
+   "shape": [
+    256
+   ]
+  },
+  {
+   "name": "f.4.weight",
+   "shape": [
+    17,
+    256
+   ]
+  },
+  {
+   "name": "f.4.bias",
+   "shape": [
+    17
+   ]
+  }
+ ],
+ "params": 80145,
+ "bytes": 320580,
+ "sha1": "853ca5590f70808366b28d5ad071238615ed2e91",
+ "actionNames": [
+  "idle",
+  "move in",
+  "move in-right",
+  "move right",
+  "move back-right",
+  "move back",
+  "move back-left",
+  "move left",
+  "move in-left",
+  "attack",
+  "roll in",
+  "roll right",
+  "roll back",
+  "roll left",
+  "guard",
+  "parry",
+  "heavy attack"
+ ],
+ "moves": [
+  "jab",
+  "slash",
+  "thrust",
+  "sweep",
+  "heavy",
+  "slam",
+  "combo",
+  "flurry",
+  "onslaught",
+  "lunge",
+  "eruption"
+ ],
+ "decisions": 6000000,
+ "minutes": 173.52,
+ "final": {
+  "win": 93.0,
+  "die": 102.0,
+  "n": 200.0,
+  "clock": 5.0,
+  "G": 16.081100000000003,
+  "frames": 717.135,
+  "php": 2.391000000000001,
+  "bhp": 28.08,
+  "meanD": 1.1681788985837247,
+  "meanOff": 0.518149594086412,
+  "parry_presses": 0.35,
+  "parries": 0.31,
+  "blocks": 0.74,
+  "guard_breaks": 0.105,
+  "hits_taken": 5.675,
+  "rolls": 0.285,
+  "dodges": 0.14,
+  "swings": 9.75,
+  "heavies": 8.945,
+  "hits_dealt": 9.47,
+  "riposte_dmg": 55.35,
+  "poise_breaks": 1.45,
+  "chip_taken": 2.099,
+  "dmg_taken": 97.60900000000001,
+  "dmg_dealt": 271.92,
+  "whiffs": 6.34,
+  "guard_frames": 6.745,
+  "wall_frames": 0.475,
+  "arc_misses": 6.185,
+  "parry_mashes": 0.0,
+  "parry_dead": 0.0,
+  "erupt_taken": 0.215,
+  "guard_pct": 0.9405481534160235,
+  "wall_pct": 0.06623578545183265,
+  "parry_pct": 88.57142857142858
+ }
+}

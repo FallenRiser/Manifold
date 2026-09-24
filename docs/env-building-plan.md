@@ -54,12 +54,21 @@ investigated") · what-the-boat-sees · the-agent-invents-tacking · pay-for-spe
 cell browser-verified by exact string equality.** Plus the training-ground page (14). **Chapter 4 (World 2 build,
 7 pages) — ✅ COMPLETE:** wildfire-brief · fire-as-a-cellular-automaton · wind-moisture-and-slope · the-helicopter ·
 coupled-clocks · a-grid-you-can-vectorise · invariants-and-property-tests. **Chapter 5 (World 2 test & train, 7 pages) —
-5 of 7:** baselines · the-crew-that-learned-nothing · pilot-or-commander · reward-is-a-values-decision ·
-the-cobra-effect (built OUT OF ORDER — it is p6 in the sidebar). **Track: 26 of 40 pages.** Next: chapter 5 page 5,
-"Training the crew: DQN vs PPO" — ⚠️ this is the page that must SHIP `scripts/wildfire_train.py` (it is already named in
-`wildfire_cases.py`'s docstring and does not exist), and it needs real training runs on the user's PC against the
-commander interface at K=4. When it ships, rewire the chain: reward-is-a-values-decision → training → the-cobra-effect
-(today those two link directly to each other). Then chapter 5 page 7, "What the crew learned".
+✅ COMPLETE:** baselines · the-crew-that-learned-nothing · pilot-or-commander · reward-is-a-values-decision ·
+training-the-crew (ships `scripts/wildfire_train.py`; nine Colab runs) · the-cobra-effect · what-the-crew-learned.
+**World 2 is finished.** World 3 is under way: its prototype is gated (see the World 3 log at the foot of
+this file) and its first page has shipped. **Track: 29 of 41 pages, 0 without a visual.** Next: chapter 6
+page 2, "A moveset as a state machine".
+
+`wildfire_train.py` now carries the analysis half as well as the training half: `learned` (behaviour probe),
+`shield` and `snap` (the two ablations), `where-won` (per-world gap distribution) and `figure` (writes
+`src/components/fire/data/whatLearned.ts`, the way `curves` writes `raceCurves.ts`). Run `version` FIRST on any
+machine — two Colab batches have already come back from a stale trainer.
+
+⚠️ **UNTESTED and named as such on the page:** a crew *retrained* in a world where drops do not wet (`WET = 0`).
+The `shield` ablation runs the shipped crew out of its training distribution, which is enough for the narrow claim
+the page makes and not enough for "the problem needs wetting". Also open: whether the crew's off-fire aim is
+anticipation or ambient spread — the control is a matched target at the same distance from the same fire.
 
 ## ⚠️ CORRECTION 2026-09-13 — "−1 per second never learns" is FALSE as a general claim
 
@@ -798,3 +807,960 @@ truncated at 300 steps. Rewards: values (−1 per ignited cell −10 per village
     +15 steps) is UNEXPLAINED — say so on the page if it isn't resolved. Side finding: every learned crew aims at
     non-burning cells in ~half of its small-fire decisions (hand-written rules never do) — cause not investigated.
   - s1 — running. PPO 2M-step equal-wall-clock run also running.
+
+## ⚠️ World 3 was rebuilt from a LINE to a FLOOR (2026-09-15)
+
+**Everything in the "prototype log" section below was measured on v1, a one-dimensional duel, and
+only the lessons survive — not the numbers.** The user asked for a three-dimensional world the
+character can move around in, and a three.js view of a one-axis world would have been a picture that
+lies about the simulation underneath it, so the environment was rebuilt rather than the renderer.
+
+What carried over unchanged: frames as the unit, the segment table (`w` windup / `d` delay / `h`
+active / `r` recovery), the parry window, the stamina economy, the two expert duellists, and every
+lesson v1 taught — above all that **the sanity ladder must contain the agent that refuses the task**,
+which is how v1's fatal bug was found in the first place.
+
+**⚠️ STALE, and flagged as such: the DQN-vs-PPO race and the 3M-decision run below were all run
+against v1.** They are kept because the refusal and turtle findings are what drove the redesign, but
+NO number from them describes the shipped world. Re-running the race on v2 is the next training job.
+
+### v2: the duel on a floor (SHIPPED)
+
+Both fighters have a position on a circular arena of radius 8.0 and the boss has a facing.
+
+- **An attack has a reach AND an arc**, and lands only inside both: `thrust` is 3.6 long and 0.35 rad
+  wide (you can step out of it), `slam` is 2.6 long and 1.40 rad wide (you cannot). The boss tracks
+  you while it winds up at 0.045 rad a frame and **stops turning the instant the active frames
+  begin** — that one rule is what makes a late sidestep work and an early one fail.
+- **The arena wall replaces v1's speed patch as the answer to refusal.** The player walks 0.075 a
+  frame, the boss closes at 0.105, and there is a wall: backing away spends **89.3% of its frames
+  against it and now dies 200 of 200** (v1: 176, and under the original bug, never). Circling forever
+  dies 197 of 200, because the boss turns faster than you can orbit it.
+- **The two bodies are solid** (`BODY = 0.95`). Without that the boss walked *through* the player
+  while closing and the player ended up standing behind it — which the one-dimensional version could
+  not express and which the 3-D view made obvious within a minute of watching it. The boss now shoves
+  you, which is why `run away` went from dying 176 times to dying every time.
+- **New action space:** 16 actions — idle, eight movement directions measured from the boss, attack,
+  four roll directions, guard, parry. Observation is 26 floats and now includes the off-axis angle,
+  the room behind you, and the reach and arc of the move being wound up.
+
+#### Sanity ladder — 200 held-out duels (seeds 1000-1199), a decision every 3 frames
+
+| player | win | die | clock | boss hp | own hp | meanD | off-axis | parries | blocks | hits | dodges | arcX | wall% | G |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| stand still | 0 | 200 | 0 | 240.0 | −12.6 | 1.77 | 0.00 | 0.00 | 0.00 | 4.53 | 0.00 | 0.00 | 0.0 | −41.26 |
+| random buttons | 0 | 200 | 0 | 228.3 | −11.6 | 1.83 | 0.06 | 0.18 | 0.18 | 4.67 | 0.40 | 0.18 | 8.0 | −39.99 |
+| mash attack | 0 | 200 | 0 | 149.2 | −13.2 | 1.29 | 0.00 | 0.00 | 0.00 | 4.58 | 0.00 | 0.00 | 0.0 | −32.24 |
+| run away | 0 | **200** | 0 | 240.0 | −12.8 | 2.15 | 0.00 | 0.00 | 0.00 | 4.58 | 0.00 | 0.00 | **89.3** | −41.28 |
+| circle | 0 | **197** | 3 | 240.0 | −12.0 | 1.84 | 0.26 | 0.00 | 0.00 | 4.62 | 0.00 | 0.93 | 0.0 | −40.75 |
+| hold guard | 0 | 0 | 200 | 240.0 | 45.3 | 1.29 | 0.00 | 0.00 | 10.80 | 0.14 | 0.00 | 0.00 | 12.1 | −5.47 |
+| block, punish | 0 | 2 | 198 | 193.1 | 37.8 | 1.09 | 0.00 | 0.00 | 10.53 | 0.68 | 0.00 | 0.00 | 6.6 | −1.83 |
+| roll, punish | 0 | 2 | 198 | 148.1 | 65.4 | 2.01 | 0.00 | 0.00 | 0.00 | 2.23 | 2.85 | 0.00 | 15.1 | +5.42 |
+| **sidestep, punish** | 0 | 2 | 198 | 148.3 | **73.6** | 1.58 | 0.28 | 0.00 | 0.00 | **1.65** | **6.84** | **2.69** | 0.0 | **+6.23** |
+| parry oracle | 187 | 13 | 0 | −5.6 | 40.9 | 1.51 | 0.00 | 4.75 | 0.00 | 2.87 | 0.00 | 0.00 | 1.3 | +44.75 |
+| **patient parry** | **200** | **0** | 0 | −12.0 | **100.0** | 1.56 | 0.00 | 8.56 | 0.00 | **0.00** | 0.00 | 0.00 | 2.9 | **+55.20** |
+
+⭐ **Solvability survives the rebuild exactly: patient parry still wins 200 of 200 on full health
+without ever being hit**, and greed still costs — the oracle wins 187 and dies 13.
+
+⭐ **The two-dimensional mechanic is measurable, and it is the point of the rebuild.**
+`arcX` counts attacks that reached the player and missed anyway, on angle. Rolling *backwards*
+collects **0.00** of them (it leaves the arc by leaving the reach) while rolling *sideways* collects
+**2.69** — and the sidestepping player ends on 73.6 hp against 65.4, taking 1.65 hits against 2.23,
+while standing 0.43 closer. Leaving the arc is strictly better than leaving the reach, because it
+keeps you close enough to punish the recovery.
+
+#### The sweeps, re-run on v2 (all superseding their v1 versions)
+
+- **Decision rate.** R ≤ 3 is free (100% wins, 8.43–8.51 parries), R = 4 dips to 95.8%, and
+  **R = 6 collapses to 21.7% wins / 73.3% deaths** with parries halved. The parry window is five
+  frames and the press must land in a three-frame band, so R ≤ 3 guarantees a decision inside it and
+  R = 6 cannot. Same conclusion as v1, now measured on the shipped world. Shipped: R = 3.
+- **Balance is a cliff.** boss hp × riposte, 120 duels: at 240 hp / ×3.0 the flawless defender wins
+  100%; at **260 / ×2.5 it wins 10.8% while still never taking a hit.** It does not start losing
+  duels, it starts running out of clock.
+- **Aggression is a difficulty dial for players who BLOCK, not for players who AVOID.** hold guard
+  56.3 → 30.0 hp as aggression goes 0 → 1, block+punish 46.0 → 23.1 — but **sidestep sits at 70–74 hp
+  throughout** and the parrier wins every duel on full health at every setting. A boss that attacks
+  more often simply offers those two more openings. (v1 could only show this for the parrier; the
+  floor gives a second example and makes the rule clearer.)
+- **Chip damage prices the shield.** hold guard G: chip 0 → −0.21 (97.9 hp), 0.20 → −5.48 (45.2),
+  0.35 → −16.91 (5.9). Guard breaks do not move with chip at all — the **stamina** cost is what breaks
+  a guard — and sidestep's row is perfectly flat because it never blocks, which is the ablation
+  checking itself.
+- ⚠️ **The clock rule, and its cost.** Under a neutral clock the losers spread over 47 points and rank
+  sensibly; under clock-as-defeat every non-winner is squeezed into −23…−41 and **mash attack, dead in
+  11 s, outscores hold guard, alive and barely scratched at 30 s.** Note this differs from v1 in an
+  important way: v1's neutral clock paid refusal about zero, which was the hack. **On the floor,
+  refusal already dies** (run away −41.28), so the neutral clock no longer rewards it — the wall did
+  the job the reward was being asked to do. The flattening cost of clock-as-defeat remains real.
+
+#### Invariants, determinism, and the TypeScript port
+
+`boss_cases.py check`: 40 duels of uniform random buttons, every frame — neither fighter outside the
+arena, stamina in range, no hp increase, no boss frame past the end of its move, no staggered boss
+with a move still out: **PASS**. Same seed plus same buttons is bit-identical. Branch coverage: 14
+parries, 12 dodges, 7 blocks, 3 guard breaks, 193 hits, 23 whiffs, **0 wins** — the winning branch is
+reachable only by a scripted player.
+
+`src/components/boss/duelSim.ts` is a TypeScript port so the arena can be **played** rather than
+replayed. It is verified, not assumed: `boss_cases.py port` records one duel's boss draws and buttons,
+and `scripts/boss_port_check.mjs` replays them through the port. Over 900 frames the largest
+disagreement in any position, angle, health or stamina is **5.0×10⁻¹³** and all counters are
+identical (14 of them at the time; 15 once poise added one).
+
+#### The arena's bodies and meters (2026-09-18)
+
+The first three.js pass drew both fighters as a capsule with a stick for a weapon. Replaced with posed
+rigs and a dressed room. **This was a renderer-only change** — `duelSim.ts`, `BOSS_SETUP` and every
+constant are untouched, `boss_port_check.mjs` still reports 5.0×10⁻¹³ with every counter identical,
+and `check-pages` is still clean over 763 pages, so nothing measured above went stale.
+
+- `src/components/boss/fighters.ts` — a knight (~1.7 units, steel and a blue cape, kite shield, sword)
+  and the boss (~2.9 units, horned helm, ember eyes, greatsword), both built from primitives as nested
+  groups so every joint can be posed. The pose functions read the SAME fields the simulation stepped —
+  `pa`, `pf`, `bm`, `bf`, `bStagger` — and return joint angles. They never write to the duel.
+- `src/components/boss/arenaScene.ts` — flagstones, wall, buttresses, four braziers, drifting dust, all
+  from `<canvas>` textures painted once at build time, plus a 64×32 equirectangular sky run through
+  `PMREMGenerator`. That environment map is not decoration: a `MeshStandardMaterial` with high
+  metalness and nothing to reflect has no diffuse term left and simply takes the colour of whatever
+  light reaches it, which is why the first pass looked like painted bronze.
+- The HUD is wired to real fields only: `php/P_HP_MAX`, `pst/P_ST_MAX` (with ticks at the parry, attack
+  and roll costs, dimmed while `pRegenLock` runs), `bhp/B_HP_MAX`, `bStagger/STAGGER`, and
+  `framesToActive(e)` as a countdown. It is written straight from the render loop through refs, so a
+  30 Hz duel never re-renders React.
+
+**Two honesty corrections the rebuild forced.**
+
+- The floor wedge was colouring the **delay** segment differently from the windup. The delay is
+  precisely the frames the boss spends holding a finished-looking windup and doing nothing, so a
+  different colour hands the player a tell the world does not give them — and it contradicted the page,
+  which already said the wedge is gold while winding and red on the frames that can hurt you. Windup
+  and delay now render identically, and so does the blade glow. The phase strip below the arena still
+  separates them, because it is labelled as an after-the-fact readout.
+- There is **no charge-up special in this world**, and one was not invented for the meter: adding a
+  resource would change the environment and stale every number above. The gold meter shows the riposte
+  window — `bStagger` counting down, during which an attack multiplies by `RIPOSTE_MULT` and after
+  which it does not. The page says this in as many words.
+
+**Measured, at 558×324, dpr 1:** `renderer.render` costs **1.47 ms** a frame (0.70 ms with a
+`gl.finish()`), over **74 draw calls and 4,952 triangles**, 8 programs, 4 textures.
+
+⚠️ **The rAF trap, hit a second time.** The arena appeared to run at 2.4 Hz. Before blaming the scene,
+measure a control page: a page in the same tab with **zero canvases** stalled the same way, with rAF
+gaps of 1–2 seconds. The pane, not the render loop, was the problem — which is exactly what the
+1.47 ms render cost says too. Screenshots are still reliable; the frame clock is not. Force the state
+you want to inspect and screenshot it rather than waiting for a moment to come round.
+
+#### Poise: a second way to stagger it (2026-09-18) — AN ENVIRONMENT CHANGE
+
+The user asked for a poise bar: stagger the boss by hitting it, not only by parrying it. This one is
+**not** renderer-only, so the numbers above that involve a player who attacks have moved and are
+re-measured here. `scripts/boss_cases.py poise` reproduces all three tables.
+
+**The mechanic.** A landed hit takes `POISE_HIT` off a pool of `B_POISE_MAX` that refills at
+`POISE_REGEN` a frame; empty it and the boss is staggered for `POISE_STAGGER`. Any stagger (parry or
+break) cancels the move it had out and refills the pool. Riposte hits do **not** drain poise — the
+boss is already down — so the multiplier is read before the drain, which means **the hit that breaks
+poise does ordinary damage and the riposte is the next one**. Shipped: 50 / 25 / 0.08 / 60, i.e.
+*two clean hits inside the same engagement*, a pool back in ~21 s, and a 60-frame opening.
+The observation grew from **26 to 27 floats** (`v[26] = b_poise / B_POISE_MAX`).
+
+**What the sweep settled, in order.**
+
+- With no refill, **only `ceil(pool / hit)` matters** — (45,15), (45,20), (60,20) and (60,25) print
+  digit-identical rows because they are all three hits. The pool and the per-hit number are one
+  parameter, not two.
+- **The refill rate decides *who* the mechanic is for**, and it does not switch off evenly. At
+  regen 0.40 the sidestepper is down to 0.21 breaks a duel while the masher still gets 0.97: hits
+  landed back to back survive a refill, hits spread across openings do not.
+- **The window length was the hard one, and it hid a trap.** Short windows are inert — at 40 frames
+  the punisher opens 2.0 breaks and cashes **0.20** of them, because the window shuts before it is
+  back in range with the stamina to swing. Conversion jumps from 0.76 to 1.81 between 56 and 58.
+  ⚠ And **52–56 REVERSES which avoider scores better** — rolling backwards beats rolling sideways
+  there and nowhere else, a resonance between the window and the sidestepper's roll-and-swing cycle.
+  58–64 is the only flat stretch where sideways still leads (+0.70 to +1.06), so the shipped value
+  is 60, the middle of it. Picking 55 "because a parry buys 55" would have landed inside the notch
+  and quietly inverted the finding this world was given a floor to demonstrate.
+- `POISE_STAGGER` (60) is therefore **longer** than `STAGGER` (55), which is the right way round: a
+  parry also negates the blow that opened it and costs 15 stamina with no setup, where a break costs
+  two landed attacks and the exposure of getting them in.
+
+**What it changed (200 held-out duels, poise off → shipped).**
+
+| player | bossHP | ownHP | breaks | G |
+|---|---|---|---|---|
+| mash attack | 149.2 → **67.0** | −13.2 → −12.6 | 1.97 | −32.24 → −23.35 |
+| block, punish | 193.1 → 163.9 | 37.8 → 41.9 | 1.00 | −1.83 → **+1.81** |
+| roll, punish | 148.1 → 95.4 | 65.4 → 72.0 | 1.72 | 5.42 → **11.66** |
+| sidestep, punish | 148.3 → 90.4 | 73.6 → 75.3 | 1.80 | 6.23 → **12.35** |
+| patient parry | −12.0 | 100.0 | **0.00** | 55.20 (unmoved) |
+
+- The **expert is untouched**: 200/200 on full health, never hit, and **0.00 breaks**, because
+  everything it lands is riposte damage already. The parry oracle went 192/8 → 195/5.
+- ⚠ **The cost: mashing now wins.** Walking in swinging lost 200 of 200 before poise; it now wins
+  **2 of 200** (and 1 of the 25 in the published cell). Still last by 26 points, but no longer a
+  policy that cannot possibly work — a reward for landing hits is a lottery ticket for the reckless,
+  and an agent is good at widening that kind of crack.
+- ⚠ **The aggression dial grew a second sign.** Before poise, `sidestep` sat flat at 70–74 hp across
+  the whole dial. Now it goes **69.1 → 79.0 hp as the boss gets angrier**, because a boss that
+  attacks more often offers an avoider more openings and openings are what poise pays for. The
+  blockers still fall (56.3 → 30.0, 48.7 → 29.0). The same knob is now difficulty for one kind of
+  player and a gift to another. At aggr 0.00 `sidestep` wins 6.7% — the first non-parrier to win.
+- **Unmoved:** `balance` (the 260-hp cliff), `rate` (R≤3 free, R=6 collapses to 21.7%), `refuse`
+  (run away 200/200 deaths at 89.3% wall frames) — none of those players ever land a hit.
+- The `arc` finding **survives at 60 and only at 60-ish**: sidestep 75.3 hp / 1.57 hits / arcX 2.47 /
+  G 12.35 against roll-backwards 72.0 / 1.81 / 0.00 / 11.66.
+
+**Also done:** `ATK_ARC = 0.90` was declared and never used — the player's attack is tested on reach
+alone — so it was deleted rather than left to imply an arc that does not exist.
+
+**Re-verified:** invariants PASS with a new `0 < b_poise <= B_POISE_MAX` check and poise breaks in
+branch coverage (3 from random play); the port replays 900 frames at **5.0×10⁻¹³** with **all 15**
+counters identical, and the recorded duel exercises the new branch (2 breaks, 0 parries); both
+runnable cells reproduce their published block by exact string equality in Pyodide.
+
+⚠ **`train.py` now needs a 27-float observation**, on top of already needing the v2 port.
+
+#### Chapters 6 and 7 drafted end to end (2026-09-18) — 12 pages, and six new measurements
+
+The user asked for a rough draft of every remaining page so they can be iterated one at a time. All
+**12** unbuilt pages now exist and are wired into `envBuildingTrack.ts`, so the track is **41 of 41**
+and no longer 0-blind only by omission. tsc EXIT 0; `check-pages` clean over **775** pages.
+
+⚠️ **Verification status, stated plainly.** Every published block on these pages is machine-generated:
+a scratchpad `regen.py` extracts each `codeX` cell out of the page, executes it against a FRESH copy
+of the shipped `BOSS_SETUP` namespace (which is what the browser's Run button does — `setup + cell`),
+and pastes the real stdout back into `outX`; standalone tables are spliced verbatim out of a named
+section of a `boss_cases.py` command by a scratchpad `secs.py`. So no number was transcribed by hand.
+**They have NOT yet been verified in Pyodide by exact string equality**, which is the standard every
+earlier page in this track met. That is the first thing the refine pass must do.
+
+**Six new `boss_cases.py` commands**, all reproducing what the pages publish:
+`states` · `timing` · `obs` · `curriculum` · `rewards` · `speed`.
+
+**⭐ `timing` — the windows, measured instead of declared.** A family of players identical but for one
+number k: press as soon as the next hitbox is k frames away or closer. At one decision a FRAME the
+parry works for k = 3..7 and **for nothing else** — 100% wins on full health inside, 4.58 hits taken
+and death outside. It is a cliff with vertical sides, which is the five-frame window written down as
+five frames, and there is no partial credit anywhere in the mechanic. At R = 3 only k = 5..7 is safe
+(k = 4 leaks 4.20 hits), because a press aimed at k can land as late as k-2 — **this is the R ≤ 3
+argument derived from the moveset rather than from training cost**. The roll is the same shape and
+twice as forgiving: k = 3..12 at R = 1, k = 5..12 at R = 3. Hardest timing, biggest payoff.
+
+**⭐⭐ `curriculum` — the moveset is a curriculum and the obvious ordering is BACKWARDS.**
+`Duel(moves=[i])` costs one argument because the moveset is data. Per move, 100 duels, own hp left:
+
+| move | mash | hold guard | block,p | roll,p | sidestep,p | oracle | patient |
+|---|---|---|---|---|---|---|---|
+| slash | −7.6 | 58.0 | 51.4 | 58.8 | 49.8 | 100% / 36.8 | 100% / 100.0 |
+| thrust | −10.0 | 50.7 | 49.0 | 71.2 | 71.2 | 99% / 36.6 | 100% / 100.0 |
+| heavy | −2.0 | 38.5 | 39.3 | **100.0** | **100.0** | 100% / 47.0 | 100% / 100.0 |
+| slam | −20.0 | 50.6 | 52.1 | **100.0** | **100.0** | 100% / 65.5 | 100% / 100.0 |
+| combo | −12.0 | **0.8** | 30.8 | −11.3 | **8.2** | **44%** / 0.3 | 100% / 100.0 |
+| ALL FIVE | −12.6 | 45.8 | 42.6 | 68.9 | 75.3 | 96% / 41.3 | 100% / 100.0 |
+
+The two attacks the brief calls frightening are the EASIEST — both avoiders finish untouched — because
+a long telegraph is only frightening to something with a reaction time. `combo` is the hard one and the
+**only move that beats the greedy expert** (44% against 99–100%). ⭐ The mechanism is an interaction
+between two numbers written on different pages: combo's hitboxes are **12 frames apart** and the roll's
+i-frames are **10 frames wide (3..12)**, so *no press covers both hits*, and the roll is 18 frames long
+so you cannot press a second. `patient parry` is untouched because **a parry cancels the move**, so the
+second hit never happens. A roll survives an attack; a parry deletes it.
+
+**⭐⭐ `delays` (in `boss_train.py`) — the parry window of BOTH delayed attacks is INSIDE the hold.**
+The probe: when a policy presses a defensive button, how many frames away is the hitbox? `patient parry`
+is flat at **4.0 / 4.1 / 4.0 / 4.0 / 4.0** across all five moves (sidestep: 7.0–7.9), which is what
+"reads the animation clock" looks like as a table and is the reference a trained policy is compared
+against. The finding fell out of the phase breakdown: the expert presses parry on 7% of its decisions
+during windup frames and **30%** during delay frames. Arithmetic: heavy's hitbox is at frame 28 and the
+press must land on 21–25, while the hold runs 20–27; slam's hitbox is at 36, press 29–33, hold 24–35.
+**"Wait out the delay" is exactly wrong for a parrier — the delay IS the window.** Nobody designed
+that; it is the second mechanic in this world produced by two independently chosen numbers.
+
+**⭐ `rewards` — the turtle, in exact arithmetic, with no training.** Three rewards × two clock rules ×
+8 players, 200 duels. Under `survive` + neutral clock `hold guard` scores **exactly 30.00** (900 frames
+at 1/30) and a win is worth **exactly +30**: refusing to fight and finishing the fight are the same
+number, and the only difference is elapsed time — so a *slower* win scores better (29 s → 59.0, 10 s →
+40.0). Under `trade` (dealt only) `hold guard` scores **exactly 0.00**: never deals, never charged.
+Under `damage` + `defeat` every non-winner is squeezed into −17…−41 and mash attack (dead at 14 s)
+outscores hold guard (alive at 30 s on 45 hp), −23.35 vs −35.47. Shipped stays `damage` + `truncate`,
+and the justification is the wall: on a floor refusal already dies, so the neutral clock no longer pays
+it. **The environment did the job the reward was being asked to do.**
+
+**`obs` — the observation, and a range check that found two real defects.** Printed labelled off a
+real duel at a delay frame; `v[18] phase = DELAY` reads 1.000, which the screen refuses to tell a human.
+Worse (better?): `v[11..15]` and `v[16]` *determine* the phase, so deleting the flags removes a
+convenience not a secret. Delay is **5.5–7.4%** of a duel's frames (~50 a duel). ⭐ The expert spends
+**0 frames** watching a recovery, because it cancels every move it sees. Range check over 20 duels:
+**`v[21]` reaches 1.091** (stagger ÷ STAGGER=55 while a poise break sets 60) and **`v[23]` is a raw
+radian up to 1.40** against `v[22]` ≤ 0.45 — "I normalised everything" was a claim and two thirds of it
+was true. Not fatal (learned first layer), but published rather than tidied away.
+
+**`speed` — 117,030 frames/s on one core** (`stand still`), 119,734 (`patient parry`), best of 3 with
+nothing else running ⇒ ~39,000 decisions/s at R=3. A 2M-decision run is 6M frames ≈ **90 s of
+simulation** inside an hour of wall clock, so the env is **under 2%** of training. World 2 profiled,
+found fire_tick at 80% and vectorised for 8.0–8.7×; World 3 ran the same measurement and **wrote no
+vectorised code at all**. Same discipline, opposite conclusion. The 64-duel divergence check is on the
+page: at any frame the duels are spread over five of the boss's six situations, so a masked-vectorised
+step would run every branch and throw most of it away.
+
+#### `scripts/boss_train.py` — NEW (2026-09-18)
+
+DQN + PPO against the extracted `BOSS_SETUP`, scored through the SHIPPED `score()` on seeds 1000–1199,
+so a trained policy is literally a new row in the sanity ladder. MLP 27→256→256→16 (DQN) and a 128-wide
+actor-critic (PPO). Budgets in **decisions** (1 decision = 3 frames; a duel is 300). Commands:
+`dqn` · `ppo` · `ladder` · `race` · `report` · `probe` · `delays` · `bench` · `version`.
+Runs write `results/boss/<tag>.json` + `.pt`.
+
+⚠️ **The envs are batched (16 by default) and NOT because the duel is slow.** One decision costs one
+GPU round trip and 16 in a batch cost about the same as one. `bench` measures the four layers — duel
+alone, + one forward per decision, + the forward over 16 duels, + half a gradient step per decision —
+and must be run on an idle machine.
+
+#### ⭐⭐ The v2 run landed: DQN reaches the expert's win rate, and the delay probe says it CHEATED
+
+**`dqn_2000k_s0` — DQN, seed 0, 2,000,000 decisions, shipped world (poise, neutral clock, `damage`
+reward), 63 min on the 1660 Ti.** Held out over the same 200 duels every scripted player sat:
+
+| | win | die | bossHP | ownHP | parry | poise | swing | hits | guard% | G |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| **the trained net** | **200** | 0 | −12.1 | 83.6 | 4.63 | **0.00** | 7.01 | 0.85 | 0.2 | **53.57** |
+| patient parry | 200 | 0 | −12.0 | 100.0 | 8.56 | 0.00 | 7.00 | 0.00 | 0.0 | 55.20 |
+| parry oracle | 195 | 5 | −8.6 | 44.7 | 4.58 | 0.26 | 9.23 | 2.71 | 0.0 | 47.83 |
+
+⭐ **It matches the expert's win rate**, lands between the two experts on score, and gets there by
+parrying — with **0.00 poise breaks**, exactly like the expert, because all its damage is already
+riposte damage. ⭐ **7.01 swings against the expert's 7.00**, and that is arithmetic rather than
+coincidence: a riposte is 12 × 3 = 36 and the boss has 240, so 7 is the number the world allows.
+The cost of its worse method is 0.85 hits a duel and 83.6 hp against 100.0.
+
+⭐ **The curve is violently non-monotone and the run's own DecisionPoint predicted it.** Zero wins
+through the first six evaluations (to 1.0M), then 22% / 59% / 68%, **100% at 1.3M**, then a collapse
+to **91% at 1.5M and 69% at 1.6M**, then 100% from 1.7M on. A budget of 1.6M would have reported a
+69% duellist and 1.3M a perfect one, from the same run. ⭐ It also VISITS AND LEAVES both local
+optima the scripted ladder predicted: poise breaks peak at **1.28 a duel at 900k** and are **0.00**
+from 1.4M, and guard frames peak at **27.3% at 900k** (the turtle forming) and end at 0.2%.
+
+⭐⭐ **`delays` — it did NOT learn to wait, and the probe caught it.** Median notice, frames to the
+hitbox, and the share landing inside the usable band:
+
+| move | expert median / in-band | trained median / mean / in-band |
+|---|---|---|
+| slash | 4 / 100% | 5 / 5.2 / 73% |
+| thrust | 4 / 100% | 4 / 4.1 / 59% |
+| **heavy** (delayed) | 4 / 100% | **6 / 9.1 / 49%** |
+| **slam** (delayed) | 4 / 100% | **6 / 11.0 / 45%** |
+| combo | 4 / 100% | 5 / 4.6 / 68% |
+
+The two delayed attacks are measurably the ones it handles worst — the brief's promise CONFIRMED —
+but the method is brute force, not patience. It makes **925 and 1051** defensive presses against
+heavy and slam where the expert makes **465 and 496**, presses parry on **44%** of its delay-frame
+decisions against the expert's 30%, and converts about **30%** of its presses into parries against
+the expert's ~100% (15.4 presses a duel → 4.63 parries, vs 8.6 → 8.56). A parry costs 15 stamina, the
+cheapest action in the world, so throwing it repeatedly through a long hold is affordable: it turns a
+timing problem into a volume problem and pays 0.85 hits a duel for it.
+⚠️ **A page reporting only the win rate would have called this "it learned to parry" and been wrong
+about the exact thing this world was built to study.** This also sharpens why the masked-observation
+ablation is the experiment that matters: the brute-force answer is available only *because* the
+policy knows a hitbox is coming and roughly when.
+
+⚠️ **Probe confound found and closed before any prose was written.** The first version counted every
+defensive press, including ones made at a safe distance — which the scripted players never make,
+since they gate on `will_connect`. Split the buckets and re-ran: **99% (net) and 100% (scripted)** of
+presses were made while the attack could actually have reached, so the early pressing is real. The
+confound was empty, but it was checked rather than assumed.
+
+**`bench` — where a training second goes** (1660 Ti, idle machine, best of 3): duel alone 18,457
+dec/s · + one forward per decision **2,108** · + that forward over 16 duels **15,622** · + half a
+gradient step **684**. So the duel is **26×** faster than the cheapest loop that trains on it, and
+batching bought **7.4×** — for the GPU round trip, not for the env. 684 dec/s × 2M ≈ 49 min, against
+63 observed, the rest being evaluations.
+
+⚠️ **Two of my own errors, caught by arithmetic rather than by review.** (1) The `speed` note said 6M
+frames is "about a minute and a half of pure simulation"; it is **under a minute** (6M ÷ ~115k), and
+the env's share of the run is **1.4%**, not the "under 2%" I first wrote by luck. (2) `bench`'s first
+row (55k frames/s) contradicted `speed` (115k) on the same page. Rather than pick one, the gap was
+decomposed and the decomposition added to `bench`: ×0.82 random play resets more often, ×0.87 the
+obs() call, ×0.95 the replay writes, ×0.83 stacking the batch = ×0.56, and the rest is the batching
+wrapper. ⚠️ Timings also move 108k–117k run to run — **quote ranges, never digits**, as World 2 had
+to learn on its vectorisation page.
+
+**Still unrun:** the PPO arm, two more DQN seeds, and the masked-observation ablation. The v1
+DQN-vs-PPO race remains STALE and is not quoted anywhere.
+
+#### Pages drafted (all 12), and what each is gated on
+
+| page | the spine | gated on |
+|---|---|---|
+| A moveset as a state machine | a move is DATA; three states not five; what the table bought | `states` |
+| Frames, hitboxes and i-frames | reach AND arc; facing commits; the roll window measured | `timing`, `arc` |
+| Stamina and the perfect-guard window | sustainable rate 2.2 s a roll vs 3.2 s between attacks; R ≤ 3 | `chip`, `rate`, `timing` |
+| What the agent sees | 27 floats, and v[18] hands over the secret | `obs` |
+| Thousands of duels at once | measure which cost dominates; here, don't vectorise | `speed`, `bench` |
+| Scripted players and a difficulty dial | the ladder as eleven arguments; the dial has two signs | `ladder`, `refuse`, `dial` |
+| Curriculum: one move, then the set | per-move difficulty inverts the obvious ordering | `curriculum` |
+| Training the duellist | the exam predates the student; report the curve | `boss_train.py dqn` |
+| The turtle | three rewards × two clocks, hacked before training | `rewards` |
+| What it learned about delayed attacks | the notice column; the window is inside the hold | `delays` |
+| Sim vs the real game | five gaps; reaction arithmetic; imitation goes the other way | arithmetic only |
+| Three worlds, one pipeline | the five steps and the eight findings common to all three | quotes W1/W2 |
+
+⚠️ **Still owed after this session:** the PPO arm and two more DQN seeds; the masked-observation
+ablation (`v[11..20]` → one flag + a recurrent policy), which is the experiment that would actually
+settle the brief's delayed-attack promise and is named as such on the page; and a browser eyeball of
+all 12 pages (four were checked). The four `pending:` blocks are now FILLED — `speed`, `bench`,
+`curve` and `delays` all landed after the training run.
+
+#### Chapters 8 and 9: how to BUILD it and how to TRAIN it, line by line (2026-09-19)
+
+User: *"have you provided how to train it step by step code by code line by line, same for env
+creation? If needed also run 1 epoch or step on cpu but also guide how to run it on GPU if it boosts
+speed. Also in end there should be a representation on how the trained agent works against the enemy,
+a lab showcasing it."* All three gaps were real. World 3 explained every design **decision** and never
+showed the code being written; `training-the-duellist` argued about budgets and evaluation and
+contained **zero lines of DQN**; and eleven of the twelve pages had no lab at all.
+
+**Three new pages, track now 44 of 44.**
+
+| page | where | what it is |
+|---|---|---|
+| `writing-the-duel` | after stamina | `step()` in its six numbered sections, the three lines that matter priced, then a full `MyDuel(Duel)` the reader assembles and checks frame for frame |
+| `the-training-loop` | before `training-the-duellist` | DQN written out in numpy and runnable in-browser: one gradient step, then the same step in a loop; then the real commands, CPU first; then the GPU question, measured |
+| `watch-it-fight` | after the delay probe | the trained net in the 3D arena with its sixteen Q-values live, plus the chain of checks that makes it the same policy |
+
+⭐⭐ **The GPU answer is no, and it is measured.** New `boss_train.py devices` runs the same four loops
+on both devices. On a GTX 1660 Ti, against this world:
+
+| loop | cpu | cuda | speedup |
+|---|---:|---:|---:|
+| the duel alone (no tensors — the control) | 19001 | 19116 | **1.01x** |
+| + a forward per decision, 1 duel | 4458 | 1876 | **0.42x** |
+| + the same forward over 16 duels | 16013 | 12755 | 0.80x |
+| + half a gradient step (what a run IS) | 639 | 636 | **1.00x** |
+
+A 2,000,000-decision run costs ~52 min of loop either way. Take the environment out and the crossover
+appears: batch 256 → **0.99x**, 1024 → 1.94x, 4096 → 6.99x, 16384 → **13.20x**, 65536 → 15.55x. So the
+rule to teach is *the batch size at which a GPU starts to pay*, not the hardware.
+
+⚠️ **The user asked twice whether this was really using the GPU** — first "still running on cpu it
+seems", then "now it seems you are using integrated GPU not my nvidia dedicated GPU". Both were fair,
+and answering them properly improved the page. The script now proves it: it names every adapter
+Windows sees (the machine has a 1660 Ti **and** an Intel UHD 630), shows `torch.cuda.device_count()`
+is 1 because CUDA is NVIDIA-only silicon, and measures **4341 GFLOP/s = 80% of the 1660 Ti's ~5.4
+TFLOP/s peak** — an order of magnitude beyond any integrated part. The card is real and it is *bored*:
+median utilisation **19%** at batch 256, 97% at 65536. It looks idle in Task Manager partly because it
+nearly is and partly because Task Manager graphs the **3D** engine while CUDA lands on **Compute_0**.
+
+⭐⭐ **`probe` rewritten, and it corrected the page I was about to ship.** The button histogram alone
+is misleading, because a press is not an action. New second section counts what the world did with
+each press, per duel:
+
+| button | presses | started | dropped: committed | dropped: too poor |
+|---|---:|---:|---:|---:|
+| attack | 33.3 | **7.00** | 23.3 | 3.1 |
+| parry | 16.8 | 4.73 | 11.3 | 0.8 |
+| **roll (all four)** | **23.0** | **0.01** | 14.8 | 8.0 |
+
+⭐ **It asks to roll twenty-three times a duel and rolls 0.01 times.** I had written that it "never
+rolls" and had "decided the roll is a worse deal than a parry". Both false: it is asking constantly
+and being **refused** — half the presses arrive while committed, the rest when it is under 25 stamina,
+because it has already spent that stamina attacking and parrying. I had also written "it barely
+moves"; walking is **38%** of its decisions. Both bullets were guesses dressed as observations, and
+the lab is what exposed them — the very first Q-panel snapshot showed it pressing a walk button.
+
+⚠️ **Two measurement bugs of my own, both caught by a number that could not be true.**
+1. The first `probe` said **0.96** attacks a duel against a ladder that says **7.01**. Cause: a
+   decision holds one button for 3 frames and `step()` reads it on *every* one, so a press refused on
+   the decision frame is often accepted on the next. Counting only the decision frame undercounts by
+   7x. Fixed, and the table now prints a **self-check** that re-derives two columns from the shipped
+   log counters and says `ok`/`MISMATCH`.
+2. `devices` gave **0.96x, 0.84x and 1.49x** on the tensor-free control row across three runs — a row
+   that must be 1.00x. Cause: all cpu reps ran before all cuda reps, so background load landed on one
+   side. Now **interleaved** cpu/cuda/cpu/cuda per loop; the control row reads **1.01x** and the
+   script prints a verdict on its own control row and tells you to throw the table away if it drifts.
+   Also `cuda memory allocated` was reporting the whole *process* (18 MB) rather than the net (301 KB).
+
+⭐ **New `scripts/boss_regen.py`** — promoted from a scratchpad tool. Executes every `const codeX` on a
+World 3 page against a fresh `BOSS_SETUP` and writes the real stdout into `const outX`; `--check --all`
+verifies without writing. **It now reports clean across every World 3 page**, which is the exact-string
+guarantee the track has been owing. Three cells were additionally run through the browser's own Run
+button and came back **byte-identical** to the published blocks.
+
+**The lab.** `DuelArenaLab` gained a `showNet` prop (off by default, so page 1 neither spoils the
+ending nor fetches 300 KB). The trained net plays in the 3D arena with a live sixteen-bar Q panel.
+Three new pieces make the claim honest rather than decorative: `Duel.obs()` ported into `duelSim.ts`,
+`src/components/boss/trainedPolicy.ts` (pure array arithmetic, imports nothing, so node can load it),
+and `scripts/boss_policy_check.mjs`, which replays 505 recorded states and checks weights by sha1,
+`obs()` to **5e-10**, Q-values to **1.2e-5**, and **505/505 identical buttons**.
+
+⭐ **An unplanned finding from building it:** the mean gap between the best and second-best Q-value is
+**0.065**, on values around forty. The policy is close to indifferent nearly everywhere — which is a
+plausible mechanism for the violently non-monotone curve, since a policy balanced on knife edges does
+not degrade gracefully, it flips.
+
+#### The Q panel was drawing nothing, and I had already measured why (2026-09-19)
+
+User, with a screenshot: *"the thinking part is not seen."* Correct. The sixteen-bar panel computed
+the right Q-values and displayed none of them legibly, because it min-max normalised inside each
+frame: `(q - worst) / (best - worst)`.
+
+New `scripts/boss_qspread.mjs` measures what that divides by, over 32,537 decisions:
+
+| | p10 | median | p90 | max |
+|---|---:|---:|---:|---:|
+| fan (best − worst) | 0.20 | **0.84** | **5.35** | 9.50 |
+| margin (best − 2nd) | 0.00 | 0.03 | 0.19 | 2.27 |
+
+A full-width bar therefore stood for 0.84 of Q in one frame and 5.35 in the next, and **31% of the
+panel** sat pinned against the right-hand edge on an average frame. Replaced with a **fixed ±4
+scale** diverging from the mean, signed-square-root compressed, with a visible centre line: it
+clips 3% of bars, which is the price of two frames being comparable at all. Q-values also run
+**15.4 to 35.9**, not "in the forties" as two pages claimed.
+
+⭐ The sting: the mechanism was a number I had already published — a mean best-vs-second-best
+margin of **0.065** — and I then built a visualisation that divides by exactly that quantity. The
+finding and the bug were one fact, a week apart.
+
+Two smaller bugs fixed alongside. Building the bars under `if (!qGrid.childElementCount)` starves
+the **second** run of the effect (fast refresh, StrictMode) of its node references while the DOM
+keeps the first run's nodes, so the panel can sit at `--` for ever while the net plays on perfectly
+— rebuilt with `replaceChildren()`. And in the first version of the measuring script,
+`new Duel({ seed })` silently ignored `seed` (DuelOpts takes an `oracle`), so "40 duels" was one
+duel forty times; the tell was statistics identical across two different sample sizes.
+
+#### The masked-observation ablation, built (2026-09-19)
+
+`obs()` hands the network the boss's animation state outright: `v[11..15]` which move, `v[16]` how
+far into it, `v[17..20]` which segment, `v[22..24]` its reach, arc and whether that hitbox covers
+you now. **Fourteen of twenty-seven floats**, and between them they make "windup or delay?" a
+lookup rather than a question — which is the thing `what-it-learned-about-delayed-attacks` claims
+was learned.
+
+`boss_train.py` gained a `View` between `env.obs()` and the first `Linear`, plus `--obs masked`
+(those fourteen floats → one flag: *a move is out*) and `--stack k` (show the last k observations,
+so timing can come from memory). `full x1` is the default and is byte-identical to before — `probe`
+reproduces its published block exactly. Measured on a real `heavy` at frame 18 (windup) versus
+frame 24 (delay):
+
+| view | floats that differ between the two phases |
+|---|---|
+| full | **5 of 27** — including v[16] the frame counter, v[17] "is windup", v[18] "is delay" |
+| masked | **2 of 15** — distance and the clock, i.e. nothing about the attack |
+
+So under the mask the two phases are genuinely indistinguishable from a single frame. New `ablate`
+command scores each arm and reports **TV(windup, delay)**: the total-variation distance between
+what a policy presses in the two phases. 0.00 means it cannot tell them apart.
+
+**RESULT (2026-09-19).** Three arms at 2,000,000 decisions, seed 0, all other defaults:
+
+| arm | win | TV(windup, delay) | notice, delayed | notice, plain |
+|---|---:|---:|---:|---:|
+| full x1 (the shipped `dqn_2000k_s0`) | **200**/200 | 0.49 | 10.1 | 4.7 |
+| masked x1 | **96**/200 | 0.18 | 17.0 | 6.6 |
+| masked x16 | **0**/200 | 0.35 | 18.0 | 7.3 |
+| `patient parry` (scripted, reads the clock) | 200/200 | **0.22** | 4.0 | 4.0 |
+
+**Strip the animation state and it falls 200 -> 96.** About half of what looked like skill was the
+observation. The delayed-attack lesson was substantially handed over, not learned.
+
+⭐ **The statistic needed its own control and nearly fooled me.** TV 0.49 (full) vs 0.18 (masked)
+reads as "the full one understands timing" -- until you see that `patient parry`, which provably
+reads the animation clock, scores only **0.22**. A high TV is not understanding: the full net's
+0.49 comes from parrying 44% during a DELAY against 13% during a windup, which is exactly what
+reading `v[18] = phase is DELAY` gets you with no model of time at all. Without the scripted row in
+the same table I would have reported it backwards.
+
+The honest column is *notice*: the full net commits to defence at **10.1 frames** on delayed
+attacks, the masked one at **17.0**. It does not wait longer and guess -- it bails EARLIER (26% of
+its windup decisions are a roll). Unable to tell a windup from a delay, it stops timing anything
+and leaves. Coherent, and worth 96 wins.
+
+⚠️ **Two things this did NOT establish.** (1) The mask drops fourteen floats, not just the two
+phase flags -- move identity, reach, arc and "covering you now" go too. So 200 -> 96 is the cost of
+losing all animation state and does not isolate the delay flag. A surgical `v[17..20]`-only arm is
+the follow-up. (2) **The memory arm failed.** `masked x16` won zero evaluation duels at EVERY
+checkpoint across 2M decisions and ended swinging 0.11 times a duel -- it learned to stand still.
+Its TV of 0.35 is noise from a degenerate policy. 240 inputs against 27 on identical
+hyperparameters did not train; whether memory can recover the lesson is **still unanswered** and
+needs a rerun tuned for the wider input.
+
+#### World 3 v2: the fight rebuilt (2026-09-19)
+
+User: *"make boss more elden ring like ... boss has sweeps, aoe strong attack fast attack weak attack
+and only 1/10 of a second parry window but window gets smaller if you spam parry (just like sekiro)."*
+
+Built as a SECOND world, not a patch. v1 (`BOSS_SETUP`, hash `b126aab75e2b`) is frozen and still
+backs all 44 published pages and the 200/200 net; v2 is `BOSS_SETUP_V2` + `duelSimV2.ts` +
+`scripts/boss_v2_train.py`. Nothing in v1 moved -- verified after every change.
+
+**Eight moves.** `jab` (18f total, under reaction time), `sweep` (arc 1.90 rad, no side to step
+to), `eruption` (full circle to 4.2m, **unblockable by guard AND parry**), plus v1's slash, thrust,
+heavy, slam, combo. Player gained a heavy attack: one hit breaks poise where the light needs two.
+Ring 8m -> 11m, obs 27 -> 32 floats, actions 16 -> 17.
+
+**The parry.** Researched rather than guessed: Sekiro's deflect is 12f at 60fps, shrinks with each
+recent guard press to ~4f and to 0 if mashed, clears after ~30f or instantly on a success. Ported
+to 30fps: **3-frame window (a tenth of a second), -1 per press inside 30 frames, floor 0, cleared
+outright by a parry that lands.** Recovery is 16f and heat is 30f *on purpose* -- pressing again as
+soon as the game allows is what wears it out. A rule punishing an input you cannot make teaches
+nothing.
+
+`parryStack` and `parryHeat` are in the observation (v[30], v[31]). Hiding them would have made the
+window depend on a press 30 frames ago that a feedforward net cannot see: partially observed for no
+reason.
+
+**Measured before any GPU was spent** (`scripts/boss_v2_probe.mjs`, 200 duels each):
+
+| player | win | parry presses | landed |
+|---|---:|---:|---:|
+| random | 0/200 | 517 | 2.1% |
+| mash parry | 0/200 | 2763 | **1.5%** |
+| patient parry | **141/200** | 872 | **63.6%** |
+
+42x the success rate off 3.2x fewer presses; 598 of mash's presses had no window left at all.
+Random and mash win nothing, patient wins 71% -- not solved by luck or by one button, but learnable.
+
+`scripts/boss_v2_cases.py parry` isolates the threshold with a *blind* periodic presser: dead
+windows go from 722 below a 30-frame gap to **exactly 0** at or above it. Not a gradient -- the rule
+showing through.
+
+**Parity:** `boss_port_check_v2.mjs` feeds the TS and the Python identical boss decisions --
+**19,125 state values identical** over two recorded duels, all 18 counters, parry stack/heat/window
+included. The mashing duel is recorded deliberately: it is the only thing that drives the fatigue
+counter to its ceiling.
+
+**Visuals, shared by both worlds.** `arenaScene.ts` rebuilt (two-tier colonnade, gate flanked by
+colossi, banners, six braziers with embers, cold rim light) and now takes a radius, so v2's 11m ring
+gets a proportionally bigger room for free. `fighters.ts` detail pass on both rigs (horns, cloak,
+furnace-through-cracked-iron for the boss; great helm with breath slits, gorget, surcoat, scabbard
+for the knight) and its pose functions take a `PoseRules` so ONE renderer draws both worlds. Camera
+pulled back 4.1m -> 6.0m and FOV 48 -> 55, because the old framing had the room entirely off-screen.
+New page `/learn/building-environments/a-harder-fight` with the playable v2 lab (779 pages, clean).
+
+⚠️ Two measurement traps hit while checking this, both mine, both worth remembering: a second
+browser tab running another WebGL arena dragged the pane to 1.2 fps and looked exactly like a
+performance regression in the new scene (it is 87 fps with one tab); and rAF only pumps while the
+pane is compositing, so DOM-scraped "the clock is frozen" readings during a tool call are an
+artifact, not a stall.
+
+#### It found a stunlock, and the stunlock was mine (2026-09-19)
+
+The DQN trained against v2 for 2M decisions and won **198/200**. The question I had posed was
+"does it learn to stop pressing the parry button"; the answer was a third option I had not
+considered. **It never pressed it. 0.01 parry presses a duel, 0.04 rolls, guard on 0.1% of
+frames** -- no defence at all, in a fight built entirely around defending.
+
+Instead: 6.25 heavy attacks a duel, 3.17 poise breaks, **73.7% of its damage from ripostes**,
+300 HP boss dead in 12.8 seconds.
+
+Cause, one line of mine: `POISE_HIT2 = 50` against `B_POISE_MAX = 50`. One heavy broke poise
+*from full, every time*, and a break is 60 frames of stagger in which every hit does 3x. Heavy ->
+break -> two free ripostes -> repeat. **I tightened the defence and, in the same edit, handed the
+player a heavy attack without re-checking the arithmetic where those two changes met.** Every
+scripted player looked fine, because none of them was optimising.
+
+Fix: heavy worth 36 against a pool of 70, so a break costs TWO commitments. Poise became a
+constructor argument so the broken build stays reproducible -- `scripts/boss_v2_stunlock.py` runs
+both side by side:
+
+| arm | win | duel | riposte share | breaks | parries | rolls | guard |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| exploiter, broken world | **198**/200 | 12.8s | 73.7% | 3.17 | 0.01 | 0.04 | 0.1% |
+| same net, fixed world | **62**/200 | 17.1s | 40.9% | 1.48 | 0.01 | 0.43 | 0.6% |
+| patient parry, broken | 136/200 | 22.1s | 81.7% | 1.28 | 4.08 | 1.26 | 0% |
+| patient parry, fixed | 87/200 | 24.2s | 73.9% | 0.71 | 4.39 | 1.42 | 0% |
+
+The control matters and is stated honestly on the page: the fixed world is harder for
+**everybody** (patient 136 -> 87). What separates them is the size of the drop -- control loses
+36% of its wins, exploiter loses 69%, and that 33-point gap is the part of its record that was
+the stunlock rather than the policy.
+
+⚠️ **Near-miss worth remembering.** Making poise a constructor argument used a whole-file
+`str.replace`, and `BOSS_SETUP` and `BOSS_SETUP_V2` share `Duel.__init__` verbatim -- so the edit
+silently moved FROZEN v1 off `b126aab75e2b` to `3b479d127a75`. Nothing complained until
+`boss_regen.py --check --all` failed with `NameError: POISE_HIT2`. Restored by slicing the v1
+block alone and refusing to write unless it hashed back. Edit one embedded setup by slice, never
+by whole-file replace, and verify the frozen one by hash.
+
+**RESULT: the script beats the net.** Same hyperparameters, same 2M decisions, fixed world:
+**73/200** for the DQN against **87/200** for the hand-written `patient parry`. First time in
+World 3 that the learned policy loses to the if-statements it was meant to beat.
+
+It still does not parry -- **0.09 presses a duel** against the script's 4.39 -- but when it does
+press it lands **64.7%**, against the script's 61.9%. It did not fail to learn the discipline; it
+learned the discipline and declined to use the button. What it built instead is evasion: roll in
+23% with no move out, move in 36% / roll in 25% during recovery, guard 17% on active frames. It
+punishes recovery windows rather than contesting attacks.
+
+Two readings the evidence does not separate: the parry is priced out (3 frames, 15 stamina, 16
+frames of recovery if wrong) and evasion is correct; or 2M is not enough. The **curve favours the
+second** -- last five evals 24, 24, 33, 38, 37, still climbing at the budget's end, where v1 was
+flat by 1.3M. So the next experiment is a longer run, not a rebalance. Stating which before running
+it would repeat the mistake made two sections up.
+
+State of v2: scripted ceiling 87/200, best learned 73/200 and rising, mash-parry still 0/200. Not
+a solved environment, which is the point.
+
+⚠️ **Still owed:** the PPO arm, two more DQN seeds, the surgical `v[17..20]`-only ablation, a
+retuned memory arm, a longer v2 run, and a browser eyeball of the nine World 3 pages
+not yet checked.
+
+## World 3 · Boss fight — prototype log (started 2026-09-15)
+
+Prototype in scratchpad `bf/` (`bf.py` the duel · `players.py` the scripted duellists ·
+`ladder.py` the sanity ladder · `checks.py` invariants and determinism · `train.py` DQN + PPO ·
+`probe.py` behaviour probe). **Nothing is shipped yet.** Every number below was measured before any
+prose was written about it, and two of the plan's own predictions have already been refuted.
+
+**The frame is the unit.** 30 frames a second, 900 frames (30 s) on the duel clock. Both fighters are
+state machines, and a move is a list of segments: `w` windup · `d` delay (a hold that looks exactly
+like windup) · `h` active frames · `r` recovery. That representation *is* the design — it makes
+"wait out the delayed attack" a property of a data table rather than of special-case code.
+
+Boss moveset (windup/delay/active/recovery frames · reach · damage):
+`slash` 14/–/3/16 · 2.2 · 18 — `thrust` 18/–/2/22 · 3.2 · 22 (advances 0.07 a frame) —
+`heavy` 20/**8**/4/28 · 2.5 · 34 — `slam` 24/**12**/5/30 · 2.4 · 30 — `combo` 12/3 then 9/3, rec 22 · 2.1 · 14.
+
+Player: 100 hp, 100 stamina. attack 8/2/14, reach 1.9, 12 dmg, 20 stamina · roll 18 frames with
+**i-frames 3–12**, 25 stamina · **parry 22 frames with a five-frame window at frames 3–7**, 15 stamina ·
+guard blocks 80% and costs 0.6 stamina per point blocked; stamina to zero is a guard break (45-frame
+lockout). A parry staggers the boss for 55 frames and hits during a stagger do **3x**.
+
+### Locked by measurement, not by taste
+
+- **Boss 240 hp, riposte x3.0.** Sweep boss hp {200,220,240,260} x riposte {2.5,3.0,3.5}, 120 duels
+  each. The outcome is a **step function, not a slope**: at 260 hp / x2.5 the flawless defensive player
+  falls from 94.2% wins to **18.3%** while still never taking a single hit. Nothing about its play
+  changed — it ran out of clock. 240 / x3.0 sits one notch inside that cliff.
+- **One decision every 3 frames.** Sweep R in {1,2,3,4,6,8,12} (120 duels): the expert is untouched at
+  R <= 3 (100% wins, 8.4–8.5 parries), dips at R=4 (95.8%) and **collapses at R=6** (21.7% wins,
+  76.7% deaths, parries 8.5 -> 4.1). The parry window is five frames wide and the press has to land in
+  a three-frame band, so R <= 3 guarantees a decision inside it and R=6 cannot. ⭐ **The decision rate
+  is not a training-speed knob: below a threshold set by the tightest window in the moveset it deletes
+  a mechanic.** R=3 costs nothing and buys a third of the decisions (300 an episode, not 900).
+
+### ⚠️ Design bug found by the first trained agent: the boss could not catch anyone
+
+v1's boss closed the gap only while idle and in cooldown, and at 0.055 a frame against the player's
+0.090. **Walking backwards was therefore a strictly safe, strictly free refusal of the whole duel** —
+and both learners found it. Held-out, after 600k decisions on v1 physics:
+
+- **PPO, all three seeds: 0 wins, 0 deaths, boss on 240.0 of 240 hp, own hp 99.7, 0.00 swings, 0.01
+  hits taken, return 0.00.** It never attacks and is never touched. Not a turtle — a refusal.
+- DQN was *inconsistent across seeds on the same reward*: seed 0 fought and won **16.5%** (boss down to
+  43.3, 12.58 swings, 1.31 parries), seed 1 fought and stalled (0% wins, boss 73.6, **0.00 parries**),
+  seed 2 refused exactly like PPO (240.0, 0.00 swings).
+
+⭐ The mechanism is arithmetic, not learning: player retreat 0.090 > boss close 0.055, so the gap grows
+0.035 a frame until the 6.0 cap, and every boss reach is under 3.2. A sweep of boss walk speed alone
+did **not** fix it (even at 0.140 the runner still took 0.21 hits a duel), because the boss also
+stopped closing whenever it committed to a move it could not land, and again through every cooldown.
+**The fix is two lines: it closes every frame it is not mid-move, at a run-up speed of 0.130 when
+further than 2.6 and a shuffle of 0.055 once nearly in range.** Costs the experts nothing (patient
+parry still 200/200 on 100 hp).
+
+### Sanity ladder — 200 held-out duels (seeds 1000–1199), locked config, chasing boss
+
+| player | win | die | clock | boss hp left | own hp | duel s | mean dist | parries | blocks | breaks | hits taken | swings | guard% | G |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| stand still | 0 | 200 | 0 | 240.0 | −13.6 | 11.3 | 1.46 | 0.00 | 0.00 | 0.00 | 4.56 | 0.00 | 0.0 | −41.36 |
+| random buttons | 0 | 200 | 0 | 216.1 | −13.6 | 15.2 | 1.54 | 0.26 | 0.28 | 0.18 | 4.65 | 2.91 | 5.6 | −38.97 |
+| mash attack | 0 | 200 | 0 | 145.6 | −13.6 | 11.2 | 1.34 | 0.00 | 0.00 | 0.00 | 4.55 | 8.79 | 0.0 | −31.91 |
+| **run away** | 0 | 4 | **196** | 240.0 | 66.0 | 29.9 | 4.12 | 0.00 | 0.00 | 0.00 | 1.54 | **0.00** | 0.0 | **−4.00** |
+| **roll away** | 0 | 0 | **200** | 240.0 | 72.3 | 30.0 | 4.08 | 0.00 | 0.00 | 0.00 | 1.26 | **0.00** | 0.0 | **−2.77** |
+| hold guard | 0 | 0 | 200 | 240.0 | 43.4 | 30.0 | 1.33 | 0.00 | 10.93 | 3.46 | 0.23 | 0.00 | 84.3 | −5.66 |
+| block, punish | 0 | 4 | 196 | 190.6 | 37.6 | 29.9 | 1.28 | 0.00 | 10.45 | 6.64 | 0.69 | 4.12 | 55.7 | −1.90 |
+| roll, punish | 0 | 0 | 200 | 144.7 | 73.6 | 30.0 | 2.32 | 0.00 | 0.00 | 0.00 | 1.61 | 7.97 | 0.0 | +6.89 |
+| parry oracle | 184 | 16 | 0 | −4.4 | 39.5 | 20.0 | 1.48 | 4.71 | 0.00 | 0.00 | 3.03 | 9.62 | 0.0 | +43.58 |
+| **patient parry** | **200** | **0** | **0** | −12.0 | **100.0** | 22.8 | 1.57 | 8.51 | 0.00 | 0.00 | **0.00** | 7.00 | 0.0 | **+55.20** |
+
+
+⚠️ **Reproducibility fix (2026-09-15):** the shipped `random_buttons` policy originally held one shared
+generator, so the row moved depending on how many duels had already been flown in the session
+(G −38.97 on the first call, −38.91 on the second). It now re-seeds from the duel's own seed at frame 0
+and is identical on repeated calls. Same family of bug as World 2's `fly()`-in-a-comprehension.
+A baseline row that moves when you run it twice is not a baseline.
+
+⭐ **Solvability is settled with room to spare: the patient parry expert wins 200 of 200 and finishes
+every duel on full health, never once taking a hit.** It reads the boss's animation clock, presses
+parry when the next active frame is five away, and swings only while the boss is staggered *and* there
+is time for the whole swing to land before the stagger ends.
+
+⭐ **The two experts differ by one line, and that line is greed.** `parry oracle` also punishes during
+recovery; it wins 184 and **dies 16 times**. Every one of those deaths is a swing still in its recovery
+frames when the boss moved again.
+
+⭐ **The ladder must contain the agent that refuses the task.** World 1 learned this the hard way when
+its boat sailed off the course; here the first version of the ladder had no "run away" row, so the
+env's worst bug was invisible until a trained agent found it. Refusal is now a standing ladder row.
+
+### The clock: truncation or defeat? (and the cost of fixing it)
+
+Even with the chasing boss, refusal still pays under a neutral clock: `roll away` scores **−2.77**
+against `mash attack`'s −31.91. Switching the clock from a truncation to a **defeat** (you failed to
+finish the duel) removes the profit — and the same 200 duels then say:
+
+| | stand still | random | mash attack | run away | roll away | hold guard | block, punish | roll, punish |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| clock = truncation | −41.36 | −38.97 | −31.91 | −4.00 | −2.77 | −5.66 | −1.90 | **+6.89** |
+| clock = defeat | −41.36 | −38.97 | −31.91 | −33.40 | −32.77 | −35.66 | −31.30 | −23.11 |
+
+⚠️ ⭐ **Removing the refusal's profit also flattens the reward's ability to rank the losers.** Under
+`defeat`, `mash attack` — which dies in 11 seconds having dealt 94 damage — outscores `hold guard`,
+which survives all 30 seconds barely touched (−31.91 vs −35.66), and every non-winning policy is
+squeezed into the band −23 to −41. Under `truncate` the same policies spread across 48 points and
+rank sensibly. This is World 1's terminated-vs-truncated question asked again, with the opposite
+textbook answer, and it is a decision record, not a bug.
+
+### Invariants and determinism
+
+`checks.py`: 40 duels of uniformly random buttons, every frame checked — distance inside [0.6, 6.0],
+stamina inside [0, 100], neither fighter's hp ever increases, no boss frame past the end of its move,
+no staggered boss with a move still out: **all pass**. Same seed plus same buttons is bit-identical;
+a different seed differs. Branch coverage under random play across those 40 duels: 14 parries, 8
+i-frame dodges, 11 blocks, 9 guard breaks, 198 clean hits, 15 whiffs, 40 deaths — **0 wins and 0 duels
+reaching the clock**, so those two endings are reachable only by a scripted player. (Same lesson as
+World 2's `truncated`: a test only checks the endings it actually reaches.)
+
+### DQN vs PPO on the fixed physics — 600k decisions, 3 seeds, both clock rules
+
+Held out: the same 200 duels (seeds 1000-1199), each arm scored under its own clock rule.
+Boss health left out of 240; a crew that never swings leaves 240.0.
+
+| | wins | boss hp left | swings | parries |
+|---|---|---|---|---|
+| DQN, clock = truncation | 0 / **19.0** / 6.5 % | 68.6 / 41.2 / 46.5 | 14.62 / 13.77 / 14.97 | 0.00 / 1.08 / 0.57 |
+| PPO, clock = truncation | 0 / 0 / 0 % | **240.0 / 240.0 / 240.0** | **0.00 / 0.00 / 0.00** | 0.00 |
+| DQN, clock = defeat | **16.0** / 0 / 0 % | 71.7 / 98.5 / 64.9 | 7.40 / 11.91 / 14.64 | 2.08 / 0.00 / 0.01 |
+| PPO, clock = defeat | 0 / 0 / 0 % | 240.0 / 160.8 / 142.5 | 0.00 / 6.60 / 9.31 | 0.00 |
+
+⭐ **At this budget the verdict does not overlap: DQN engages on every seed, PPO on none of them
+under a neutral clock.** Unlike World 2's race, where the seeds overlapped and only reliability could
+be claimed, here the boss-health column is separated by the whole bar.
+
+⭐⭐ **PPO's local optimum is a one-line rule, digit for digit — twice.** A behaviour probe (all twelve
+nets evaluated under one common neutral clock) shows seeds 1 and 2 pressing **guard on 100% of their
+decisions**, and every column then equals the scripted `hold guard` row exactly: own hp 43.4, boss
+240.0, guard 84.3% of frames, 10.93 blocks, 0.23 hits taken. This is World 2's flat-pilot result
+(`lambda env: 5 if env.t == 0 else 0`) happening again in a completely different world.
+
+⭐ **Seed 0 found the other refusal and would not let go of it.** Its buttons are 93% "walk backwards",
+7% guard: mean distance 4.00, **68.9% of frames beyond every boss's reach**, 0.00 swings, 0.00 hits.
+Switching the clock to a defeat — which scores that policy -30 on every single duel — left it
+**unchanged** (93.0 hp, 0.00 swings). Once the policy never engages, every outcome is equally bad and
+there is no gradient left to climb, which is exactly the flattening the scripted ladder predicted.
+
+### ⭐⭐ The 600k verdict was a BUDGET artefact, not a ceiling
+
+One DQN run at **3M decisions** (seed 1, neutral clock, 19.9 min on a 1660 Ti), held out over the
+same 200 duels:
+
+**100.0% wins · 0% deaths · boss hp -12.8 · own hp 87.1 · 4.16 parries · 0.56 hits taken · guard 0.7%**
+
+It matches the hand-written expert's win rate (200/200) while taking a little damage the expert never
+takes (87.1 hp against 100.0) and parrying about half as often (4.16 against 8.51) -- it wins some of
+its openings by trading rather than by reading. **The skill this world was built around is learnable,
+and it appears about four times later than the local optima do.** Training-curve wins: 23.5% at 1.10M,
+76.0% at 1.35M, 86.5% at 1.45M, then a **dip to 19.5% at 2.10M** and a recovery to 89.0% at 2.40M --
+so the run is not monotone and a single end-of-run number would misreport it in either direction.
+
+⚠️ Everything above is ONE long run. Whether all three seeds reach the ceiling, and whether PPO does
+at the same budget, is UNMEASURED.
+
+### Throughput
+
+64k-83k frames a second on one core (three repeats, measured while a training run was using the
+machine, so the true figure is at the top of that range or above).
+
+### Still open after this session
+
+- Chip damage on a block is 20%; measured with scripted players (`boss_cases.py chip`), untested on a
+  learner.
+- Batching for the "thousands of duels at once" page is not written. The prototype steps one duel at a
+  time and that was fast enough to defer it.
+- Whether all three DQN seeds reach the ceiling at 3M decisions, and whether PPO does.
+- The plan predicted **turtling** as this world's reward hack. Both turtling and outright **refusal**
+  were measured, and refusal came first and was the harder of the two to remove.
+
+### Build status
+
+`BOSS_SETUP` shipped in `src/lib/runtimeSetup.ts` (the frame-by-frame `Duel`, the moveset table, the
+nine scripted duellists, `duel` / `score` / `ladder`, and `moveset()` which draws each attack as the
+frames it occupies). `scripts/boss_cases.py` extracts it back out of the TypeScript and reproduces
+every number above: `check` · `ladder` · `balance` · `rate` · `chase` · `clock` · `dial` · `chip` ·
+`moveset` · `export`.
+
+**Page 1 of World 3 SHIPPED 2026-09-15: `the-duel-brief` ("The brief: thirty seconds, one boss").**
+New `src/components/boss/DuelReplay.tsx` (frame-by-frame replay of recorded duels, with the boss's
+last three seconds of animation drawn as a strip) and `data/briefDuels.ts` (three duels on seed 1002,
+written by `boss_cases.py export`). Both runnable cells browser-verified by **exact string equality**
+in Pyodide; tsc clean; 763 pages house-rule clean.
+
+⚠️ The outline in this plan gave World 3 thirteen pages and no brief, which Worlds 1 and 2 both have.
+A brief page was added, so World 3 is fourteen pages and the track is 41.
+
+## 2026-09-19 — the 200 ms parry, and the blocks nothing was checking
+
+The v2 deflect window went from 3 frames to 6. Sekiro's is twelve frames at sixty a second; what
+ports across is the **duration** (200 ms), not the frame count, and 200 ms at thirty a second is
+six. The original 3 was a mis-port that had been described on the page as faithful. `PARRY_STEP`
+went to 2 with it, so the ladder is 6 -> 4 -> 2 -> 0 and three hasty presses still spend it.
+
+**v1 is untouched, and provably so.** It is a different file (`duelSim.ts`), a different setup
+block (`BOSS_SETUP`, still sha1 `b126aab75e2b`, 641 lines), and it does not contain the identifiers
+that changed at all -- v1 spells its window `PAR_I0 = 3` / `PAR_I1 = 7`, and `PARRY_WIN`/
+`PARRY_STEP` do not exist in it. `boss_policy_check.mjs` still reports 200/200 and
+`boss_port_check.mjs` still reports all 15 counters identical. No v1 number moved.
+
+What the widening did invalidate was a cluster of numbers on `a-harder-fight` that **nothing was
+re-deriving**. Three of its blocks are `CodeOutput source="scripts/..."` -- pasted stdout rather
+than runnable cells -- and `boss_regen.py` only knew how to pair a `codeX` with an `outX`, while
+`check-pages.js` only verifies attached blocks. So they kept quoting a 3-frame window, and prose
+had been written off the stale figures: a "722 dead windows" that contradicted its own table's 832,
+and a "63.6%" that appeared nowhere on the page at all.
+
+### Three bugs found while fixing it
+
+1. **`boss_v2_stunlock.py` was contaminated across worlds.** It pins the superseded build by
+   loading `scripts/archive/boss_v2_build1.py` (self-contained, `PARRY_WIN = 3`, `N_OBS = 32`) and
+   runs the archived nets against it -- but it took its scripted CONTROL from the *live* trainer,
+   so a current policy with current helpers was driving a frozen world. Widening the live window
+   walked a number published as history from 136/200 to 118/200 without anyone touching the build
+   it describes. The control now comes from the archive too, and the published 136 -> 87 / 36% /
+   33-point figures reproduce exactly. A control that moves when the thing it controls for does
+   not is not a control.
+2. **`boss_v2_cases.py` printed a literal `land%%`** -- a `%%` in a plain `print` with no
+   formatting applied.
+3. **`thousands-of-duels-at-once` quoted a throughput range it had outgrown.** Four fresh runs span
+   115,514-121,212 frames/s; the page said 108,000-117,000 (36,000-39,000 decisions/s). Widened to
+   108,000-121,000 / 36,000-40,000, which covers every sample ever recorded for it.
+
+### The reproducibility guard now covers standalone blocks
+
+`boss_regen.py` grew a `STANDALONE` registry: an `outX` can name a **command**, and `--check`
+re-runs it and diffs. Registered: a-harder-fight's `outProbe`/`outParry`/`outStun`, and
+reading-a-policy's `outProbe`/`outButtons` (those two carry an echoed `$ ...` line, supported via
+`echo`). reading-a-policy's two reproduced **byte-identically on the first run** -- that page was
+already correct.
+
+Coverage: **45 of 76 output blocks in the track are now machine-verified, up from 43.**
+
+### Blocks still checked by hand, and why
+
+A block is registerable only if it is a command's WHOLE stdout. These are not:
+
+- **Hand-trimmed excerpts** -- `a-moveset/outFreq` (5 lines of `states`' 30), `frames-hitboxes/
+  outArc` (5 of `arc`'s 8), `reading-a-policy/outSpread` (19 of `boss_qspread_v2.mjs`' 28).
+  Re-running them verifies nothing unless the splicer learns to match a sub-range; registering
+  them as-is would overwrite the excerpt with the full run.
+- **A noisy benchmark** -- `thousands-of-duels/outSpeed` reads a few per cent different every run,
+  so it would cry wolf on every check. Its prose quotes a range on purpose.
+- **The remaining 28**, which need trained nets, a GPU, or long runs (`boss_train.py` x7,
+  `wildfire_train.py` x5, `boss_cases.py` x16 at ~5.5 min total). The 16 `boss_cases.py` ones were
+  re-derived by hand this session: **13 reproduce byte-identically and the other 3 are the excerpt
+  and benchmark cases above**, so v1's published numbers are confirmed intact.
+
+Verified green after all of it: tsc · `check-pages.js` (781 pages) · `boss_regen.py --check --all`
+(18 pages) · `boss_port_check.mjs` · `boss_policy_check.mjs` (200/200) · `boss_port_check_v2.mjs` ·
+`boss_policy_check_v2.mjs` · both world hashes (`b126aab75e2b` / `fd3243469b99`).

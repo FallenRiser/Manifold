@@ -93,7 +93,7 @@ export const FAMILIES: Group[] = [
       { title: "Logistic regression", href: "/learn/logistic-regression" },
       { title: "k-Nearest Neighbors", href: "/learn/k-nearest-neighbors" },
       { title: "Naive Bayes", href: "/learn/naive-bayes" },
-      { title: "Support Vector Machines" },
+      { title: "Support Vector Machines", href: "/learn/support-vector-machines", partial: true },
       { title: "Kernel methods" },
       { title: "Perceptron & online classifiers" },
       { title: "Multi-class strategies" },

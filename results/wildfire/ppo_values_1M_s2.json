@@ -1,0 +1,242 @@
+{
+ "tag": "ppo_values_1M_s2",
+ "learner": "ppo",
+ "seed": 2,
+ "sim_steps": 1000000,
+ "reward": "values",
+ "K": 4,
+ "rscale": 0.1,
+ "held_out": {
+  "village_damaged": 0.78,
+  "village_saved": 0.765,
+  "burnt": 114.5,
+  "put_out": 2.0,
+  "drops": 3.66,
+  "steps": 62.2,
+  "ret": -120.7,
+  "eval_seconds": 8.2
+ },
+ "curve": [
+  {
+   "sim_steps": 55563,
+   "minutes": 0.45,
+   "village": 7.17,
+   "saved": 0.15,
+   "burnt": 171.4,
+   "put_out": 2.0,
+   "train_return": -223.4
+  },
+  {
+   "sim_steps": 103127,
+   "minutes": 0.84,
+   "village": 7.47,
+   "saved": 0.125,
+   "burnt": 174.1,
+   "put_out": 0.5,
+   "train_return": -219.6
+  },
+  {
+   "sim_steps": 150847,
+   "minutes": 1.24,
+   "village": 6.45,
+   "saved": 0.15,
+   "burnt": 164.9,
+   "put_out": 3.4,
+   "train_return": -217.8
+  },
+  {
+   "sim_steps": 206649,
+   "minutes": 1.69,
+   "village": 7.33,
+   "saved": 0.125,
+   "burnt": 170.4,
+   "put_out": 1.7,
+   "train_return": -211.7
+  },
+  {
+   "sim_steps": 254465,
+   "minutes": 2.08,
+   "village": 7.45,
+   "saved": 0.125,
+   "burnt": 173.4,
+   "put_out": 1.7,
+   "train_return": -229.3
+  },
+  {
+   "sim_steps": 302291,
+   "minutes": 2.48,
+   "village": 7.33,
+   "saved": 0.125,
+   "burnt": 166.8,
+   "put_out": 4.9,
+   "train_return": -214.4
+  },
+  {
+   "sim_steps": 357941,
+   "minutes": 2.93,
+   "village": 5.65,
+   "saved": 0.225,
+   "burnt": 151.4,
+   "put_out": 6.2,
+   "train_return": -212.9
+  },
+  {
+   "sim_steps": 405496,
+   "minutes": 3.32,
+   "village": 3.5,
+   "saved": 0.3,
+   "burnt": 139.9,
+   "put_out": 4.1,
+   "train_return": -178.7
+  },
+  {
+   "sim_steps": 452983,
+   "minutes": 3.72,
+   "village": 2.73,
+   "saved": 0.325,
+   "burnt": 140.3,
+   "put_out": 3.9,
+   "train_return": -200.5
+  },
+  {
+   "sim_steps": 500324,
+   "minutes": 4.11,
+   "village": 1.25,
+   "saved": 0.575,
+   "burnt": 140.4,
+   "put_out": 3.3,
+   "train_return": -181.2
+  },
+  {
+   "sim_steps": 555277,
+   "minutes": 4.56,
+   "village": 2.23,
+   "saved": 0.5,
+   "burnt": 130.9,
+   "put_out": 3.2,
+   "train_return": -185.0
+  },
+  {
+   "sim_steps": 602287,
+   "minutes": 4.94,
+   "village": 1.73,
+   "saved": 0.575,
+   "burnt": 134.5,
+   "put_out": 2.9,
+   "train_return": -160.3
+  },
+  {
+   "sim_steps": 656829,
+   "minutes": 5.39,
+   "village": 1.35,
+   "saved": 0.65,
+   "burnt": 135.2,
+   "put_out": 3.6,
+   "train_return": -164.8
+  },
+  {
+   "sim_steps": 703544,
+   "minutes": 5.77,
+   "village": 0.78,
+   "saved": 0.775,
+   "burnt": 125.2,
+   "put_out": 4.0,
+   "train_return": -152.3
+  },
+  {
+   "sim_steps": 757691,
+   "minutes": 6.21,
+   "village": 1.07,
+   "saved": 0.7,
+   "burnt": 118.0,
+   "put_out": 4.9,
+   "train_return": -144.7
+  },
+  {
+   "sim_steps": 803989,
+   "minutes": 6.58,
+   "village": 0.78,
+   "saved": 0.725,
+   "burnt": 123.7,
+   "put_out": 3.8,
+   "train_return": -148.2
+  },
+  {
+   "sim_steps": 850225,
+   "minutes": 6.97,
+   "village": 0.7,
+   "saved": 0.75,
+   "burnt": 115.9,
+   "put_out": 3.2,
+   "train_return": -128.8
+  },
+  {
+   "sim_steps": 903829,
+   "minutes": 7.41,
+   "village": 0.62,
+   "saved": 0.75,
+   "burnt": 118.8,
+   "put_out": 2.4,
+   "train_return": -150.3
+  },
+  {
+   "sim_steps": 957254,
+   "minutes": 7.85,
+   "village": 0.75,
+   "saved": 0.725,
+   "burnt": 120.9,
+   "put_out": 2.6,
+   "train_return": -146.1
+  },
+  {
+   "sim_steps": 1002844,
+   "minutes": 8.23,
+   "village": 0.72,
+   "saved": 0.75,
+   "burnt": 117.8,
+   "put_out": 1.8,
+   "train_return": -132.7
+  }
+ ],
+ "episodes": 13554,
+ "truncated": 0,
+ "minutes": 8.2,
+ "config": {
+  "cmd": "race",
+  "steps": 1000000,
+  "seed": 2,
+  "seeds": 3,
+  "reward": "values",
+  "rscale": 0.1,
+  "K": 4,
+  "device": "cuda",
+  "envs": 64,
+  "width": 64,
+  "blocks": 3,
+  "lr": 0.0003,
+  "gamma": 0.99,
+  "clip_grad": 0.5,
+  "eval_worlds": 200,
+  "curve_every": 50000,
+  "curve_worlds": 40,
+  "tag": null,
+  "save_net": false,
+  "replay": 50000,
+  "batch": 256,
+  "updates": 4,
+  "warmup": 5000,
+  "target_every": 1000,
+  "eps_start": 1.0,
+  "eps_end": 0.05,
+  "eps_frac": 0.3,
+  "rollout": 32,
+  "epochs": 4,
+  "minibatch": 512,
+  "lam": 0.95,
+  "clip": 0.2,
+  "ent": 0.01,
+  "vf": 0.5,
+  "learner": "ppo"
+ },
+ "machine": "colab-t4"
+}

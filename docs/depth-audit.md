@@ -178,7 +178,12 @@ Three of the five are done, so the list needs replacing rather than extending. O
 1. **Naive Bayes (16/20 blind), SVR (11/16) and kernel ridge (10/16)** — the worst *ratios* left,
    each one pass, and kernel ridge is also one of the two tracks still at zero PredictPrompts.
 2. **Math foundations (20/34 blind, 0 proofs, 0 runnable code, 367 w/pg)** — the tier-0 spine fails
-   every test in this document at once, and every other track points at it.
+   every test in this document at once, and every other track points at it. ⚠️ **This is no longer a
+   figure pass.** The user's instruction of 2026-09-15 turns it into a teaching rebuild: one concept
+   per page (34 pages → ~70), 3–4 end-to-end worked examples and 10+ graded problems with full
+   solutions per concept. Authority is **`docs/math-pedagogy-plan.md`** — read it before touching any
+   page in `math-foundations`, `learning-theory` or `model-selection`. The four debts listed here get
+   cleared *by* that rebuild, in one pass per page, not as four separate passes.
 3. **Finish `DecisionPoint`** (§0.4 #5 above), now that the component no longer lives under
    `capstone/`.
 4. **Give `evaluation` runnable code** — thresholds, ROC and calibration are the one place where a
@@ -192,7 +197,7 @@ A live status table for all nine cross-cutting fixes is in **§0.5**.
 Everything above is diagnosis. This is the live list: what has been done, what has not, and the
 number attached to each. Re-run `node scripts/inventory.js` before trusting any of it.
 
-**Where the site stands.** 794 pages outlined, **760 built**, **264 (35%) with no visual**, 21 of 34
+**Where the site stands.** 794 pages outlined, **760 built**, **263 (35%) with no visual**, 21 of 34
 tracks with **zero `<Proof>`**, 5 tracks with **no runnable code**, `DecisionPoint` on **20 pages in
 10 tracks**, `<Term>` on **12 pages in 3 tracks**, `<Backlinks>` on **23 of 760**.
 
@@ -226,7 +231,7 @@ Pages with no lab, no rendered figure and no inline `<svg>`. Six tracks are clea
 | Capstone · asteroid | 15 / 24 | Linear regression | 3 / 47 |
 | RL · MDPs | 14 / 24 | Function approximation | 2 / 24 |
 | Backpropagation | 13 / 22 | Architecture design | 1 / 27 |
-| Support vector regression | 11 / 16 | Building environments | 1 / 27 |
+| Support vector regression | 11 / 16 | ~~Building environments~~ | **0 / 27** |
 | Decision trees | 11 / 20 | Evaluation & metrics | 1 / 10 |
 | Kernel ridge regression | 10 / 16 | | |
 | Regularized regression | 9 / 26 | | |
@@ -247,9 +252,9 @@ the corrected `inventory.js` now checks for the tag and not just the import:
 
 - `function-approximation/when-td-diverges` imports `Curve` and `BAIRD_X`/`BAIRD_SERIES`, renders none of them.
 - `function-approximation/whats-safe` imports `TriadDiagram`, never renders it.
-- `building-environments/training-the-crew` imports `RaceLab`, never renders it — this is the known
-  DQN-vs-PPO race gap (`fire/data/raceCurves.ts` is still `[]`), so the import is a placeholder for
-  data that does not exist yet.
+- ~~`building-environments/training-the-crew` imports `RaceLab`, never renders it.~~ ✅ **fixed
+  2026-09-15**: the nine race runs landed, `raceCurves.ts` is populated and the lab is rendered.
+  That was the last blind page in the track.
 
 The fourth, `architecture-design/the-checklist`, is the last blind page in a finished track and
 imports nothing; `evaluation/the-evaluation-checklist` is the same shape.
@@ -1694,6 +1699,11 @@ CH2) and almost no code or interactivity after it.
 # Part three · Foundations & theory
 
 ## 11. Math foundations — 34pp · **368 w/pg** · 20 without a visual · **0 proofs** · **0 CodeBlocks** · 13 labs
+
+> ⚠️ **Everything below is diagnosis and still accurate. The prescription has moved** to
+> `docs/math-pedagogy-plan.md` (2026-09-15), which rebuilds this track around worked examples and
+> graded problem sets rather than patching the four deficits one at a time. The page splits it
+> proposes start from the findings in this section.
 
 Tier 0, the spine under everything, and the site's clearest case of **depth inverted**: 34 pages
 averaging 368 words while carrying 10–20 MathBlocks each. *The dot product & projection* is 286 words

@@ -22,6 +22,13 @@ feature_names = [f"x{i}" for i in range(X.shape[1])]
 df = pd.DataFrame(X, columns=feature_names); df["target"] = y
 `;
 
+// Calculus & optimization strand of Math foundations. Deliberately bare: these pages are about
+// doing the calculus by hand, so the preamble supplies arithmetic and nothing that would do the
+// work. No sympy, no autograd -- the point is to watch a limit converge, not to be handed it.
+export const CALCULUS_SETUP = `import numpy as np
+import math
+`;
+
 // Clustering context — k-means track (no labels needed).
 export const CLUSTER_SETUP = `import numpy as np
 from sklearn.datasets import make_blobs
@@ -1501,4 +1508,1520 @@ def draw_fire(env):
         print("  |" + row + "|")
     print("  +" + "-" * (2 * N) + "+")
     print("  . grass  ^ forest  # rock  ~ lake  H village  * burning  x burnt  @ helicopter")
+`;
+
+// World 3 of the building-environments track: a Soulslike duel on a circular arena,
+// one frame at a time. Both fighters are state machines; a boss move is a list of
+// (kind, frames) segments and lands only inside BOTH its reach and its arc.
+// Reproduced exactly by scripts/boss_cases.py, which extracts THIS string and runs it.
+export const BOSS_SETUP = `import math
+
+import numpy as np
+
+FPS = 30
+MAX_FRAMES = 900
+
+# ---------------------------------------------------------------- the arena
+ARENA = 8.0                       # radius; both fighters are clamped inside it
+START_D = 4.0
+
+# ---------------------------------------------------------------- the two fighters
+P_HP_MAX, P_ST_MAX = 100.0, 100.0
+B_HP_MAX = 240.0
+
+P_SPEED = 0.075                   # units per frame
+B_CHASE = 0.105                   # you cannot outrun it -- rolling is the only way to make space
+B_TURN_IDLE = 0.13                # radians per frame while it has no move out
+B_TURN_WIND = 0.045               # and while winding one up: enough to punish an EARLY sidestep
+
+ST_REGEN = 0.55
+ST_DELAY = 20
+
+# ---------------------------------------------------------------- player actions
+A_IDLE = 0
+A_MOVE0 = 1                       # 1..8 = move, in eighths of a turn measured FROM the boss
+A_ATK = 9
+A_ROLL0 = 10                      # 10..13 = roll toward / right / away / left
+A_GUARD = 14
+A_PARRY = 15
+N_ACTIONS = 16
+ACTION_NAMES = (["idle"]
+                + [f"move {n}" for n in ["in", "in-right", "right", "back-right",
+                                         "back", "back-left", "left", "in-left"]]
+                + ["attack"]
+                + [f"roll {n}" for n in ["in", "right", "back", "left"]]
+                + ["guard", "parry"])
+
+ATK_SEG = [("w", 8), ("h", 2), ("r", 14)]
+ATK_REACH, ATK_DMG, ATK_COST = 2.0, 12.0, 20.0
+
+ROLL_LEN, ROLL_I0, ROLL_I1 = 18, 3, 12
+ROLL_DIST, ROLL_COST = 1.7, 25.0
+
+PARRY_LEN, PAR_I0, PAR_I1, PARRY_COST = 22, 3, 7, 15.0
+
+GUARD_CHIP = 0.20
+GUARD_ST = 0.6
+HITSTUN, GUARDBREAK = 20, 45
+STAGGER = 55
+RIPOSTE_MULT = 3.0
+
+# --- poise: the boss can be staggered by being HIT, not only by being parried.
+# Two clean hits empty a pool of 50 that refills at 0.08 a frame, so the pool is back in about
+# twenty seconds and the two hits have to belong to the same engagement rather than to the duel.
+# POISE_STAGGER was measured, not assumed. Short windows (40-50) are almost inert: the punishers
+# open two breaks a duel and cash 0.20 of them, because the window shuts before they are back in
+# range with the stamina to swing. Worse, 52-56 is a resonance with the sidestepper's roll-and-
+# swing cycle that REVERSES which avoider scores better, and 58-64 is the only flat stretch where
+# the ordering the floor was built to show holds with margin. 60 sits in the middle of it.
+# It is five frames longer than the STAGGER a parry buys, and that is the right way round: a parry
+# also negates the blow that opened it and costs 15 stamina with no setup, where a break costs two
+# landed attacks and the exposure of getting them in.
+B_POISE_MAX = 50.0
+POISE_HIT = 25.0
+POISE_REGEN = 0.08
+POISE_STAGGER = 60
+
+# ---------------------------------------------------------------- the boss moveset
+# "w" windup, "d" delay (looks exactly like windup), "h" active, "r" recovery.
+# arc is the HALF-width in radians: 0.35 is a thrust you can step out of, 1.40 is a slam you cannot.
+MOVES = [
+    dict(name="slash", seg=[("w", 14), ("h", 3), ("r", 16)], reach=2.4, arc=0.80, dmg=18.0, adv=0.030),
+    dict(name="thrust", seg=[("w", 18), ("h", 2), ("r", 22)], reach=3.6, arc=0.35, dmg=22.0, adv=0.075),
+    dict(name="heavy", seg=[("w", 20), ("d", 8), ("h", 4), ("r", 28)], reach=2.7, arc=0.95, dmg=34.0, adv=0.015),
+    dict(name="slam", seg=[("w", 24), ("d", 12), ("h", 5), ("r", 30)], reach=2.6, arc=1.40, dmg=30.0, adv=0.000),
+    dict(name="combo", seg=[("w", 12), ("h", 3), ("w", 9), ("h", 3), ("r", 22)], reach=2.3, arc=0.70, dmg=14.0, adv=0.045),
+]
+N_MOVES = len(MOVES)
+ENGAGE = 2.9                      # beyond this it closes instead of swinging
+BODY = 0.95                       # the two of them are solid: neither walks through the other
+
+
+def move_len(m):
+    return sum(n for _, n in m["seg"])
+
+
+def phase_at(m, f):
+    """Which segment of move m is frame f in? Returns (kind, index of that segment)."""
+    acc = 0
+    for i, (kind, n) in enumerate(m["seg"]):
+        if f < acc + n:
+            return kind, i
+        acc += n
+    return "r", len(m["seg"]) - 1
+
+
+def wrap(a):
+    "An angle into [-pi, pi]."
+    return (a + math.pi) % (2 * math.pi) - math.pi
+
+
+def clamp_arena(x, z):
+    r = math.hypot(x, z)
+    if r <= ARENA:
+        return x, z
+    return x * ARENA / r, z * ARENA / r
+
+
+class Duel:
+    """One fight on a floor. step() advances exactly one frame."""
+
+    def __init__(self, seed=0, aggr=0.5, moves=None, reward="damage", chip=GUARD_CHIP,
+                 clock=MAX_FRAMES, timeout="truncate"):
+        self.rng = np.random.default_rng(seed)
+        self.aggr = aggr
+        self.allowed = list(range(N_MOVES)) if moves is None else list(moves)
+        self.reward_kind = reward
+        self.chip = chip
+        self.clock = clock
+        self.timeout = timeout
+        self.reset(seed)
+
+    # ------------------------------------------------------------------ reset
+    def reset(self, seed=None):
+        if seed is not None:
+            self.rng = np.random.default_rng(seed)
+            self.seed = seed
+        self.t = 0
+        # the boss in the middle, the player on a random bearing at arm's length plus a bit
+        th = float(self.rng.uniform(-math.pi, math.pi))
+        self.bx, self.bz = 0.0, 0.0
+        self.px, self.pz = START_D * math.sin(th), START_D * math.cos(th)
+        self.bang = self.to_player()
+        self.php, self.bhp = P_HP_MAX, B_HP_MAX
+        self.pst = P_ST_MAX
+        self.pa, self.pf = A_IDLE, 0
+        self.pdir = 4                    # the direction a bare roll goes: away
+        self.p_stun = 0
+        self.p_regen_lock = 0
+        self.p_hit_done = False
+        self.guarding = False
+        self.bm, self.bf = -1, 0
+        self.b_seg_done = -1
+        self.b_cd = int(self.rng.integers(10, 40))
+        self.b_stagger = 0
+        self.b_poise = B_POISE_MAX
+        self.log = dict(parries=0, blocks=0, guard_breaks=0, hits_taken=0, rolls=0,
+                        dodges=0, swings=0, hits_dealt=0, riposte_dmg=0.0, poise_breaks=0,
+                        chip_taken=0.0, dmg_taken=0.0, dmg_dealt=0.0, whiffs=0,
+                        guard_frames=0, wall_frames=0, arc_misses=0,
+                        boss_moves=np.zeros(N_MOVES, int))
+        return self.obs()
+
+    # ------------------------------------------------------------------ geometry
+    @property
+    def d(self):
+        return math.hypot(self.px - self.bx, self.pz - self.bz)
+
+    def to_player(self):
+        return math.atan2(self.px - self.bx, self.pz - self.bz)
+
+    def off_axis(self):
+        "How far off the boss's centre line you are, in radians. 0 = dead ahead."
+        return wrap(self.to_player() - self.bang)
+
+    # ------------------------------------------------------------------ helpers
+    @property
+    def busy(self):
+        if self.p_stun > 0:
+            return True
+        if self.pa == A_ATK:
+            return self.pf < move_len(dict(seg=ATK_SEG))
+        if A_ROLL0 <= self.pa <= A_ROLL0 + 3:
+            return self.pf < ROLL_LEN
+        if self.pa == A_PARRY:
+            return self.pf < PARRY_LEN
+        return False
+
+    def spend(self, c):
+        self.pst = max(0.0, self.pst - c)
+        self.p_regen_lock = ST_DELAY
+
+    def _shift(self, eighths, dist):
+        "Move the player dist units along a bearing measured in eighths of a turn from the boss."
+        ang = self.to_player() + math.pi + eighths * math.pi / 4.0
+        self.px, self.pz = clamp_arena(self.px + dist * math.sin(ang),
+                                       self.pz + dist * math.cos(ang))
+        self._separate()
+
+    def _separate(self):
+        """Keep the two bodies apart.
+
+        Without this the boss simply walks through the player while closing, and the player
+        ends up standing behind it -- which the one-dimensional version could not express and
+        which looks exactly as wrong as it is once the duel is drawn on a floor.
+        """
+        dx, dz = self.px - self.bx, self.pz - self.bz
+        r = math.hypot(dx, dz)
+        if r >= BODY:
+            return
+        if r < 1e-9:
+            dx, dz, r = math.sin(self.bang), math.cos(self.bang), 1.0
+        ux, uz = dx / r, dz / r
+        self.px, self.pz = clamp_arena(self.bx + ux * BODY, self.bz + uz * BODY)
+        # if the wall stopped the player being pushed out, push the boss back instead
+        if math.hypot(self.px - self.bx, self.pz - self.bz) < BODY - 1e-9:
+            self.bx, self.bz = clamp_arena(self.px - ux * BODY, self.pz - uz * BODY)
+
+    # ------------------------------------------------------------------ one frame
+    def step(self, a):
+        php0, bhp0 = self.php, self.bhp
+
+        # --- 1. the button, if it is even read this frame -----------------------
+        if not self.busy:
+            self.guarding = (a == A_GUARD)
+            if A_MOVE0 <= a <= A_MOVE0 + 7:
+                self.pdir = (a - A_MOVE0)
+                self.pa, self.pf = a, 0
+            elif a == A_ATK and self.pst >= ATK_COST:
+                self.pa, self.pf, self.p_hit_done = A_ATK, 0, False
+                self.spend(ATK_COST)
+                self.log["swings"] += 1
+            elif A_ROLL0 <= a <= A_ROLL0 + 3 and self.pst >= ROLL_COST:
+                self.pa, self.pf = a, 0
+                self.pdir = 2 * (a - A_ROLL0)
+                self.spend(ROLL_COST)
+                self.log["rolls"] += 1
+            elif a == A_PARRY and self.pst >= PARRY_COST:
+                self.pa, self.pf = A_PARRY, 0
+                self.spend(PARRY_COST)
+            elif a in (A_IDLE, A_GUARD):
+                self.pa, self.pf = a, 0
+
+        if self.guarding:
+            self.log["guard_frames"] += 1
+        if self.d > 0 and math.hypot(self.px, self.pz) > ARENA - 0.6:
+            self.log["wall_frames"] += 1
+
+        # --- 2. the player moves -----------------------------------------------
+        if self.p_stun == 0:
+            if A_MOVE0 <= self.pa <= A_MOVE0 + 7:
+                self._shift(self.pa - A_MOVE0, P_SPEED * (0.55 if self.guarding else 1.0))
+            elif A_ROLL0 <= self.pa <= A_ROLL0 + 3 and self.pf < ROLL_I1:
+                self._shift(2 * (self.pa - A_ROLL0), ROLL_DIST / ROLL_I1)
+
+        # --- 3. the boss decides ------------------------------------------------
+        if self.b_stagger > 0:
+            self.b_stagger -= 1
+        elif self.bm < 0:
+            if self.b_cd > 0:
+                self.b_cd -= 1
+            self.bang = self.bang + max(-B_TURN_IDLE, min(B_TURN_IDLE, wrap(self.to_player() - self.bang)))
+            if self.d > ENGAGE:
+                self._close(B_CHASE)
+            if self.b_cd <= 0 and self.d <= ENGAGE:
+                self.bm = self._pick()
+                self.bf, self.b_seg_done = 0, -1
+                self.log["boss_moves"][self.bm] += 1
+
+        # --- 4. the boss animation, its facing, and its hitboxes ----------------
+        if self.bm >= 0 and self.b_stagger == 0:
+            m = MOVES[self.bm]
+            kind, seg = phase_at(m, self.bf)
+            if kind in ("w", "d"):
+                # it can still correct its aim while winding up, but only slowly
+                self.bang = self.bang + max(-B_TURN_WIND, min(B_TURN_WIND, wrap(self.to_player() - self.bang)))
+                self._close(m["adv"])
+            if kind == "h" and seg != self.b_seg_done:
+                if self.d <= m["reach"] and abs(self.off_axis()) <= m["arc"]:
+                    self._boss_hits(m["dmg"])
+                    self.b_seg_done = seg
+                elif self.bf == self._seg_start(m, seg):
+                    self.log["whiffs"] += 1
+                    if self.d <= m["reach"]:
+                        self.log["arc_misses"] += 1      # in range, but you were not in front of it
+            self.bf += 1
+            if self.bf >= move_len(m):
+                self.bm, self.bf = -1, 0
+                lo = int(round(6 + 40 * (1.0 - self.aggr)))
+                self.b_cd = int(self.rng.integers(lo, lo + 26))
+
+        # --- 5. the player's own hitbox ----------------------------------------
+        if self.pa == A_ATK:
+            kind, _ = phase_at(dict(seg=ATK_SEG), self.pf)
+            if kind == "h" and not self.p_hit_done and self.d <= ATK_REACH:
+                mult = RIPOSTE_MULT if self.b_stagger > 0 else 1.0
+                dealt = ATK_DMG * mult
+                self.bhp -= dealt
+                self.p_hit_done = True
+                self.log["hits_dealt"] += 1
+                self.log["dmg_dealt"] += dealt
+                if mult > 1.0:
+                    self.log["riposte_dmg"] += dealt
+                else:
+                    # Poise. The multiplier above was read BEFORE this, so the hit that breaks
+                    # the pool does ordinary damage and the riposte is the NEXT one: a break is
+                    # only worth anything if you follow it up.
+                    self.b_poise -= POISE_HIT
+                    if self.b_poise <= 0.0:
+                        self._stagger(POISE_STAGGER)
+                        self.log["poise_breaks"] += 1
+
+        # --- 6. clocks -----------------------------------------------------------
+        if self.b_stagger == 0:
+            self.b_poise = min(B_POISE_MAX, self.b_poise + POISE_REGEN)
+        self.pf += 1
+        if self.p_stun > 0:
+            self.p_stun -= 1
+        if self.p_regen_lock > 0:
+            self.p_regen_lock -= 1
+        elif not self.guarding:
+            self.pst = min(P_ST_MAX, self.pst + ST_REGEN)
+        self.t += 1
+
+        won, lost = self.bhp <= 0, self.php <= 0
+        terminated = bool(won or lost)
+        truncated = bool(self.t >= self.clock and not terminated)
+        if truncated and self.timeout == "defeat":
+            lost, terminated, truncated = True, True, False
+        r = self._reward(php0, bhp0, won, lost)
+        return self.obs(), r, terminated, truncated, dict(won=won, lost=lost)
+
+    def _close(self, dist):
+        "The boss walks dist units along its own facing."
+        self.bx, self.bz = clamp_arena(self.bx + dist * math.sin(self.bang),
+                                       self.bz + dist * math.cos(self.bang))
+        self._separate()
+
+    def _seg_start(self, m, seg):
+        return sum(n for _, n in m["seg"][:seg])
+
+    def _pick(self):
+        cands = []
+        for i in self.allowed:
+            m = MOVES[i]
+            wind = sum(n for k, n in m["seg"] if k in ("w", "d"))
+            if m["reach"] + m["adv"] * wind >= self.d - 0.1:
+                cands.append(i)
+        if not cands:
+            cands = [1]
+        w = np.array([1.0 + 1.5 * self.aggr if MOVES[i]["name"] in ("heavy", "slam") else 1.0
+                      for i in cands])
+        return int(self.rng.choice(cands, p=w / w.sum()))
+
+    def _stagger(self, frames):
+        """Put the boss down. Any stagger cancels the move it had out and refills its poise."""
+        self.b_stagger = frames
+        self.b_poise = B_POISE_MAX
+        self.bm, self.bf = -1, 0
+        self.b_cd = 0
+
+    def _boss_hits(self, dmg):
+        if A_ROLL0 <= self.pa <= A_ROLL0 + 3 and ROLL_I0 <= self.pf <= ROLL_I1:
+            self.log["dodges"] += 1
+            return
+        if self.pa == A_PARRY and PAR_I0 <= self.pf <= PAR_I1:
+            self.log["parries"] += 1
+            self._stagger(STAGGER)
+            return
+        # the player is locked on to the boss, exactly as these games do it, so a raised shield
+        # always covers the attack. (An earlier version tested a guard arc here and, because the
+        # player always faces the boss, that test was false whenever it mattered: hold guard
+        # blocked NOTHING and scored identically to standing still.)
+        if self.guarding and self.pst > 0:
+            chip = dmg * self.chip
+            self.php -= chip
+            self.pst -= dmg * GUARD_ST
+            self.p_regen_lock = ST_DELAY
+            self.log["blocks"] += 1
+            self.log["chip_taken"] += chip
+            self.log["dmg_taken"] += chip
+            if self.pst <= 0:
+                self.pst = 0.0
+                self.p_stun = GUARDBREAK
+                self.pa, self.pf = A_IDLE, 0
+                self.guarding = False
+                self.log["guard_breaks"] += 1
+            return
+        self.php -= dmg
+        self.p_stun = HITSTUN
+        self.pa, self.pf = A_IDLE, 0
+        self.guarding = False
+        self.log["hits_taken"] += 1
+        self.log["dmg_taken"] += dmg
+
+    # ------------------------------------------------------------------ reward
+    def _reward(self, php0, bhp0, won, lost):
+        dealt = bhp0 - self.bhp
+        taken = php0 - self.php
+        if self.reward_kind == "damage":
+            r = 0.1 * dealt - 0.1 * taken
+        elif self.reward_kind == "trade":
+            r = 0.1 * dealt
+        elif self.reward_kind == "survive":
+            r = 1.0 / FPS
+        else:
+            raise ValueError(self.reward_kind)
+        if won:
+            r += 30.0
+        if lost:
+            r -= 30.0
+        return float(r)
+
+    # ------------------------------------------------------------------ what it sees
+    def obs(self):
+        m = MOVES[self.bm] if self.bm >= 0 else None
+        kind = phase_at(m, self.bf)[0] if m else "i"
+        off = self.off_axis()
+        v = np.zeros(27, np.float32)
+        v[0] = self.d / ARENA
+        v[1] = math.sin(off)
+        v[2] = math.cos(off)
+        v[3] = (ARENA - math.hypot(self.px, self.pz)) / ARENA     # room behind you
+        v[4] = self.php / P_HP_MAX
+        v[5] = self.bhp / B_HP_MAX
+        v[6] = self.pst / P_ST_MAX
+        v[7] = self.pa / (N_ACTIONS - 1)
+        v[8] = min(self.pf, 40) / 40.0
+        v[9] = self.p_stun / GUARDBREAK
+        v[10] = 1.0 if self.guarding else 0.0
+        if m is not None:
+            v[11 + self.bm] = 1.0                                  # which move (5 slots)
+        v[16] = min(self.bf, 60) / 60.0
+        v[17] = 1.0 if kind == "w" else 0.0
+        v[18] = 1.0 if kind == "d" else 0.0
+        v[19] = 1.0 if kind == "h" else 0.0
+        v[20] = 1.0 if kind == "r" else 0.0
+        v[21] = self.b_stagger / STAGGER
+        v[22] = (m["reach"] / ARENA) if m is not None else 0.0
+        v[23] = m["arc"] if m is not None else 0.0
+        v[24] = 1.0 if (m is not None and self.d <= m["reach"] and abs(off) <= m["arc"]) else 0.0
+        v[25] = self.t / self.clock
+        v[26] = self.b_poise / B_POISE_MAX
+        return v
+
+
+IN, IN_R, RIGHT, BACK_R, BACK, BACK_L, LEFT, IN_L = range(8)
+ROLL_IN, ROLL_RIGHT, ROLL_BACK, ROLL_LEFT = (A_ROLL0 + i for i in range(4))
+
+
+def frames_to_active(env):
+    """Frames until the boss's next active frame, or None if it has no move out."""
+    if env.bm < 0 or env.b_stagger > 0:
+        return None
+    m = MOVES[env.bm]
+    acc, f = 0, env.bf
+    for i, (kind, n) in enumerate(m["seg"]):
+        if kind == "h" and acc + n > f and i != env.b_seg_done:
+            return max(0, acc - f)
+        acc += n
+    return None
+
+
+def will_connect(env, slack=0.25):
+    """Is the player currently inside the reach AND the arc of the move being wound up?"""
+    if env.bm < 0 or env.b_stagger > 0:
+        return False
+    m = MOVES[env.bm]
+    return env.d <= m["reach"] + slack and abs(env.off_axis()) <= m["arc"]
+
+
+def boss_recovering(env):
+    if env.bm < 0:
+        return env.b_stagger == 0
+    return phase_at(MOVES[env.bm], env.bf)[0] == "r"
+
+
+def hold_range(env, lo=1.5, hi=2.2):
+    "Stay inside the boss's threat range so it actually attacks, without crowding it."
+    if env.d > hi:
+        return A_MOVE0 + IN
+    if env.d < lo:
+        return A_MOVE0 + BACK
+    return A_IDLE
+
+
+def close_and_hit(env):
+    if env.d > ATK_REACH - 0.15:
+        return A_MOVE0 + IN
+    return A_ATK if env.pst >= ATK_COST else A_IDLE
+
+
+# --------------------------------------------------------------------- the ladder
+def stand_still(env):
+    return A_IDLE
+
+
+def random_buttons(seed=0):
+    box = {"rng": np.random.default_rng(seed)}
+
+    def pol(env):
+        if env.t == 0:
+            box["rng"] = np.random.default_rng(seed + 7919 * env.seed)
+        return int(box["rng"].integers(0, N_ACTIONS))
+    return pol
+
+
+def masher(env):
+    """Walk in and swing whenever the bar allows."""
+    return close_and_hit(env)
+
+
+def turtle(env):
+    return A_GUARD
+
+
+def run_away(env):
+    """Refuse the duel. On a floor with a wall there is nowhere to go, which is the point."""
+    return A_MOVE0 + BACK
+
+
+def circle(env):
+    """Walk around it forever. The classic thing a new player tries in two dimensions."""
+    return A_MOVE0 + RIGHT
+
+
+def block_and_punish(env):
+    if env.b_stagger > 0 or boss_recovering(env):
+        if env.pst >= ATK_COST:
+            return close_and_hit(env)
+    return A_GUARD
+
+
+def roll_and_punish(env):
+    """Roll AWAY through the active frames."""
+    k = frames_to_active(env)
+    if k is not None and 3 <= k <= 10 and will_connect(env) and env.pst >= ROLL_COST:
+        return ROLL_BACK
+    if env.b_stagger > 0 or boss_recovering(env):
+        if env.pst >= ATK_COST + ROLL_COST:
+            return close_and_hit(env)
+    return hold_range(env)
+
+
+def sidestep_and_punish(env):
+    """Step OUT OF THE ARC instead of away from it, then punish from the side.
+
+    This is the player v1 could not have: rolling sideways keeps you close enough to hit the
+    recovery, which rolling backwards does not. It only works because the boss commits its
+    facing when the active frames start.
+    """
+    k = frames_to_active(env)
+    if k is not None and 3 <= k <= 10 and will_connect(env) and env.pst >= ROLL_COST:
+        return ROLL_RIGHT if env.off_axis() >= 0 else ROLL_LEFT
+    if env.b_stagger > 0 or boss_recovering(env):
+        if env.pst >= ATK_COST + ROLL_COST:
+            return close_and_hit(env)
+    return hold_range(env)
+
+
+def parry_oracle(env):
+    """Reads the animation clock and parries on frame; also punishes recovery."""
+    k = frames_to_active(env)
+    want = (PAR_I0 + PAR_I1) // 2
+    if k is not None and 3 <= k <= want and will_connect(env) and env.pst >= PARRY_COST:
+        return A_PARRY
+    if env.b_stagger > 0:
+        return close_and_hit(env)
+    if boss_recovering(env) and env.pst >= ATK_COST + PARRY_COST:
+        return close_and_hit(env)
+    return hold_range(env)
+
+
+def patient_parry(env):
+    """The oracle minus the greed: it swings only while the boss is staggered, and only while
+    the stagger will outlast the whole swing."""
+    k = frames_to_active(env)
+    want = (PAR_I0 + PAR_I1) // 2
+    if k is not None and 3 <= k <= want and will_connect(env) and env.pst >= PARRY_COST:
+        return A_PARRY
+    if env.b_stagger > move_len(dict(seg=ATK_SEG)):
+        if env.pst >= ATK_COST + PARRY_COST or env.d > ATK_REACH - 0.15:
+            return close_and_hit(env)
+    return hold_range(env)
+
+
+PLAYERS = [
+    ("stand still", stand_still), ("random buttons", random_buttons()),
+    ("mash attack", masher), ("run away", run_away), ("circle", circle),
+    ("hold guard", turtle), ("block, punish", block_and_punish),
+    ("roll, punish", roll_and_punish), ("sidestep, punish", sidestep_and_punish),
+    ("parry oracle", parry_oracle), ("patient parry", patient_parry),
+]
+
+
+# --------------------------------------------------------------------- scoring
+def duel(policy, seed=0, repeat=3, **kw):
+    env = Duel(seed=seed, **kw)
+    G, a, dsum, offsum = 0.0, A_IDLE, 0.0, 0.0
+    while True:
+        if env.t % repeat == 0:
+            a = policy(env)
+        _, r, term, trunc, info = env.step(a)
+        G += r
+        dsum += env.d
+        offsum += abs(env.off_axis())
+        if term or trunc:
+            return dict(G=G, frames=env.t, won=int(info["won"]), lost=int(info["lost"]),
+                        php=env.php, bhp=env.bhp, meanD=dsum / env.t,
+                        meanOff=offsum / env.t, **env.log)
+
+
+def score(policy, n=200, seed0=1000, repeat=3, **kw):
+    rows = [duel(policy, seed=seed0 + i, repeat=repeat, **kw) for i in range(n)]
+    out = dict(win=sum(r["won"] for r in rows), die=sum(r["lost"] for r in rows), n=n)
+    out["clock"] = n - out["win"] - out["die"]
+    for k in rows[0]:
+        if k not in ("won", "lost", "boss_moves"):
+            out[k] = float(np.mean([float(r[k]) for r in rows]))
+    out["guard_pct"] = 100.0 * out["guard_frames"] / out["frames"]
+    out["wall_pct"] = 100.0 * out["wall_frames"] / out["frames"]
+    return out
+
+
+def ladder(players=None, n=200, seed0=1000, repeat=3, **kw):
+    print("player           win  die  clk  bossHP  ownHP   sec  meanD  offax  parry  poise  block   brk  hits  dodge  arcX  swing  wall%        G")
+    out = {}
+    for name, pol in (PLAYERS if players is None else players):
+        r = score(pol, n=n, seed0=seed0, repeat=repeat, **kw)
+        out[name] = r
+        print("%-16s %4d %4d %4d %7.1f %6.1f %5.1f %6.2f %6.2f %6.2f %6.2f %6.2f %5.2f %5.2f %6.2f %5.2f %6.2f %6.1f %8.2f" % (
+            name, r["win"], r["die"], r["clock"], r["bhp"], r["php"], r["frames"] / FPS,
+            r["meanD"], r["meanOff"], r["parries"], r["poise_breaks"], r["blocks"], r["guard_breaks"],
+            r["hits_taken"], r["dodges"], r["arc_misses"], r["swings"], r["wall_pct"], r["G"]))
+    return out
+
+
+def timeline(name, width=1):
+    """Draw one boss move as the frames it actually occupies."""
+    m = [x for x in MOVES if x["name"] == name][0]
+    mark = {"w": "-", "d": "=", "h": "#", "r": "."}
+    bar = "".join(mark[k] * (n * width) for k, n in m["seg"])
+    return "%-7s %s  %d frames, reach %.1f, arc %.2f rad, %.0f damage" % (
+        name, bar, move_len(m), m["reach"], m["arc"], m["dmg"])
+
+
+def moveset():
+    print("windup -   delay =   ACTIVE #   recovery .")
+    for m in MOVES:
+        print(timeline(m["name"]))
+`;
+
+/**
+ * The duel, version 2 -- "The Warden, rebound".
+ *
+ * BOSS_SETUP above is FROZEN: every number published in World 3 was measured against it.
+ * This is a second world standing beside it, not a patch to the first. Eight moves instead
+ * of five (a jab too fast to react to, a sweep too wide to step around, and an unblockable
+ * eruption that covers the whole circle), a parry window of three frames that shrinks every
+ * time you press it again too soon, a bigger ring, and a heavy attack for the player.
+ *
+ * The twin of src/components/boss/duelSimV2.ts; scripts/boss_port_check_v2.mjs feeds both
+ * the same boss decisions and compares every frame.
+ */
+export const BOSS_SETUP_V2 = `import math
+
+import numpy as np
+
+FPS = 30
+MAX_FRAMES = 1080                 # 36 seconds
+
+# --------------------------------------------------------------------- the floor
+ARENA = 11.0                      # radius; both fighters are clamped inside it
+START_D = 5.5
+P_HP_MAX = 100.0
+P_ST_MAX = 100.0
+B_HP_MAX = 300.0
+
+P_SPEED = 0.075                   # units per frame
+B_CHASE = 0.105                   # you cannot outrun it -- rolling is the only way to make space
+B_TURN_IDLE = 0.13                # radians per frame while it has no move out
+B_TURN_WIND = 0.045               # and while winding one up: enough to punish an EARLY sidestep
+
+ST_REGEN = 0.55
+ST_DELAY = 20
+
+# --------------------------------------------------------------------- the buttons
+A_IDLE = 0
+A_MOVE0 = 1
+A_ATK = 9
+A_ROLL0 = 10
+A_GUARD = 14
+A_PARRY = 15
+A_HEAVY = 16
+N_ACTIONS = 17
+# Twelve RESERVED slots for the move one-hot, not len(MOVES). The ninth move shifted every index
+# after it and made two trained nets unloadable; this is the cheap insurance against doing that
+# again. Three unused floats is a fair price.
+MOVE_SLOTS = 12
+N_OBS = 38
+ACTION_NAMES = (["idle"]
+                + ["move in", "move in-right", "move right", "move back-right",
+                   "move back", "move back-left", "move left", "move in-left"]
+                + ["attack"]
+                + ["roll in", "roll right", "roll back", "roll left"]
+                + ["guard", "parry", "heavy attack"])
+
+# --------------------------------------------------------------------- the player's two swings
+# Light: fast and cheap, and worth very little posture. Twelve or thirteen of them break
+# the boss, which is a real plan but a slow one -- see the note on POISE_REGEN.
+ATK_SEG = [("w", 8), ("h", 2), ("r", 14)]
+ATK_REACH = 2.0
+ATK_DMG = 12.0
+ATK_COST = 20.0
+POISE_HIT = 16.0
+# Heavy: slower than every boss move but the eruption, and worth more poise damage than a light
+# -- but nothing like a whole pool on its own.
+#
+# Breaking poise takes THREE landed swings, and it takes three whatever you throw: heavy-only,
+# light-only or mixed. That is not the arithmetic it looks like (36 + 36 = 72 >= 70), because the
+# pool REGENERATES while you are swinging -- a heavy is 39 frames, which is 3.1 points back --
+# so two heavies land on 1.2 remaining and the third is what puts it down. Measured, not
+# reasoned: scripts/boss_v2_cases.py poise prints the trace.
+#
+# The first build of this world had the heavy at 50 against a pool of 50, so ONE broke poise from
+# full and the trained agent stunlocked the boss for a 12.8-second win. See boss_v2_stunlock.py.
+ATK2_SEG = [("w", 14), ("h", 3), ("r", 22)]
+ATK2_REACH = 2.3
+ATK2_DMG = 26.0
+ATK2_COST = 34.0
+# 33 against a pool of 100: FIVE landed heavies break the boss, not one and not two. The
+# heavy is the posture weapon -- a light is worth about half of it per swing and less than half
+# per second, so committing to the slow swing is what actually moves the bar.
+POISE_HIT2 = 33.0
+
+ROLL_LEN = 18
+ROLL_I0 = 3
+ROLL_I1 = 12
+ROLL_DIST = 1.7
+ROLL_COST = 25.0
+
+# --------------------------------------------------------------------- the parry, rebuilt
+# Sekiro's deflect is 12 frames at 60fps by default and SHRINKS with each recent press of the
+# guard button -- down to about 4 frames, and to nothing if you mash -- clearing again after
+# about 30 frames of not pressing, or instantly on a successful deflect.
+#
+# Ported to this sim's 30fps: 6 frames of window -- 200ms, the same wall-clock as the
+# source material -- losing PARRY_STEP frames for each press inside PARRY_HEAT, and heat that
+# outlasts the recovery so that pressing again as soon as you are able DOES stack. An earlier
+# build used 3 frames and called it a port; it was half the window it claimed to be. The width
+# is forgiving now and the fatigue does the punishing, which is the split the source actually
+# uses: a correct read should land, and what should cost you is pressing when you had not read
+# anything. PARRY_LEN is shorter than v1's 22 precisely so that mashing is physically possible
+# -- a mechanic that punishes an input you cannot make teaches nothing.
+PARRY_LEN = 16
+PAR_I0 = 2
+PARRY_WIN = 6
+# Frames of window lost per press inside PARRY_HEAT. At 2 the ladder is 6 -> 4 -> 2 -> 0, so
+# three hasty presses still spend the window completely.
+PARRY_STEP = 2
+PARRY_HEAT = 30
+PARRY_MAX_STACK = 3
+PARRY_COST = 15.0
+
+GUARD_CHIP = 0.20
+GUARD_ST = 0.6
+HITSTUN = 20
+GUARDBREAK = 45
+STAGGER = 55
+RIPOSTE_MULT = 3.0
+
+B_POISE_MAX = 100.0
+# The bar is progress you can LOSE. At 0.35 a frame the boss recovers 10.5 posture a second,
+# so disengaging for two seconds gives back roughly the whole of one heavy. That is the tension
+# the old 0.08 did not have: there, progress was permanent and backing off was free, so there
+# was no reason not to poke once and leave. Now pressure has to be sustained or it is wasted.
+POISE_REGEN = 0.35
+POISE_STAGGER = 60
+# A landed parry is the biggest single source of posture damage in the game -- more than a heavy
+# -- but it does NOT stagger on its own any more. It cancels the move and interrupts for
+# PARRY_FLINCH frames, which is far too short to riposte into. The riposte window only opens when
+# the bar actually breaks. One deflect never dropped a Sekiro boss either.
+PARRY_POISE = 50.0
+PARRY_FLINCH = 14
+# Posture recovery is tied to vitality. Above REGEN_HI health it recovers at full rate, between
+# REGEN_LO and REGEN_HI at half, and below REGEN_LO it does not recover at all. This is what makes
+# the fight snowball: the pressure you build early stops leaking once the boss is hurt.
+REGEN_HI = 0.7
+REGEN_LO = 0.5
+
+# --------------------------------------------------------------------- the moveset
+# arc is a HALF-angle in radians: the move connects when the player is within arc of the boss's
+# centre line. 3.20 is past pi, which is how "everywhere" is spelled.
+#
+# v1 had five moves and they were all frontal cones of a similar width, so one answer -- back
+# away and to the side -- covered nearly all of them. The three additions each close one of the
+# doors that left open:
+#   jab        18 frames start to finish. Too fast to react to, so it has to be respected before
+#              it starts, which is a different skill from reacting.
+#   sweep      arc 1.90. You cannot sidestep it. You leave, or you wear it.
+#   eruption   the full circle out to 4.2m, and UNBLOCKABLE: no guard, no parry. The only answer
+#              is to not be standing there, which costs stamina you wanted for something else.
+MOVES = [
+    dict(name="jab", seg=[("w", 6), ("h", 2), ("r", 10)],
+         reach=2.2, arc=0.70, dmg=11, adv=0.05),
+    dict(name="slash", seg=[("w", 14), ("h", 3), ("r", 16)],
+         reach=2.4, arc=0.80, dmg=18, adv=0.03),
+    dict(name="thrust", seg=[("w", 18), ("h", 2), ("r", 22)],
+         reach=3.6, arc=0.35, dmg=22, adv=0.075),
+    dict(name="sweep", seg=[("w", 16), ("h", 4), ("r", 24)],
+         reach=3.2, arc=1.90, dmg=26, adv=0.04),
+    dict(name="heavy", seg=[("w", 20), ("d", 8), ("h", 4), ("r", 28)],
+         reach=2.7, arc=0.95, dmg=34, adv=0.015),
+    dict(name="slam", seg=[("w", 24), ("d", 12), ("h", 5), ("r", 30)],
+         reach=2.6, arc=1.40, dmg=30, adv=0.0),
+    dict(name="combo", seg=[("w", 12), ("h", 3), ("w", 9), ("h", 3), ("r", 22)],
+         reach=2.3, arc=0.70, dmg=14, adv=0.045),
+    dict(name="flurry",
+         seg=[("w", 14), ("h", 2), ("w", 16), ("h", 2), ("w", 16), ("h", 2),
+              ("w", 16), ("h", 2), ("w", 16), ("h", 2), ("r", 26)],
+         reach=2.4, arc=0.75, dmg=9, adv=0.03),
+    dict(name="onslaught",
+         seg=[("w", 16), ("h", 2), ("w", 18), ("h", 2), ("w", 18), ("h", 2),
+              ("w", 18), ("h", 2), ("d", 14), ("w", 10), ("h", 2), ("w", 18),
+              ("h", 2), ("w", 18), ("h", 2), ("r", 30)],
+         reach=2.5, arc=0.80, dmg=8, adv=0.025),
+    dict(name="lunge", seg=[("w", 18), ("h", 3), ("r", 26)],
+         reach=2.8, arc=0.60, dmg=24, adv=0.22, gap=True),
+    dict(name="eruption", seg=[("w", 30), ("d", 8), ("h", 6), ("r", 34)],
+         reach=4.2, arc=3.20, dmg=40, adv=0.0, unblockable=True),
+]
+N_MOVES = len(MOVES)
+ENGAGE = 3.4                      # beyond this it closes instead of swinging
+# How far out the boss will start a GAP-CLOSER. Everything else needs you inside ENGAGE, so
+# backing off used to mean the boss simply walked at you and nothing happened until it arrived.
+# The lunge closes 18 x 0.22 = 4.0 units during its own windup, which is what makes retreating a
+# decision with a cost rather than a free reset.
+LUNGE_ENGAGE = 7.0
+BODY = 0.95                       # the two of them are solid: neither walks through the other
+
+
+def move_len(m):
+    return sum(n for _, n in m["seg"])
+
+
+def phase_at(m, f):
+    "Which segment of the animation frame f falls in, and its index."
+    acc = 0
+    for i, (kind, n) in enumerate(m["seg"]):
+        if f < acc + n:
+            return kind, i
+        acc += n
+    return "r", len(m["seg"]) - 1
+
+
+def wrap(a):
+    "An angle folded back into -pi..pi."
+    return (a + math.pi) % (2 * math.pi) - math.pi
+
+
+def clamp_arena(x, z):
+    r = math.hypot(x, z)
+    if r <= ARENA:
+        return x, z
+    return x * ARENA / r, z * ARENA / r
+
+
+class Duel:
+    """One fight on a floor. step() advances exactly one frame."""
+
+    def __init__(self, seed=0, aggr=0.5, moves=None, reward="damage", chip=GUARD_CHIP,
+                 clock=MAX_FRAMES, timeout="truncate",
+                 poise_max=B_POISE_MAX, poise_hit=POISE_HIT, poise_hit2=POISE_HIT2,
+                 poise_regen=POISE_REGEN, parry_poise=PARRY_POISE):
+        # poise_max / poise_hit2 are overridable so the SUPERSEDED build stays reproducible: the
+        # first v2 had a 50-point pool and a heavy worth 50, i.e. a guaranteed break from full,
+        # and the agent trained against it found a stunlock. scripts/boss_v2_stunlock.py.
+        self.rng = np.random.default_rng(seed)
+        self.poise_max = poise_max
+        self.poise_hit = poise_hit
+        self.poise_hit2 = poise_hit2
+        self.poise_regen = poise_regen
+        self.parry_poise = parry_poise
+        self.aggr = aggr
+        self.allowed = list(range(N_MOVES)) if moves is None else list(moves)
+        self.reward_kind = reward
+        self.chip = chip
+        self.clock = clock
+        self.timeout = timeout
+        self.reset(seed)
+
+    # ------------------------------------------------------------------ reset
+    def reset(self, seed=None):
+        if seed is not None:
+            self.rng = np.random.default_rng(seed)
+            self.seed = seed
+        self.t = 0
+        th = float(self.rng.uniform(-math.pi, math.pi))
+        self.bx, self.bz = 0.0, 0.0
+        self.px, self.pz = START_D * math.sin(th), START_D * math.cos(th)
+        self.bang = self.to_player()
+        self.php, self.bhp = P_HP_MAX, B_HP_MAX
+        self.pst = P_ST_MAX
+        self.pa, self.pf = A_IDLE, 0
+        self.pdir = 4
+        self.p_stun = 0
+        self.p_regen_lock = 0
+        self.p_hit_done = False
+        self.guarding = False
+        self.bm, self.bf = -1, 0
+        self.b_seg_done = -1
+        self.b_cd = int(self.rng.integers(10, 40))
+        self.b_stagger = 0
+        self.b_poise = self.poise_max
+        self.parry_stack = 0          # 0 fresh, PARRY_MAX_STACK is no window at all
+        self.parry_heat = 0           # frames left in which another press counts as a repeat
+        self.parry_win = PARRY_WIN    # the window THIS parry was started with
+        self.b_flinch = 0             # parried: move cancelled, but NOT a riposte window
+        self.log = dict(parries=0, blocks=0, guard_breaks=0, hits_taken=0, rolls=0,
+                        dodges=0, swings=0, heavies=0, hits_dealt=0, riposte_dmg=0.0,
+                        poise_breaks=0, chip_taken=0.0, dmg_taken=0.0, dmg_dealt=0.0,
+                        whiffs=0, guard_frames=0, wall_frames=0, arc_misses=0,
+                        parry_mashes=0, parry_dead=0, erupt_taken=0,
+                        boss_moves=np.zeros(N_MOVES, int))
+        return self.obs()
+
+    # ------------------------------------------------------------------ geometry
+    @property
+    def d(self):
+        return math.hypot(self.px - self.bx, self.pz - self.bz)
+
+    def to_player(self):
+        return math.atan2(self.px - self.bx, self.pz - self.bz)
+
+    def off_axis(self):
+        "How far off the boss's centre line you are, in radians. 0 = dead ahead."
+        return wrap(self.to_player() - self.bang)
+
+    # ------------------------------------------------------------------ helpers
+    @property
+    def busy(self):
+        if self.p_stun > 0:
+            return True
+        if self.pa == A_ATK:
+            return self.pf < move_len(dict(seg=ATK_SEG))
+        if self.pa == A_HEAVY:
+            return self.pf < move_len(dict(seg=ATK2_SEG))
+        if A_ROLL0 <= self.pa <= A_ROLL0 + 3:
+            return self.pf < ROLL_LEN
+        if self.pa == A_PARRY:
+            return self.pf < PARRY_LEN
+        return False
+
+    @property
+    def parry_live(self):
+        "Is the parry actually catching this frame? Uses the window frozen at press time."
+        return self.pa == A_PARRY and PAR_I0 <= self.pf < PAR_I0 + self.parry_win
+
+    def spend(self, c):
+        self.pst = max(0.0, self.pst - c)
+        self.p_regen_lock = ST_DELAY
+
+    def _shift(self, eighths, dist):
+        ang = self.to_player() + math.pi + eighths * math.pi / 4
+        self.px, self.pz = clamp_arena(self.px + dist * math.sin(ang),
+                                       self.pz + dist * math.cos(ang))
+        self._separate()
+
+    def _close(self, dist):
+        self.bx, self.bz = clamp_arena(self.bx + dist * math.sin(self.bang),
+                                       self.bz + dist * math.cos(self.bang))
+        self._separate()
+
+    def _separate(self):
+        "Keep the two bodies apart, so the boss shoves the player instead of walking through."
+        dx, dz = self.px - self.bx, self.pz - self.bz
+        r = math.hypot(dx, dz)
+        if r >= BODY:
+            return
+        if r < 1e-9:
+            dx, dz, r = math.sin(self.bang), math.cos(self.bang), 1.0
+        ux, uz = dx / r, dz / r
+        self.px, self.pz = clamp_arena(self.bx + ux * BODY, self.bz + uz * BODY)
+        if math.hypot(self.px - self.bx, self.pz - self.bz) < BODY - 1e-9:
+            self.bx, self.bz = clamp_arena(self.px - ux * BODY, self.pz - uz * BODY)
+
+    def _seg_start(self, m, seg):
+        return sum(n for _, n in m["seg"][:seg])
+
+    def _start_parry(self):
+        "The button went down. Freeze the window it gets, and charge it for the habit."
+        if self.parry_heat > 0:
+            self.parry_stack = min(PARRY_MAX_STACK, self.parry_stack + 1)
+            self.log["parry_mashes"] += 1
+        else:
+            self.parry_stack = 0
+        self.parry_heat = PARRY_HEAT
+        self.parry_win = max(0, PARRY_WIN - PARRY_STEP * self.parry_stack)
+        if self.parry_win == 0:
+            self.log["parry_dead"] += 1
+        self.pa, self.pf = A_PARRY, 0
+        self.spend(PARRY_COST)
+
+    # ------------------------------------------------------------------ one frame
+    def step(self, a):
+        php0, bhp0 = self.php, self.bhp
+
+        # 1. the button, if it is even read this frame
+        if not self.busy:
+            self.guarding = a == A_GUARD
+            if A_MOVE0 <= a <= A_MOVE0 + 7:
+                self.pa, self.pf = a, 0
+            elif a == A_ATK and self.pst >= ATK_COST:
+                self.pa, self.pf, self.p_hit_done = A_ATK, 0, False
+                self.spend(ATK_COST)
+                self.log["swings"] += 1
+            elif a == A_HEAVY and self.pst >= ATK2_COST:
+                self.pa, self.pf, self.p_hit_done = A_HEAVY, 0, False
+                self.spend(ATK2_COST)
+                self.log["swings"] += 1
+                self.log["heavies"] += 1
+            elif A_ROLL0 <= a <= A_ROLL0 + 3 and self.pst >= ROLL_COST:
+                self.pa, self.pf = a, 0
+                self.spend(ROLL_COST)
+                self.log["rolls"] += 1
+            elif a == A_PARRY and self.pst >= PARRY_COST:
+                self._start_parry()
+            elif a in (A_IDLE, A_GUARD):
+                self.pa, self.pf = a, 0
+        if self.guarding:
+            self.log["guard_frames"] += 1
+        if math.hypot(self.px, self.pz) > ARENA - 0.6:
+            self.log["wall_frames"] += 1
+
+        # 2. the player moves
+        if self.p_stun == 0:
+            if A_MOVE0 <= self.pa <= A_MOVE0 + 7:
+                self._shift(self.pa - A_MOVE0, P_SPEED * (0.55 if self.guarding else 1.0))
+            elif A_ROLL0 <= self.pa <= A_ROLL0 + 3 and self.pf < ROLL_I1:
+                self._shift(2 * (self.pa - A_ROLL0), ROLL_DIST / ROLL_I1)
+
+        # 3. the boss decides
+        if self.b_stagger > 0:
+            self.b_stagger -= 1
+        elif self.b_flinch > 0:
+            self.b_flinch -= 1
+        elif self.bm < 0:
+            if self.b_cd > 0:
+                self.b_cd -= 1
+            want = wrap(self.to_player() - self.bang)
+            self.bang += max(-B_TURN_IDLE, min(B_TURN_IDLE, want))
+            if self.d > ENGAGE:
+                self._close(B_CHASE)
+            if self.b_cd <= 0 and self.d <= LUNGE_ENGAGE:
+                # Beyond ENGAGE only a gap-closer is eligible; _pick returns None if none reaches.
+                want = self._pick(far=self.d > ENGAGE)
+                if want is not None:
+                    self.bm = want
+                    self.bf, self.b_seg_done = 0, -1
+                    self.log["boss_moves"][self.bm] += 1
+
+        # 4. the boss animation, its facing, and its hitboxes
+        if self.bm >= 0 and self.b_stagger == 0 and self.b_flinch == 0:
+            m = MOVES[self.bm]
+            kind, seg = phase_at(m, self.bf)
+            if kind in ("w", "d"):
+                want = wrap(self.to_player() - self.bang)
+                self.bang += max(-B_TURN_WIND, min(B_TURN_WIND, want))
+                self._close(m["adv"])
+            if kind == "h" and seg != self.b_seg_done:
+                if self.d <= m["reach"] and abs(self.off_axis()) <= m["arc"]:
+                    self._boss_hits(m["dmg"], m)
+                    self.b_seg_done = seg
+                elif self.bf == self._seg_start(m, seg):
+                    self.log["whiffs"] += 1
+                    if self.d <= m["reach"]:
+                        self.log["arc_misses"] += 1
+            self.bf += 1
+            if self.bf >= move_len(m):
+                self.bm, self.bf = -1, 0
+                lo = int(round(6 + 40 * (1 - self.aggr)))
+                self.b_cd = int(self.rng.integers(lo, lo + 26))
+
+        # 5. the player's own hitbox
+        if self.pa in (A_ATK, A_HEAVY):
+            heavy = self.pa == A_HEAVY
+            segs = ATK2_SEG if heavy else ATK_SEG
+            reach = ATK2_REACH if heavy else ATK_REACH
+            kind = phase_at(dict(seg=segs), self.pf)[0]
+            if kind == "h" and not self.p_hit_done and self.d <= reach:
+                mult = RIPOSTE_MULT if self.b_stagger > 0 else 1.0
+                dealt = (ATK2_DMG if heavy else ATK_DMG) * mult
+                self.bhp -= dealt
+                self.p_hit_done = True
+                self.log["hits_dealt"] += 1
+                self.log["dmg_dealt"] += dealt
+                if mult > 1:
+                    self.log["riposte_dmg"] += dealt
+                else:
+                    # Poise. The multiplier was read BEFORE this, so the hit that breaks the pool
+                    # does ordinary damage and the riposte is the NEXT one: a break only pays if
+                    # you follow up.
+                    self.b_poise -= self.poise_hit2 if heavy else self.poise_hit
+                    if self.b_poise <= 0:
+                        self._stagger(POISE_STAGGER)
+                        self.log["poise_breaks"] += 1
+
+        # 6. clocks
+        if self.b_stagger == 0:
+            # vitality-linked recovery: full, half, then none
+            frac = self.bhp / B_HP_MAX
+            scale = 1.0 if frac > REGEN_HI else (0.5 if frac > REGEN_LO else 0.0)
+            self.b_poise = min(self.poise_max, self.b_poise + self.poise_regen * scale)
+        self.pf += 1
+        if self.p_stun > 0:
+            self.p_stun -= 1
+        if self.parry_heat > 0:
+            self.parry_heat -= 1
+        if self.p_regen_lock > 0:
+            self.p_regen_lock -= 1
+        elif not self.guarding:
+            self.pst = min(P_ST_MAX, self.pst + ST_REGEN)
+        self.t += 1
+
+        won = self.bhp <= 0
+        lost = self.php <= 0
+        term = won or lost
+        trunc = self.t >= self.clock and not term
+        if trunc and self.timeout == "defeat":
+            lost, term, trunc = True, True, False
+        r = self._reward(php0, bhp0, won, lost)
+        return self.obs(), r, term, trunc, dict(won=won, lost=lost)
+
+    def _pick(self, far=False):
+        cands = []
+        for i in self.allowed:
+            m = MOVES[i]
+            if far and not m.get("gap"):
+                continue
+            wind = sum(n for k, n in m["seg"] if k in ("w", "d"))
+            if m["reach"] + m["adv"] * wind >= self.d - 0.1:
+                cands.append(i)
+        # Out past ENGAGE there is no fallback: if nothing can reach, the boss keeps walking.
+        if far and not cands:
+            return None
+        use = cands if cands else [1]
+        # The slow, committing moves get likelier as aggression rises; the eruption stays rare
+        # whatever happens, because a boss that opens with it every time is a boss with one move.
+        w = []
+        for i in use:
+            n = MOVES[i]["name"]
+            if n == "eruption":
+                w.append(0.35 + 0.5 * self.aggr)
+            elif n == "lunge":
+                w.append(1.4)
+            # long strings are the parry test, so they are common on purpose
+            elif n == "flurry":
+                w.append(1.5)
+            elif n == "onslaught":
+                w.append(0.9 + 0.6 * self.aggr)
+            elif n in ("heavy", "slam"):
+                w.append(1 + 1.5 * self.aggr)
+            else:
+                w.append(1.0)
+        w = np.array(w, float)
+        return int(self.rng.choice(use, p=w / w.sum()))
+
+    def _stagger(self, frames):
+        "Put the boss down. Any stagger cancels the move it had out and refills its poise."
+        self.b_stagger = frames
+        self.b_poise = self.poise_max
+        self.bm, self.bf, self.b_cd = -1, 0, 0
+
+    def _boss_hits(self, dmg, m):
+        if A_ROLL0 <= self.pa <= A_ROLL0 + 3 and ROLL_I0 <= self.pf <= ROLL_I1:
+            self.log["dodges"] += 1
+            return
+        # The eruption goes through the shield and through the parry. Rolling out of it works
+        # only because i-frames are i-frames; standing in it and pressing a button does not.
+        if not m.get("unblockable"):
+            if self.parry_live:
+                self.log["parries"] += 1
+                # A clean parry clears the fatigue outright, exactly as a successful deflect does
+                # in Sekiro. Landing one is what buys back the next one.
+                self.parry_stack, self.parry_heat = 0, 0
+                # ...and it feeds the posture bar rather than skipping it. The move is cancelled
+                # and the boss interrupted, but there is no riposte here -- only a BREAK opens it.
+                self.b_poise -= self.parry_poise
+                self.bm, self.bf = -1, 0
+                self.b_flinch = PARRY_FLINCH
+                if self.b_poise <= 0:
+                    self._stagger(POISE_STAGGER)
+                    self.log["poise_breaks"] += 1
+                return
+            if self.guarding and self.pst > 0:
+                chip = dmg * self.chip
+                self.php -= chip
+                self.pst -= dmg * GUARD_ST
+                self.p_regen_lock = ST_DELAY
+                self.log["blocks"] += 1
+                self.log["chip_taken"] += chip
+                self.log["dmg_taken"] += chip
+                if self.pst <= 0:
+                    self.pst = 0.0
+                    self.p_stun = GUARDBREAK
+                    self.pa, self.pf = A_IDLE, 0
+                    self.guarding = False
+                    self.log["guard_breaks"] += 1
+                return
+        # Hitstun scales with the size of the blow. A flat 20 frames was fine when every move hit
+        # once, but a 7-hit string lands every 18-20 frames, so a flat stun locked you through the
+        # whole rest of the combo after one missed parry -- eat one, eat all seven. A 9-damage chip
+        # now stuns 8 frames, short enough to recover and contest the next beat; the eruption still
+        # stuns the full 20. Being hit should cost you a beat, not the string.
+        self.php -= dmg
+        self.p_stun = max(8, min(HITSTUN, int(round(HITSTUN * dmg / 22.0))))
+        self.pa, self.pf = A_IDLE, 0
+        self.guarding = False
+        self.log["hits_taken"] += 1
+        self.log["dmg_taken"] += dmg
+        if m.get("unblockable"):
+            self.log["erupt_taken"] += 1
+
+    # ------------------------------------------------------------------ reward
+    def _reward(self, php0, bhp0, won, lost):
+        dealt = bhp0 - self.bhp
+        taken = php0 - self.php
+        if self.reward_kind == "damage":
+            r = 0.1 * dealt - 0.1 * taken
+        elif self.reward_kind == "trade":
+            r = 0.1 * dealt
+        elif self.reward_kind == "survive":
+            r = 1.0 / FPS
+        else:
+            raise ValueError(self.reward_kind)
+        if won:
+            r += 30.0
+        if lost:
+            r -= 30.0
+        return float(r)
+
+    # ------------------------------------------------------------------ what it sees
+    def obs(self):
+        m = MOVES[self.bm] if self.bm >= 0 else None
+        kind = phase_at(m, self.bf)[0] if m else "i"
+        off = self.off_axis()
+        v = np.zeros(N_OBS, np.float32)
+        v[0] = self.d / ARENA
+        v[1] = math.sin(off)
+        v[2] = math.cos(off)
+        v[3] = (ARENA - math.hypot(self.px, self.pz)) / ARENA     # room behind you
+        v[4] = self.php / P_HP_MAX
+        v[5] = self.bhp / B_HP_MAX
+        v[6] = self.pst / P_ST_MAX
+        v[7] = self.pa / (N_ACTIONS - 1)
+        v[8] = min(self.pf, 40) / 40.0
+        v[9] = self.p_stun / GUARDBREAK
+        v[10] = 1.0 if self.guarding else 0.0
+        if m is not None:
+            v[11 + self.bm] = 1.0                                  # which move (12 reserved)
+        v[23] = min(self.bf, 60) / 60.0
+        v[24] = 1.0 if kind == "w" else 0.0
+        v[25] = 1.0 if kind == "d" else 0.0
+        v[26] = 1.0 if kind == "h" else 0.0
+        v[27] = 1.0 if kind == "r" else 0.0
+        v[28] = self.b_stagger / STAGGER
+        v[29] = (m["reach"] / ARENA) if m is not None else 0.0
+        v[30] = (m["arc"] / math.pi) if m is not None else 0.0     # arc can exceed 1
+        v[31] = 1.0 if (m is not None and self.d <= m["reach"] and abs(off) <= m["arc"]) else 0.0
+        v[32] = self.t / self.clock
+        v[33] = self.b_poise / self.poise_max
+        # Without these two the parry rule is a partially observed problem for no reason: the
+        # window depends on what you pressed half a second ago, so the agent is shown it.
+        v[34] = self.parry_stack / PARRY_MAX_STACK                 # how worn the parry is
+        v[35] = self.parry_heat / PARRY_HEAT                       # until it comes back
+        v[36] = self.b_flinch / PARRY_FLINCH                       # parried, interrupted
+        # How far through THIS move we are, which v[23] stops being able to say once a move runs
+        # past its 60-frame cap. flurry is 114 frames and onslaught is 174, so without this the
+        # back half of every long string is one indistinguishable instant to the network.
+        v[37] = min(1.0, self.bf / move_len(m)) if m else 0.0
+        return v
+
+
+IN, IN_R, RIGHT, BACK_R, BACK, BACK_L, LEFT, IN_L = range(8)
+ROLL_IN, ROLL_RIGHT, ROLL_BACK, ROLL_LEFT = (A_ROLL0 + i for i in range(4))
+
+
+def frames_to_active(env):
+    """Frames until the boss's next active frame, or None if it has no move out."""
+    if env.bm < 0 or env.b_stagger > 0:
+        return None
+    m = MOVES[env.bm]
+    acc, f = 0, env.bf
+    for i, (kind, n) in enumerate(m["seg"]):
+        if kind == "h" and acc + n > f and i != env.b_seg_done:
+            return max(0, acc - f)
+        acc += n
+    return None
+
+
+def will_connect(env, slack=0.25):
+    """Is the player currently inside the reach AND the arc of the move being wound up?"""
+    if env.bm < 0 or env.b_stagger > 0:
+        return False
+    m = MOVES[env.bm]
+    return env.d <= m["reach"] + slack and abs(env.off_axis()) <= m["arc"]
+
+
+def incoming(env):
+    """The move the boss has out, or None."""
+    return MOVES[env.bm] if (env.bm >= 0 and env.b_stagger == 0) else None
+
+
+def boss_recovering(env):
+    if env.bm < 0 or env.b_stagger > 0:
+        return False
+    return phase_at(MOVES[env.bm], env.bf)[0] == "r"
+
+
+def window_if_pressed_now(env):
+    """How many frames of parry the NEXT press would get, given the fatigue right now."""
+    stack = min(PARRY_MAX_STACK, env.parry_stack + 1) if env.parry_heat > 0 else 0
+    return max(0, PARRY_WIN - PARRY_STEP * stack)
+
+
+# --------------------------------------------------------------------- scripted players
+def hold_range(env, lo=1.6, hi=2.3):
+    if env.pst < 30:
+        return A_MOVE0 + BACK
+    if env.d > hi:
+        return A_MOVE0 + IN
+    if env.d < lo:
+        return A_MOVE0 + BACK
+    return A_MOVE0 + RIGHT
+
+
+def close_and_hit(env):
+    if env.d <= ATK_REACH and env.pst >= ATK_COST:
+        return A_ATK
+    return A_MOVE0 + IN
+
+
+def stand_still(env):
+    return A_IDLE
+
+
+def random_buttons(seed=0):
+    rng = np.random.default_rng(seed)
+
+    def pol(env):
+        return int(rng.integers(0, N_ACTIONS))
+    return pol
+
+
+def masher(env):
+    return A_ATK if env.pst >= ATK_COST else A_IDLE
+
+
+def run_away(env):
+    return A_MOVE0 + BACK
+
+
+def circle(env):
+    return A_MOVE0 + RIGHT
+
+
+def turtle(env):
+    return A_GUARD
+
+
+def mash_parry(env):
+    """The habit the fatigue rule exists to punish. Kept as a named player so the cost of it is
+    a number on the ladder rather than an assertion in a comment."""
+    if env.b_stagger > 0 and env.d <= ATK2_REACH and env.pst >= ATK2_COST:
+        return A_HEAVY
+    if env.pst >= PARRY_COST:
+        return A_PARRY
+    return hold_range(env)
+
+
+def roll_and_punish(env):
+    k = frames_to_active(env)
+    if k is not None and 3 <= k <= 10 and will_connect(env) and env.pst >= ROLL_COST:
+        return ROLL_BACK
+    if env.b_stagger > 0 or boss_recovering(env):
+        if env.pst >= ATK_COST + ROLL_COST:
+            return close_and_hit(env)
+    return hold_range(env)
+
+
+def patient_parry(env):
+    """Parries only on a read, and only while the window is still full width. Rolls out of the
+    sweep and the eruption, because neither can be answered with a button."""
+    m = incoming(env)
+    k = frames_to_active(env)
+    if m is not None and m.get("unblockable"):
+        if k is not None and k <= 14 and env.pst >= ROLL_COST:
+            return ROLL_BACK
+        return A_MOVE0 + BACK
+    if env.b_stagger > 0:
+        if env.d <= ATK2_REACH and env.pst >= ATK2_COST:
+            return A_HEAVY
+        if env.d <= ATK_REACH and env.pst >= ATK_COST:
+            return A_ATK
+        return A_MOVE0 + IN
+    if (k is not None and 1 <= k <= 3 and will_connect(env) and env.pst >= PARRY_COST
+            and window_if_pressed_now(env) >= PARRY_WIN):
+        return A_PARRY
+    if m is not None and m["arc"] > 1.5 and k is not None and k <= 6 and env.pst >= ROLL_COST:
+        return ROLL_BACK
+    if env.bm < 0 and env.d <= ATK_REACH and env.pst >= ATK_COST:
+        return A_ATK
+    return hold_range(env)
+
+
+def pressure(env):
+    """Builds posture with the HEAVY and stays on top of the boss; parries as defence, not as plan.
+
+    This is the reference player for v2, and it exists because 'patient parry' is not one. That
+    player only swings while the boss is already staggered, which was fine when a single parry
+    granted a stagger -- it no longer does, so a policy waiting for one waits forever. The route
+    the numbers actually describe is five landed heavies, and this is what taking it looks like.
+    """
+    m, k = incoming(env), frames_to_active(env)
+    if m is not None and m.get("unblockable"):
+        if k is not None and k <= 14 and env.pst >= ROLL_COST:
+            return ROLL_BACK
+        return A_MOVE0 + BACK
+    if env.b_stagger > 0:                       # a break is earned; cash it
+        if env.d <= ATK2_REACH and env.pst >= ATK2_COST:
+            return A_HEAVY
+        if env.d <= ATK_REACH and env.pst >= ATK_COST:
+            return A_ATK
+        return A_MOVE0 + IN
+    if (k is not None and 1 <= k <= 3 and will_connect(env) and env.pst >= PARRY_COST
+            and window_if_pressed_now(env) > 0):
+        return A_PARRY
+    if m is not None and m["arc"] > 1.5 and k is not None and k <= 6 and env.pst >= ROLL_COST:
+        return ROLL_BACK
+    # the plan: land heavies. Recovery is the safe window, but do not only wait for it.
+    if env.d <= ATK2_REACH and env.pst >= ATK2_COST and (env.bm < 0 or boss_recovering(env)):
+        return A_HEAVY
+    if env.d <= ATK_REACH and env.pst >= ATK_COST and (env.bm < 0 or boss_recovering(env)):
+        return A_ATK
+    if env.pst < 40:
+        return A_MOVE0 + BACK
+    return A_MOVE0 + IN if env.d > ATK2_REACH else A_MOVE0 + RIGHT
+
+
+PLAYERS = [
+    ("stand still", stand_still), ("random buttons", random_buttons()),
+    ("mash attack", masher), ("run away", run_away), ("circle", circle),
+    ("hold guard", turtle), ("mash parry", mash_parry),
+    ("roll, punish", roll_and_punish), ("patient parry", patient_parry),
+    ("pressure", pressure),
+]
+
+
+# --------------------------------------------------------------------- scoring
+def duel(policy, seed=0, repeat=3, **kw):
+    env = Duel(seed=seed, **kw)
+    G, a, dsum, offsum = 0.0, A_IDLE, 0.0, 0.0
+    presses = 0
+    while True:
+        if env.t % repeat == 0:
+            a = policy(env)
+        if a == A_PARRY and not env.busy and env.pst >= PARRY_COST:
+            presses += 1
+        _, r, term, trunc, info = env.step(a)
+        G += r
+        dsum += env.d
+        offsum += abs(env.off_axis())
+        if term or trunc:
+            return dict(G=G, frames=env.t, won=int(info["won"]), lost=int(info["lost"]),
+                        php=env.php, bhp=env.bhp, meanD=dsum / env.t,
+                        meanOff=offsum / env.t, parry_presses=presses, **env.log)
+
+
+def score(policy, n=200, seed0=1000, repeat=3, **kw):
+    rows = [duel(policy, seed=seed0 + i, repeat=repeat, **kw) for i in range(n)]
+    out = dict(win=sum(r["won"] for r in rows), die=sum(r["lost"] for r in rows), n=n)
+    out["clock"] = n - out["win"] - out["die"]
+    for k in rows[0]:
+        if k not in ("won", "lost", "boss_moves"):
+            out[k] = float(np.mean([float(r[k]) for r in rows]))
+    out["guard_pct"] = 100.0 * out["guard_frames"] / out["frames"]
+    out["wall_pct"] = 100.0 * out["wall_frames"] / out["frames"]
+    out["parry_pct"] = (100.0 * out["parries"] / out["parry_presses"]
+                        if out["parry_presses"] > 0 else 0.0)
+    return out
+
+
+def ladder(players=None, n=200, seed0=1000, repeat=3, **kw):
+    print("player           win  die  clk  bossHP  ownHP   sec  press  parry  land%  mash  dead  poise  hits  erupt        G")
+    out = {}
+    for name, pol in (PLAYERS if players is None else players):
+        r = score(pol, n=n, seed0=seed0, repeat=repeat, **kw)
+        out[name] = r
+        print("%-16s %4d %4d %4d %7.1f %6.1f %5.1f %6.2f %6.2f %6.1f %5.2f %5.2f %6.2f %5.2f %6.2f %8.2f" % (
+            name, r["win"], r["die"], r["clock"], r["bhp"], r["php"], r["frames"] / FPS,
+            r["parry_presses"], r["parries"], r["parry_pct"], r["parry_mashes"],
+            r["parry_dead"], r["poise_breaks"], r["hits_taken"], r["erupt_taken"], r["G"]))
+    return out
+
+
+def timeline(name, width=1):
+    """Draw one boss move as the frames it actually occupies."""
+    m = [x for x in MOVES if x["name"] == name][0]
+    mark = {"w": "-", "d": "=", "h": "#", "r": "."}
+    bar = "".join(mark[k] * (n * width) for k, n in m["seg"])
+    tail = "  UNBLOCKABLE" if m.get("unblockable") else ""
+    return "%-9s %s  %d frames, reach %.1f, arc %.2f rad, %.0f damage%s" % (
+        name, bar, move_len(m), m["reach"], m["arc"], m["dmg"], tail)
+
+
+def moveset():
+    print("windup -   delay =   ACTIVE #   recovery .")
+    for m in MOVES:
+        print(timeline(m["name"]))
 `;

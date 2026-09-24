@@ -11,7 +11,7 @@ import { RaceLab } from "@/components/fire/RaceLab";
 export const metadata = {
   title: "Training the crew: DQN vs PPO — Manifold",
   description:
-    "Two learners, one world, one interface. DQN and PPO are raced against the shipped wildfire environment on the same two hundred held-out worlds, and the answer depends entirely on what you count: at equal simulator steps one of them wins clearly, at equal minutes of training it is a tie. The page ships the trainer that produced every number on it.",
+    "Two learners, one world, one interface. DQN and PPO are raced against the shipped wildfire environment on the same two hundred held-out worlds. DQN averages 0.75 village cells lost to PPO\u2019s 1.27 and becomes the first crew on this track to beat the hand-written fire chief \u2014 but the seeds overlap, so the mean is not the claim. DQN\u2019s three runs land within 0.17 of each other while PPO\u2019s spread over 1.5, and the honest question turns out to be not which learner is better but which one you can trust to have worked. The page ships the trainer that produced every number on it.",
 };
 
 const GOLD = "var(--c-rl)";
@@ -31,8 +31,8 @@ export default function TrainingTheCrew() {
           decision we made deliberately, at eleven to one. The{" "}
           <Link href="/learn/building-environments/baselines" style={link}>bar</Link> is a ten-line rule that loses 1.11
           village cells. What is left is the part that usually gets written first: pick a learner and train it. This
-          page picks two, races them against each other on the same two hundred worlds, and finds that the winner
-          depends on what you put on the bottom axis.</>}
+          page picks two, races them against each other on the same two hundred worlds, and finds that the
+          interesting number is not the winner&rsquo;s.</>}
         titleSize={40}
         introSize={17.5}
       />
@@ -206,9 +206,164 @@ export default function TrainingTheCrew() {
           </p>
         </Callout>
 
-        {/* RESULTS */}
+        <h2>The race</h2>
+        <p>
+          Nine runs: three seeds of DQN at a million simulator steps, and three seeds of PPO evaluated at a million
+          and again at two million. All on one machine, one at a time, so the minutes are comparable with each
+          other. Every score is the two hundred exam worlds, scored by the same <code>command()</code> that scored
+          the chiefs.
+        </p>
 
-        {/* CLOSING — rewritten once the race lands */}
+        <PredictPrompt
+          accent={GOLD}
+          prompt={<>The guard chief loses <strong>1.11</strong> village cells and was written in ten lines, without
+            training. Both learners now get a million steps against the same world. Where do they land?</>}
+          options={[
+            "Both clear the chief comfortably — a million steps is a lot",
+            "One clears it, one does not",
+            "Both land near it, inside the ±0.35 the exam carries",
+            "Neither gets near it",
+          ]}
+          nudge={<>The Proof at the bottom of this page argues the village term is the quietest part of the reward.
+            It was written before any of these runs existed.</>}
+        />
+
+        <RaceLab />
+
+        <p>
+          At equal simulator steps the means separate: <strong>0.75</strong> village cells for DQN against{" "}
+          <strong>1.27</strong> for PPO, and 70.8 cells burnt against 112.5. Switching the axis to minutes does not
+          rescue PPO. It is the cheaper learner per step &mdash; a million steps costs it 8.1 minutes against
+          DQN&rsquo;s 13.5, because it replays nothing &mdash; but given <em>more</em> wall clock than DQN spent in
+          total, two million steps and 16.3 minutes, it still lands at 1.34. This page was built expecting the two
+          axes to name different winners. They do not.
+        </p>
+
+        <div style={{ overflowX: "auto", margin: "18px 0" }}>
+          <table style={{ borderCollapse: "collapse", fontSize: 13.5, minWidth: 520 }}>
+            <thead>
+              <tr style={{ borderBottom: "1px solid var(--border)" }}>
+                <th style={th}>crew</th>
+                <th style={thr}>village lost</th>
+                <th style={thr}>the three seeds</th>
+                <th style={thr}>saved</th>
+                <th style={thr}>burnt</th>
+                <th style={thr}>minutes</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style={{ borderBottom: "1px solid var(--border)" }}>
+                <td style={td}><strong>DQN, 1M</strong></td>
+                <td style={tdr}><strong>0.75</strong></td><td style={tdr}>0.69 / 0.69 / 0.86</td>
+                <td style={tdr}>80.8%</td><td style={tdr}>70.8</td><td style={tdr}>13.5</td>
+              </tr>
+              <tr style={{ borderBottom: "1px solid var(--border)" }}>
+                <td style={td}>PPO, 1M</td>
+                <td style={tdr}>1.27</td><td style={tdr}>1.03 / 2.00 / 0.78</td>
+                <td style={tdr}>70.0%</td><td style={tdr}>112.5</td><td style={tdr}>8.1</td>
+              </tr>
+              <tr style={{ borderBottom: "1px solid var(--border)" }}>
+                <td style={td}>PPO, 2M</td>
+                <td style={tdr}>1.34</td><td style={tdr}>0.94 / 2.31 / 0.76</td>
+                <td style={tdr}>69.3%</td><td style={tdr}>99.9</td><td style={tdr}>16.3</td>
+              </tr>
+              <tr style={{ borderBottom: "1px solid var(--border)" }}>
+                <td style={td}>the guard chief</td>
+                <td style={tdr}>1.11</td><td style={tdr}>&mdash;</td>
+                <td style={tdr}>78.5%</td><td style={tdr}>81.7</td><td style={tdr}>0</td>
+              </tr>
+              <tr>
+                <td style={td}>the nearest chief</td>
+                <td style={tdr}>2.69</td><td style={tdr}>&mdash;</td>
+                <td style={tdr}>65.5%</td><td style={tdr}>85.6</td><td style={tdr}>0</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <Callout title="The rule this page set itself, applied to its own result" color={GOLD}>
+          <p style={{ margin: 0 }}>
+            Two sections ago this page promised that &ldquo;a claim only gets made when the seeds do not
+            overlap.&rdquo; They overlap. DQN runs from 0.69 to 0.86 and PPO&rsquo;s best seed is <strong>0.78</strong>,
+            which is inside that range &mdash; one PPO run in three is as good as the DQN runs. So{" "}
+            <em>&ldquo;DQN beats PPO&rdquo; is not a sentence this page is allowed to write</em>, however much a
+            0.75-against-1.27 gap in the means invites it. Three seeds an arm is enough to see a difference this
+            size and not enough to call it. What the seeds do support is a different claim, and it is the more
+            useful one.
+          </p>
+        </Callout>
+
+        <h2>The number that is not the mean</h2>
+        <p>
+          Read the seed column instead of the average. DQN&rsquo;s three runs are 0.69, 0.69 and 0.86 &mdash; a
+          spread of <strong>0.17</strong>. PPO&rsquo;s six scores run from 0.76 to 2.31, a spread of{" "}
+          <strong>1.55</strong>, and it is not noise spread evenly over the runs: seeds 0 and 2 settle near 0.8 and
+          stay there, while seed 1 is stuck near 2.1 by a quarter of the way in and two million steps never move it.
+          That is not one policy measured noisily. It is two different policies, and which one you get is decided by
+          the initialisation.
+        </p>
+        <p>
+          Which is why the axis toggle above is worth dragging rather than reading once. Park the cursor at 13.5
+          minutes &mdash; everything DQN spent &mdash; and PPO has bought about 1.63M steps with it, half a million
+          more than DQN got. Its three seeds sit at <strong>0.80, 2.04 and 0.71</strong>; DQN&rsquo;s three finish
+          at <strong>0.45, 0.05 and 0.28</strong>. Not one PPO run is ahead, and its best is more than double
+          DQN&rsquo;s worst. Extra wall clock does not rescue PPO, and neither does extra experience: the two axes
+          this page was built around agree.
+        </p>
+        <p>
+          Note what that comparison had to be careful about. Those are all probe numbers, on the same forty worlds,
+          read at the same point on the same axis. Comparing PPO&rsquo;s probe against DQN&rsquo;s 200-world 0.75
+          would have made two PPO seeds look like winners, and it is the wrong comparison &mdash; two exams, one
+          sentence.
+        </p>
+        <Callout title="Why the chart's numbers sit below the table's" color={GOLD}>
+          <p style={{ margin: 0 }}>
+            Drag the lab to the end of training and DQN reads about <strong>0.30</strong>; the table two sections up
+            says <strong>0.75</strong>. Both are honest, and they are different exams. A curve point is a probe over
+            forty worlds &mdash; seeds 1000&ndash;1039, the front of the exam block &mdash; taken every fifty
+            thousand steps during training, because scoring two hundred worlds eighty times over would cost more
+            than the training run. That block is <em>easier</em> than the full two hundred, and measurably so: the
+            guard chief loses <strong>0.85</strong> village cells on it against <strong>1.11</strong> over all two
+            hundred, and the nearest chief <strong>2.15</strong> against 2.69. It is not easier for everyone &mdash;
+            a chief that drops on a random burning cell scores 4.58 there against 4.40 overall &mdash; which says
+            what kind of worlds they are: ones where defending the village is possible if you know how. So the
+            reference lines on the chart are the chiefs&rsquo; scores <em>on those same forty worlds</em>, not their
+            exam scores. Putting the 200-world bar under 40-world curves would have flattered every crew on the
+            chart by about a fifth.
+          </p>
+        </Callout>
+        <p>
+          Forty worlds also carry about <strong>&plusmn;0.78</strong> on their own, which is larger than most of the
+          gaps in this section. That is why no claim on this page rests on a probe: they are here for the shape of
+          the trajectory, and every number that gets argued over comes from the two hundred.
+        </p>
+
+        <h2>Does the crew beat the chief?</h2>
+        <p>
+          DQN&rsquo;s 0.75 against the guard chief&rsquo;s 1.11 looks like a win, and this page has already shown
+          why that is not enough: two scores taken separately carry about &plusmn;0.65 between them, which swallows
+          a gap of 0.36. The fix was written down earlier and never applied to a crew, because until this run no
+          crew had been saved to disk. Fly each trained network over the <em>same</em> two hundred worlds the chief
+          flew, and difference them world by world:
+        </p>
+
+        <CodeOutput source="scripts/wildfire_train.py">{outPaired}</CodeOutput>
+
+        <p>
+          Two of the three seeds beat the guard chief with the gap clear of two standard errors; the third does not
+          separate from it. Pairing is what makes even that much readable &mdash; the same comparison scored
+          separately carries &plusmn;0.43, and 0.42 against &plusmn;0.43 is not a result. So the sentence that
+          survives is <strong>this crew usually beats the fire chief, and never by much</strong>: a million steps of
+          training, against ten lines someone wrote after reading the reward once.
+        </p>
+        <p>
+          Against the nearest chief there is nothing to argue about &mdash; all three seeds are ahead by about two
+          village cells, several times the error bar. And the three DQN seeds cannot be told apart from{" "}
+          <em>each other</em>: paired gaps of 0.01, 0.17 and 0.17 against error bars of 0.23 to 0.25. That is the
+          stability the spread showed, arrived at a second way.
+        </p>
+
+
 
         <Proof title="Why the thing we care about is the quietest part of the reward">
           <p>
@@ -245,6 +400,23 @@ export default function TrainingTheCrew() {
             communicate in a whisper.
           </p>
         </Proof>
+
+        <h2>What the race was actually for</h2>
+        <p>
+          The question this page opened with was <em>what are you counting?</em> and the expected answer was that
+          steps and minutes would name different winners. They did not; DQN is ahead on both. What the two axes
+          exposed instead is that the learner with the better average is also the dull one, and that the learner
+          which can be quicker is quicker only when it works. Given one run to spend, and no way to tell a good seed
+          from a bad one until it has finished, you would take DQN &mdash; not because it is the better algorithm,
+          but because its answer does not depend on which run you happened to get.
+        </p>
+        <p>
+          And the bar set four pages ago is still doing more work than either learner. Ten lines of rule lose 1.11
+          village cells. A million steps of DQN loses 0.75, which is a real improvement and a paired one, and it
+          cost thirteen minutes of GPU and five pages of decisions to get there. PPO, after two million steps, has
+          drawn level with the rule. The Proof below was written before any of these runs existed, and it predicted
+          exactly this.
+        </p>
 
         <Callout title="What this page does not show" color={GOLD}>
           <p style={{ margin: 0 }}>
@@ -339,6 +511,27 @@ const outNoise = `guard over the 200 held-out worlds: 1.11 village cells lost, w
   first hundred worlds 1.25, second hundred 0.98
 nearest minus guard, flown on the SAME 200 worlds: +1.57 +/-0.42
   scored separately, the same gap would carry +/-0.65`;
+
+const outPaired = `  nearest                2.69
+  guard                  1.11
+  densest                3.33
+  dqn_values_1M_s0       0.69
+  dqn_values_1M_s1       0.69
+  dqn_values_1M_s2       0.86
+
+  paired differences over the same 200 worlds (crew minus chief, negative = crew better)
+  crew                   chief          gap   2 s.e.  unpaired 2 s.e.  verdict
+  dqn_values_1M_s0       guard        -0.42     0.31             0.43  crew better
+  dqn_values_1M_s0       nearest      -2.00     0.49             0.61  crew better
+  dqn_values_1M_s1       guard        -0.42     0.31             0.44  crew better
+  dqn_values_1M_s1       nearest      -2.00     0.50             0.61  crew better
+  dqn_values_1M_s2       guard        -0.25     0.34             0.47  not separated
+  dqn_values_1M_s2       nearest      -1.82     0.49             0.63  crew better
+
+  seed-to-seed, paired the same way
+  dqn_values_1M_s0       dqn_values_1M_s1         -0.01 +/-0.23
+  dqn_values_1M_s0       dqn_values_1M_s2         -0.17 +/-0.25
+  dqn_values_1M_s1       dqn_values_1M_s2         -0.17 +/-0.24`;
 
 const th: React.CSSProperties = { textAlign: "left", padding: "7px 12px 7px 0", fontWeight: 500, color: "var(--muted)", fontSize: 12.5 };
 const thr: React.CSSProperties = { ...th, textAlign: "right", paddingRight: 14 };

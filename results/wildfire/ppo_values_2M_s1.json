@@ -1,0 +1,422 @@
+{
+ "tag": "ppo_values_2M_s1",
+ "learner": "ppo",
+ "seed": 1,
+ "sim_steps": 2000000,
+ "reward": "values",
+ "K": 4,
+ "rscale": 0.1,
+ "held_out": {
+  "village_damaged": 2.31,
+  "village_saved": 0.605,
+  "burnt": 95.3,
+  "put_out": 15.4,
+  "drops": 2.39,
+  "steps": 51.4,
+  "ret": -118.7,
+  "eval_seconds": 6.4
+ },
+ "curve": [
+  {
+   "sim_steps": 55614,
+   "minutes": 0.46,
+   "village": 7.03,
+   "saved": 0.15,
+   "burnt": 164.6,
+   "put_out": 4.6,
+   "train_return": -205.0
+  },
+  {
+   "sim_steps": 103157,
+   "minutes": 0.84,
+   "village": 5.75,
+   "saved": 0.25,
+   "burnt": 148.9,
+   "put_out": 7.7,
+   "train_return": -192.6
+  },
+  {
+   "sim_steps": 150792,
+   "minutes": 1.24,
+   "village": 1.52,
+   "saved": 0.625,
+   "burnt": 139.1,
+   "put_out": 10.7,
+   "train_return": -219.4
+  },
+  {
+   "sim_steps": 206107,
+   "minutes": 1.69,
+   "village": 1.12,
+   "saved": 0.675,
+   "burnt": 135.9,
+   "put_out": 10.7,
+   "train_return": -184.7
+  },
+  {
+   "sim_steps": 253394,
+   "minutes": 2.09,
+   "village": 1.2,
+   "saved": 0.675,
+   "burnt": 128.9,
+   "put_out": 14.4,
+   "train_return": -172.8
+  },
+  {
+   "sim_steps": 300461,
+   "minutes": 2.48,
+   "village": 1.2,
+   "saved": 0.75,
+   "burnt": 122.2,
+   "put_out": 17.1,
+   "train_return": -186.7
+  },
+  {
+   "sim_steps": 355289,
+   "minutes": 2.93,
+   "village": 1.02,
+   "saved": 0.75,
+   "burnt": 113.5,
+   "put_out": 13.9,
+   "train_return": -162.2
+  },
+  {
+   "sim_steps": 402259,
+   "minutes": 3.32,
+   "village": 0.9,
+   "saved": 0.675,
+   "burnt": 120.5,
+   "put_out": 14.2,
+   "train_return": -168.7
+  },
+  {
+   "sim_steps": 457025,
+   "minutes": 3.77,
+   "village": 1.07,
+   "saved": 0.65,
+   "burnt": 115.8,
+   "put_out": 15.5,
+   "train_return": -159.5
+  },
+  {
+   "sim_steps": 503764,
+   "minutes": 4.16,
+   "village": 1.18,
+   "saved": 0.75,
+   "burnt": 103.4,
+   "put_out": 14.7,
+   "train_return": -145.1
+  },
+  {
+   "sim_steps": 550286,
+   "minutes": 4.54,
+   "village": 0.88,
+   "saved": 0.8,
+   "burnt": 109.0,
+   "put_out": 15.3,
+   "train_return": -155.8
+  },
+  {
+   "sim_steps": 604507,
+   "minutes": 4.98,
+   "village": 0.78,
+   "saved": 0.825,
+   "burnt": 105.8,
+   "put_out": 15.2,
+   "train_return": -142.5
+  },
+  {
+   "sim_steps": 650794,
+   "minutes": 5.35,
+   "village": 1.0,
+   "saved": 0.8,
+   "burnt": 106.0,
+   "put_out": 15.2,
+   "train_return": -116.0
+  },
+  {
+   "sim_steps": 704339,
+   "minutes": 5.79,
+   "village": 0.7,
+   "saved": 0.8,
+   "burnt": 103.5,
+   "put_out": 15.4,
+   "train_return": -127.5
+  },
+  {
+   "sim_steps": 750342,
+   "minutes": 6.17,
+   "village": 1.05,
+   "saved": 0.725,
+   "burnt": 109.9,
+   "put_out": 15.0,
+   "train_return": -138.4
+  },
+  {
+   "sim_steps": 804096,
+   "minutes": 6.61,
+   "village": 1.3,
+   "saved": 0.65,
+   "burnt": 99.8,
+   "put_out": 15.2,
+   "train_return": -121.1
+  },
+  {
+   "sim_steps": 850235,
+   "minutes": 7.0,
+   "village": 1.5,
+   "saved": 0.675,
+   "burnt": 95.1,
+   "put_out": 14.4,
+   "train_return": -126.0
+  },
+  {
+   "sim_steps": 904071,
+   "minutes": 7.45,
+   "village": 2.4,
+   "saved": 0.575,
+   "burnt": 99.5,
+   "put_out": 14.2,
+   "train_return": -102.5
+  },
+  {
+   "sim_steps": 950471,
+   "minutes": 7.83,
+   "village": 2.08,
+   "saved": 0.625,
+   "burnt": 103.7,
+   "put_out": 13.2,
+   "train_return": -124.6
+  },
+  {
+   "sim_steps": 1004572,
+   "minutes": 8.27,
+   "village": 2.15,
+   "saved": 0.625,
+   "burnt": 97.5,
+   "put_out": 12.3,
+   "train_return": -119.6
+  },
+  {
+   "sim_steps": 1050871,
+   "minutes": 8.65,
+   "village": 1.93,
+   "saved": 0.625,
+   "burnt": 97.2,
+   "put_out": 13.4,
+   "train_return": -101.9
+  },
+  {
+   "sim_steps": 1104829,
+   "minutes": 9.08,
+   "village": 1.9,
+   "saved": 0.625,
+   "burnt": 90.2,
+   "put_out": 13.3,
+   "train_return": -123.2
+  },
+  {
+   "sim_steps": 1151343,
+   "minutes": 9.46,
+   "village": 2.38,
+   "saved": 0.6,
+   "burnt": 98.9,
+   "put_out": 11.2,
+   "train_return": -116.0
+  },
+  {
+   "sim_steps": 1205343,
+   "minutes": 9.9,
+   "village": 1.77,
+   "saved": 0.65,
+   "burnt": 91.0,
+   "put_out": 11.1,
+   "train_return": -121.8
+  },
+  {
+   "sim_steps": 1251656,
+   "minutes": 10.28,
+   "village": 2.02,
+   "saved": 0.65,
+   "burnt": 95.0,
+   "put_out": 10.9,
+   "train_return": -147.8
+  },
+  {
+   "sim_steps": 1305687,
+   "minutes": 10.72,
+   "village": 2.08,
+   "saved": 0.625,
+   "burnt": 95.5,
+   "put_out": 10.3,
+   "train_return": -133.6
+  },
+  {
+   "sim_steps": 1351908,
+   "minutes": 11.09,
+   "village": 1.95,
+   "saved": 0.65,
+   "burnt": 89.7,
+   "put_out": 11.7,
+   "train_return": -98.3
+  },
+  {
+   "sim_steps": 1405785,
+   "minutes": 11.53,
+   "village": 1.98,
+   "saved": 0.625,
+   "burnt": 90.0,
+   "put_out": 11.9,
+   "train_return": -96.3
+  },
+  {
+   "sim_steps": 1451868,
+   "minutes": 11.9,
+   "village": 2.38,
+   "saved": 0.6,
+   "burnt": 95.5,
+   "put_out": 12.5,
+   "train_return": -135.1
+  },
+  {
+   "sim_steps": 1505775,
+   "minutes": 12.34,
+   "village": 2.15,
+   "saved": 0.625,
+   "burnt": 94.7,
+   "put_out": 12.5,
+   "train_return": -118.8
+  },
+  {
+   "sim_steps": 1552081,
+   "minutes": 12.72,
+   "village": 1.57,
+   "saved": 0.675,
+   "burnt": 91.9,
+   "put_out": 10.7,
+   "train_return": -105.2
+  },
+  {
+   "sim_steps": 1605753,
+   "minutes": 13.15,
+   "village": 2.52,
+   "saved": 0.575,
+   "burnt": 100.8,
+   "put_out": 14.2,
+   "train_return": -126.5
+  },
+  {
+   "sim_steps": 1651878,
+   "minutes": 13.53,
+   "village": 2.0,
+   "saved": 0.65,
+   "burnt": 92.2,
+   "put_out": 12.4,
+   "train_return": -112.2
+  },
+  {
+   "sim_steps": 1705767,
+   "minutes": 13.96,
+   "village": 2.42,
+   "saved": 0.6,
+   "burnt": 99.5,
+   "put_out": 15.0,
+   "train_return": -103.8
+  },
+  {
+   "sim_steps": 1751839,
+   "minutes": 14.32,
+   "village": 2.38,
+   "saved": 0.625,
+   "burnt": 87.7,
+   "put_out": 13.8,
+   "train_return": -97.3
+  },
+  {
+   "sim_steps": 1805677,
+   "minutes": 14.75,
+   "village": 2.33,
+   "saved": 0.65,
+   "burnt": 91.7,
+   "put_out": 14.8,
+   "train_return": -106.5
+  },
+  {
+   "sim_steps": 1851677,
+   "minutes": 15.13,
+   "village": 2.33,
+   "saved": 0.6,
+   "burnt": 87.7,
+   "put_out": 15.7,
+   "train_return": -119.8
+  },
+  {
+   "sim_steps": 1905461,
+   "minutes": 15.57,
+   "village": 2.55,
+   "saved": 0.6,
+   "burnt": 86.7,
+   "put_out": 15.8,
+   "train_return": -115.9
+  },
+  {
+   "sim_steps": 1951432,
+   "minutes": 15.95,
+   "village": 2.27,
+   "saved": 0.625,
+   "burnt": 84.4,
+   "put_out": 15.6,
+   "train_return": -134.0
+  },
+  {
+   "sim_steps": 2005063,
+   "minutes": 16.38,
+   "village": 2.48,
+   "saved": 0.6,
+   "burnt": 85.4,
+   "put_out": 15.0,
+   "train_return": -105.6
+  }
+ ],
+ "episodes": 33307,
+ "truncated": 0,
+ "minutes": 16.4,
+ "config": {
+  "cmd": "race",
+  "steps": 2000000,
+  "seed": 1,
+  "seeds": 3,
+  "reward": "values",
+  "rscale": 0.1,
+  "K": 4,
+  "device": "cuda",
+  "envs": 64,
+  "width": 64,
+  "blocks": 3,
+  "lr": 0.0003,
+  "gamma": 0.99,
+  "clip_grad": 0.5,
+  "eval_worlds": 200,
+  "curve_every": 50000,
+  "curve_worlds": 40,
+  "tag": null,
+  "save_net": false,
+  "replay": 50000,
+  "batch": 256,
+  "updates": 4,
+  "warmup": 5000,
+  "target_every": 1000,
+  "eps_start": 1.0,
+  "eps_end": 0.05,
+  "eps_frac": 0.3,
+  "rollout": 32,
+  "epochs": 4,
+  "minibatch": 512,
+  "lam": 0.95,
+  "clip": 0.2,
+  "ent": 0.01,
+  "vf": 0.5,
+  "learner": "ppo"
+ },
+ "machine": "colab-t4"
+}

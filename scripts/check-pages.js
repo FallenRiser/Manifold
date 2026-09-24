@@ -11,6 +11,11 @@
 //   R2  Every source="..." must point at a file that actually exists.  This is
 //       house rule #1 (every number is reproduced by something in the repo)
 //       turned from a promise into a check.
+//   R3  A page rendering <Worked> or <Practice> must be covered by
+//       scripts/math_check.py, which recomputes every published answer
+//       independently.  Several hundred hand-written maths answers are the
+//       largest source of silently-wrong numbers this site can have: a sign
+//       error passes tsc, passes R1 and R2, and passes a careful read.
 //
 // Exit 0 = clean.  Exit 1 = violations, listed.
 const fs = require("fs");
@@ -30,6 +35,16 @@ function walk(dir, out = []) {
 
 const violations = [];
 const pages = walk(APP);
+
+// R3 setup: which pages scripts/math_check.py says it verifies.  Read out of the
+// PAGES map rather than guessed, so adding a page to one and not the other fails.
+const CHECKER = path.join(ROOT, "scripts", "math_check.py");
+const checkedPages = new Set();
+if (fs.existsSync(CHECKER)) {
+  const src = fs.readFileSync(CHECKER, "utf8");
+  const block = /PAGES\s*=\s*\{([\s\S]*?)\}/.exec(src);
+  if (block) for (const m of block[1].matchAll(/"([^"]+page\.tsx)"/g)) checkedPages.add(m[1]);
+}
 
 for (const file of pages) {
   const src = fs.readFileSync(file, "utf8");
@@ -51,6 +66,15 @@ for (const file of pages) {
     if (srcAttr && !fs.existsSync(path.join(ROOT, srcAttr[1]))) {
       violations.push(`R2  ${rel}:${line}  source="${srcAttr[1]}" does not exist in the repo.`);
     }
+  }
+
+  // R3  worked examples and problem sets publish answers; answers must be verified.
+  const teaches = /<Worked[\s>]/.test(src) || /<Practice[\s>]/.test(src);
+  if (teaches && !checkedPages.has(rel)) {
+    violations.push(
+      `R3  ${rel}  renders <Worked>/<Practice> but is not listed in scripts/math_check.py's ` +
+        `PAGES map — every published answer must be recomputed independently.`
+    );
   }
 }
 

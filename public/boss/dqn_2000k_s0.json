@@ -1,0 +1,82 @@
+{
+ "tag": "dqn_2000k_s0",
+ "obs": 27,
+ "actions": 16,
+ "repeat": 3,
+ "layers": [
+  {
+   "name": "f.0.weight",
+   "shape": [
+    256,
+    27
+   ]
+  },
+  {
+   "name": "f.0.bias",
+   "shape": [
+    256
+   ]
+  },
+  {
+   "name": "f.2.weight",
+   "shape": [
+    256,
+    256
+   ]
+  },
+  {
+   "name": "f.2.bias",
+   "shape": [
+    256
+   ]
+  },
+  {
+   "name": "f.4.weight",
+   "shape": [
+    16,
+    256
+   ]
+  },
+  {
+   "name": "f.4.bias",
+   "shape": [
+    16
+   ]
+  }
+ ],
+ "params": 77072,
+ "bytes": 308288,
+ "sha1": "32d1fd3b2400e79cf3f646c3a6e0b8138b0f3ecc",
+ "actionNames": [
+  "idle",
+  "move in",
+  "move in-right",
+  "move right",
+  "move back-right",
+  "move back",
+  "move back-left",
+  "move left",
+  "move in-left",
+  "attack",
+  "roll in",
+  "roll right",
+  "roll back",
+  "roll left",
+  "guard",
+  "parry"
+ ],
+ "decisions": 2000000,
+ "minutes": 62.63948414723078,
+ "final": {
+  "win": 200.0,
+  "die": 0.0,
+  "n": 200.0,
+  "php": 83.55400000000002,
+  "bhp": -12.12,
+  "parries": 4.63,
+  "poise_breaks": 0.0,
+  "swings": 7.01,
+  "hits_taken": 0.855,
+  "G": 53.5674
+ }
+}

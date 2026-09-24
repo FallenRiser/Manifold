@@ -1,0 +1,80 @@
+{
+  "kind": "snap",
+  "K": 4,
+  "worlds": 200,
+  "rows": {
+    "guard": {
+      "village_damaged": 1.11,
+      "village_saved": 0.785,
+      "burnt": 81.7,
+      "put_out": 13.7,
+      "drops": 2.71,
+      "steps": 45.2,
+      "ret": -92.3
+    },
+    "nearest": {
+      "village_damaged": 2.69,
+      "village_saved": 0.655,
+      "burnt": 85.6,
+      "put_out": 16.7,
+      "drops": 3.44,
+      "steps": 47.2,
+      "ret": -111.6
+    },
+    "dqn_values_1M_s0": {
+      "village_damaged": 0.69,
+      "village_saved": 0.8,
+      "burnt": 69.5,
+      "put_out": 12.1,
+      "drops": 2.92,
+      "steps": 42.7,
+      "ret": -75.4
+    },
+    "dqn_values_1M_s0 snapped": {
+      "village_damaged": 1.14,
+      "village_saved": 0.745,
+      "burnt": 75.0,
+      "put_out": 15.8,
+      "drops": 2.62,
+      "steps": 42.3,
+      "ret": -85.6
+    },
+    "dqn_values_1M_s1": {
+      "village_damaged": 0.69,
+      "village_saved": 0.825,
+      "burnt": 70.1,
+      "put_out": 10.1,
+      "drops": 3.01,
+      "steps": 44.3,
+      "ret": -76.1
+    },
+    "dqn_values_1M_s1 snapped": {
+      "village_damaged": 1.51,
+      "village_saved": 0.735,
+      "burnt": 77.5,
+      "put_out": 15.7,
+      "drops": 2.73,
+      "steps": 43.8,
+      "ret": -92.5
+    },
+    "dqn_values_1M_s2": {
+      "village_damaged": 0.86,
+      "village_saved": 0.8,
+      "burnt": 72.7,
+      "put_out": 10.7,
+      "drops": 2.9,
+      "steps": 46.3,
+      "ret": -80.6
+    },
+    "dqn_values_1M_s2 snapped": {
+      "village_damaged": 1.52,
+      "village_saved": 0.735,
+      "burnt": 73.6,
+      "put_out": 15.7,
+      "drops": 2.67,
+      "steps": 42.7,
+      "ret": -88.4
+    }
+  },
+  "trainer": 2
+}

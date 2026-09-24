@@ -1,0 +1,60 @@
+{
+  "kind": "paired",
+  "K": 4,
+  "worlds": 200,
+  "means": {
+    "nearest": 2.69,
+    "guard": 1.115,
+    "densest": 3.335,
+    "dqn_values_1M_s0": 0.69,
+    "dqn_values_1M_s1": 0.695,
+    "dqn_values_1M_s2": 0.865
+  },
+  "world_sd": {
+    "nearest": 3.895,
+    "guard": 2.46,
+    "densest": 4.141,
+    "dqn_values_1M_s0": 1.783,
+    "dqn_values_1M_s1": 1.892,
+    "dqn_values_1M_s2": 2.205
+  },
+  "rows": {
+    "dqn_values_1M_s0_vs_guard": {
+      "gap": -0.425,
+      "se2": 0.306,
+      "unpaired_se2": 0.43,
+      "verdict": "crew better"
+    },
+    "dqn_values_1M_s0_vs_nearest": {
+      "gap": -2.0,
+      "se2": 0.492,
+      "unpaired_se2": 0.606,
+      "verdict": "crew better"
+    },
+    "dqn_values_1M_s1_vs_guard": {
+      "gap": -0.42,
+      "se2": 0.315,
+      "unpaired_se2": 0.439,
+      "verdict": "crew better"
+    },
+    "dqn_values_1M_s1_vs_nearest": {
+      "gap": -1.995,
+      "se2": 0.496,
+      "unpaired_se2": 0.612,
+      "verdict": "crew better"
+    },
+    "dqn_values_1M_s2_vs_guard": {
+      "gap": -0.25,
+      "se2": 0.34,
+      "unpaired_se2": 0.467,
+      "verdict": "not separated"
+    },
+    "dqn_values_1M_s2_vs_nearest": {
+      "gap": -1.825,
+      "se2": 0.487,
+      "unpaired_se2": 0.633,
+      "verdict": "crew better"
+    }
+  },
+  "trainer": 2
+}

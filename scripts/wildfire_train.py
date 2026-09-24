@@ -14,9 +14,15 @@ scorer (200 worlds, seeds 1000-1199, which training never touches).
     python scripts/wildfire_train.py ppo --steps 2000000 --seed 0
     python scripts/wildfire_train.py dqn --steps 1000000 --seed 0 --reward extinguish --rscale 1.0
     python scripts/wildfire_train.py baselines          # the hand-written dispatchers, same scorer
+    python scripts/wildfire_train.py version            # which copy is this? run it first on a new machine
     python scripts/wildfire_train.py race               # the whole head-to-head, one run after another
     python scripts/wildfire_train.py report             # every result JSON so far, as a table
     python scripts/wildfire_train.py curves             # the curves, into the RaceLab data module
+    python scripts/wildfire_train.py learned            # what the trained crew DOES, beside the chiefs
+    python scripts/wildfire_train.py where-won          # is the crew's win spread over the exam, or local?
+    python scripts/wildfire_train.py shield             # take the wetting out of a drop: who falls over?
+    python scripts/wildfire_train.py snap               # move only the crew's aim onto the fire
+    python scripts/wildfire_train.py figure             # those results, into the ShieldLab data module
 
 Budgets are quoted in SIMULATOR steps, not decisions: a commander decision costs ~3.9 sim steps at
 K=4, and the simulator is the scarce resource. Runs write results/wildfire/<tag>.json.
@@ -56,6 +62,7 @@ def load_setup(name="WILDFIRE_SETUP"):
 G = load_setup()
 Command, command, dispatcher = G["Command"], G["command"], G["dispatcher"]
 N, DECIDE_EVERY = G["N"], G["DECIDE_EVERY"]
+VILLAGE, BURNING, LAKE = G["VILLAGE"], G["BURNING"], G["LAKE"]   # the probes in `learned` read the map
 NA = N * N                     # 256 target cells
 NC = 12                        # observation layers
 
@@ -166,7 +173,13 @@ def evaluate(net, device, reward, K, n=200):
     return score
 
 
+# Bumped whenever a change would make older results incomparable. Stamped into every
+# result file so a run that came back from another machine can be checked instead of trusted.
+TRAINER = 2   # 2: DQN gained n-step returns, a dueling head and a 200k replay
+
+
 def save(tag, payload):
+    payload.setdefault("trainer", TRAINER)
     OUT.mkdir(parents=True, exist_ok=True)
     p = OUT / f"{tag}.json"
     p.write_text(json.dumps(payload, indent=2), encoding="utf-8")
@@ -413,16 +426,44 @@ def race(a):
             run(b)
 
 
+def stale(r):
+    """Was this run produced by a different trainer than the one in the repo right now?
+
+    Returns a reason string, or "" if the run is current. The check is on the CONFIG, not the
+    tag: the runs that caught this out were named exactly like race runs. A DQN result whose
+    config has no `nstep`/`dueling` key came from the version before those existed, i.e. 1-step
+    with a small replay -- the configuration `diag_dqn_1step_1M_s0` documents as the one that
+    peaks early and then unlearns. Publishing it as the DQN arm would race a tuned PPO against
+    a deliberately bad DQN and call the result a finding.
+    """
+    c = r.get("config", {})
+    if r.get("stale_config"):
+        return "marked stale_config"
+    if r.get("trainer") is not None and r["trainer"] < TRAINER:
+        return f"trainer v{r['trainer']}, this script is v{TRAINER}"
+    # No stamp means the run predates stamping, not that it is wrong -- fall through to the
+    # config, which is what actually distinguishes the arms. v2 changed DQN only: train_ppo()
+    # reads none of nstep, dueling or replay, so an unstamped PPO run is still current.
+    if r["learner"] == "dqn" and ("nstep" not in c or "dueling" not in c):
+        return "DQN config has no nstep/dueling: produced by a trainer older than v2"
+    return ""
+
+
 def curves(a):
     """Write the measured training curves into the lab's data module. Every point is a held-out
     probe recorded with both what it had cost in simulator steps and what it had cost in minutes."""
-    runs = []
+    runs, skipped = [], []
     for f in sorted(OUT.glob("*.json")):
         r = json.loads(f.read_text())
         if r.get("kind") == "baselines" or r.get("reward") != "values" or not r.get("curve"):
             continue
         if any(k in r["tag"] for k in ("colab", "sweep", "diag")):   # another machine, a tuning
             continue                              # run, or a diagnostic: none belong on this axis
+        why = stale(r)
+        if why:
+            print(f"  SKIP {r['tag']}: {why}")
+            skipped.append(r["tag"])
+            continue
         pts = [dict(sim=c["sim_steps"], min=c["minutes"], village=c["village"],
                     saved=c["saved"], burnt=c["burnt"], put=c["put_out"]) for c in r["curve"]]
         h = r["held_out"]
@@ -433,6 +474,21 @@ def curves(a):
     base = json.loads((OUT / f"baselines_values_K{a.K}.json").read_text())["rows"]
     bar = {k: dict(village=v["village_damaged"], burnt=v["burnt"], put=v["put_out"], saved=v["village_saved"])
            for k, v in base.items()}
+
+    # A curve point is a probe over curve_worlds worlds, not over the 200-world exam, and the two
+    # are not interchangeable: the probe block is easier for any policy that can defend the village
+    # (guard 0.85 there against 1.11 over 200). Drawing the 200-world bar under 40-world curves
+    # flatters every crew by about a fifth, so measure the chiefs on the probe block too.
+    probe = {}
+    block = range(1000, 1000 + a.curve_worlds)
+    for mode in ("nearest", "guard"):
+        v = per_world(dispatcher(mode), block, a.K)
+        b = per_world(dispatcher(mode), block, a.K, "burnt")
+        probe[mode] = dict(village=round(float(v.mean()), 2),
+                           burnt=round(float(b.mean()), 1),
+                           se2=round(float(2 * v.std(ddof=1) / np.sqrt(len(v))), 2))
+        print(f"  probe block ({a.curve_worlds} worlds): {mode} village {probe[mode]['village']:.2f} "
+              f"+/-{probe[mode]['se2']:.2f}  burnt {probe[mode]['burnt']:.1f}")
     head = [
         "// Generated by scripts/wildfire_train.py curves. Do not edit by hand.",
         "// Held-out probes taken DURING training (exam worlds, seeds 1000+), recorded with both the",
@@ -445,11 +501,22 @@ def curves(a):
         "",
         "export const BAR = " + json.dumps(bar, indent=1) + ";",
         "",
+        "// The chiefs scored on the PROBE block instead — the same " + str(a.curve_worlds) + " worlds every curve",
+        "// point above is measured on. Use these for reference lines drawn under the curves; BAR is the",
+        "// 200-world exam and belongs with the final scores, not with a probe.",
+        "export const BAR_PROBE = " + json.dumps(probe, indent=1) + ";",
+        "",
     ]
     dst = ROOT / "src" / "components" / "fire" / "data" / "raceCurves.ts"
     dst.write_text("\n".join(head), encoding="utf-8")
     print(f"  wrote {dst.relative_to(ROOT)}  ({len(runs)} runs, "
           f"{sum(len(r['points']) for r in runs)} probes)")
+    if skipped:
+        print(f"  {len(skipped)} run(s) skipped as not current: {', '.join(skipped)}")
+    arms = {(r["learner"], r["budget"]) for r in runs}
+    for want in (("DQN", 1_000_000), ("PPO", 1_000_000), ("PPO", 2_000_000)):
+        if want not in arms:
+            print(f"  INCOMPLETE: no {want[0]} at {want[1]/1e6:.0f}M — the race is not ready to publish")
 
 
 def report(a):
@@ -474,9 +541,431 @@ def report(a):
               f"burnt {'/'.join(f'{x:.0f}' for x in b)} (mean {np.mean(b):.1f})")
 
 
+def per_world(pick, seeds, K, field="village_damaged"):
+    """Fly one policy over each world alone and keep its per-world score.
+
+    command() returns the mean over its worlds, which is enough to report a score and not enough
+    to test a difference. Same worlds, same order, one row each.
+    """
+    out = []
+    for k in seeds:
+        w = Command(K=K)
+        w.reset(seed=k)
+        while True:
+            _, _, te, tr, _ = w.step(pick(w.env))
+            if te or tr:
+                break
+        out.append(w.env.summary()[field])
+    return np.array(out, dtype=float)
+
+
+def paired(a):
+    """Every saved crew against every hand-written chief, paired on the 200 exam worlds."""
+    device = torch.device(a.device)
+    seeds = range(1000, 1000 + a.eval_worlds)
+    scores = {}
+
+    for mode in ("nearest", "guard", "densest"):
+        scores[mode] = per_world(dispatcher(mode), seeds, a.K)
+        print(f"  {mode:22s} {scores[mode].mean():.2f}")
+
+    for p in sorted(OUT.glob("*.pt")):
+        r = json.loads((OUT / f"{p.stem}.json").read_text())
+        net = PointerNet(r["config"]["width"], r["config"]["blocks"],
+                         critic=r["learner"] == "ppo",
+                         dueling=bool(r["config"].get("dueling", 0))).to(device)
+        net.load_state_dict(torch.load(p, map_location=device))
+        net.eval()
+        scores[p.stem] = per_world(greedy_pick(net, device), seeds, a.K)
+        print(f"  {p.stem:22s} {scores[p.stem].mean():.2f}")
+
+    crews = [k for k in scores if k not in ("nearest", "guard", "densest")]
+    n = a.eval_worlds
+    print(f"\n  paired differences over the same {n} worlds (crew minus chief, negative = crew better)")
+    print(f"  {'crew':22s} {'chief':10s} {'gap':>7s} {'2 s.e.':>8s} {'unpaired 2 s.e.':>16s}  verdict")
+    rows = {}
+    for c in sorted(crews):
+        for chief in ("guard", "nearest"):
+            d = scores[c] - scores[chief]
+            se = 2 * d.std(ddof=1) / np.sqrt(n)
+            un = 2 * np.sqrt(scores[c].var(ddof=1) / n + scores[chief].var(ddof=1) / n)
+            verdict = "crew better" if d.mean() + se < 0 else ("chief better" if d.mean() - se > 0 else "not separated")
+            print(f"  {c:22s} {chief:10s} {d.mean():+7.2f} {se:8.2f} {un:16.2f}  {verdict}")
+            rows[f"{c}_vs_{chief}"] = dict(gap=round(float(d.mean()), 3), se2=round(float(se), 3),
+                                           unpaired_se2=round(float(un), 3), verdict=verdict)
+
+    if len(crews) > 1:
+        print(f"\n  seed-to-seed, paired the same way")
+        cs = sorted(crews)
+        for i in range(len(cs)):
+            for j in range(i + 1, len(cs)):
+                d = scores[cs[i]] - scores[cs[j]]
+                se = 2 * d.std(ddof=1) / np.sqrt(n)
+                print(f"  {cs[i]:22s} {cs[j]:22s} {d.mean():+7.2f} +/-{se:.2f}")
+
+    save(f"paired_K{a.K}", dict(kind="paired", K=a.K, worlds=n,
+                                means={k: round(float(v.mean()), 3) for k, v in scores.items()},
+                                world_sd={k: round(float(v.std(ddof=1)), 3) for k, v in scores.items()},
+                                rows=rows))
+
+
+# ---- what did it learn? ---------------------------------------------------------------
+VTHREAT = 3.5     # a burning cell this close to the village centre is a threat (cobra page's probe)
+
+
+def probe_one(pick, seed, K, drop_r=None):
+    """Fly one world and record every decision and every bucket.
+
+    The crew is flown by the SHIPPED Command loop -- the same one that scores it -- with
+    env.step wrapped so a drop is recorded at the moment it happens. An instance attribute
+    shadows the bound method, so Command.step's `env.step(a)` goes through the wrapper.
+    """
+    w = Command(K=K)
+    w.reset(seed=seed)
+    env = w.env
+    k = env.drop_r if drop_r is None else drop_r
+    village = np.argwhere(env.T == VILLAGE)
+    vc = village.mean(0)
+    raw = env.step
+    drops, decisions = [], []
+
+    def wrapped(a):
+        r, c = env.pos
+        wet = a == 5 and env.water > 0 and env.T[r, c] != LAKE
+        if wet:
+            sq = (slice(max(r - k, 0), r + k + 1), slice(max(c - k, 0), c + k + 1))
+            # A drop that hits no fire is not necessarily wasted: it can wet the cells the fire is
+            # about to reach. Count them -- unburnt, flammable, and touching a burning cell now.
+            burning = env.S == BURNING
+            touching = np.zeros((N, N), bool)
+            for dr in (-1, 0, 1):
+                for dc in (-1, 0, 1):
+                    if dr or dc:
+                        touching |= G["shift"](burning, dr, dc, False)
+            edge = (env.S == G["UNBURNT"]) & G["FLAMMABLE"][env.T] & touching
+            before = dict(t=env.t, alight=int(burning.sum()),
+                          dv=float(np.hypot(r - vc[0], c - vc[1])),
+                          edge=int(edge[sq].sum()),
+                          on_village=int((env.T[sq] == VILLAGE).any()))
+        out = raw(a)
+        if wet:
+            before["hit"] = out[4]["put_out"]
+            drops.append(before)
+        return out
+
+    env.step = wrapped
+    while True:
+        fire = np.argwhere(env.S == BURNING)
+        tgt = int(pick(env))
+        tr, tc = divmod(tgt, N)
+        if len(fire):
+            cheb = np.abs(fire - np.array([tr, tc])).max(1)
+            near_v = np.hypot(*(fire - vc).T)
+            decisions.append(dict(
+                alight=len(fire),
+                on_fire=int(env.S[tr, tc] == BURNING),
+                covers=int(cheb.min() <= k),                 # the 5x5 drop square holds a burning cell
+                reach=float(cheb.min()),
+                dv=float(np.hypot(tr - vc[0], tc - vc[1])),
+                threat=int(near_v.min() <= VTHREAT),
+                answers=int((cheb <= k).any() and near_v[cheb <= k].min() <= VTHREAT),
+            ))
+        _, _, te, tr_, _ = w.step(tgt)
+        if te or tr_:
+            break
+    s = env.summary()
+    s["truncated"] = int(env.t >= env.max_steps and (env.S == BURNING).any())
+    return s, drops, decisions
+
+
+def probe(pick, seeds, K):
+    "Roll probe_one over the exam worlds and reduce to one row."
+    eps, drops, decs, firsts = [], [], [], []
+    for seed in seeds:
+        s, d, c = probe_one(pick, seed, K)
+        eps.append(s)
+        drops += d
+        decs += c
+        if d:
+            firsts.append(d[0]["t"])
+    n = len(eps)
+    mean = lambda rows, key: float(np.mean([r[key] for r in rows])) if rows else float("nan")
+    endgame = [d for d in decs if 1 <= d["alight"] <= 6]
+    threat = [d for d in decs if d["threat"]]
+    return dict(
+        village=mean(eps, "village_damaged"), burnt=mean(eps, "burnt"), steps=mean(eps, "t"),
+        saved=float(np.mean([e["village_damaged"] == 0 for e in eps])),
+        truncated=mean(eps, "truncated"),
+        drops=len(drops) / n, put_out=mean(eps, "put_out"),
+        first_drop=float(np.mean(firsts)) if firsts else float("nan"),
+        hit=mean(drops, "hit"), dry=float(np.mean([d["hit"] == 0 for d in drops])) if drops else float("nan"),
+        alight_at_drop=mean(drops, "alight"), drop_dv=mean(drops, "dv"),
+        edge=mean(drops, "edge"),
+        edge_dry=mean([d for d in drops if d["hit"] == 0], "edge"),
+        on_village=float(np.mean([d["on_village"] for d in drops])) if drops else float("nan"),
+        decisions=len(decs) / n,
+        on_fire=mean(decs, "on_fire"), covers=mean(decs, "covers"), reach=mean(decs, "reach"),
+        tgt_dv=mean(decs, "dv"),
+        endgame_n=len(endgame) / n, endgame_covers=mean(endgame, "covers"),
+        threat_n=len(threat) / n, threat_answers=mean(threat, "answers"),
+    )
+
+
+def load_crew(p, device):
+    "Rebuild a saved net from the config stored beside it."
+    r = json.loads((OUT / f"{p.stem}.json").read_text())
+    if stale(r):
+        raise SystemExit(f"{p.stem}: {stale(r)}")
+    net = PointerNet(r["config"]["width"], r["config"]["blocks"],
+                     critic=r["learner"] == "ppo", dueling=bool(r["config"].get("dueling", 0))).to(device)
+    net.load_state_dict(torch.load(p, map_location=device))
+    net.eval()
+    return net
+
+
+def learned(a):
+    """What the trained crew does, beside what the hand-written chiefs do.
+
+    The score says the crew is better. It does not say how, and "how" is the only part that
+    transfers to the next world. Three families of probe, all on the exam worlds:
+      per drop     -- when a bucket is thrown, onto how much fire, how far from the village
+      per decision -- what the commander names as a target, and whether fire is even there
+      the endgame  -- decisions taken with the fire nearly out, where the episode can be ended
+      the threat   -- decisions taken while fire burns within VTHREAT of the village centre
+    """
+    device = torch.device(a.device)
+    seeds = range(1000, 1000 + a.eval_worlds)
+    rows = {}
+    for mode in ("nearest", "guard", "densest"):
+        rows[mode] = probe(dispatcher(mode), seeds, a.K)
+        print(f"  {mode} done")
+    for p in sorted(OUT.glob("*.pt")):
+        rows[p.stem] = probe(greedy_pick(load_crew(p, device), device), seeds, a.K)
+        print(f"  {p.stem} done")
+
+    order = list(rows)
+    FIELDS = [
+        ("episode", None, None),
+        ("village cells lost /9", "village", "{:.2f}"),
+        ("all nine saved", "saved", "{:.0%}"),
+        ("cells burnt", "burnt", "{:.1f}"),
+        ("steps", "steps", "{:.1f}"),
+        ("ran out of time", "truncated", "{:.0%}"),
+        ("per drop", None, None),
+        ("buckets thrown", "drops", "{:.2f}"),
+        ("first one at step", "first_drop", "{:.1f}"),
+        ("cells hit per drop", "hit", "{:.2f}"),
+        ("drops that hit nothing", "dry", "{:.0%}"),
+        ("cells burning when it lands", "alight_at_drop", "{:.1f}"),
+        ("cells on the fire's edge under it", "edge", "{:.1f}"),
+        ("   ... on the drops that hit nothing", "edge_dry", "{:.1f}"),
+        ("distance from the village", "drop_dv", "{:.1f}"),
+        ("drops touching the village", "on_village", "{:.0%}"),
+        ("per decision", None, None),
+        ("decisions", "decisions", "{:.1f}"),
+        ("target is itself burning", "on_fire", "{:.0%}"),
+        ("drop square covers fire", "covers", "{:.0%}"),
+        ("cells to the nearest fire", "reach", "{:.1f}"),
+        ("target's distance from village", "tgt_dv", "{:.1f}"),
+        ("the endgame (1-6 cells alight)", None, None),
+        ("such decisions", "endgame_n", "{:.1f}"),
+        ("aimed at the last fire", "endgame_covers", "{:.0%}"),
+        ("the village threatened", None, None),
+        ("such decisions", "threat_n", "{:.1f}"),
+        ("answered it", "threat_answers", "{:.0%}"),
+    ]
+    w = max(len(f[0]) for f in FIELDS) + 2
+    print("\n  " + " " * w + "".join(f"{k.replace('dqn_values_1M_', 'dqn '):>16s}" for k in order))
+    for label, key, fmt in FIELDS:
+        if key is None:
+            print(f"\n  {label}")
+            continue
+        print(f"  {label:{w}s}" + "".join(f"{fmt.format(rows[k][key]):>16s}" for k in order))
+    save(f"learned_K{a.K}", dict(kind="learned", K=a.K, worlds=a.eval_worlds, vthreat=VTHREAT, rows=rows))
+
+
+def where_won(a):
+    """Is the win spread over the exam, or does it live in a handful of worlds?
+
+    The cobra page asked whether a number was local. The same question applies to an advantage:
+    a mean of -0.42 village cells could be a small edge everywhere or a rout in ten worlds.
+    """
+    device = torch.device(a.device)
+    seeds = list(range(1000, 1000 + a.eval_worlds))
+    chief = per_world(dispatcher("guard"), seeds, a.K)
+    print(f"  {'crew':24s} {'worlds better':>14s} {'same':>7s} {'worse':>7s} {'gap':>8s} "
+          f"{'top-10 share':>13s} {'worst world':>12s}")
+    out = {}
+    for p in sorted(OUT.glob("*.pt")):
+        crew = per_world(greedy_pick(load_crew(p, device), device), seeds, a.K)
+        d = crew - chief
+        tot = d.sum()
+        top = np.sort(d)[:10].sum()
+        out[p.stem] = dict(better=int((d < 0).sum()), same=int((d == 0).sum()), worse=int((d > 0).sum()),
+                           gap=round(float(d.mean()), 3), top10_share=round(float(top / tot), 3),
+                           worst=round(float(d.max()), 1),
+                           crew_mean=round(float(crew.mean()), 3), chief_mean=round(float(chief.mean()), 3),
+                           # the gaps themselves, sorted, so a figure can show the shape and not the mean
+                           sorted_gap=[int(x) for x in np.sort(d)])
+        r = out[p.stem]
+        print(f"  {p.stem:24s} {r['better']:14d} {r['same']:7d} {r['worse']:7d} {r['gap']:+8.2f} "
+              f"{r['top10_share']:12.0%} {r['worst']:+12.1f}")
+    save(f"where_won_K{a.K}", dict(kind="where_won", K=a.K, worlds=a.eval_worlds,
+                                   chief="guard", rows=out))
+
+
+def shield(a):
+    """Take the wetting out of a drop and re-run the exam.
+
+    WET is read as a global inside Wildfire.step, and the environment lives in the namespace the
+    shipped preamble was exec'd into -- so setting G["WET"] = 0 is the whole ablation: a drop still
+    un-burns every burning cell under it, and no longer leaves the square wet. The hand-written
+    chiefs are the control. They aim at fire, so the wetting is a side effect for them; if it is
+    the crew's mechanism, only the crew should fall over.
+    """
+    device = torch.device(a.device)
+    seeds = range(1000, 1000 + a.eval_worlds)
+    picks = {m: dispatcher(m) for m in ("nearest", "guard", "densest")}
+    for p in sorted(OUT.glob("*.pt")):
+        picks[p.stem] = greedy_pick(load_crew(p, device), device)
+
+    rows, wet0 = {}, G["WET"]
+    for name, pick in picks.items():
+        out = {}
+        for tag, wet in (("shipped", wet0), ("no shield", 0.0)):
+            G["WET"] = wet
+            v = per_world(pick, seeds, a.K)
+            b = per_world(pick, seeds, a.K, field="burnt")
+            out[tag] = (float(v.mean()), float(b.mean()), v)
+        G["WET"] = wet0
+        d = out["no shield"][2] - out["shipped"][2]
+        se = 2 * d.std(ddof=1) / np.sqrt(a.eval_worlds)
+        rows[name] = dict(village=round(out["shipped"][0], 3), village_dry=round(out["no shield"][0], 3),
+                          burnt=round(out["shipped"][1], 1), burnt_dry=round(out["no shield"][1], 1),
+                          cost=round(float(d.mean()), 3), se2=round(float(se), 3))
+        r = rows[name]
+        print(f"  {name:22s} village {r['village']:5.2f} -> {r['village_dry']:5.2f}  "
+              f"({r['cost']:+.2f} +/-{r['se2']:.2f})   burnt {r['burnt']:6.1f} -> {r['burnt_dry']:6.1f}")
+    save(f"shield_K{a.K}", dict(kind="shield", K=a.K, worlds=a.eval_worlds, wet=wet0, rows=rows))
+
+
+def snap_to_fire(pick):
+    "The crew's own target, moved onto the nearest burning cell (Chebyshev: the drop is a square)."
+    def p(env):
+        t = int(pick(env))
+        tr, tc = divmod(t, N)
+        fire = np.argwhere(env.S == BURNING)
+        if not len(fire):
+            return t
+        f = fire[np.abs(fire - np.array([tr, tc])).max(1).argmin()]
+        return int(f[0] * N + f[1])
+    return p
+
+
+def snap(a):
+    """Every saved crew, as trained and with its aim snapped onto the fire.
+
+    A caveat that belongs with the number: snapping changes the whole trajectory, so this is not a
+    per-decision counterfactual. It answers "is a crew that aims like a chief still better than a
+    chief", not "what would this one decision have cost".
+    """
+    device = torch.device(a.device)
+    rows = {}
+    for mode in ("guard", "nearest"):
+        rows[mode] = command(dispatcher(mode), n=a.eval_worlds, K=a.K)
+        print(f"  {mode:22s} {rows[mode]['village_damaged']:5.2f} village  {rows[mode]['ret']:7.1f} return")
+    for p in sorted(OUT.glob("*.pt")):
+        pick = greedy_pick(load_crew(p, device), device)
+        for tag, q in ((p.stem, pick), (p.stem + " snapped", snap_to_fire(pick))):
+            rows[tag] = command(q, n=a.eval_worlds, K=a.K)
+            print(f"  {tag:22s} {rows[tag]['village_damaged']:5.2f} village  {rows[tag]['ret']:7.1f} return  "
+                  f"{rows[tag]['burnt']:6.1f} burnt")
+    save(f"snap_K{a.K}", dict(kind="snap", K=a.K, worlds=a.eval_worlds, rows=rows))
+
+
+def figure(a):
+    """Write results/wildfire/{shield,snap,where_won}_K*.json into the ShieldLab data module."""
+    need = [f"shield_K{a.K}", f"snap_K{a.K}", f"where_won_K{a.K}", f"learned_K{a.K}"]
+    have = {}
+    for tag in need:
+        p = OUT / f"{tag}.json"
+        if not p.exists():
+            raise SystemExit(f"missing {p.relative_to(ROOT)} -- run `{tag.split('_K')[0].replace('_', '-')}` first")
+        have[tag] = json.loads(p.read_text())
+
+    sh, sn, ww, le = (have[t] for t in need)
+    crews = sorted(k for k in sh["rows"] if k.endswith(tuple("0123456789")) and k.startswith("dqn"))
+    chiefs = ["guard", "nearest", "densest"]
+
+    def label(k):
+        return f"DQN seed {k[-1]}" if k.startswith("dqn") else k
+
+    rows = []
+    for k in chiefs + crews:
+        crew = k in crews
+        rows.append(dict(
+            key=k, label=label(k), crew=crew,
+            trained=sh["rows"][k]["village"],
+            # A chief already aims at the nearest fire, so snapping it there is the identity. The
+            # middle column is drawn flat for them on purpose, and that is the control.
+            snapped=sn["rows"][f"{k} snapped"]["village_damaged"] if crew else sh["rows"][k]["village"],
+            dry=sh["rows"][k]["village_dry"],
+            dryCost=sh["rows"][k]["cost"], drySe=sh["rows"][k]["se2"],
+            onFire=round(le["rows"][k]["on_fire"], 3),
+            reach=round(le["rows"][k]["reach"], 2),
+        ))
+
+    gaps = [dict(key=k, label=label(k), gap=v["gap"], better=v["better"], same=v["same"],
+                 worse=v["worse"], sorted=v["sorted_gap"]) for k, v in sorted(ww["rows"].items())]
+
+    head = [
+        "// Generated by scripts/wildfire_train.py figure. Do not edit by hand.",
+        "// Two ablations and one distribution, all on the 200 exam worlds (seeds 1000-1199).",
+        "//   trained  the policy as it is scored everywhere else in this chapter",
+        "//   snapped  the SAME policy, its chosen target slid onto the nearest burning cell",
+        "//   dry      the shipped policy in a world where a drop no longer wets the square it lands on",
+        "// A chief always aims at fire already, so `snapped` is the identity for the three of them.",
+        "export type Ablation = { key: string; label: string; crew: boolean; trained: number; snapped: number;"
+        " dry: number; dryCost: number; drySe: number; onFire: number; reach: number };",
+        "export type Gap = { key: string; label: string; gap: number; better: number; same: number;"
+        " worse: number; sorted: number[] };",
+        "",
+        "export const ABLATION: Ablation[] = " + json.dumps(rows, indent=1) + ";",
+        "",
+        "// Per-world village damage, crew minus the guard chief, sorted. Negative = the crew did better.",
+        "export const GAPS: Gap[] = " + json.dumps(gaps, indent=1) + ";",
+        "",
+        "export const CHIEF = " + json.dumps(dict(village=sh["rows"]["guard"]["village"],
+                                                 dry=sh["rows"]["guard"]["village_dry"]), indent=1) + ";",
+        "",
+    ]
+    dst = ROOT / "src" / "components" / "fire" / "data" / "whatLearned.ts"
+    dst.write_text("\n".join(head), encoding="utf-8")
+    print(f"  wrote {dst.relative_to(ROOT)}  ({len(rows)} policies, {len(gaps)} crews)")
+
+
+def version(a):
+    """Which copy of this trainer is this? Run it first on any machine you upload to.
+
+    Twice a batch has come back from an older copy whose DQN arm ran 1-step with a 50k replay,
+    and nothing caught it until the configs were read by hand. Checking with `--help | grep`
+    needs grep to exist and the pipe to survive, so an empty answer could mean a stale file OR a
+    shell that has no grep. This cannot be ambiguous: it always prints a verdict.
+    """
+    have = {k: hasattr(a, k) for k in ("nstep", "dueling", "replay")}
+    ok = all(have.values()) and a.replay >= 200_000 and a.nstep >= 2 and a.dueling
+    print(f"wildfire_train.py  TRAINER v{TRAINER}")
+    print(f"  DQN arm: nstep={getattr(a, 'nstep', 'MISSING')}  "
+          f"dueling={getattr(a, 'dueling', 'MISSING')}  replay={getattr(a, 'replay', 'MISSING')}")
+    print("  CURRENT: results from this copy belong in the race."
+          if ok else "  STALE OR RETUNED: do not race results from this copy.")
+    return 0 if ok else 1
+
+
 def main(argv=None):
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument("cmd", choices=["dqn", "ppo", "baselines", "race", "report", "curves"])
+    p.add_argument("cmd", choices=["dqn", "ppo", "baselines", "race", "report", "curves", "paired",
+                                   "learned", "where-won", "shield", "snap", "figure", "version"])
     p.add_argument("--steps", type=int, default=1_000_000, help="budget in SIMULATOR steps")
     p.add_argument("--seed", type=int, default=0)
     p.add_argument("--seeds", type=int, default=3, help="race: seeds per learner")
@@ -527,6 +1016,20 @@ def main(argv=None):
         race(a)
     elif a.cmd == "curves":
         curves(a)
+    elif a.cmd == "paired":
+        paired(a)
+    elif a.cmd == "learned":
+        learned(a)
+    elif a.cmd == "where-won":
+        where_won(a)
+    elif a.cmd == "shield":
+        shield(a)
+    elif a.cmd == "snap":
+        snap(a)
+    elif a.cmd == "figure":
+        figure(a)
+    elif a.cmd == "version":
+        raise SystemExit(version(a))
     else:
         report(a)
     print(f"\n({time.time() - t0:.1f}s)")

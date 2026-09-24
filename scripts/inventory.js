@@ -49,7 +49,7 @@ function analyze(fp) {
   // carrying only those still has nothing to look at, and counting them as figures is what
   // made the asteroid capstone read as 0 pages without a visual when 15 of its 24 have none.
   const isFig = (i) => /components\/(figures|capstone)\//.test(i.from) && !/capstone\/pedagogy/.test(i.from);
-  const isLab = (i) => /components\/(labs|fire|sail)\//.test(i.from) || /Lab$/.test(i.n);
+  const isLab = (i) => /components\/(labs|fire|sail|boss)\//.test(i.from) || /Lab$/.test(i.n);
   // An import is not a visual until it is rendered. Strip the import block, then require the tag.
   const body = s.replace(/^import[\s\S]*?from\s+"[^"]+";?$/gm, '');
   const rendered = (i) => new RegExp('<' + i.n + '(?![A-Za-z0-9_])').test(body);

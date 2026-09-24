@@ -5,7 +5,2072 @@
 export type RacePoint = { sim: number; min: number; village: number; saved: number; burnt: number; put: number };
 export type RaceRun = { learner: "DQN" | "PPO"; budget: number; seed: number; minutes: number; points: RacePoint[]; final: RacePoint };
 
-export const RACE_RUNS: RaceRun[] = [];
+export const RACE_RUNS: RaceRun[] = [
+ {
+  "learner": "DQN",
+  "budget": 1000000,
+  "seed": 0,
+  "minutes": 13.5,
+  "points": [
+   {
+    "sim": 50011,
+    "min": 0.56,
+    "village": 1.45,
+    "saved": 0.625,
+    "burnt": 111.1,
+    "put": 17.0
+   },
+   {
+    "sim": 100177,
+    "min": 1.22,
+    "village": 1.4,
+    "saved": 0.65,
+    "burnt": 87.2,
+    "put": 12.3
+   },
+   {
+    "sim": 150195,
+    "min": 1.89,
+    "village": 1.12,
+    "saved": 0.725,
+    "burnt": 93.3,
+    "put": 8.1
+   },
+   {
+    "sim": 200185,
+    "min": 2.56,
+    "village": 0.88,
+    "saved": 0.775,
+    "burnt": 95.0,
+    "put": 10.9
+   },
+   {
+    "sim": 250060,
+    "min": 3.24,
+    "village": 0.7,
+    "saved": 0.825,
+    "burnt": 86.8,
+    "put": 7.6
+   },
+   {
+    "sim": 300230,
+    "min": 3.95,
+    "village": 0.47,
+    "saved": 0.875,
+    "burnt": 82.0,
+    "put": 8.0
+   },
+   {
+    "sim": 350017,
+    "min": 4.65,
+    "village": 0.62,
+    "saved": 0.85,
+    "burnt": 74.1,
+    "put": 9.6
+   },
+   {
+    "sim": 400196,
+    "min": 5.36,
+    "village": 0.28,
+    "saved": 0.875,
+    "burnt": 74.5,
+    "put": 8.3
+   },
+   {
+    "sim": 450043,
+    "min": 6.04,
+    "village": 0.47,
+    "saved": 0.875,
+    "burnt": 73.9,
+    "put": 9.4
+   },
+   {
+    "sim": 500186,
+    "min": 6.73,
+    "village": 0.42,
+    "saved": 0.875,
+    "burnt": 71.1,
+    "put": 8.9
+   },
+   {
+    "sim": 550225,
+    "min": 7.41,
+    "village": 0.35,
+    "saved": 0.9,
+    "burnt": 68.1,
+    "put": 9.9
+   },
+   {
+    "sim": 600144,
+    "min": 8.08,
+    "village": 0.45,
+    "saved": 0.875,
+    "burnt": 68.2,
+    "put": 10.7
+   },
+   {
+    "sim": 650071,
+    "min": 8.78,
+    "village": 0.33,
+    "saved": 0.875,
+    "burnt": 72.0,
+    "put": 9.3
+   },
+   {
+    "sim": 700229,
+    "min": 9.46,
+    "village": 0.53,
+    "saved": 0.825,
+    "burnt": 74.4,
+    "put": 8.9
+   },
+   {
+    "sim": 750215,
+    "min": 10.13,
+    "village": 0.53,
+    "saved": 0.875,
+    "burnt": 66.5,
+    "put": 9.7
+   },
+   {
+    "sim": 800163,
+    "min": 10.8,
+    "village": 0.47,
+    "saved": 0.875,
+    "burnt": 69.7,
+    "put": 9.2
+   },
+   {
+    "sim": 850207,
+    "min": 11.48,
+    "village": 0.5,
+    "saved": 0.8,
+    "burnt": 74.2,
+    "put": 9.1
+   },
+   {
+    "sim": 900220,
+    "min": 12.16,
+    "village": 0.68,
+    "saved": 0.875,
+    "burnt": 65.8,
+    "put": 10.6
+   },
+   {
+    "sim": 950043,
+    "min": 12.83,
+    "village": 0.55,
+    "saved": 0.85,
+    "burnt": 67.5,
+    "put": 10.4
+   },
+   {
+    "sim": 1000203,
+    "min": 13.51,
+    "village": 0.45,
+    "saved": 0.85,
+    "burnt": 62.1,
+    "put": 12.1
+   }
+  ],
+  "final": {
+   "sim": 1000000,
+   "min": 13.5,
+   "village": 0.69,
+   "saved": 0.8,
+   "burnt": 69.5,
+   "put": 12.1
+  }
+ },
+ {
+  "learner": "DQN",
+  "budget": 1000000,
+  "seed": 1,
+  "minutes": 13.4,
+  "points": [
+   {
+    "sim": 50122,
+    "min": 0.53,
+    "village": 1.68,
+    "saved": 0.55,
+    "burnt": 122.3,
+    "put": 14.3
+   },
+   {
+    "sim": 100035,
+    "min": 1.19,
+    "village": 0.88,
+    "saved": 0.775,
+    "burnt": 103.6,
+    "put": 10.5
+   },
+   {
+    "sim": 150230,
+    "min": 1.84,
+    "village": 0.15,
+    "saved": 0.85,
+    "burnt": 118.5,
+    "put": 6.0
+   },
+   {
+    "sim": 200073,
+    "min": 2.5,
+    "village": 0.15,
+    "saved": 0.85,
+    "burnt": 120.6,
+    "put": 3.1
+   },
+   {
+    "sim": 250166,
+    "min": 3.18,
+    "village": 0.9,
+    "saved": 0.775,
+    "burnt": 107.2,
+    "put": 6.7
+   },
+   {
+    "sim": 300047,
+    "min": 3.85,
+    "village": 0.53,
+    "saved": 0.85,
+    "burnt": 99.4,
+    "put": 8.7
+   },
+   {
+    "sim": 350177,
+    "min": 4.53,
+    "village": 0.2,
+    "saved": 0.875,
+    "burnt": 89.4,
+    "put": 7.6
+   },
+   {
+    "sim": 400109,
+    "min": 5.22,
+    "village": 0.25,
+    "saved": 0.925,
+    "burnt": 78.8,
+    "put": 8.6
+   },
+   {
+    "sim": 450176,
+    "min": 5.91,
+    "village": 0.42,
+    "saved": 0.85,
+    "burnt": 77.7,
+    "put": 9.0
+   },
+   {
+    "sim": 500171,
+    "min": 6.61,
+    "village": 0.45,
+    "saved": 0.825,
+    "burnt": 79.3,
+    "put": 8.4
+   },
+   {
+    "sim": 550157,
+    "min": 7.3,
+    "village": 0.47,
+    "saved": 0.875,
+    "burnt": 72.7,
+    "put": 7.8
+   },
+   {
+    "sim": 600195,
+    "min": 7.98,
+    "village": 0.2,
+    "saved": 0.95,
+    "burnt": 70.5,
+    "put": 8.0
+   },
+   {
+    "sim": 650182,
+    "min": 8.66,
+    "village": 0.35,
+    "saved": 0.925,
+    "burnt": 64.2,
+    "put": 8.5
+   },
+   {
+    "sim": 700026,
+    "min": 9.35,
+    "village": 0.33,
+    "saved": 0.95,
+    "burnt": 61.8,
+    "put": 8.3
+   },
+   {
+    "sim": 750138,
+    "min": 10.04,
+    "village": 0.17,
+    "saved": 0.95,
+    "burnt": 62.0,
+    "put": 8.9
+   },
+   {
+    "sim": 800158,
+    "min": 10.73,
+    "village": 0.33,
+    "saved": 0.925,
+    "burnt": 67.9,
+    "put": 8.0
+   },
+   {
+    "sim": 850041,
+    "min": 11.4,
+    "village": 0.4,
+    "saved": 0.9,
+    "burnt": 66.3,
+    "put": 8.9
+   },
+   {
+    "sim": 900113,
+    "min": 12.07,
+    "village": 0.3,
+    "saved": 0.925,
+    "burnt": 63.0,
+    "put": 9.3
+   },
+   {
+    "sim": 950053,
+    "min": 12.74,
+    "village": 0.28,
+    "saved": 0.9,
+    "burnt": 64.5,
+    "put": 10.3
+   },
+   {
+    "sim": 1000001,
+    "min": 13.44,
+    "village": 0.05,
+    "saved": 0.95,
+    "burnt": 62.6,
+    "put": 10.0
+   }
+  ],
+  "final": {
+   "sim": 1000000,
+   "min": 13.4,
+   "village": 0.69,
+   "saved": 0.825,
+   "burnt": 70.1,
+   "put": 10.1
+  }
+ },
+ {
+  "learner": "DQN",
+  "budget": 1000000,
+  "seed": 2,
+  "minutes": 13.5,
+  "points": [
+   {
+    "sim": 50025,
+    "min": 0.55,
+    "village": 2.02,
+    "saved": 0.525,
+    "burnt": 120.5,
+    "put": 16.6
+   },
+   {
+    "sim": 100160,
+    "min": 1.22,
+    "village": 1.32,
+    "saved": 0.575,
+    "burnt": 121.8,
+    "put": 6.1
+   },
+   {
+    "sim": 150217,
+    "min": 1.89,
+    "village": 0.4,
+    "saved": 0.8,
+    "burnt": 122.7,
+    "put": 3.9
+   },
+   {
+    "sim": 200134,
+    "min": 2.57,
+    "village": 0.12,
+    "saved": 0.875,
+    "burnt": 103.7,
+    "put": 6.9
+   },
+   {
+    "sim": 250026,
+    "min": 3.26,
+    "village": 0.28,
+    "saved": 0.875,
+    "burnt": 93.9,
+    "put": 8.0
+   },
+   {
+    "sim": 300059,
+    "min": 3.95,
+    "village": 0.6,
+    "saved": 0.825,
+    "burnt": 90.3,
+    "put": 7.3
+   },
+   {
+    "sim": 350166,
+    "min": 4.65,
+    "village": 0.35,
+    "saved": 0.875,
+    "burnt": 85.7,
+    "put": 8.3
+   },
+   {
+    "sim": 400003,
+    "min": 5.32,
+    "village": 0.5,
+    "saved": 0.825,
+    "burnt": 72.2,
+    "put": 8.6
+   },
+   {
+    "sim": 450034,
+    "min": 6.0,
+    "village": 0.38,
+    "saved": 0.875,
+    "burnt": 81.0,
+    "put": 7.2
+   },
+   {
+    "sim": 500072,
+    "min": 6.68,
+    "village": 0.38,
+    "saved": 0.875,
+    "burnt": 79.5,
+    "put": 7.0
+   },
+   {
+    "sim": 550207,
+    "min": 7.36,
+    "village": 0.38,
+    "saved": 0.875,
+    "burnt": 73.0,
+    "put": 8.1
+   },
+   {
+    "sim": 600071,
+    "min": 8.04,
+    "village": 0.33,
+    "saved": 0.9,
+    "burnt": 75.2,
+    "put": 9.4
+   },
+   {
+    "sim": 650185,
+    "min": 8.73,
+    "village": 0.25,
+    "saved": 0.875,
+    "burnt": 79.5,
+    "put": 7.9
+   },
+   {
+    "sim": 700154,
+    "min": 9.43,
+    "village": 0.15,
+    "saved": 0.95,
+    "burnt": 72.7,
+    "put": 7.8
+   },
+   {
+    "sim": 750119,
+    "min": 10.11,
+    "village": 0.17,
+    "saved": 0.925,
+    "burnt": 71.5,
+    "put": 7.5
+   },
+   {
+    "sim": 800017,
+    "min": 10.79,
+    "village": 0.3,
+    "saved": 0.875,
+    "burnt": 68.4,
+    "put": 9.9
+   },
+   {
+    "sim": 850226,
+    "min": 11.47,
+    "village": 0.42,
+    "saved": 0.875,
+    "burnt": 68.2,
+    "put": 9.3
+   },
+   {
+    "sim": 900196,
+    "min": 12.16,
+    "village": 0.2,
+    "saved": 0.925,
+    "burnt": 65.9,
+    "put": 8.9
+   },
+   {
+    "sim": 950086,
+    "min": 12.84,
+    "village": 0.38,
+    "saved": 0.9,
+    "burnt": 67.2,
+    "put": 10.2
+   },
+   {
+    "sim": 1000169,
+    "min": 13.53,
+    "village": 0.28,
+    "saved": 0.875,
+    "burnt": 64.6,
+    "put": 12.0
+   }
+  ],
+  "final": {
+   "sim": 1000000,
+   "min": 13.5,
+   "village": 0.86,
+   "saved": 0.8,
+   "burnt": 72.7,
+   "put": 10.7
+  }
+ },
+ {
+  "learner": "PPO",
+  "budget": 1000000,
+  "seed": 0,
+  "minutes": 8.1,
+  "points": [
+   {
+    "sim": 55478,
+    "min": 0.45,
+    "village": 5.9,
+    "saved": 0.2,
+    "burnt": 146.5,
+    "put": 7.5
+   },
+   {
+    "sim": 102968,
+    "min": 0.83,
+    "village": 5.88,
+    "saved": 0.25,
+    "burnt": 142.3,
+    "put": 7.7
+   },
+   {
+    "sim": 150476,
+    "min": 1.2,
+    "village": 3.48,
+    "saved": 0.4,
+    "burnt": 132.0,
+    "put": 9.4
+   },
+   {
+    "sim": 205884,
+    "min": 1.64,
+    "village": 3.3,
+    "saved": 0.425,
+    "burnt": 139.1,
+    "put": 7.9
+   },
+   {
+    "sim": 253311,
+    "min": 2.02,
+    "village": 2.33,
+    "saved": 0.425,
+    "burnt": 150.1,
+    "put": 8.2
+   },
+   {
+    "sim": 300706,
+    "min": 2.4,
+    "village": 2.08,
+    "saved": 0.5,
+    "burnt": 131.2,
+    "put": 7.7
+   },
+   {
+    "sim": 355929,
+    "min": 2.84,
+    "village": 2.17,
+    "saved": 0.5,
+    "burnt": 137.7,
+    "put": 11.5
+   },
+   {
+    "sim": 403171,
+    "min": 3.22,
+    "village": 1.6,
+    "saved": 0.675,
+    "burnt": 128.3,
+    "put": 12.8
+   },
+   {
+    "sim": 450224,
+    "min": 3.59,
+    "village": 1.18,
+    "saved": 0.75,
+    "burnt": 123.2,
+    "put": 12.0
+   },
+   {
+    "sim": 505087,
+    "min": 4.03,
+    "village": 1.07,
+    "saved": 0.725,
+    "burnt": 114.4,
+    "put": 13.5
+   },
+   {
+    "sim": 552003,
+    "min": 4.4,
+    "village": 0.93,
+    "saved": 0.75,
+    "burnt": 114.8,
+    "put": 14.4
+   },
+   {
+    "sim": 606501,
+    "min": 4.83,
+    "village": 0.72,
+    "saved": 0.65,
+    "burnt": 128.3,
+    "put": 11.0
+   },
+   {
+    "sim": 653220,
+    "min": 5.22,
+    "village": 0.78,
+    "saved": 0.775,
+    "burnt": 115.5,
+    "put": 10.4
+   },
+   {
+    "sim": 707762,
+    "min": 5.66,
+    "village": 0.93,
+    "saved": 0.75,
+    "burnt": 125.6,
+    "put": 10.5
+   },
+   {
+    "sim": 754668,
+    "min": 6.05,
+    "village": 1.23,
+    "saved": 0.625,
+    "burnt": 116.8,
+    "put": 9.9
+   },
+   {
+    "sim": 801712,
+    "min": 6.45,
+    "village": 0.97,
+    "saved": 0.65,
+    "burnt": 116.0,
+    "put": 9.4
+   },
+   {
+    "sim": 856553,
+    "min": 6.9,
+    "village": 1.38,
+    "saved": 0.65,
+    "burnt": 115.4,
+    "put": 8.9
+   },
+   {
+    "sim": 903370,
+    "min": 7.28,
+    "village": 1.32,
+    "saved": 0.675,
+    "burnt": 124.5,
+    "put": 7.2
+   },
+   {
+    "sim": 950083,
+    "min": 7.65,
+    "village": 1.48,
+    "saved": 0.675,
+    "burnt": 119.5,
+    "put": 7.7
+   },
+   {
+    "sim": 1004604,
+    "min": 8.09,
+    "village": 0.6,
+    "saved": 0.7,
+    "burnt": 120.3,
+    "put": 5.4
+   }
+  ],
+  "final": {
+   "sim": 1000000,
+   "min": 8.1,
+   "village": 1.03,
+   "saved": 0.72,
+   "burnt": 119.9,
+   "put": 6.0
+  }
+ },
+ {
+  "learner": "PPO",
+  "budget": 1000000,
+  "seed": 1,
+  "minutes": 8.1,
+  "points": [
+   {
+    "sim": 55614,
+    "min": 0.43,
+    "village": 7.03,
+    "saved": 0.15,
+    "burnt": 164.6,
+    "put": 4.6
+   },
+   {
+    "sim": 103157,
+    "min": 0.82,
+    "village": 5.75,
+    "saved": 0.25,
+    "burnt": 148.9,
+    "put": 7.7
+   },
+   {
+    "sim": 150792,
+    "min": 1.21,
+    "village": 1.52,
+    "saved": 0.625,
+    "burnt": 139.1,
+    "put": 10.7
+   },
+   {
+    "sim": 206107,
+    "min": 1.65,
+    "village": 1.12,
+    "saved": 0.675,
+    "burnt": 135.9,
+    "put": 10.7
+   },
+   {
+    "sim": 253394,
+    "min": 2.04,
+    "village": 1.2,
+    "saved": 0.675,
+    "burnt": 128.9,
+    "put": 14.4
+   },
+   {
+    "sim": 300461,
+    "min": 2.42,
+    "village": 1.2,
+    "saved": 0.75,
+    "burnt": 122.2,
+    "put": 17.1
+   },
+   {
+    "sim": 355289,
+    "min": 2.86,
+    "village": 1.02,
+    "saved": 0.75,
+    "burnt": 113.5,
+    "put": 13.9
+   },
+   {
+    "sim": 402259,
+    "min": 3.24,
+    "village": 0.9,
+    "saved": 0.675,
+    "burnt": 120.5,
+    "put": 14.2
+   },
+   {
+    "sim": 457025,
+    "min": 3.68,
+    "village": 1.07,
+    "saved": 0.65,
+    "burnt": 115.8,
+    "put": 15.5
+   },
+   {
+    "sim": 503764,
+    "min": 4.06,
+    "village": 1.18,
+    "saved": 0.75,
+    "burnt": 103.4,
+    "put": 14.7
+   },
+   {
+    "sim": 550286,
+    "min": 4.44,
+    "village": 0.88,
+    "saved": 0.8,
+    "burnt": 109.0,
+    "put": 15.3
+   },
+   {
+    "sim": 604507,
+    "min": 4.87,
+    "village": 0.78,
+    "saved": 0.825,
+    "burnt": 105.8,
+    "put": 15.2
+   },
+   {
+    "sim": 650794,
+    "min": 5.25,
+    "village": 1.0,
+    "saved": 0.8,
+    "burnt": 106.0,
+    "put": 15.2
+   },
+   {
+    "sim": 704339,
+    "min": 5.68,
+    "village": 0.7,
+    "saved": 0.8,
+    "burnt": 103.5,
+    "put": 15.4
+   },
+   {
+    "sim": 750342,
+    "min": 6.04,
+    "village": 1.05,
+    "saved": 0.725,
+    "burnt": 109.9,
+    "put": 15.0
+   },
+   {
+    "sim": 804096,
+    "min": 6.48,
+    "village": 1.3,
+    "saved": 0.65,
+    "burnt": 99.8,
+    "put": 15.2
+   },
+   {
+    "sim": 850235,
+    "min": 6.86,
+    "village": 1.5,
+    "saved": 0.675,
+    "burnt": 95.1,
+    "put": 14.4
+   },
+   {
+    "sim": 904071,
+    "min": 7.3,
+    "village": 2.4,
+    "saved": 0.575,
+    "burnt": 99.5,
+    "put": 14.2
+   },
+   {
+    "sim": 950471,
+    "min": 7.68,
+    "village": 2.08,
+    "saved": 0.625,
+    "burnt": 103.7,
+    "put": 13.2
+   },
+   {
+    "sim": 1004572,
+    "min": 8.12,
+    "village": 2.15,
+    "saved": 0.625,
+    "burnt": 97.5,
+    "put": 12.3
+   }
+  ],
+  "final": {
+   "sim": 1000000,
+   "min": 8.1,
+   "village": 2.0,
+   "saved": 0.615,
+   "burnt": 103.1,
+   "put": 11.2
+  }
+ },
+ {
+  "learner": "PPO",
+  "budget": 1000000,
+  "seed": 2,
+  "minutes": 8.2,
+  "points": [
+   {
+    "sim": 55563,
+    "min": 0.45,
+    "village": 7.17,
+    "saved": 0.15,
+    "burnt": 171.4,
+    "put": 2.0
+   },
+   {
+    "sim": 103127,
+    "min": 0.84,
+    "village": 7.47,
+    "saved": 0.125,
+    "burnt": 174.1,
+    "put": 0.5
+   },
+   {
+    "sim": 150847,
+    "min": 1.24,
+    "village": 6.45,
+    "saved": 0.15,
+    "burnt": 164.9,
+    "put": 3.4
+   },
+   {
+    "sim": 206649,
+    "min": 1.69,
+    "village": 7.33,
+    "saved": 0.125,
+    "burnt": 170.4,
+    "put": 1.7
+   },
+   {
+    "sim": 254465,
+    "min": 2.08,
+    "village": 7.45,
+    "saved": 0.125,
+    "burnt": 173.4,
+    "put": 1.7
+   },
+   {
+    "sim": 302291,
+    "min": 2.48,
+    "village": 7.33,
+    "saved": 0.125,
+    "burnt": 166.8,
+    "put": 4.9
+   },
+   {
+    "sim": 357941,
+    "min": 2.93,
+    "village": 5.65,
+    "saved": 0.225,
+    "burnt": 151.4,
+    "put": 6.2
+   },
+   {
+    "sim": 405496,
+    "min": 3.32,
+    "village": 3.5,
+    "saved": 0.3,
+    "burnt": 139.9,
+    "put": 4.1
+   },
+   {
+    "sim": 452983,
+    "min": 3.72,
+    "village": 2.73,
+    "saved": 0.325,
+    "burnt": 140.3,
+    "put": 3.9
+   },
+   {
+    "sim": 500324,
+    "min": 4.11,
+    "village": 1.25,
+    "saved": 0.575,
+    "burnt": 140.4,
+    "put": 3.3
+   },
+   {
+    "sim": 555277,
+    "min": 4.56,
+    "village": 2.23,
+    "saved": 0.5,
+    "burnt": 130.9,
+    "put": 3.2
+   },
+   {
+    "sim": 602287,
+    "min": 4.94,
+    "village": 1.73,
+    "saved": 0.575,
+    "burnt": 134.5,
+    "put": 2.9
+   },
+   {
+    "sim": 656829,
+    "min": 5.39,
+    "village": 1.35,
+    "saved": 0.65,
+    "burnt": 135.2,
+    "put": 3.6
+   },
+   {
+    "sim": 703544,
+    "min": 5.77,
+    "village": 0.78,
+    "saved": 0.775,
+    "burnt": 125.2,
+    "put": 4.0
+   },
+   {
+    "sim": 757691,
+    "min": 6.21,
+    "village": 1.07,
+    "saved": 0.7,
+    "burnt": 118.0,
+    "put": 4.9
+   },
+   {
+    "sim": 803989,
+    "min": 6.58,
+    "village": 0.78,
+    "saved": 0.725,
+    "burnt": 123.7,
+    "put": 3.8
+   },
+   {
+    "sim": 850225,
+    "min": 6.97,
+    "village": 0.7,
+    "saved": 0.75,
+    "burnt": 115.9,
+    "put": 3.2
+   },
+   {
+    "sim": 903829,
+    "min": 7.41,
+    "village": 0.62,
+    "saved": 0.75,
+    "burnt": 118.8,
+    "put": 2.4
+   },
+   {
+    "sim": 957254,
+    "min": 7.85,
+    "village": 0.75,
+    "saved": 0.725,
+    "burnt": 120.9,
+    "put": 2.6
+   },
+   {
+    "sim": 1002844,
+    "min": 8.23,
+    "village": 0.72,
+    "saved": 0.75,
+    "burnt": 117.8,
+    "put": 1.8
+   }
+  ],
+  "final": {
+   "sim": 1000000,
+   "min": 8.2,
+   "village": 0.78,
+   "saved": 0.765,
+   "burnt": 114.5,
+   "put": 2.0
+  }
+ },
+ {
+  "learner": "PPO",
+  "budget": 2000000,
+  "seed": 0,
+  "minutes": 16.3,
+  "points": [
+   {
+    "sim": 55478,
+    "min": 0.45,
+    "village": 5.9,
+    "saved": 0.2,
+    "burnt": 146.5,
+    "put": 7.5
+   },
+   {
+    "sim": 102968,
+    "min": 0.83,
+    "village": 5.88,
+    "saved": 0.25,
+    "burnt": 142.3,
+    "put": 7.7
+   },
+   {
+    "sim": 150476,
+    "min": 1.21,
+    "village": 3.48,
+    "saved": 0.4,
+    "burnt": 132.0,
+    "put": 9.4
+   },
+   {
+    "sim": 205884,
+    "min": 1.65,
+    "village": 3.3,
+    "saved": 0.425,
+    "burnt": 139.1,
+    "put": 7.9
+   },
+   {
+    "sim": 253311,
+    "min": 2.04,
+    "village": 2.33,
+    "saved": 0.425,
+    "burnt": 150.1,
+    "put": 8.2
+   },
+   {
+    "sim": 300706,
+    "min": 2.43,
+    "village": 2.08,
+    "saved": 0.5,
+    "burnt": 131.2,
+    "put": 7.7
+   },
+   {
+    "sim": 355929,
+    "min": 2.88,
+    "village": 2.17,
+    "saved": 0.5,
+    "burnt": 137.7,
+    "put": 11.5
+   },
+   {
+    "sim": 403171,
+    "min": 3.27,
+    "village": 1.6,
+    "saved": 0.675,
+    "burnt": 128.3,
+    "put": 12.8
+   },
+   {
+    "sim": 450224,
+    "min": 3.65,
+    "village": 1.18,
+    "saved": 0.75,
+    "burnt": 123.2,
+    "put": 12.0
+   },
+   {
+    "sim": 505087,
+    "min": 4.09,
+    "village": 1.07,
+    "saved": 0.725,
+    "burnt": 114.4,
+    "put": 13.5
+   },
+   {
+    "sim": 552003,
+    "min": 4.47,
+    "village": 0.93,
+    "saved": 0.75,
+    "burnt": 114.8,
+    "put": 14.4
+   },
+   {
+    "sim": 606501,
+    "min": 4.91,
+    "village": 0.72,
+    "saved": 0.65,
+    "burnt": 128.3,
+    "put": 11.0
+   },
+   {
+    "sim": 653220,
+    "min": 5.27,
+    "village": 0.78,
+    "saved": 0.775,
+    "burnt": 115.5,
+    "put": 10.4
+   },
+   {
+    "sim": 707762,
+    "min": 5.72,
+    "village": 0.93,
+    "saved": 0.75,
+    "burnt": 125.6,
+    "put": 10.5
+   },
+   {
+    "sim": 754668,
+    "min": 6.11,
+    "village": 1.23,
+    "saved": 0.625,
+    "burnt": 116.8,
+    "put": 9.9
+   },
+   {
+    "sim": 801712,
+    "min": 6.5,
+    "village": 0.97,
+    "saved": 0.65,
+    "burnt": 116.0,
+    "put": 9.4
+   },
+   {
+    "sim": 856553,
+    "min": 6.93,
+    "village": 1.38,
+    "saved": 0.65,
+    "burnt": 115.4,
+    "put": 8.9
+   },
+   {
+    "sim": 903370,
+    "min": 7.32,
+    "village": 1.32,
+    "saved": 0.675,
+    "burnt": 124.5,
+    "put": 7.2
+   },
+   {
+    "sim": 950083,
+    "min": 7.7,
+    "village": 1.48,
+    "saved": 0.675,
+    "burnt": 119.5,
+    "put": 7.7
+   },
+   {
+    "sim": 1004604,
+    "min": 8.13,
+    "village": 0.6,
+    "saved": 0.7,
+    "burnt": 120.3,
+    "put": 5.4
+   },
+   {
+    "sim": 1051131,
+    "min": 8.51,
+    "village": 0.72,
+    "saved": 0.75,
+    "burnt": 127.0,
+    "put": 4.4
+   },
+   {
+    "sim": 1105256,
+    "min": 8.95,
+    "village": 0.62,
+    "saved": 0.775,
+    "burnt": 127.4,
+    "put": 3.7
+   },
+   {
+    "sim": 1151615,
+    "min": 9.32,
+    "village": 0.5,
+    "saved": 0.775,
+    "burnt": 121.7,
+    "put": 5.0
+   },
+   {
+    "sim": 1205465,
+    "min": 9.76,
+    "village": 0.35,
+    "saved": 0.8,
+    "burnt": 118.0,
+    "put": 3.9
+   },
+   {
+    "sim": 1251498,
+    "min": 10.15,
+    "village": 0.68,
+    "saved": 0.8,
+    "burnt": 120.7,
+    "put": 3.4
+   },
+   {
+    "sim": 1304948,
+    "min": 10.58,
+    "village": 0.45,
+    "saved": 0.825,
+    "burnt": 112.5,
+    "put": 4.9
+   },
+   {
+    "sim": 1350754,
+    "min": 10.96,
+    "village": 0.47,
+    "saved": 0.825,
+    "burnt": 112.2,
+    "put": 5.3
+   },
+   {
+    "sim": 1403966,
+    "min": 11.39,
+    "village": 0.65,
+    "saved": 0.825,
+    "burnt": 106.4,
+    "put": 4.9
+   },
+   {
+    "sim": 1456834,
+    "min": 11.83,
+    "village": 0.65,
+    "saved": 0.8,
+    "burnt": 107.1,
+    "put": 6.1
+   },
+   {
+    "sim": 1502241,
+    "min": 12.2,
+    "village": 0.6,
+    "saved": 0.8,
+    "burnt": 108.6,
+    "put": 6.1
+   },
+   {
+    "sim": 1555019,
+    "min": 12.63,
+    "village": 0.55,
+    "saved": 0.775,
+    "burnt": 111.0,
+    "put": 5.9
+   },
+   {
+    "sim": 1600434,
+    "min": 13.01,
+    "village": 0.45,
+    "saved": 0.875,
+    "burnt": 100.4,
+    "put": 7.7
+   },
+   {
+    "sim": 1653803,
+    "min": 13.44,
+    "village": 0.75,
+    "saved": 0.775,
+    "burnt": 100.3,
+    "put": 7.7
+   },
+   {
+    "sim": 1707109,
+    "min": 13.88,
+    "village": 1.15,
+    "saved": 0.7,
+    "burnt": 100.7,
+    "put": 8.0
+   },
+   {
+    "sim": 1752641,
+    "min": 14.24,
+    "village": 0.47,
+    "saved": 0.85,
+    "burnt": 105.6,
+    "put": 6.3
+   },
+   {
+    "sim": 1805287,
+    "min": 14.67,
+    "village": 0.88,
+    "saved": 0.75,
+    "burnt": 107.8,
+    "put": 5.2
+   },
+   {
+    "sim": 1850538,
+    "min": 15.05,
+    "village": 0.78,
+    "saved": 0.725,
+    "burnt": 112.9,
+    "put": 5.1
+   },
+   {
+    "sim": 1903503,
+    "min": 15.48,
+    "village": 0.72,
+    "saved": 0.75,
+    "burnt": 108.8,
+    "put": 5.0
+   },
+   {
+    "sim": 1956231,
+    "min": 15.92,
+    "village": 0.6,
+    "saved": 0.75,
+    "burnt": 105.2,
+    "put": 5.3
+   },
+   {
+    "sim": 2001635,
+    "min": 16.3,
+    "village": 0.4,
+    "saved": 0.825,
+    "burnt": 105.9,
+    "put": 6.2
+   }
+  ],
+  "final": {
+   "sim": 2000000,
+   "min": 16.3,
+   "village": 0.94,
+   "saved": 0.725,
+   "burnt": 103.2,
+   "put": 6.0
+  }
+ },
+ {
+  "learner": "PPO",
+  "budget": 2000000,
+  "seed": 1,
+  "minutes": 16.4,
+  "points": [
+   {
+    "sim": 55614,
+    "min": 0.46,
+    "village": 7.03,
+    "saved": 0.15,
+    "burnt": 164.6,
+    "put": 4.6
+   },
+   {
+    "sim": 103157,
+    "min": 0.84,
+    "village": 5.75,
+    "saved": 0.25,
+    "burnt": 148.9,
+    "put": 7.7
+   },
+   {
+    "sim": 150792,
+    "min": 1.24,
+    "village": 1.52,
+    "saved": 0.625,
+    "burnt": 139.1,
+    "put": 10.7
+   },
+   {
+    "sim": 206107,
+    "min": 1.69,
+    "village": 1.12,
+    "saved": 0.675,
+    "burnt": 135.9,
+    "put": 10.7
+   },
+   {
+    "sim": 253394,
+    "min": 2.09,
+    "village": 1.2,
+    "saved": 0.675,
+    "burnt": 128.9,
+    "put": 14.4
+   },
+   {
+    "sim": 300461,
+    "min": 2.48,
+    "village": 1.2,
+    "saved": 0.75,
+    "burnt": 122.2,
+    "put": 17.1
+   },
+   {
+    "sim": 355289,
+    "min": 2.93,
+    "village": 1.02,
+    "saved": 0.75,
+    "burnt": 113.5,
+    "put": 13.9
+   },
+   {
+    "sim": 402259,
+    "min": 3.32,
+    "village": 0.9,
+    "saved": 0.675,
+    "burnt": 120.5,
+    "put": 14.2
+   },
+   {
+    "sim": 457025,
+    "min": 3.77,
+    "village": 1.07,
+    "saved": 0.65,
+    "burnt": 115.8,
+    "put": 15.5
+   },
+   {
+    "sim": 503764,
+    "min": 4.16,
+    "village": 1.18,
+    "saved": 0.75,
+    "burnt": 103.4,
+    "put": 14.7
+   },
+   {
+    "sim": 550286,
+    "min": 4.54,
+    "village": 0.88,
+    "saved": 0.8,
+    "burnt": 109.0,
+    "put": 15.3
+   },
+   {
+    "sim": 604507,
+    "min": 4.98,
+    "village": 0.78,
+    "saved": 0.825,
+    "burnt": 105.8,
+    "put": 15.2
+   },
+   {
+    "sim": 650794,
+    "min": 5.35,
+    "village": 1.0,
+    "saved": 0.8,
+    "burnt": 106.0,
+    "put": 15.2
+   },
+   {
+    "sim": 704339,
+    "min": 5.79,
+    "village": 0.7,
+    "saved": 0.8,
+    "burnt": 103.5,
+    "put": 15.4
+   },
+   {
+    "sim": 750342,
+    "min": 6.17,
+    "village": 1.05,
+    "saved": 0.725,
+    "burnt": 109.9,
+    "put": 15.0
+   },
+   {
+    "sim": 804096,
+    "min": 6.61,
+    "village": 1.3,
+    "saved": 0.65,
+    "burnt": 99.8,
+    "put": 15.2
+   },
+   {
+    "sim": 850235,
+    "min": 7.0,
+    "village": 1.5,
+    "saved": 0.675,
+    "burnt": 95.1,
+    "put": 14.4
+   },
+   {
+    "sim": 904071,
+    "min": 7.45,
+    "village": 2.4,
+    "saved": 0.575,
+    "burnt": 99.5,
+    "put": 14.2
+   },
+   {
+    "sim": 950471,
+    "min": 7.83,
+    "village": 2.08,
+    "saved": 0.625,
+    "burnt": 103.7,
+    "put": 13.2
+   },
+   {
+    "sim": 1004572,
+    "min": 8.27,
+    "village": 2.15,
+    "saved": 0.625,
+    "burnt": 97.5,
+    "put": 12.3
+   },
+   {
+    "sim": 1050871,
+    "min": 8.65,
+    "village": 1.93,
+    "saved": 0.625,
+    "burnt": 97.2,
+    "put": 13.4
+   },
+   {
+    "sim": 1104829,
+    "min": 9.08,
+    "village": 1.9,
+    "saved": 0.625,
+    "burnt": 90.2,
+    "put": 13.3
+   },
+   {
+    "sim": 1151343,
+    "min": 9.46,
+    "village": 2.38,
+    "saved": 0.6,
+    "burnt": 98.9,
+    "put": 11.2
+   },
+   {
+    "sim": 1205343,
+    "min": 9.9,
+    "village": 1.77,
+    "saved": 0.65,
+    "burnt": 91.0,
+    "put": 11.1
+   },
+   {
+    "sim": 1251656,
+    "min": 10.28,
+    "village": 2.02,
+    "saved": 0.65,
+    "burnt": 95.0,
+    "put": 10.9
+   },
+   {
+    "sim": 1305687,
+    "min": 10.72,
+    "village": 2.08,
+    "saved": 0.625,
+    "burnt": 95.5,
+    "put": 10.3
+   },
+   {
+    "sim": 1351908,
+    "min": 11.09,
+    "village": 1.95,
+    "saved": 0.65,
+    "burnt": 89.7,
+    "put": 11.7
+   },
+   {
+    "sim": 1405785,
+    "min": 11.53,
+    "village": 1.98,
+    "saved": 0.625,
+    "burnt": 90.0,
+    "put": 11.9
+   },
+   {
+    "sim": 1451868,
+    "min": 11.9,
+    "village": 2.38,
+    "saved": 0.6,
+    "burnt": 95.5,
+    "put": 12.5
+   },
+   {
+    "sim": 1505775,
+    "min": 12.34,
+    "village": 2.15,
+    "saved": 0.625,
+    "burnt": 94.7,
+    "put": 12.5
+   },
+   {
+    "sim": 1552081,
+    "min": 12.72,
+    "village": 1.57,
+    "saved": 0.675,
+    "burnt": 91.9,
+    "put": 10.7
+   },
+   {
+    "sim": 1605753,
+    "min": 13.15,
+    "village": 2.52,
+    "saved": 0.575,
+    "burnt": 100.8,
+    "put": 14.2
+   },
+   {
+    "sim": 1651878,
+    "min": 13.53,
+    "village": 2.0,
+    "saved": 0.65,
+    "burnt": 92.2,
+    "put": 12.4
+   },
+   {
+    "sim": 1705767,
+    "min": 13.96,
+    "village": 2.42,
+    "saved": 0.6,
+    "burnt": 99.5,
+    "put": 15.0
+   },
+   {
+    "sim": 1751839,
+    "min": 14.32,
+    "village": 2.38,
+    "saved": 0.625,
+    "burnt": 87.7,
+    "put": 13.8
+   },
+   {
+    "sim": 1805677,
+    "min": 14.75,
+    "village": 2.33,
+    "saved": 0.65,
+    "burnt": 91.7,
+    "put": 14.8
+   },
+   {
+    "sim": 1851677,
+    "min": 15.13,
+    "village": 2.33,
+    "saved": 0.6,
+    "burnt": 87.7,
+    "put": 15.7
+   },
+   {
+    "sim": 1905461,
+    "min": 15.57,
+    "village": 2.55,
+    "saved": 0.6,
+    "burnt": 86.7,
+    "put": 15.8
+   },
+   {
+    "sim": 1951432,
+    "min": 15.95,
+    "village": 2.27,
+    "saved": 0.625,
+    "burnt": 84.4,
+    "put": 15.6
+   },
+   {
+    "sim": 2005063,
+    "min": 16.38,
+    "village": 2.48,
+    "saved": 0.6,
+    "burnt": 85.4,
+    "put": 15.0
+   }
+  ],
+  "final": {
+   "sim": 2000000,
+   "min": 16.4,
+   "village": 2.31,
+   "saved": 0.605,
+   "burnt": 95.3,
+   "put": 15.4
+  }
+ },
+ {
+  "learner": "PPO",
+  "budget": 2000000,
+  "seed": 2,
+  "minutes": 16.3,
+  "points": [
+   {
+    "sim": 55563,
+    "min": 0.46,
+    "village": 7.17,
+    "saved": 0.15,
+    "burnt": 171.4,
+    "put": 2.0
+   },
+   {
+    "sim": 103127,
+    "min": 0.85,
+    "village": 7.47,
+    "saved": 0.125,
+    "burnt": 174.1,
+    "put": 0.5
+   },
+   {
+    "sim": 150847,
+    "min": 1.24,
+    "village": 6.45,
+    "saved": 0.15,
+    "burnt": 164.9,
+    "put": 3.4
+   },
+   {
+    "sim": 206649,
+    "min": 1.69,
+    "village": 7.33,
+    "saved": 0.125,
+    "burnt": 170.4,
+    "put": 1.7
+   },
+   {
+    "sim": 254465,
+    "min": 2.09,
+    "village": 7.45,
+    "saved": 0.125,
+    "burnt": 173.4,
+    "put": 1.7
+   },
+   {
+    "sim": 302291,
+    "min": 2.48,
+    "village": 7.33,
+    "saved": 0.125,
+    "burnt": 166.8,
+    "put": 4.9
+   },
+   {
+    "sim": 357941,
+    "min": 2.93,
+    "village": 5.65,
+    "saved": 0.225,
+    "burnt": 151.4,
+    "put": 6.2
+   },
+   {
+    "sim": 405496,
+    "min": 3.31,
+    "village": 3.5,
+    "saved": 0.3,
+    "burnt": 139.9,
+    "put": 4.1
+   },
+   {
+    "sim": 452983,
+    "min": 3.7,
+    "village": 2.73,
+    "saved": 0.325,
+    "burnt": 140.3,
+    "put": 3.9
+   },
+   {
+    "sim": 500324,
+    "min": 4.08,
+    "village": 1.25,
+    "saved": 0.575,
+    "burnt": 140.4,
+    "put": 3.3
+   },
+   {
+    "sim": 555277,
+    "min": 4.52,
+    "village": 2.23,
+    "saved": 0.5,
+    "burnt": 130.9,
+    "put": 3.2
+   },
+   {
+    "sim": 602287,
+    "min": 4.9,
+    "village": 1.73,
+    "saved": 0.575,
+    "burnt": 134.5,
+    "put": 2.9
+   },
+   {
+    "sim": 656829,
+    "min": 5.34,
+    "village": 1.35,
+    "saved": 0.65,
+    "burnt": 135.2,
+    "put": 3.6
+   },
+   {
+    "sim": 703544,
+    "min": 5.72,
+    "village": 0.78,
+    "saved": 0.775,
+    "burnt": 125.2,
+    "put": 4.0
+   },
+   {
+    "sim": 757691,
+    "min": 6.15,
+    "village": 1.07,
+    "saved": 0.7,
+    "burnt": 118.0,
+    "put": 4.9
+   },
+   {
+    "sim": 803989,
+    "min": 6.52,
+    "village": 0.78,
+    "saved": 0.725,
+    "burnt": 123.7,
+    "put": 3.8
+   },
+   {
+    "sim": 850225,
+    "min": 6.9,
+    "village": 0.7,
+    "saved": 0.75,
+    "burnt": 115.9,
+    "put": 3.2
+   },
+   {
+    "sim": 903829,
+    "min": 7.32,
+    "village": 0.62,
+    "saved": 0.75,
+    "burnt": 118.8,
+    "put": 2.4
+   },
+   {
+    "sim": 957254,
+    "min": 7.75,
+    "village": 0.75,
+    "saved": 0.725,
+    "burnt": 120.9,
+    "put": 2.6
+   },
+   {
+    "sim": 1002844,
+    "min": 8.11,
+    "village": 0.72,
+    "saved": 0.75,
+    "burnt": 117.8,
+    "put": 1.8
+   },
+   {
+    "sim": 1055644,
+    "min": 8.53,
+    "village": 0.45,
+    "saved": 0.8,
+    "burnt": 124.0,
+    "put": 1.4
+   },
+   {
+    "sim": 1100858,
+    "min": 8.9,
+    "village": 0.38,
+    "saved": 0.8,
+    "burnt": 124.0,
+    "put": 2.5
+   },
+   {
+    "sim": 1153627,
+    "min": 9.33,
+    "village": 0.45,
+    "saved": 0.85,
+    "burnt": 123.4,
+    "put": 2.2
+   },
+   {
+    "sim": 1206428,
+    "min": 9.76,
+    "village": 0.5,
+    "saved": 0.8,
+    "burnt": 121.8,
+    "put": 2.2
+   },
+   {
+    "sim": 1251585,
+    "min": 10.14,
+    "village": 0.47,
+    "saved": 0.825,
+    "burnt": 124.2,
+    "put": 2.5
+   },
+   {
+    "sim": 1304298,
+    "min": 10.57,
+    "village": 0.65,
+    "saved": 0.8,
+    "burnt": 123.3,
+    "put": 2.8
+   },
+   {
+    "sim": 1356936,
+    "min": 11.0,
+    "village": 0.45,
+    "saved": 0.8,
+    "burnt": 123.7,
+    "put": 2.7
+   },
+   {
+    "sim": 1401989,
+    "min": 11.37,
+    "village": 0.28,
+    "saved": 0.8,
+    "burnt": 119.8,
+    "put": 3.5
+   },
+   {
+    "sim": 1454512,
+    "min": 11.79,
+    "village": 0.38,
+    "saved": 0.775,
+    "burnt": 113.6,
+    "put": 4.8
+   },
+   {
+    "sim": 1507030,
+    "min": 12.22,
+    "village": 0.45,
+    "saved": 0.75,
+    "burnt": 110.6,
+    "put": 6.0
+   },
+   {
+    "sim": 1552127,
+    "min": 12.59,
+    "village": 0.62,
+    "saved": 0.8,
+    "burnt": 109.3,
+    "put": 5.9
+   },
+   {
+    "sim": 1604483,
+    "min": 13.02,
+    "village": 0.62,
+    "saved": 0.775,
+    "burnt": 107.0,
+    "put": 6.9
+   },
+   {
+    "sim": 1656650,
+    "min": 13.45,
+    "village": 0.75,
+    "saved": 0.775,
+    "burnt": 106.9,
+    "put": 6.7
+   },
+   {
+    "sim": 1701340,
+    "min": 13.82,
+    "village": 0.47,
+    "saved": 0.8,
+    "burnt": 106.1,
+    "put": 6.0
+   },
+   {
+    "sim": 1753601,
+    "min": 14.25,
+    "village": 0.4,
+    "saved": 0.8,
+    "burnt": 110.1,
+    "put": 6.0
+   },
+   {
+    "sim": 1805782,
+    "min": 14.68,
+    "village": 0.47,
+    "saved": 0.775,
+    "burnt": 105.1,
+    "put": 6.1
+   },
+   {
+    "sim": 1850420,
+    "min": 15.05,
+    "village": 0.62,
+    "saved": 0.75,
+    "burnt": 100.8,
+    "put": 7.8
+   },
+   {
+    "sim": 1902557,
+    "min": 15.49,
+    "village": 0.62,
+    "saved": 0.775,
+    "burnt": 97.0,
+    "put": 8.2
+   },
+   {
+    "sim": 1954721,
+    "min": 15.92,
+    "village": 0.72,
+    "saved": 0.75,
+    "burnt": 102.3,
+    "put": 7.8
+   },
+   {
+    "sim": 2006708,
+    "min": 16.35,
+    "village": 0.68,
+    "saved": 0.775,
+    "burnt": 102.9,
+    "put": 8.5
+   }
+  ],
+  "final": {
+   "sim": 2000000,
+   "min": 16.3,
+   "village": 0.76,
+   "saved": 0.75,
+   "burnt": 101.1,
+   "put": 7.6
+  }
+ }
+];
 
 export const BAR = {
  "random": {
@@ -37,5 +2102,21 @@ export const BAR = {
   "burnt": 96.3,
   "put": 22.0,
   "saved": 0.565
+ }
+};
+
+// The chiefs scored on the PROBE block instead — the same 40 worlds every curve
+// point above is measured on. Use these for reference lines drawn under the curves; BAR is the
+// 200-world exam and belongs with the final scores, not with a probe.
+export const BAR_PROBE = {
+ "nearest": {
+  "village": 2.15,
+  "burnt": 80.3,
+  "se2": 1.18
+ },
+ "guard": {
+  "village": 0.85,
+  "burnt": 75.3,
+  "se2": 0.66
  }
 };

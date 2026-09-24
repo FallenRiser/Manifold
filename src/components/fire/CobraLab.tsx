@@ -115,7 +115,7 @@ function Heat({ title, sub, accent, world, v, best, other, pick, onPick, ready }
     <div style={{ flex: "1 1 248px", maxWidth: SIZE }}>
       <div style={{ fontSize: 12, color: "var(--ink)", marginBottom: 1 }}>{title}</div>
       <div style={{ fontSize: 11, color: "var(--faint)", marginBottom: 5 }}>{sub}</div>
-      <svg viewBox={`0 0 ${SIZE} ${SIZE}`} width="100%" style={{ maxWidth: SIZE, display: "block", borderRadius: 8, background: "var(--bg)" }}>
+      <svg viewBox={`0 0 ${SIZE} ${SIZE}`} width="100%" style={{ maxWidth: SIZE, display: "block", borderRadius: 8, background: "var(--paper)" }}>
         {TERRAIN.map((ty, i) => {
           const { x, y } = at(i), s = world.S[i];
           return (

@@ -4,6 +4,7 @@ import { REG_TRACK } from "./regularizationTrack";
 import { POLY_TRACK } from "./polynomialRegressionTrack";
 import { KRR_TRACK } from "./kernelRidgeTrack";
 import { SVR_TRACK } from "./svrTrack";
+import { SVM_TRACK } from "./svmTrack";
 import { DECISION_TREES_TRACK } from "./decisionTreesTrack";
 import { RANDOM_FORESTS_TRACK } from "./randomForestsTrack";
 import { BOOSTING_TRACK } from "./boostingTrack";
@@ -60,6 +61,7 @@ const TRACKS: { name: string; accent: string; chapters: TrackChapter[] }[] = [
   { name: "k-Nearest neighbors", accent: "var(--c-classification)", chapters: KNN_TRACK },
   { name: "Naive Bayes", accent: "var(--c-classification)", chapters: NB_TRACK },
   { name: "Logistic regression", accent: "var(--c-classification)", chapters: LOG_TRACK },
+  { name: "Support vector machines", accent: "var(--c-classification)", chapters: SVM_TRACK },
   { name: "Evaluation & metrics", accent: "var(--c-metrics)", chapters: EVAL_TRACK },
   { name: "Math foundations", accent: "var(--c-fundamentals)", chapters: MF_TRACK },
   { name: "Learning theory", accent: "var(--c-metrics)", chapters: LT_TRACK },
