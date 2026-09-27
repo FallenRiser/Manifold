@@ -31,6 +31,7 @@ import { CAP_TRACK } from "./housingCapstoneTrack";
 import { NEO_TRACK } from "./neoCapstoneTrack";
 import { RL_CAP_TRACK } from "./rlCapstoneTrack";
 import { LOP_CAP_TRACK } from "./lopCapstoneTrack";
+import { ROUTING_TRACK } from "./routingCapstoneTrack";
 import { FA_TRACK } from "./functionApproximationTrack";
 import { ENV_TRACK } from "./envBuildingTrack";
 import type { TrackChapter } from "./linearRegressionTrack";
@@ -80,6 +81,7 @@ const TRACKS: { name: string; accent: string; chapters: TrackChapter[] }[] = [
   { name: "Asteroid-hazard capstone", accent: "var(--c-space)", chapters: NEO_TRACK },
   { name: "Warehouse-robot capstone", accent: "var(--c-warehouse)", chapters: RL_CAP_TRACK },
   { name: "Learning to parry (field report)", accent: "var(--c-krat)", chapters: LOP_CAP_TRACK },
+  { name: "Message-routing capstone", accent: "var(--c-post)", chapters: ROUTING_TRACK },
   { name: "Function approximation", accent: "var(--c-rl)", chapters: FA_TRACK },
   { name: "Building environments", accent: "var(--c-rl)", chapters: ENV_TRACK },
 ];

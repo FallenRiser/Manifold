@@ -64,17 +64,22 @@ export const SVM_TRACK: TrackChapter[] = [
     title: "In practice",
     tier: 2,
     pages: [
-      { title: "Scaling, and why an SVM can't skip it" },
-      { title: "Choosing C and gamma" },
-      { title: "Multi-class: one-vs-one & one-vs-rest" },
-      { title: "Probabilities from an SVM" },
-      { title: "SVM vs logistic regression vs forest" },
+      { title: "Scaling, and why an SVM can't skip it",
+        href: "/learn/support-vector-machines/scaling-and-why-an-svm-cannot-skip-it" },
+      { title: "Choosing C and gamma",
+        href: "/learn/support-vector-machines/choosing-c-and-gamma" },
+      { title: "Multi-class: one-vs-one & one-vs-rest",
+        href: "/learn/support-vector-machines/multi-class-one-vs-one-and-one-vs-rest" },
+      { title: "Probabilities from an SVM",
+        href: "/learn/support-vector-machines/probabilities-from-an-svm" },
+      { title: "SVM vs logistic regression vs forest",
+        href: "/learn/support-vector-machines/svm-vs-logistic-regression-vs-forest" },
     ],
   },
   {
     title: "In the wild",
     tier: 2,
-    pages: [{ title: "When to use an SVM" }],
+    pages: [{ title: "When to use an SVM", href: "/learn/support-vector-machines/when-to-use-an-svm" }],
   },
 ];
 

@@ -1,0 +1,130 @@
+{
+ "n": 2527,
+ "acc": 0.8235,
+ "lo": 0.8093,
+ "hi": 0.8378,
+ "forums": {
+  "min": 29,
+  "min_name": "alt.atheism",
+  "max": 353,
+  "max_name": "misc.forsale",
+  "median": 108,
+  "min_acc": 0.4483,
+  "min_lo": 0.2759,
+  "min_hi": 0.6207
+ },
+ "pairs": [
+  {
+   "key": "view",
+   "a": "the whole post",
+   "b": "the router's view",
+   "acc_a": 0.8239,
+   "acc_b": 0.8235,
+   "only_a": 94,
+   "only_b": 93,
+   "lo": -0.0103,
+   "hi": 0.0107
+  },
+  {
+   "key": "sklearn",
+   "a": "the router's view",
+   "b": "scikit-learn's cleaning",
+   "acc_a": 0.8235,
+   "acc_b": 0.7812,
+   "only_a": 155,
+   "only_b": 48,
+   "lo": 0.0317,
+   "hi": 0.053
+  },
+  {
+   "key": "tail",
+   "a": "the tail kept",
+   "b": "the tail cut",
+   "acc_a": 0.8235,
+   "acc_b": 0.816,
+   "only_a": 45,
+   "only_b": 26,
+   "lo": 0.0012,
+   "hi": 0.0142
+  },
+  {
+   "key": "minilm",
+   "a": "TF-IDF",
+   "b": "MiniLM alone",
+   "acc_a": 0.8235,
+   "acc_b": 0.7831,
+   "only_a": 250,
+   "only_b": 148,
+   "lo": 0.0245,
+   "hi": 0.0562
+  },
+  {
+   "key": "bge",
+   "a": "bge-large alone",
+   "b": "TF-IDF",
+   "acc_a": 0.8322,
+   "acc_b": 0.8235,
+   "only_a": 179,
+   "only_b": 157,
+   "lo": -0.0047,
+   "hi": 0.0233
+  },
+  {
+   "key": "mini_both",
+   "a": "TF-IDF + MiniLM",
+   "b": "TF-IDF",
+   "acc_a": 0.8504,
+   "acc_b": 0.8235,
+   "only_a": 94,
+   "only_b": 26,
+   "lo": 0.019,
+   "hi": 0.0352
+  },
+  {
+   "key": "bge_both",
+   "a": "TF-IDF + bge-large",
+   "b": "bge-large alone",
+   "acc_a": 0.8595,
+   "acc_b": 0.8322,
+   "only_a": 136,
+   "only_b": 67,
+   "lo": 0.0158,
+   "hi": 0.0384
+  },
+  {
+   "key": "final",
+   "a": "TF-IDF + bge-large",
+   "b": "TF-IDF",
+   "acc_a": 0.8595,
+   "acc_b": 0.8235,
+   "only_a": 128,
+   "only_b": 37,
+   "lo": 0.0269,
+   "hi": 0.0459
+  }
+ ],
+ "senders": {
+  "known": 923,
+  "new": 1604,
+  "gap": 0.0459,
+  "lo": 0.0175,
+  "hi": 0.0745
+ },
+ "tail": {
+  "known": 0.0163,
+  "known_lo": 0.0054,
+  "known_hi": 0.0271,
+  "new": 0.0025,
+  "new_lo": -0.0062,
+  "new_hi": 0.0112,
+  "gap": 0.0138,
+  "lo": 0.0003,
+  "hi": 0.0274
+ },
+ "promise": {
+  "routed": 2059,
+  "acc": 0.9335,
+  "lo": 0.9223,
+  "hi": 0.9441
+ }
+}

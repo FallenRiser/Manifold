@@ -22,14 +22,17 @@ import numpy as np
 from scipy.optimize import LinearConstraint, linprog, minimize, minimize_scalar
 from scipy.spatial import cKDTree
 from scipy.stats import norm
-from sklearn.datasets import (load_breast_cancer, load_digits, load_wine, make_blobs,
-                              make_circles, make_moons)
+from sklearn.datasets import (load_breast_cancer, load_digits, load_iris, load_wine,
+                              make_blobs, make_circles, make_classification, make_moons)
+from sklearn.calibration import CalibratedClassifierCV
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression, Perceptron
-from sklearn.model_selection import StratifiedKFold, cross_val_score, train_test_split
+from sklearn.model_selection import (GridSearchCV, StratifiedKFold, cross_val_predict,
+                                     cross_val_score, train_test_split)
 from sklearn.multiclass import OneVsOneClassifier, OneVsRestClassifier
 from sklearn.pipeline import make_pipeline
-from sklearn.preprocessing import PolynomialFeatures, StandardScaler
+from sklearn.preprocessing import (MinMaxScaler, PolynomialFeatures, RobustScaler,
+                                   StandardScaler)
 from sklearn.svm import SVC, LinearSVC
 
 np.set_printoptions(precision=4, suppress=True)
@@ -3743,6 +3746,1781 @@ def stopping():
     print("without changing the shape. Page 20 is about what you reach for instead.")
 
 
+# ------------------------------------------------------------------ #
+# 54. A distance has units
+# ------------------------------------------------------------------ #
+def _share(X):
+    """Each feature's share of the average squared distance between two points.
+
+    Averaged over every ordered pair, |x - z|^2 is exactly 2 * sum_j var_j, so feature j
+    contributes var_j / sum var, whatever the labels are and whatever the model is.
+    """
+    v = X.var(0)
+    return v / v.sum()
+
+
+def units():
+    section("54. a distance has units")
+    X, y = load_breast_cancer(return_X_y=True)
+    names = load_breast_cancer().feature_names
+    Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.3, random_state=RS, stratify=y)
+    n = len(Xtr)
+    sq = (Xtr ** 2).sum(1)
+    D2 = np.maximum(sq[:, None] + sq[None, :] - 2 * Xtr @ Xtr.T, 0)
+    print("The rbf kernel only ever sees |x - z|^2, and a squared distance is a SUM over the")
+    print("features. Average it over every pair of training points and the sum splits cleanly:")
+    print()
+    print("  %-44s %14.1f" % ("mean |x - z|^2 over all %d x %d pairs" % (n, n), D2.mean()))
+    print("  %-44s %14.1f" % ("2 x (sum of the 30 feature variances)", 2 * Xtr.var(0).sum()))
+    print()
+    print("So each feature's share of every distance the model computes is its variance over the")
+    print("total -- fixed by the units it was recorded in, before any model is fitted:")
+    print()
+    sh = _share(Xtr)
+    o = np.argsort(-sh)
+    print("  %-26s %14s %12s" % ("feature (breast_cancer)", "std deviation", "share"))
+    for k in o[:4]:
+        print("  %-26s %14.4f %11.4f%%" % (names[k], np.sqrt(Xtr[:, k].var()), 100 * sh[k]))
+    print("  %-26s %14s %12s" % ("... 25 more ...", "", ""))
+    k = o[-1]
+    print("  %-26s %14.6f %11.2e%%" % (names[k], np.sqrt(Xtr[:, k].var()), 100 * sh[k]))
+    print()
+    print("  the two area features together: %.2f%% of every squared distance" % (100 * sh[o[:2]].sum()))
+    print()
+    print("A model built from distances inherits that split. Fit the default rbf SVM on the raw")
+    print("numbers, then on ONLY the largest feature, and compare:")
+    print()
+    full = SVC().fit(Xtr, ytr)
+    one = SVC().fit(Xtr[:, [o[0]]], ytr)
+    std = make_pipeline(StandardScaler(), SVC()).fit(Xtr, ytr)
+    print("  %-40s %10s" % ("", "test acc"))
+    print("  %-40s %10.4f" % ("rbf, all 30 features, raw units", full.score(Xte, yte)))
+    print("  %-40s %10.4f" % ("rbf, '%s' alone, raw units" % names[o[0]],
+                              one.score(Xte[:, [o[0]]], yte)))
+    print("  %-40s %10.4f" % ("rbf, all 30 features, standardised", std.score(Xte, yte)))
+    agree = (full.predict(Xte) == one.predict(Xte[:, [o[0]]])).mean()
+    print()
+    print("  the 30-feature model and the 1-feature model give the same label on %.2f%% of"
+          % (100 * agree))
+    print("  the test set")
+    print()
+    print("Thirty features went in and the model behaves, to within %d test points, like a model"
+          % int(round((1 - agree) * len(yte))))
+    print("of one. Nothing was wrong with the other twenty-nine; they were recorded in smaller")
+    print("units, so they barely register in the only quantity the kernel looks at.")
+    print()
+    Xw, yw = load_wine(return_X_y=True)
+    nw = load_wine().feature_names
+    shw = _share(Xw)
+    ow = np.argsort(-shw)
+    cv = StratifiedKFold(10, shuffle=True, random_state=RS)
+    raw = cross_val_score(SVC(), Xw, yw, cv=cv).mean()
+    stw = cross_val_score(make_pipeline(StandardScaler(), SVC()), Xw, yw, cv=cv).mean()
+    print("Wine is the same story, harder. '%s' is %.2f%% of every squared distance, and 10-fold"
+          % (nw[ow[0]], 100 * shw[ow[0]]))
+    print("accuracy goes from %.4f on the raw numbers to %.4f once every feature is put on one"
+          % (raw, stw))
+    print("scale.")
+
+
+# ------------------------------------------------------------------ #
+# 55. Change the units, change the model
+# ------------------------------------------------------------------ #
+def _units_points(n, seed, noise=0.25):
+    """The points UnitsDialLab draws, reproduced exactly.
+
+    Two moons, but with no trig: the half-circle is walked with the rational parameterisation
+    ((1 - m^2), 2m) / (1 + m^2), which is plain arithmetic, so the browser and this file get
+    the same bits. Lehmer generator, sum-of-six-uniforms noise, rounded to three decimals.
+    """
+    st = (seed % 2147483646) + 1
+
+    def u():
+        nonlocal st
+        st = (st * 48271) % 2147483647
+        return st / 2147483647
+
+    def gauss():
+        return (sum(u() for _ in range(6)) - 3) / 1.2247
+
+    X, y = [], []
+    for i in range(n):
+        lab = 1.0 if i % 2 == 0 else -1.0
+        t = 0.02 + 0.96 * u()
+        m = t / (1 - t)
+        c = (1 - m * m) / (1 + m * m)
+        s = 2 * m / (1 + m * m)
+        x, z = (c, s) if lab > 0 else (1 - c, 0.5 - s)
+        x = (x - 0.5 + gauss() * noise) / 0.87
+        z = (z - 0.25 + gauss() * noise) / 0.5
+        X.append([round(x * 1000) / 1000, round(z * 1000) / 1000])
+        y.append(lab)
+    return np.array(X), np.array(y)
+
+
+UNITS_DIAL = (0.01, 0.03, 0.1, 0.3, 1.0, 3.0, 10.0, 30.0, 100.0)
+
+
+def _units_case():
+    """Record sklearn's answers on the lab's own points, at every stop on its dial."""
+    import pathlib
+    Xtr, ytr = _units_points(80, 5)
+    Xte, yte = _units_points(80, 6)
+    cases = []
+    for k in UNITS_DIAL:
+        S = np.array([k, 1.0])
+        A, B = Xtr * S, Xte * S
+        sc = StandardScaler().fit(A)
+        for std in (False, True):
+            At, Bt = (sc.transform(A), sc.transform(B)) if std else (A, B)
+            m = SVC(C=1.0, gamma="scale", tol=1e-10).fit(At, ytr)
+            cases.append(dict(k=k, standardise=std, gamma=float(m._gamma),
+                              nsv=int(m.n_support_.sum()),
+                              train=float(m.score(At, ytr)), test=float(m.score(Bt, yte)),
+                              f=[float(v) for v in np.round(m.decision_function(At), 10)]))
+    p = pathlib.Path(__file__).resolve().parents[1] / "results" / "svm_units_case.json"
+    p.parent.mkdir(exist_ok=True)
+    pts = lambda X, y: [dict(x=float(a), z=float(b), y=float(c)) for (a, b), c in zip(X, y)]
+    p.write_text(json.dumps(dict(train=pts(Xtr, ytr), test=pts(Xte, yte), cases=cases)),
+                 encoding="utf-8")
+    sys.stderr.write("  [wrote results/svm_units_case.json -- %d cases]\n" % len(cases))
+
+
+def unitsdial():
+    section("55. change the units of ONE feature")
+    print("Take the two moons, already standardised, and change nothing about them except the")
+    print("units of the horizontal feature: multiply it by k. Metres to millimetres is k = 1000.")
+    print("The points are the same points; the labels are the same labels. 20 draws of 400")
+    print("points, half held out, the default rbf SVM (C=1, gamma='scale') every time:")
+    print()
+    ks = (0.01, 0.1, 0.3, 1.0, 3.0, 10.0, 30.0, 100.0)
+    R = {k: [] for k in ks}
+    S = []
+    same = total = 0
+    for sd in range(20):
+        X, y = make_moons(n_samples=400, noise=0.22, random_state=sd)
+        X = StandardScaler().fit_transform(X)
+        A, B, ya, yb = train_test_split(X, y, test_size=0.5, random_state=sd, stratify=y)
+        for k in ks:
+            sc = np.array([k, 1.0])
+            R[k].append(SVC().fit(A * sc, ya).score(B * sc, yb))
+        ref = make_pipeline(StandardScaler(), SVC()).fit(A, ya)
+        S.append(ref.score(B, yb))
+        for k in ks:
+            sc = np.array([k, 1.0])
+            p = make_pipeline(StandardScaler(), SVC()).fit(A * sc, ya).predict(B * sc)
+            same += int((p == ref.predict(B)).all())
+            total += 1
+    S = np.array(S)
+    print("  %8s %13s %10s %10s %18s" % ("k", "share of |x-z|^2", "mean test", "worst",
+                                         "beats standardised"))
+    for k in ks:
+        r = np.array(R[k])
+        print("  %8g %13.4f %10.4f %10.4f %13d of 20"
+              % (k, k * k / (k * k + 1), r.mean(), r.min(), int((r > S).sum())))
+    print("  %8s %13s %10.4f %10.4f" % ("std", "0.5000", S.mean(), S.min()))
+    print()
+    print("Shrink the horizontal units and the kernel stops seeing the horizontal direction,")
+    print("so the model can only split the moons by height; grow them and it can only see")
+    print("left-and-right. On the same data, the narrow end costs %.0f points in 100 of test"
+          % (100 * (S.mean() - np.mean(R[ks[0]]))))
+    print("accuracy and the wide end costs %.0f." % (100 * (S.mean() - np.mean(R[ks[-1]]))))
+    print("gamma='scale' does not rescue it: it divides by the variance of ALL the numbers at")
+    print("once, which fixes the overall size of the distances and leaves their ratio alone.")
+    print()
+    print("Standardise first and k stops mattering at all. Over all %d fits (%d values of k,"
+          % (total, len(ks)))
+    print("20 draws), the standardised model gave the same label to every held-out point as the")
+    print("'std' row on %d of them: the scaler divides the multiplication back out before the"
+          % same)
+    print("kernel ever sees it.")
+    print()
+    print("But look at k = 3: it beats the standardised model on %d draws of 20. Standardising"
+          % int((np.array(R[3.0]) > S).sum()))
+    print("does not find the BEST units. It finds units nobody chose on purpose -- not whoever")
+    print("recorded the data -- so every feature starts with the same say and the model, not")
+    print("the spreadsheet, decides what matters.")
+    _units_case()
+
+
+# ------------------------------------------------------------------ #
+# 56. The margin has units too
+# ------------------------------------------------------------------ #
+def penalty():
+    section("56. the linear SVM is not scale-free either")
+    print("No kernel here, so no distances between points -- but the objective still has a norm")
+    print("in it. Multiply feature j by k and the same boundary needs w_j / k in place of w_j,")
+    print("so its share of (1/2)|w|^2 becomes (1/2) w_j^2 / k^2. Changing a feature's units IS")
+    print("changing how much the SVM is charged for using it.")
+    print()
+    X, y = load_breast_cancer(return_X_y=True)
+    names = load_breast_cancer().feature_names
+    Xs = StandardScaler().fit_transform(X)
+    A, B, ya, yb = train_test_split(Xs, y, test_size=0.3, random_state=RS, stratify=y)
+    w = SVC(kernel="linear", C=1.0).fit(A, ya).coef_[0]
+    j = int(np.argmax(np.abs(w)))
+    print("The feature the linear SVM leans on hardest is '%s'." % names[j])
+    print("Shrink its units and watch what it is worth to the model -- its weight times its")
+    print("(new) standard deviation, the change in f from moving one standard deviation along it:")
+    print()
+    print("  %8s %16s %14s %12s" % ("k", "charge x 1/k^2", "effect per sd", "test acc"))
+    eff, acc = {}, []
+    for k in (1.0, 0.3, 0.1, 0.03, 0.01, 0.001):
+        sc = np.ones(A.shape[1])
+        sc[j] = k
+        m = SVC(kernel="linear", C=1.0).fit(A * sc, ya)
+        eff[k] = m.coef_[0][j] * k
+        acc.append(m.score(B * sc, yb))
+        print("  %8g %16.0f %14.4f %12.4f" % (k, 1 / (k * k), eff[k], acc[-1]))
+    print()
+    print("At k = 0.01 the feature is worth 1/%s of what it was, and nothing told the model to"
+          % format(int(round(eff[1.0] / eff[0.01])), ","))
+    print("drop it. Test accuracy moves by %d test point%s and no more, because breast_cancer"
+          % (int(round((max(acc) - min(acc)) * len(yb))),
+             "" if int(round((max(acc) - min(acc)) * len(yb))) == 1 else "s"))
+    print("has thirty features and many of them say the same thing. The point is not that it")
+    print("cost accuracy here. It is that a choice about units quietly made a modelling")
+    print("decision, and nothing in the output says so.")
+    print()
+    print("The units also decide whether the solver finishes. Raw breast_cancer, every fit")
+    print("capped at 2,000,000 iterations:")
+    print()
+    Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.3, random_state=RS, stratify=y)
+    print("  %-26s %12s %10s %10s" % ("", "iterations", "capped", "test acc"))
+    its = {}
+    for nm, mdl in (("linear, raw", SVC(kernel="linear", max_iter=2000000)),
+                    ("linear, standardised", make_pipeline(StandardScaler(),
+                                                           SVC(kernel="linear",
+                                                               max_iter=2000000))),
+                    ("rbf, raw", SVC(max_iter=2000000)),
+                    ("rbf, standardised", make_pipeline(StandardScaler(),
+                                                        SVC(max_iter=2000000)))):
+        m = mdl.fit(Xtr, ytr)
+        it = int((m[-1] if hasattr(m, "steps") else m).n_iter_.max())
+        its[nm] = it
+        print("  %-26s %12s %10s %10.4f" % (nm, format(it, ","), it >= 2000000,
+                                            m.score(Xte, yte)))
+    print()
+    print("The linear fit on raw numbers does not converge: it stops because it ran out of")
+    print("iterations, with a warning that is easy to scroll past. Standardised, it finishes in")
+    print("%s. And read the rbf rows the other way: on raw numbers it takes %s iterations"
+          % (format(its["linear, standardised"], ","), its["rbf, raw"]))
+    print("against %s, and scores worse. It is quick because the problem it is solving is"
+          % its["rbf, standardised"])
+    print("nearly one-dimensional: it is the one-feature model from the start of the page.")
+    print("Finishing fast is not evidence of finishing right.")
+
+
+# ------------------------------------------------------------------ #
+# 57. Which scaler, and who does not care
+# ------------------------------------------------------------------ #
+def whichscaler():
+    section("57. which scaler, and which models do not care")
+    cv = StratifiedKFold(10, shuffle=True, random_state=RS)
+    print("Three common ways to put features on one scale: subtract the mean and divide by the")
+    print("standard deviation (Standard), squash into [0, 1] (MinMax), or subtract the median and")
+    print("divide by the interquartile range (Robust). 10-fold accuracy, rbf SVM, scaler fitted")
+    print("inside each fold:")
+    print()
+    Xb, yb = load_breast_cancer(return_X_y=True)
+    Xw, yw = load_wine(return_X_y=True)
+    print("  %-10s %20s %20s" % ("", "breast_cancer", "wine"))
+    M = {0: [], 1: []}
+    for nm, sc in (("none", None), ("Standard", StandardScaler()), ("MinMax", MinMaxScaler()),
+                   ("Robust", RobustScaler())):
+        r = []
+        for X, y in ((Xb, yb), (Xw, yw)):
+            p = SVC() if sc is None else make_pipeline(sc, SVC())
+            v = cross_val_score(p, X, y, cv=cv)
+            if sc is not None:
+                M[len(r)].append((v.mean(), v.std()))
+            r.append("%.4f +- %.4f" % (v.mean(), v.std()))
+        print("  %-10s %20s %20s" % (nm, r[0], r[1]))
+    print()
+    for d, nm in ((0, "breast_cancer"), (1, "wine")):
+        mu = [a for a, _ in M[d]]
+        print("  %-14s best scaler minus worst %.4f, smallest fold spread %.4f"
+              % (nm, max(mu) - min(mu), min(b for _, b in M[d])))
+    print()
+    print("On both datasets the gap between the best scaler and the worst is smaller than the")
+    print("fold-to-fold spread of any of them. The choice that matters is doing it at all.")
+    print("Robust exists for data where a handful of extreme values would otherwise set the")
+    print("scale for everyone; a median and an interquartile range do not move when they do.")
+    print()
+    print("Where the scaler is fitted is a separate question. Fit it on all the data before")
+    print("cross-validating and each fold's held-out points have leaked their mean and spread")
+    print("into the training side:")
+    print()
+    leak = cross_val_score(SVC(), StandardScaler().fit_transform(Xb), yb, cv=cv).mean()
+    clean = cross_val_score(make_pipeline(StandardScaler(), SVC()), Xb, yb, cv=cv).mean()
+    print("  %-40s %10.4f" % ("scaler fitted on everything, then CV", leak))
+    print("  %-40s %10.4f" % ("scaler fitted inside each fold", clean))
+    print()
+    print("Here it makes no difference worth the name -- a mean and a spread are weak")
+    print("information about 57 held-out points. Fit it inside the pipeline anyway. It costs")
+    print("nothing, and it is the only version that matches what the model would really have")
+    print("known at training time.")
+    print()
+    print("And some models never needed any of this. A tree splits one feature at a time on a")
+    print("threshold, and an increasing change of units moves the threshold with the data:")
+    print()
+    Xtr, Xte, ytr, yte = train_test_split(Xb, yb, test_size=0.3, random_state=RS, stratify=yb)
+    sc = StandardScaler().fit(Xtr)
+    f0 = RandomForestClassifier(random_state=RS).fit(Xtr, ytr)
+    f1 = RandomForestClassifier(random_state=RS).fit(sc.transform(Xtr), ytr)
+    f2 = RandomForestClassifier(random_state=RS).fit(Xtr * 1024.0, ytr)
+    p0 = f0.predict_proba(Xte)
+    p1 = f1.predict_proba(sc.transform(Xte))
+    p2 = f2.predict_proba(Xte * 1024.0)
+    same = int((f0.predict(Xte) == f1.predict(sc.transform(Xte))).sum())
+    moved = int((np.abs(p0 - p1).max(1) > 0).sum())
+    print("  %-36s %14s %12s" % ("random forest, raw vs ...", "same labels", "max |dp|"))
+    print("  %-36s %10d/%d %12.3e" % ("... standardised", same, len(yte), np.abs(p0 - p1).max()))
+    print("  %-36s %10d/%d %12.3e" % ("... every feature x 1024",
+                                     int((f0.predict(Xte) == f2.predict(Xte * 1024.0)).sum()),
+                                     len(yte), np.abs(p0 - p2).max()))
+    print()
+    print("Every label is the same. Standardising moves the probability at %d of %d test points,"
+          % (moved, len(yte)))
+    print("by at most one tree's vote in 100, because subtracting a mean and dividing is not")
+    print("exact in floating point, and a split threshold can land one rounding error to the")
+    print("other side of a point.")
+    print("Multiply by 1024 -- a power of two, which floating point does exactly -- and the")
+    print("forest is identical to the last bit. That is the contrast the page is about: a tree")
+    print("compares a feature with itself, and an SVM compares features with each other.")
+
+
+# ------------------------------------------------------------------ #
+# 58. The whole grid
+# ------------------------------------------------------------------ #
+GRID_C = 10.0 ** np.arange(-2, 5)
+GRID_G = 10.0 ** np.arange(-4, 3)
+LAB_C = (0.01, 0.1, 1.0, 10.0, 100.0, 1000.0)
+LAB_G = (0.03, 0.1, 0.3, 1.0, 3.0, 10.0, 30.0, 100.0)
+
+
+def _grid(X, y, cv):
+    """5-fold accuracy and its standard error at every (C, gamma), standardised inside the fold."""
+    g = GridSearchCV(make_pipeline(StandardScaler(), SVC()),
+                     {"svc__C": GRID_C, "svc__gamma": GRID_G}, cv=cv, n_jobs=-1).fit(X, y)
+    M = g.cv_results_["mean_test_score"].reshape(len(GRID_C), len(GRID_G))
+    S = g.cv_results_["std_test_score"].reshape(len(GRID_C), len(GRID_G))
+    return g, M, S
+
+
+def _grid_case():
+    """Record sklearn's answers on CGridLab's own points, at every cell of its grid."""
+    import pathlib
+    Xt, yt = _units_points(80, 5, noise=0.45)
+    Xv, yv = _units_points(200, 6, noise=0.45)
+    cells = []
+    for C in LAB_C:
+        for g in LAB_G:
+            m = SVC(C=C, gamma=g, tol=1e-10).fit(Xt, yt)
+            D2 = ((Xt[:, None, :] - Xt[None, :, :]) ** 2).sum(-1)
+            cells.append(dict(C=C, gamma=g, nsv=int(m.n_support_.sum()),
+                              objective=_dobj(_sk_alpha(m, len(yt)), np.exp(-g * D2), yt),
+                              train=float(m.score(Xt, yt)), val=float(m.score(Xv, yv)),
+                              f=[float(v) for v in np.round(m.decision_function(Xt), 10)]))
+    p = pathlib.Path(__file__).resolve().parents[1] / "results" / "svm_grid_case.json"
+    p.parent.mkdir(exist_ok=True)
+    pts = lambda X, y: [dict(x=float(a), z=float(b), y=float(c)) for (a, b), c in zip(X, y)]
+    p.write_text(json.dumps(dict(train=pts(Xt, yt), val=pts(Xv, yv), cells=cells)),
+                 encoding="utf-8")
+    sys.stderr.write("  [wrote results/svm_grid_case.json -- %d cells]\n" % len(cells))
+
+
+def cgrid():
+    section("58. the whole C x gamma grid")
+    X, y = load_breast_cancer(return_X_y=True)
+    cv = StratifiedKFold(5, shuffle=True, random_state=RS)
+    g, M, S = _grid(X, y, cv)
+    print("breast_cancer, standardised inside each fold, 5-fold accuracy at every pair. Rows are")
+    print("C, columns are gamma, both a factor of ten apart:")
+    print()
+    print("  %8s " % "C | gamma" + " ".join("%7g" % v for v in GRID_G))
+    for i, c in enumerate(GRID_C):
+        print("  %8g " % c + " ".join("%7.4f" % v for v in M[i]))
+    print()
+    best = M.max()
+    base = max(np.mean(y), 1 - np.mean(y))
+    near = int((M >= best - 0.01).sum())
+    cliff = int((M <= base + 0.01).sum())
+    print("  %-52s %8.4f" % ("best cell", best))
+    print("  %-52s %8.4f" % ("always predicting the larger class", base))
+    print("  %-52s %5d of %d" % ("cells within 0.01 of the best", near, M.size))
+    print("  %-52s %5d of %d" % ("cells no better than always predicting one class", cliff, M.size))
+    d = cross_val_score(make_pipeline(StandardScaler(), SVC()), X, y, cv=cv).mean()
+    print("  %-52s %8.4f" % ("the defaults, C=1 and gamma='scale' (= 1/%d here)" % X.shape[1], d))
+    print()
+    print("A plateau with cliffs. %d cells are within a point of the best, and %d are no better"
+          % (near, cliff))
+    print("than ignoring the features. The whole right-hand side is one cliff: gamma so large that")
+    print("every point is similar only to itself, which no value of C repairs. The top row is")
+    print("the other one: C so small that the margin is allowed to swallow everything.")
+    print()
+    print("Now read the best gamma in each row:")
+    print()
+    print("  %8s %12s %10s %8s" % ("C", "best gamma", "accuracy", "#SV"))
+    for i, c in enumerate(GRID_C):
+        j = int(M[i].argmax())
+        m = make_pipeline(StandardScaler(), SVC(C=c, gamma=GRID_G[j])).fit(X, y)
+        tie = "   (every gamma ties)" if np.ptp(M[i]) == 0 else ""
+        print("  %8g %12s %10.4f %8d%s" % (c, "--" if tie else "%g" % GRID_G[j], M[i, j],
+                                          m[-1].n_support_.sum(), tie))
+    print()
+    print("As C rises, the best gamma falls. The two are not independent knobs, they are two")
+    print("ways of spending the same thing: a large gamma lets the boundary bend around single")
+    print("points, a large C lets it insist on classifying them. Spend a lot of one and the best")
+    print("move is to spend less of the other, which is why the good cells lie along a diagonal")
+    print("rather than in a blob around one value of each.")
+    _grid_case()
+
+
+# ------------------------------------------------------------------ #
+# 59. What tuning buys
+# ------------------------------------------------------------------ #
+def tuningbuys():
+    section("59. what tuning C and gamma actually buys")
+    print("The fair comparison is not the grid's best score against the default's. The grid's")
+    print("best score was chosen BECAUSE it was high on those folds. So: an outer 5-fold split,")
+    print("and inside each outer training set a full grid search with its own 5-fold CV. The")
+    print("tuned model is then scored on an outer fold it never saw. Five repeats, each with")
+    print("fresh splits, on three datasets, all standardised inside the fold:")
+    print()
+    pipe = make_pipeline(StandardScaler(), SVC())
+    grid = {"svc__C": GRID_C, "svc__gamma": GRID_G}
+    print("  %-14s %10s %10s %10s %14s %10s"
+          % ("", "defaults", "tuned", "tuned-def", "tuned won", "grid said"))
+    gains, opt, wins = [], [], {}
+    for name, (X, y) in (("moons", make_moons(n_samples=400, noise=0.30, random_state=RS)),
+                         ("breast_cancer", load_breast_cancer(return_X_y=True)),
+                         ("wine", load_wine(return_X_y=True))):
+        r = []
+        for sd in range(5):
+            outer = StratifiedKFold(5, shuffle=True, random_state=100 + sd)
+            inner = StratifiedKFold(5, shuffle=True, random_state=sd)
+            d = cross_val_score(pipe, X, y, cv=outer).mean()
+            t = cross_val_score(GridSearchCV(pipe, grid, cv=inner, n_jobs=-1), X, y,
+                                cv=outer).mean()
+            gb = GridSearchCV(pipe, grid, cv=outer, n_jobs=-1).fit(X, y).best_score_
+            r.append((d, t, gb))
+        r = np.array(r)
+        gains.append(r[:, 1].mean() - r[:, 0].mean())
+        opt.append(r[:, 2].mean() - r[:, 1].mean())
+        wins[name] = int((r[:, 1] > r[:, 0]).sum())
+        print("  %-14s %10.4f %10.4f %+10.4f %9d of 5 %10.4f"
+              % (name, r[:, 0].mean(), r[:, 1].mean(), gains[-1],
+                 int((r[:, 1] > r[:, 0]).sum()), r[:, 2].mean()))
+    print()
+    print("'grid said' is the best score GridSearchCV reports on the outer folds -- the number")
+    npos = sum(o > 0 for o in opt)
+    print("people usually quote. It is above the honestly-tested tuned model on %s, by"
+          % ("every dataset" if npos == len(opt) else "%d of %d datasets" % (npos, len(opt))))
+    print("%.4f to %.4f." % (min(opt), max(opt)))
+    print()
+    print("On standardised data the defaults are already on the plateau. The honest gain from a")
+    print("49-cell search is between %+.4f and %+.4f -- smaller than the amount the grid"
+          % (min(gains), max(gains)))
+    lost = [n for n, w in wins.items() if w == 0]
+    print("flatters itself by%s. That is not an argument"
+          % ((", and on %s the defaults won every repeat" % " and ".join(lost)) if lost else ""))
+    Xb, yb = load_breast_cancer(return_X_y=True)
+    _, Mb, _ = _grid(Xb, yb, StratifiedKFold(5, shuffle=True, random_state=RS))
+    cliff = int((Mb <= max(yb.mean(), 1 - yb.mean()) + 0.01).sum())
+    print("against tuning. It is an argument for knowing what the search is for. Section 58")
+    print("found %d of %d cells on breast_cancer no better than guessing, and a search is"
+          % (cliff, Mb.size))
+    print("insurance against landing on one. What it cannot be trusted with is telling you how")
+    print("well it did.")
+
+
+# ------------------------------------------------------------------ #
+# 60. The best cell is flattered
+# ------------------------------------------------------------------ #
+def curse():
+    section("60. what a grid search finds in pure noise")
+    print("Take breast_cancer's 30 features and throw the labels away: replace them with coin")
+    print("flips. There is now nothing to find. Run the same 49-cell search anyway:")
+    print()
+    X, _ = load_breast_cancer(return_X_y=True)
+    pipe = make_pipeline(StandardScaler(), SVC())
+    grid = {"svc__C": GRID_C, "svc__gamma": GRID_G}
+    print("  %6s %14s %12s %12s %12s" % ("seed", "larger class", "median cell", "grid best",
+                                         "nested"))
+    rows = []
+    for sd in range(5):
+        y = np.random.RandomState(sd).randint(0, 2, len(X))
+        cv = StratifiedKFold(5, shuffle=True, random_state=sd)
+        g = GridSearchCV(pipe, grid, cv=cv, n_jobs=-1).fit(X, y)
+        inner = StratifiedKFold(5, shuffle=True, random_state=50 + sd)
+        nest = cross_val_score(GridSearchCV(pipe, grid, cv=inner, n_jobs=-1), X, y, cv=cv).mean()
+        base = max(y.mean(), 1 - y.mean())
+        med = float(np.median(g.cv_results_["mean_test_score"]))
+        rows.append((base, med, g.best_score_, nest))
+        print("  %6d %14.4f %12.4f %12.4f %12.4f" % (sd, base, med, g.best_score_, nest))
+    r = np.array(rows).mean(0)
+    print("  %6s %14.4f %12.4f %12.4f %12.4f" % ("mean", *r))
+    print()
+    print("The typical cell scores exactly what always guessing the larger class scores, which")
+    print("is the truth. The BEST cell beats it by %.4f on average -- a finding, reported with"
+          % (r[2] - r[0]))
+    print("four decimals, in data with nothing in it. Nothing went wrong. 49 noisy estimates were")
+    print("made and the largest was kept, and the largest of 49 noisy numbers is above their")
+    print("centre. The nested estimate, which tests the winner on data the search never touched,")
+    print("comes back at %.4f: chance, or a little under." % r[3])
+    print()
+    print("The same thing happens on real data, only it is hidden inside a real signal. It is")
+    print("why 'grid said' in the previous table was too high every time.")
+
+
+# ------------------------------------------------------------------ #
+# 61. Choosing from a flat top
+# ------------------------------------------------------------------ #
+def flattop():
+    section("61. choosing from a flat top, and what the grid costs")
+    print("If a dozen cells are within noise of the best, picking the single highest one is")
+    print("picking noise. An alternative: take every cell within one standard error of the best,")
+    print("and of those keep the model with the fewest support vectors. Tested the honest way,")
+    print("outer 5-fold with the search inside, five repeats:")
+    print()
+    pipe = make_pipeline(StandardScaler(), SVC())
+    grid = {"svc__C": GRID_C, "svc__gamma": GRID_G}
+    print("  %-14s %12s %12s %10s %12s" % ("", "best cell", "simplest", "#SV best",
+                                           "#SV simplest"))
+    cut, cost = [], []
+    for name, (X, y) in (("moons", make_moons(n_samples=400, noise=0.30, random_state=RS)),
+                         ("breast_cancer", load_breast_cancer(return_X_y=True)),
+                         ("wine", load_wine(return_X_y=True))):
+        res = []
+        for sd in range(5):
+            outer = StratifiedKFold(5, shuffle=True, random_state=100 + sd)
+            for tr, te in outer.split(X, y):
+                g = GridSearchCV(pipe, grid, cv=StratifiedKFold(5, shuffle=True, random_state=sd),
+                                 n_jobs=-1).fit(X[tr], y[tr])
+                Mv = g.cv_results_["mean_test_score"]
+                Se = g.cv_results_["std_test_score"] / np.sqrt(5)
+                P = g.cv_results_["params"]
+                b = int(Mv.argmax())
+                fits = {}
+                for i in range(len(Mv)):
+                    if Mv[i] >= Mv[b] - Se[b]:
+                        fits[i] = make_pipeline(StandardScaler(),
+                                                SVC(C=P[i]["svc__C"],
+                                                    gamma=P[i]["svc__gamma"])).fit(X[tr], y[tr])
+                sv = {i: int(m[-1].n_support_.sum()) for i, m in fits.items()}
+                s = min(fits, key=lambda i: (sv[i], i))
+                res.append((fits[b].score(X[te], y[te]), fits[s].score(X[te], y[te]),
+                            sv[b], sv[s]))
+        r = np.array(res).mean(0)
+        cut.append(1 - r[3] / r[2])
+        cost.append(r[0] - r[1])
+        print("  %-14s %12.4f %12.4f %10.1f %12.1f" % (name, *r))
+    print()
+    print("%.0f%% to %.0f%% fewer support vectors, and accuracy that moves by between %+.4f and"
+          % (100 * min(cut), 100 * max(cut), -max(cost)))
+    print("%+.4f. Fewer support vectors is a faster model to run, and when the scores cannot tell"
+          % -min(cost))
+    print("the candidates apart, the simpler boundary is the one with less room to have fitted")
+    print("noise. Whether the trade is worth it depends on what the model is for; the table puts")
+    print("a price on it.")
+    print()
+    print("The grid is also not equally expensive everywhere. libsvm's own iteration count at")
+    print("every cell, breast_cancer standardised:")
+    print()
+    Xb, yb = load_breast_cancer(return_X_y=True)
+    Xs = StandardScaler().fit_transform(Xb)
+    print("  %8s " % "C | gamma" + " ".join("%8g" % v for v in GRID_G))
+    I = np.zeros((len(GRID_C), len(GRID_G)), dtype=int)
+    for i, c in enumerate(GRID_C):
+        for j, gm in enumerate(GRID_G):
+            I[i, j] = int(SVC(C=c, gamma=gm).fit(Xs, yb).n_iter_.max())
+        print("  %8g " % c + " ".join("%8d" % v for v in I[i]))
+    print()
+    i, j = np.unravel_index(I.argmax(), I.shape)
+    print("The dearest cell, C=%g and gamma=%g, takes %s iterations; the cheapest takes %d."
+          % (GRID_C[i], GRID_G[j], format(int(I.max()), ","), int(I.min())))
+    print("Large C with small gamma is the slow corner: a nearly linear kernel on data a line")
+    print("cannot separate, and a penalty so high the solver has to fight for every point. It")
+    print("holds good cells too -- the diagonal runs through it -- so the point is not to avoid")
+    print("it, only to know where the time in a grid search goes.")
+
+
+# ------------------------------------------------------------------ #
+# 62. Two ways to get many classes out of a two-class machine
+# ------------------------------------------------------------------ #
+def _pairs(k):
+    return [(a, b) for a in range(k) for b in range(a + 1, k)]
+
+
+def twoways():
+    section("62. one-vs-rest and one-vs-one, built and counted")
+    X, y = load_digits(return_X_y=True)
+    Xs = StandardScaler().fit_transform(X)
+    k = len(np.unique(y))
+    P = _pairs(k)
+    print("digits: %d images, %d classes, standardised. The default rbf SVM (C=1,"
+          % (len(y), k))
+    print("gamma='scale') is the binary machine inside both.")
+    print()
+    ovo = SVC().fit(Xs, y)                                 # libsvm's own one-vs-one
+    ovr = OneVsRestClassifier(SVC()).fit(Xs, y)
+    rows_ovo = [int(((y == a) | (y == b)).sum()) for a, b in P]
+    work_ovo = int(sum(int(i) * r for i, r in zip(ovo.n_iter_, rows_ovo)))
+    work_ovr = int(sum(int(e.n_iter_[0]) * len(y) for e in ovr.estimators_))
+    sv_ovr = sum(len(e.support_) for e in ovr.estimators_)
+    print("  %-44s %12s %12s" % ("", "one-vs-rest", "one-vs-one"))
+    print("  %-44s %12d %12d" % ("binary models fitted", k, len(P)))
+    print("  %-44s %12s %12s" % ("training points each model sees", "%d" % len(y),
+                                 "%d-%d" % (min(rows_ovo), max(rows_ovo))))
+    print("  %-44s %12s %12s" % ("training points summed over all models",
+                                 format(k * len(y), ","), format(sum(rows_ovo), ",")))
+    print("  %-44s %12s %12s" % ("solver work (iterations x points, summed)",
+                                 format(work_ovr, ","), format(work_ovo, ",")))
+    print("  %-44s %12d %12d" % ("support vectors a prediction must visit", sv_ovr,
+                                 int(ovo.n_support_.sum())))
+    acc = {}
+    for lab, m in (("ovr", OneVsRestClassifier(SVC())), ("ovo", SVC())):
+        acc[lab] = np.mean([cross_val_score(make_pipeline(StandardScaler(), m), X, y,
+                                            cv=StratifiedKFold(5, shuffle=True, random_state=sd)
+                                            ).mean() for sd in range(5)])
+    print("  %-44s %12.4f %12.4f" % ("accuracy (5-fold, 5 repeats)", acc["ovr"], acc["ovo"]))
+    print()
+    print("One-vs-one fits %.1f times as many models and does %.1f times LESS work. Each of its"
+          % (len(P) / k, work_ovr / work_ovo))
+    print("models sees two classes, about a fifth of the data, and an SVM's cost grows faster")
+    print("than its data. At prediction time libsvm pools the support vectors of all %d pairs,"
+          % len(P))
+    print("so one-vs-one visits %d points where one-vs-rest visits %d. And the accuracy is the"
+          % (int(ovo.n_support_.sum()), sv_ovr))
+    print("same to within %.4f." % abs(acc["ovr"] - acc["ovo"]))
+    print()
+    print("sklearn's SVC is ALWAYS one-vs-one. Its decision_function_shape='ovr' option only")
+    print("reshapes the output; the models and the labels are the same:")
+    print()
+    for name, (Xd, yd) in (("iris", load_iris(return_X_y=True)),
+                           ("wine", load_wine(return_X_y=True)),
+                           ("digits", load_digits(return_X_y=True))):
+        Z = StandardScaler().fit_transform(Xd)
+        a = SVC(decision_function_shape="ovo").fit(Z, yd)
+        b = SVC(decision_function_shape="ovr").fit(Z, yd)
+        same = int((a.predict(Z) == b.predict(Z)).sum())
+        print("  %-8s decision_function %-8s vs %-8s   same label on %d of %d"
+              % (name, str(a.decision_function(Z).shape), str(b.decision_function(Z).shape),
+                 same, len(yd)))
+    print()
+    print("To get real one-vs-rest from a kernel SVM, wrap it: OneVsRestClassifier(SVC()).")
+    print("LinearSVC goes the other way and is one-vs-rest by default.")
+
+
+# ------------------------------------------------------------------ #
+# 63. The class in the middle
+# ------------------------------------------------------------------ #
+MULTI_LAYOUTS = {"row": ((-2.0, 0.0), (0.0, 0.0), (2.0, 0.0)),
+                 "triangle": ((0.0, 1.6), (-1.8, -1.0), (1.8, -1.0))}
+MULTI_GAMMA = 0.5
+
+
+def _multi_points(n, seed, layout, sd=0.7):
+    """The points MultiClassLab draws, reproduced exactly: n per class, classes interleaved.
+
+    Lehmer generator, sum-of-six-uniforms noise scaled to unit variance, rounded half-up to
+    three decimals the way Math.round does.
+    """
+    st = (seed % 2147483646) + 1
+
+    def u():
+        nonlocal st
+        st = (st * 48271) % 2147483647
+        return st / 2147483647
+
+    def gauss():
+        return (sum(u() for _ in range(6)) - 3) / math.sqrt(0.5)
+
+    X, y = [], []
+    for i in range(3 * n):
+        c = i % 3
+        cx, cz = MULTI_LAYOUTS[layout][c]
+        x = cx + gauss() * sd
+        z = cz + gauss() * sd
+        X.append([math.floor(x * 1000 + 0.5) / 1000, math.floor(z * 1000 + 0.5) / 1000])
+        y.append(c)
+    return np.array(X), np.array(y)
+
+
+def _row(n, seed, sep, sd=0.7):
+    rng = np.random.RandomState(seed)
+    X = np.vstack([np.c_[rng.randn(n) * sd + (c - 1) * sep, rng.randn(n) * sd] for c in range(3)])
+    return X, np.repeat([0, 1, 2], n)
+
+
+def _multi_case():
+    """Record sklearn's answers on MultiClassLab's own points, for every setting of the lab."""
+    import pathlib
+    out = {}
+    for layout in MULTI_LAYOUTS:
+        Xt, yt = _multi_points(30, 7, layout)
+        Xv, yv = _multi_points(200, 8, layout)
+        pts = lambda X, y: [dict(x=float(a), z=float(b), c=int(c)) for (a, b), c in zip(X, y)]
+        out[layout] = dict(train=pts(Xt, yt), val=pts(Xv, yv), fits={})
+        for kern in ("linear", "rbf"):
+            for strat in ("ovr", "ovo"):
+                jobs = ([(k, None) for k in range(3)] if strat == "ovr" else _pairs(3))
+                models, D = [], []
+                for a, b in jobs:
+                    s = np.ones(len(yt), bool) if b is None else (yt == a) | (yt == b)
+                    ys = np.where(yt[s] == a, 1.0, -1.0)
+                    m = SVC(kernel=kern, C=1.0, gamma=MULTI_GAMMA, tol=1e-8,
+                            max_iter=200000).fit(Xt[s], ys)
+                    Ks = (Xt[s] @ Xt[s].T if kern == "linear" else
+                          np.exp(-MULTI_GAMMA * ((Xt[s][:, None] - Xt[s][None]) ** 2).sum(-1)))
+                    models.append(dict(pos=a, neg=b, nsv=int(m.n_support_.sum()),
+                                       objective=_dobj(_sk_alpha(m, len(ys)), Ks, ys),
+                                       f=[float(v) for v in np.round(m.decision_function(Xt[s]), 10)]))
+                    D.append(m.decision_function(Xv))
+                D = np.column_stack(D)
+                if strat == "ovr":
+                    pred = D.argmax(1)
+                else:
+                    V = np.zeros((len(yv), 3))
+                    for j, (a, b) in enumerate(jobs):
+                        V[D[:, j] > 0, a] += 1
+                        V[D[:, j] <= 0, b] += 1
+                    pred = V.argmax(1)
+                out[layout]["fits"]["%s/%s" % (kern, strat)] = dict(
+                    models=models, pred=[int(v) for v in pred],
+                    recall=[float((pred[yv == c] == c).mean()) for c in range(3)],
+                    acc=float((pred == yv).mean()))
+    p = pathlib.Path(__file__).resolve().parents[1] / "results" / "svm_multi_case.json"
+    p.parent.mkdir(exist_ok=True)
+    p.write_text(json.dumps(out), encoding="utf-8")
+    sys.stderr.write("  [wrote results/svm_multi_case.json -- %d settings]\n"
+                     % sum(len(v["fits"]) for v in out.values()))
+    return out
+
+
+def masking():
+    section("63. the class in the middle")
+    print("Three classes in a row along one axis: A on the left, B in the middle, C on the")
+    print("right, each a round cloud of spread 0.7. 30 training points per class, 300 new ones")
+    print("to score on, 20 draws at each spacing. Linear SVMs, C=1:")
+    print()
+    print("  %8s %22s %22s %14s" % ("", "linear one-vs-rest", "linear one-vs-one",
+                                    "B-vs-rest"))
+    print("  %8s %10s %11s %10s %11s %14s" % ("spacing", "all", "B only", "all", "B only",
+                                             "says 'B' to B"))
+    owns = []
+    for sep in (2.0, 3.0, 4.0):
+        res = []
+        for sd in range(20):
+            Xt, yt = _row(30, sd, sep)
+            Xv, yv = _row(300, 1000 + sd, sep)
+            r = OneVsRestClassifier(SVC(kernel="linear", max_iter=200000)).fit(Xt, yt)
+            o = SVC(kernel="linear").fit(Xt, yt)
+            mid = lambda m: (m.predict(Xv[yv == 1]) == 1).mean()
+            own = (r.estimators_[1].decision_function(Xv[yv == 1]) > 0).mean()
+            res.append((r.score(Xv, yv), mid(r), o.score(Xv, yv), mid(o), own))
+            owns.append(own)
+        a = np.array(res).mean(0)
+        print("  %8g %10.4f %11.4f %10.4f %11.4f %14.4f" % (sep, *a))
+    print()
+    print("B-vs-rest asks one straight line to put B on one side and BOTH neighbours on the")
+    print("other. No line can. The line it settles for says 'B' to %s of B's own points,"
+          % ("none" if max(owns) == 0 else "at most %.4f" % max(owns)))
+    print("in any of the 60 draws. So B is left to win on a technicality: wherever A's and C's")
+    print("scores are both even lower than B's, a strip between them. At spacing 2 that strip")
+    print("catches about half of B. One-vs-one never asks the impossible question. Its models")
+    print("are A-vs-B, A-vs-C and B-vs-C, and each pair has a line between them.")
+    print()
+    print("This is not a toy problem. Iris's three species, projected on their first principal")
+    print("component, standardised:")
+    print()
+    X, y = load_iris(return_X_y=True)
+    from sklearn.decomposition import PCA
+    z = PCA(1).fit_transform(StandardScaler().fit_transform(X))[:, 0]
+    s = np.sign(z[y == 0].mean())
+    names = ("setosa", "versicolor", "virginica")
+    print("  " + "   ".join("%s %+.2f" % (names[c], s * z[y == c].mean()) for c in range(3)))
+    print()
+    print("Versicolor sits in the middle. Recall for each species, 5-fold, 5 repeats:")
+    print()
+    print("  %-34s %10s %11s %10s" % ("", *names))
+    for lab, m in (("linear one-vs-rest", OneVsRestClassifier(SVC(kernel="linear"))),
+                   ("linear one-vs-one", SVC(kernel="linear")),
+                   ("rbf one-vs-rest", OneVsRestClassifier(SVC())),
+                   ("rbf one-vs-one", SVC())):
+        rec = []
+        for sd in range(5):
+            p = cross_val_predict(make_pipeline(StandardScaler(), m), X, y,
+                                  cv=StratifiedKFold(5, shuffle=True, random_state=sd))
+            rec.append([(p[y == c] == c).mean() for c in range(3)])
+        print("  %-34s %10.4f %11.4f %10.4f" % (lab, *np.mean(rec, 0)))
+    print()
+    print("The middle class is the one linear one-vs-rest loses, by the same mechanism. A")
+    print("kernel removes the problem at its root: an rbf boundary can wrap around B, so")
+    print("B-vs-rest is a fair question again, and the two strategies agree.")
+    _multi_case()
+
+
+# ------------------------------------------------------------------ #
+# 64. Who claims a point
+# ------------------------------------------------------------------ #
+def claims():
+    section("64. who claims a point, and what the answer is worth")
+    print("One-vs-rest asks every model 'is this yours?'. Nothing makes exactly one of them")
+    print("say yes. One-vs-one holds a round-robin and counts wins. digits, standardised, the")
+    print("default rbf SVM, trained on the even-numbered images and scored on the odd ones:")
+    print()
+    X, y = load_digits(return_X_y=True)
+    Xs = StandardScaler().fit_transform(X)
+    Xtr, ytr, Xte, yte = Xs[::2], y[::2], Xs[1::2], y[1::2]
+    k = 10
+    r = OneVsRestClassifier(SVC()).fit(Xtr, ytr)
+    D = r.decision_function(Xte)
+    npos = (D > 0).sum(1)
+    pr = D.argmax(1)
+    print("  one-vs-rest: how many of the 10 models said 'mine'")
+    print("  %-30s %8s %10s %14s" % ("", "points", "share", "argmax right"))
+    for lab, msk in (("exactly one", npos == 1), ("none", npos == 0),
+                     ("two or more", npos >= 2)):
+        print("  %-30s %8d %10.4f %14s" % (lab, msk.sum(), msk.mean(),
+                                           "%.4f" % (pr[msk] == yte[msk]).mean()
+                                           if msk.any() else "--"))
+    wrong = pr != yte
+    print("  %-30s %8d %10.4f" % ("all", len(yte), (pr == yte).mean()))
+    print()
+    o = SVC(decision_function_shape="ovo").fit(Xtr, ytr)
+    Dv = o.decision_function(Xte)
+    V = np.zeros((len(yte), k))
+    for j, (a, b) in enumerate(_pairs(k)):
+        V[Dv[:, j] > 0, a] += 1
+        V[Dv[:, j] <= 0, b] += 1
+    top = V.max(1)
+    po = o.predict(Xte)
+    print("  one-vs-one: how many of its 9 duels the winning class won")
+    print("  %-30s %8s %10s %14s" % ("", "points", "share", "vote right"))
+    for lab, msk in (("all 9", top == 9), ("fewer (a tie at the top)", top < 9)):
+        print("  %-30s %8d %10.4f %14s" % (lab, msk.sum(), msk.mean(),
+                                           "%.4f" % (po[msk] == yte[msk]).mean()
+                                           if msk.any() else "--"))
+    print("  %-30s %8d %10.4f" % ("all", len(yte), (po == yte).mean()))
+    print()
+    nw = int(wrong.sum())
+    print("One-vs-rest's awkward cases are informative. %d of its %d mistakes are points no"
+          % (int((wrong & (npos != 1)).sum()), nw))
+    print("model claimed, where it had to fall back on 'whose score is least negative'; on")
+    print("points exactly one model claimed it is right %.1f%% of the time."
+          % (100 * (pr[npos == 1] == yte[npos == 1]).mean()))
+    print()
+    print("One-vs-one's vote is not. The winning class won all nine of its duels on %d of %d"
+          % (int((top == 9).sum()), len(yte)))
+    print("points -- including %d of its %d mistakes. A clean sweep is the normal result,"
+          % (int(((top == 9) & (po != yte)).sum()), int((po != yte).sum())))
+    print("right or wrong. Of the 45 models, 36 never saw the true class at all: they were")
+    print("trained on two classes that are both wrong for this point, and their votes land")
+    print("somewhere regardless. A vote count is a label, not a confidence. Page 18 is about")
+    print("getting a real one.")
+
+
+# ------------------------------------------------------------------ #
+# 65. More classes
+# ------------------------------------------------------------------ #
+def perk():
+    section("65. what more classes cost, and which to pick")
+    print("2,000 points in 10 dimensions, split into k well-separated blobs, standardised,")
+    print("the default rbf SVM. Solver work is iterations times points, summed over models:")
+    print()
+    print("  %4s %10s %14s %10s %14s %9s %10s"
+          % ("k", "OvR models", "OvR work", "OvO models", "OvO work", "OvR/OvO", "same label"))
+    for kk in (3, 5, 10, 20, 40):
+        X, y = make_blobs(n_samples=2000, centers=kk, n_features=10, cluster_std=3.0,
+                          random_state=0)
+        Xs = StandardScaler().fit_transform(X)
+        o = SVC().fit(Xs, y)
+        r = OneVsRestClassifier(SVC()).fit(Xs, y)
+        rw = [int(((y == a) | (y == b)).sum()) for a, b in _pairs(kk)]
+        wo = int(sum(int(i) * n for i, n in zip(o.n_iter_, rw)))
+        wr = int(sum(int(e.n_iter_[0]) * len(y) for e in r.estimators_))
+        print("  %4d %10d %14s %10d %14s %9.2f %10.4f"
+              % (kk, kk, format(wr, ","), len(rw), format(wo, ","), wr / wo,
+                 (o.predict(Xs) == r.predict(Xs)).mean()))
+    print()
+    print("The usual worry is that one-vs-one's k(k-1)/2 models explode: 780 of them at k=40.")
+    print("They do, and it does not matter, because each one gets smaller as k grows. Both")
+    print("strategies' work rises with k, and one-vs-one stays the cheaper one at every row.")
+    print()
+    print("Accuracy, 5-fold with 5 repeats, standardised, C=1. The last column is Crammer and")
+    print("Singer's formulation, which solves ONE joint problem over all classes instead of")
+    print("many binary ones (LinearSVC(multi_class='crammer_singer')):")
+    print()
+    print("  %-8s %10s %10s %10s %10s %14s"
+          % ("", "rbf OvR", "rbf OvO", "lin OvR", "lin OvO", "Crammer-Singer"))
+    rows = []
+    for name, (X, y) in (("iris", load_iris(return_X_y=True)),
+                         ("wine", load_wine(return_X_y=True)),
+                         ("digits", load_digits(return_X_y=True))):
+        row = []
+        for m in (OneVsRestClassifier(SVC()), SVC(),
+                  OneVsRestClassifier(SVC(kernel="linear")), SVC(kernel="linear"),
+                  LinearSVC(multi_class="crammer_singer", max_iter=100000)):
+            row.append(np.mean([cross_val_score(make_pipeline(StandardScaler(), m), X, y,
+                                                cv=StratifiedKFold(5, shuffle=True,
+                                                                   random_state=sd)).mean()
+                                for sd in range(5)]))
+        print("  %-8s %10.4f %10.4f %10.4f %10.4f %14.4f" % (name, *row))
+        rows.append(row)
+    R = np.array(rows)
+    rbf_gap = np.abs(R[:, 0] - R[:, 1]).max()
+    lin_gap = np.abs(R[:, 2] - R[:, 3]).max()
+    ovo_wins = int((R[:, 3] > R[:, 2]).sum())
+    cs_best = int((R[:, 4] >= R[:, 2:4].max(1)).sum())
+    print()
+    print("With an rbf kernel the choice is worth at most %.4f. With a linear one it is worth"
+          % rbf_gap)
+    print("up to %.4f, and one-vs-one won %d of %d. The single joint problem is the principled"
+          % (lin_gap, ovo_wins, len(R)))
+    print("answer, and it was the best linear option on %d of %d datasets." % (cs_best, len(R)))
+
+
+# ------------------------------------------------------------------ #
+# 66. A score is not a probability
+# ------------------------------------------------------------------ #
+def _platt(f, y01):
+    """Platt's sigmoid, P(y=1|f) = 1 / (1 + exp(A f + B)), fitted with his smoothed targets."""
+    from sklearn.calibration import _sigmoid_calibration
+    a, b = _sigmoid_calibration(f, y01)
+    return float(a), float(b)
+
+
+def _sig(f, a, b):
+    return 1.0 / (1.0 + np.exp(a * f + b))
+
+
+def _cv_scores(make, X, y, folds):
+    """Held-out decision values: each point scored by a model that never saw it."""
+    f = np.zeros(len(y))
+    for k in np.unique(folds):
+        te = folds == k
+        f[te] = make().fit(X[~te], y[~te]).decision_function(X[te])
+    return f
+
+
+def _folds(y, seed=0):
+    """Stratified 5-fold assignment, as libsvm's own cross-validation uses.
+
+    Plain i % 5 folds are NOT safe here: at small C every price sits at the cap, the offset is
+    only pinned to an interval, and a fold with a few more points of one class shifts it by
+    +-0.7 -- larger than the rest of the score. Held-out scores then measure the fold, not the
+    point, and Platt's slope collapses.
+    """
+    f = np.zeros(len(y), dtype=int)
+    for k, (_, te) in enumerate(StratifiedKFold(5, shuffle=True, random_state=seed).split(y, y)):
+        f[te] = k
+    return f
+
+
+def _ll(y01, p):
+    p = np.clip(p, 1e-15, 1 - 1e-15)
+    return float(-np.mean(y01 * np.log(p) + (1 - y01) * np.log(1 - p)))
+
+
+def _ece(p, y01, edges=(0, 0.2, 0.4, 0.6, 0.8, 1.0)):
+    """Expected calibration error: the gap between saying and happening, averaged over bins."""
+    e = 0.0
+    for lo, hi in zip(edges[:-1], edges[1:]):
+        m = (p >= lo) & ((p < hi) if hi < 1 else (p <= hi))
+        if m.any():
+            e += m.mean() * abs(p[m].mean() - y01[m].mean())
+    return float(e)
+
+
+def squash():
+    section("66. what an SVM score means as a probability")
+    print("breast_cancer, standardised, the default rbf SVM. Half the data to train on, half")
+    print("held out, five splits pooled -- 1,425 held-out predictions. Two ways to turn a")
+    print("decision value f into a probability of 'benign':")
+    print()
+    print("  squash    1 / (1 + exp(-f)), the obvious thing to try")
+    print("  Platt     1 / (1 + exp(A f + B)), with A and B fitted by logistic regression on")
+    print("            decision values the model produced for points it had NOT seen (5-fold)")
+    print()
+    X, y = load_breast_cancer(return_X_y=True)
+    F, Y, PS, PP, AB = [], [], [], [], []
+    for sd in range(5):
+        A_, B_, ya, yb = train_test_split(X, y, test_size=0.5, random_state=sd, stratify=y)
+        sc = StandardScaler().fit(A_)
+        A_, B_ = sc.transform(A_), sc.transform(B_)
+        fcv = _cv_scores(SVC, A_, ya, _folds(ya))
+        a, b = _platt(fcv, ya)
+        fb = SVC().fit(A_, ya).decision_function(B_)
+        F.append(fb)
+        Y.append(yb)
+        PS.append(_sig(fb, -1.0, 0.0))
+        PP.append(_sig(fb, a, b))
+        AB.append((a, b))
+    F, Y, PS, PP = map(np.concatenate, (F, Y, PS, PP))
+    a, b = np.mean(AB, 0)
+    edges = (0, 0.1, 0.3, 0.5, 0.7, 0.9, 1.0)
+    print("  %-13s %26s %26s" % ("", "squash", "Platt"))
+    print("  %-13s %7s %9s %9s %7s %9s %9s" % ("said", "points", "said", "happened",
+                                              "points", "said", "happened"))
+    for lo, hi in zip(edges[:-1], edges[1:]):
+        cells = []
+        for P in (PS, PP):
+            m = (P >= lo) & ((P < hi) if hi < 1 else (P <= hi))
+            cells += ([m.sum(), P[m].mean(), Y[m].mean()] if m.any() else [0, np.nan, np.nan])
+        lab = "%.1f - %.1f" % (lo, hi)
+        print("  %-13s %7d %9s %9s %7d %9s %9s"
+              % (lab, cells[0], "--" if np.isnan(cells[1]) else "%.3f" % cells[1],
+                 "--" if np.isnan(cells[2]) else "%.3f" % cells[2],
+                 cells[3], "--" if np.isnan(cells[4]) else "%.3f" % cells[4],
+                 "--" if np.isnan(cells[5]) else "%.3f" % cells[5]))
+    print()
+    print("  %-40s %10s %10s" % ("", "squash", "Platt"))
+    print("  %-40s %10.4f %10.4f" % ("log loss (lower is better)", _ll(Y, PS), _ll(Y, PP)))
+    print("  %-40s %10.4f %10.4f" % ("calibration error (said vs happened)", _ece(PS, Y, edges),
+                                     _ece(PP, Y, edges)))
+    print("  %-40s %10.4f %10.4f" % ("share of points given more than 0.9 either way",
+                                     np.mean(np.maximum(PS, 1 - PS) > 0.9),
+                                     np.mean(np.maximum(PP, 1 - PP) > 0.9)))
+    print()
+    out = np.abs(F) >= 1
+    right = (np.sign(F) == np.where(Y > 0, 1, -1))
+    print("The squash is timid. It never says more than %.3f, yet the points it calls 0.7-0.9"
+          % PS.max())
+    print("happen %.0f%% of the time. The reason is the margin. A point exactly on it has f = 1,"
+          % (100 * Y[(PS >= 0.7) & (PS < 0.9)].mean()))
+    print("which the squash turns into 1/(1+e^-1) = %.3f. But on held-out data %.0f%% of points"
+          % (1 / (1 + np.exp(-1)), 100 * out.mean()))
+    print("land at or beyond the margin, and %.1f%% of those are classified correctly. Platt's fit"
+          % (100 * right[out].mean()))
+    print("says a point on the margin is benign with probability %.3f (A = %.2f, B = %.2f, the"
+          % (_sig(1.0, a, b), a, b))
+    print("mean over the five splits): the SVM's own unit of distance, measured against what")
+    print("actually happens.")
+
+
+# ------------------------------------------------------------------ #
+# 67. The score has no units
+# ------------------------------------------------------------------ #
+PLATT_C = (0.01, 0.03, 0.1, 0.3, 1.0, 3.0, 10.0, 100.0, 1000.0)
+PLATT_GAMMA = 1.0
+
+
+def _platt_case():
+    """Record sklearn's answers on PlattLab's points (CGridLab's) at every stop on its C dial."""
+    import pathlib
+    Xt, yt = _units_points(80, 5, noise=0.45)
+    Xv, yv = _units_points(200, 6, noise=0.45)
+    t01, v01 = (yt > 0).astype(float), (yv > 0).astype(float)
+    folds = np.arange(len(yt)) % 5
+    cases = []
+    for C in PLATT_C:
+        mk = lambda: SVC(C=C, gamma=PLATT_GAMMA, tol=1e-10)
+        m = mk().fit(Xt, yt)
+        ft, fv = m.decision_function(Xt), m.decision_function(Xv)
+        fcv = _cv_scores(mk, Xt, yt, folds)
+        K = np.exp(-PLATT_GAMMA * ((Xt[:, None] - Xt[None]) ** 2).sum(-1))
+        objs = []
+        for k in range(5):
+            tr = folds != k
+            mf = mk().fit(Xt[tr], yt[tr])
+            objs.append(_dobj(_sk_alpha(mf, int(tr.sum())), K[np.ix_(tr, tr)], yt[tr]))
+        rec = dict(C=C, nsv=int(m.n_support_.sum()),
+                   objective=_dobj(_sk_alpha(m, len(yt)), K, yt), cv_objectives=objs,
+                   f=[float(v) for v in np.round(ft, 10)],
+                   fcv=[float(v) for v in np.round(fcv, 10)],
+                   val=float(m.score(Xv, yv)))
+        for key, f in (("train", ft), ("cv", fcv)):
+            a, b = _platt(f, t01)
+            rec[key] = dict(A=a, B=b, ll=_ll(v01, _sig(fv, a, b)))
+        rec["squash"] = dict(ll=_ll(v01, _sig(fv, -1.0, 0.0)))
+        cases.append(rec)
+    p = pathlib.Path(__file__).resolve().parents[1] / "results" / "svm_platt_case.json"
+    p.parent.mkdir(exist_ok=True)
+    pts = lambda X, y: [dict(x=float(a), z=float(b), y=float(c)) for (a, b), c in zip(X, y)]
+    p.write_text(json.dumps(dict(gamma=PLATT_GAMMA, train=pts(Xt, yt), val=pts(Xv, yv),
+                                 cases=cases)), encoding="utf-8")
+    sys.stderr.write("  [wrote results/svm_platt_case.json -- %d cases]\n" % len(cases))
+
+
+def scale():
+    section("67. the score has no units")
+    print("Why not just squash f? Because nothing fixes how big f is. Moons, 600 points, half")
+    print("held out, rbf with gamma = 1, and only C changing. 'spread' is the 90th percentile")
+    print("of |f| on held-out points; A is Platt's fitted slope, from 5-fold held-out scores:")
+    print()
+    X, y = make_moons(n_samples=600, noise=0.30, random_state=RS)
+    A_, B_, ya, yb = train_test_split(X, y, test_size=0.5, random_state=RS, stratify=y)
+    sc = StandardScaler().fit(A_)
+    A_, B_ = sc.transform(A_), sc.transform(B_)
+    print("  %8s %10s %9s %8s %14s %13s" % ("C", "accuracy", "spread", "A", "squash loss",
+                                            "Platt loss"))
+    rows = []
+    for C in PLATT_C:
+        mk = lambda: SVC(C=C, gamma=PLATT_GAMMA)
+        m = mk().fit(A_, ya)
+        fb = m.decision_function(B_)
+        a, b = _platt(_cv_scores(mk, A_, ya, _folds(ya)), ya)
+        r = (C, m.score(B_, yb), np.percentile(np.abs(fb), 90), a, _ll(yb, _sig(fb, -1, 0)),
+             _ll(yb, _sig(fb, a, b)))
+        rows.append(r)
+        print("  %8g %10.4f %9.3f %8.2f %14.4f %13.4f" % r)
+    R = np.array(rows)
+    print()
+    print("The spread of f grows %.0f-fold across the dial while accuracy moves between %.4f"
+          % (R[:, 2].max() / R[:, 2].min(), R[:, 1].min()))
+    print("and %.4f. f is measured in margins, and C decides how wide a margin is, so the same"
+          % R[:, 1].max())
+    print("point at the same distance from the boundary gets a different score at every C. A")
+    print("fixed squash reads that as a change in confidence. Platt's A absorbs it -- %.1f at"
+          % R[0, 3])
+    print("the small-C end, %.2f at the large -- and its loss stays between %.4f and %.4f while"
+          % (R[-1, 3], R[:, 5].min(), R[:, 5].max()))
+    print("the squash's runs from %.4f to %.4f." % (R[:, 4].min(), R[:, 4].max()))
+    print()
+    mk = lambda: SVC(C=PLATT_C[0], gamma=PLATT_GAMMA)
+    fb = mk().fit(A_, ya).decision_function(B_)
+    plain = np.arange(len(ya)) % 5
+    a, b = _platt(_cv_scores(mk, A_, ya, plain), ya)
+    share = [ya[plain == k].mean() for k in range(5)]
+    print("The held-out scores need STRATIFIED folds, one trap worth seeing once. Split the same")
+    print("points into folds by position instead, and the share of the positive class per fold")
+    print("runs from %.2f to %.2f. At C = %g every price is at the cap, the offset b is pinned"
+          % (min(share), max(share), PLATT_C[0]))
+    print("only to an interval, and each fold's imbalance pushes it around by more than the rest")
+    print("of the score. Platt then fits the folds, not the points: A = %.2f, loss %.4f instead"
+          % (a, _ll(yb, _sig(fb, a, b))))
+    print("of %.4f." % R[0, 5])
+    lls = [_ll(yb, SVC(C=PLATT_C[0], gamma=PLATT_GAMMA, probability=True, random_state=sd)
+               .fit(A_, ya).predict_proba(B_)[:, 1]) for sd in range(10)]
+    print()
+    print("sklearn's SVC(probability=True) falls into it. libsvm shuffles its internal folds")
+    print("without stratifying, and at C = %g its loss over ten random_state values runs from"
+          % PLATT_C[0])
+    print("%.4f to %.4f, against the stratified %.4f above. At C = 1 the offset is set by free"
+          % (min(lls), max(lls), R[0, 5]))
+    l1 = [_ll(yb, SVC(C=1.0, gamma=PLATT_GAMMA, probability=True, random_state=sd)
+              .fit(A_, ya).predict_proba(B_)[:, 1]) for sd in range(10)]
+    print("support vectors, the trap closes, and the same ten runs land between %.4f and %.4f"
+          % (min(l1), max(l1)))
+    print("(stratified: %.4f)." % R[PLATT_C.index(1.0), 5])
+    _platt_case()
+
+
+# ------------------------------------------------------------------ #
+# 68. Whose scores to fit on
+# ------------------------------------------------------------------ #
+def heldout():
+    section("68. fit the sigmoid on training scores, or held-out ones?")
+    print("Platt's paper says: not on the training points' own scores, because the model has")
+    print("seen them. The cheap alternative is tempting, so measure it. For each C and gamma:")
+    print("the sigmoid fitted once on the training scores and once on 5-fold held-out scores,")
+    print("both scored by log loss on the held-out half. Five splits:")
+    print()
+    print("  %-14s %6s %7s %9s %9s %11s %11s %9s"
+          % ("", "C", "gamma", "train acc", "test acc", "loss:train", "loss:held", "penalty"))
+    gaps = []
+    for name, (X, y) in (("breast_cancer", load_breast_cancer(return_X_y=True)),
+                         ("moons", make_moons(n_samples=600, noise=0.30, random_state=RS))):
+        for C in (1.0, 100.0):
+            for g in (0.01, 0.1, 1.0, 10.0):
+                r = []
+                for sd in range(5):
+                    A_, B_, ya, yb = train_test_split(X, y, test_size=0.5, random_state=sd,
+                                                      stratify=y)
+                    sc = StandardScaler().fit(A_)
+                    A_, B_ = sc.transform(A_), sc.transform(B_)
+                    mk = lambda: SVC(C=C, gamma=g)
+                    m = mk().fit(A_, ya)
+                    fb = m.decision_function(B_)
+                    a1, b1 = _platt(m.decision_function(A_), ya)
+                    a2, b2 = _platt(_cv_scores(mk, A_, ya, _folds(ya)), ya)
+                    r.append((m.score(A_, ya), m.score(B_, yb), _ll(yb, _sig(fb, a1, b1)),
+                              _ll(yb, _sig(fb, a2, b2))))
+                r = np.array(r).mean(0)
+                gaps.append((r[0] - r[1], r[2] - r[3]))
+                print("  %-14s %6g %7g %9.4f %9.4f %11.4f %11.4f %+9.4f"
+                      % (name, C, g, *r, r[2] - r[3]))
+                name = ""
+    G = np.array(gaps)
+    big = G[:, 0] > 0.05
+    print()
+    print("'penalty' is how much worse the training-score fit is. Where the model does about as")
+    print("well on new points as on its own (a gap under 0.05, %d of %d rows), the penalty is"
+          % (int((~big).sum()), len(G)))
+    print("between %+.4f and %+.4f: nothing. Where it memorises (%d rows), the penalty is up to"
+          % (G[~big, 1].min(), G[~big, 1].max(), int(big.sum())))
+    print("%+.4f. Training scores lie in exactly one case, and it is the case you will not see" % G[big, 1].max())
+    print("coming, because the training accuracy looks wonderful. sklearn's probability=True")
+    print("always takes the held-out route, which is what the next section is about.")
+
+
+# ------------------------------------------------------------------ #
+# 69. What probability=True does, and the alternatives
+# ------------------------------------------------------------------ #
+def probtrue():
+    section("69. probability=True, and what else you could do")
+    print("SVC(probability=True) runs libsvm's own 5-fold cross-validation inside fit() to get")
+    print("held-out scores, then fits Platt's sigmoid on them -- per pair of classes, combined")
+    print("across pairs for more than two. So each binary model is fitted six times. Three side")
+    print("effects, measured with ten different random_state values on each dataset:")
+    print()
+    print("  %-14s %22s %22s %20s" % ("", "predict != argmax", "largest change in a",
+                                      "same labels as"))
+    print("  %-14s %22s %22s %20s" % ("", "of predict_proba", "probability, by seed",
+                                      "probability=False"))
+    for name, (X, y) in (("breast_cancer", load_breast_cancer(return_X_y=True)),
+                         ("wine", load_wine(return_X_y=True)),
+                         ("iris", load_iris(return_X_y=True)),
+                         ("digits", load_digits(return_X_y=True)),
+                         ("moons", make_moons(n_samples=600, noise=0.30, random_state=RS))):
+        Xs = StandardScaler().fit_transform(X)
+        plain = SVC().fit(Xs, y).predict(Xs)
+        dis, P, same = [], [], True
+        for sd in range(10):
+            m = SVC(probability=True, random_state=sd).fit(Xs, y)
+            pr = m.predict_proba(Xs)
+            dis.append(int((m.predict(Xs) != m.classes_[pr.argmax(1)]).sum()))
+            P.append(pr)
+            same &= bool((m.predict(Xs) == plain).all())
+        P = np.array(P)
+        print("  %-14s %13s of %-6d %22.4f %20s"
+              % (name, "%d-%d" % (min(dis), max(dis)), len(y),
+                 float((P.max(0) - P.min(0)).max()), "yes" if same else "no"))
+    print()
+    print("predict() still uses the plain decision values; predict_proba() uses the sigmoid,")
+    print("and on a handful of points they disagree about the label. The internal folds are")
+    print("random, so the same data and the same model give probabilities that move with")
+    print("random_state. And the labels from predict() never change: the whole apparatus sits")
+    print("on top of the same SVM.")
+    print()
+    print("Against the alternatives, on held-out data (half split, five splits, standardised).")
+    print("Isotonic regression fits a staircase instead of a sigmoid (CalibratedClassifierCV,")
+    print("5-fold); logistic regression is the model built to output probabilities:")
+    print()
+    print("  %-14s %-24s %10s %10s %12s %12s" % ("", "", "log loss", "Brier", "calib. err",
+                                               "said 0 or 1"))
+    for name, (X, y) in (("breast_cancer", load_breast_cancer(return_X_y=True)),
+                         ("moons", make_moons(n_samples=600, noise=0.30, random_state=RS))):
+        res = {}
+        for sd in range(5):
+            A_, B_, ya, yb = train_test_split(X, y, test_size=0.5, random_state=sd, stratify=y)
+            sc = StandardScaler().fit(A_)
+            A_, B_ = sc.transform(A_), sc.transform(B_)
+            fb = SVC().fit(A_, ya).decision_function(B_)
+            ps = {
+                "SVM, squash": _sig(fb, -1, 0),
+                "SVM, probability=True": SVC(probability=True, random_state=sd).fit(A_, ya)
+                .predict_proba(B_)[:, 1],
+                "SVM, isotonic": CalibratedClassifierCV(SVC(), method="isotonic", cv=5)
+                .fit(A_, ya).predict_proba(B_)[:, 1],
+                "logistic regression": LogisticRegression(max_iter=5000).fit(A_, ya)
+                .predict_proba(B_)[:, 1],
+            }
+            for k, p in ps.items():
+                res.setdefault(k, []).append((_ll(yb, p), float(np.mean((p - yb) ** 2)),
+                                              _ece(p, yb), int(((p == 0) | (p == 1)).sum())))
+        for k, v in res.items():
+            v = np.array(v)
+            print("  %-14s %-24s %10.4f %10.4f %12.4f %12d"
+                  % (name, k, *v[:, :3].mean(0), int(v[:, 3].sum())))
+            name = ""
+    print()
+    lr = np.array(res["logistic regression"])[:, 1].mean()
+    sq = np.array(res["SVM, squash"])[:, 1].mean()
+    print("Isotonic has the lowest calibration error on moons and the worst log loss on both,")
+    print("for one reason: the last column. A staircase can say exactly 0 or exactly 1, and one")
+    print("confident miss at probability 0 costs log loss a fortune. Platt's sigmoid never")
+    print("reaches either end. Logistic regression is best in every column on breast_cancer,")
+    print("where a straight boundary is enough. On moons, where it is not, its Brier score")
+    print("(%.4f) is barely better than the uncalibrated squash (%.4f): a probability is only"
+          % (lr, sq))
+    print("as good as the model underneath it.")
+
+
+# ------------------------------------------------------------------ #
+# 70. Six datasets, three models
+# ------------------------------------------------------------------ #
+def _three():
+    """The three contenders at their defaults. Scaled where scaling matters (page 15)."""
+    return (("rbf SVM", make_pipeline(StandardScaler(), SVC())),
+            ("logistic regression", make_pipeline(StandardScaler(),
+                                                  LogisticRegression(max_iter=5000))),
+            # n_jobs=1: with several threads the trees' probabilities are summed in whatever
+            # order the threads finish, and a point on an exact 150-150 tie can flip by one ulp
+            # from run to run -- which the regen guard caught as a drifted block.
+            ("random forest", RandomForestClassifier(n_estimators=300, random_state=RS,
+                                                     n_jobs=1)))
+
+
+def _titanic():
+    """Titanic with the obvious preparation: median/mode imputation, one-hot for the categories."""
+    from sklearn.compose import ColumnTransformer
+    from sklearn.datasets import fetch_openml
+    from sklearn.impute import SimpleImputer
+    from sklearn.preprocessing import OneHotEncoder
+    t = fetch_openml("titanic", version=1, as_frame=True).frame
+    num = ["pclass", "age", "sibsp", "parch", "fare"]
+    cat = ["sex", "embarked"]
+    pre = ColumnTransformer([
+        ("n", SimpleImputer(strategy="median"), num),
+        ("c", make_pipeline(SimpleImputer(strategy="most_frequent"),
+                            OneHotEncoder(handle_unknown="ignore", sparse_output=False)), cat)])
+    return pre.fit_transform(t[num + cat]), t["survived"].astype(int).values
+
+
+def _covtype(n, seed=0):
+    from sklearn.datasets import fetch_covtype
+    X, y = fetch_covtype(return_X_y=True)
+    i = np.random.RandomState(seed).choice(len(y), n, replace=False)
+    return X[i], y[i]
+
+
+def contest():
+    section("70. six datasets, three models, all at their defaults")
+    print("5-fold cross-validation, repeated with five different shuffles, the same folds for")
+    print("all three models. Defaults throughout: page 16 found tuning an SVM on scaled data")
+    print("buys a few thousandths, and a forest's defaults are famously hard to beat.")
+    print()
+    data = (("breast_cancer", load_breast_cancer(return_X_y=True)),
+            ("wine", load_wine(return_X_y=True)),
+            ("digits", load_digits(return_X_y=True)),
+            ("titanic", _titanic()),
+            ("moons", make_moons(n_samples=600, noise=0.30, random_state=RS)),
+            ("covertype 4k", _covtype(4000)))
+    names = [n for n, _ in _three()]
+    print("  %-14s %6s %4s %10s %10s %10s   %s" % ("", "n", "d", "rbf SVM", "log. reg.",
+                                                  "forest", "SVM vs forest, 5 repeats"))
+    tally = []
+    for dname, (X, y) in data:
+        S = {}
+        for n, m in _three():
+            S[n] = np.array([cross_val_score(m, X, y, cv=StratifiedKFold(5, shuffle=True,
+                                                                          random_state=sd)).mean()
+                             for sd in range(5)])
+        d = S["rbf SVM"] - S["random forest"]
+        wins = int((d > 0).sum())
+        best = max(names, key=lambda k: S[k].mean())
+        tally.append((dname, best, d.mean(), wins))
+        print("  %-14s %6d %4d %10.4f %10.4f %10.4f   %+.4f, SVM ahead %d of 5"
+              % (dname, len(y), X.shape[1], *[S[k].mean() for k in names], d.mean(), wins))
+    print()
+    for n in names:
+        won = [t[0] for t in tally if t[1] == n]
+        print("  %-22s best on %d: %s" % (n, len(won), ", ".join(won) if won else "--"))
+    print()
+    same = sum(1 for t in tally if t[3] in (0, 5))
+    print("No model wins everywhere, and the margins are small: the SVM and the forest are")
+    print("never more than %.1f points apart. But they are not noise. On %d of %d datasets"
+          % (100 * max(abs(t[2]) for t in tally), same, len(tally)))
+    print("one of the two was ahead on all five repeats. Each dataset has a winner; there is no")
+    print("winner across datasets. The rest of this page is about telling in advance which")
+    print("kind of dataset you have.")
+
+
+# ------------------------------------------------------------------ #
+# 71. Features that carry nothing
+# ------------------------------------------------------------------ #
+def _extra(n, k, seed):
+    """k pure-noise features for n points: Lehmer, six-uniform noise at unit variance, 3 dp."""
+    st = (seed % 2147483646) + 1
+
+    def u():
+        nonlocal st
+        st = (st * 48271) % 2147483647
+        return st / 2147483647
+
+    out = np.zeros((n, k))
+    for i in range(n):
+        for j in range(k):
+            g = (sum(u() for _ in range(6)) - 3) / math.sqrt(0.5)
+            out[i, j] = math.floor(g * 1000 + 0.5) / 1000
+    return out
+
+
+NOISE_K = (0, 1, 2, 5, 10, 20, 50)
+
+
+def _noise_case():
+    """Record sklearn's answers on NoiseFeatureLab's own points at every stop on its dial."""
+    import pathlib
+    Xt, yt = _units_points(200, 21)
+    Xv, yv = _units_points(400, 22)
+    Et, Ev = _extra(200, max(NOISE_K), 1021), _extra(400, max(NOISE_K), 1022)
+    cases = []
+    for k in NOISE_K:
+        A, B = np.c_[Xt, Et[:, :k]], np.c_[Xv, Ev[:, :k]]
+        sc = StandardScaler().fit(A)
+        A, B = sc.transform(A), sc.transform(B)
+        g = 1.0 / (A.shape[1] * A.var())
+        s = SVC(C=1.0, gamma=g, tol=1e-10).fit(A, yt)
+        lr = LogisticRegression(C=1.0, tol=1e-12, max_iter=100000).fit(A, yt)
+        rf = [float(RandomForestClassifier(n_estimators=100, random_state=r).fit(A, yt)
+                    .score(B, yv)) for r in range(20)]
+        cases.append(dict(k=k, gamma=float(g), svm=float(s.score(B, yv)),
+                          nsv=int(s.n_support_.sum()),
+                          objective=_dobj(_sk_alpha(s, len(yt)),
+                                          np.exp(-g * ((A[:, None] - A[None]) ** 2).sum(-1)), yt),
+                          f=[float(v) for v in np.round(s.decision_function(A), 10)],
+                          logreg=float(lr.score(B, yv)),
+                          w=[float(v) for v in lr.coef_[0]], b=float(lr.intercept_[0]),
+                          forest=rf))
+    p = pathlib.Path(__file__).resolve().parents[1] / "results" / "svm_noise_case.json"
+    p.parent.mkdir(exist_ok=True)
+    pts = lambda X, y: [dict(x=float(a), z=float(b), y=float(c)) for (a, b), c in zip(X, y)]
+    p.write_text(json.dumps(dict(train=pts(Xt, yt), val=pts(Xv, yv),
+                                 extra_train=Et.tolist(), extra_val=Ev.tolist(), cases=cases)),
+                 encoding="utf-8")
+    sys.stderr.write("  [wrote results/svm_noise_case.json -- %d cases]\n" % len(cases))
+
+
+def noisefeat():
+    section("71. features that carry nothing")
+    print("Moons again, 600 points, and next to the two real features k columns of pure noise.")
+    print("Standardised, so every column has the same say in a distance. 5-fold, the noise")
+    print("redrawn for each of three repeats. 'tuned SVM' searches C and gamma inside every")
+    print("training fold (3-fold inner search over the 7 x 7 grid of page 16):")
+    print()
+    X, y = make_moons(n_samples=600, noise=0.30, random_state=RS)
+    grid = {"svc__C": GRID_C, "svc__gamma": GRID_G}
+    print("  %4s %12s %10s %10s %10s %10s" % ("k", "real share", "rbf SVM", "tuned SVM",
+                                              "log. reg.", "forest"))
+    R = []
+    for k in (0, 2, 5, 10, 20):
+        r = []
+        for sd in range(3):
+            Z = np.c_[X, np.random.RandomState(sd).randn(len(y), k)]
+            cv = StratifiedKFold(5, shuffle=True, random_state=sd)
+            row = []
+            for n, m in _three():
+                row.append(cross_val_score(m, Z, y, cv=cv).mean())
+            t = GridSearchCV(make_pipeline(StandardScaler(), SVC()), grid,
+                             cv=StratifiedKFold(3, shuffle=True, random_state=sd), n_jobs=-1)
+            row.insert(1, cross_val_score(t, Z, y, cv=cv).mean())
+            r.append(row)
+        r = np.mean(r, 0)
+        R.append(r)
+        print("  %4d %12.3f %10.4f %10.4f %10.4f %10.4f" % (k, 2 / (2 + k), *r))
+    R = np.array(R)
+    print()
+    print("'real share' is page 15's number: the share of the average squared distance that")
+    print("the two real features still carry once every column is standardised. At k = 5 it is")
+    print("under a third, and the rbf SVM has lost %.1f points; the forest has lost %.1f."
+          % (100 * (R[0, 0] - R[2, 0]), 100 * (R[0, 3] - R[2, 3])))
+    print("A kernel measures similarity with every feature at once and has no way to ignore one.")
+    print("A tree picks one feature per split, and a noise column rarely wins a split.")
+    print()
+    tg = R[1:, 1] - R[1:, 0]
+    print("Tuning does not rescue it. With noise present, searching C and gamma moves the SVM by")
+    print("between %+.4f and %+.4f, and the tuned SVM is still below the forest at %s."
+          % (tg.min(), tg.max(), "every k" if (R[:, 1] < R[:, 3]).all() else
+             "%d of %d values of k" % (int((R[:, 1] < R[:, 3]).sum()), len(R))))
+    print("No setting of the kernel can tell it which features to ignore. By k = 20 the default")
+    print("SVM scores %.4f and logistic regression" % R[4, 0])
+    print("%.4f: the curved boundary is worth %+.1f points over a straight line, against %+.1f"
+          % (R[4, 2], 100 * (R[4, 0] - R[4, 2]), 100 * (R[0, 0] - R[0, 2])))
+    print("with no noise at all.")
+    _noise_case()
+
+
+# ------------------------------------------------------------------ #
+# 72. When the truth is a line
+# ------------------------------------------------------------------ #
+def linear():
+    section("72. when the truth really is a straight line")
+    print("A boundary that is exactly a hyperplane in the first five features, plus label noise.")
+    print("Every feature beyond the fifth is irrelevant, so d = 5 is a pure linear problem and")
+    print("d = 500 is the same problem buried in 495 useless columns. 5-fold, 3 repeats:")
+    print()
+    print("  %6s %5s %10s %10s %10s %10s %14s" % ("n", "d", "linear SVM", "log. reg.",
+                                                  "rbf SVM", "forest", "best linear -"))
+    print("  %6s %5s %10s %10s %10s %10s %14s" % ("", "", "", "", "", "", "forest"))
+    rows = []
+    for n in (200, 1000):
+        for d in (5, 20, 100, 500):
+            r = []
+            for sd in range(3):
+                X, y = _linear_truth(n, d, seed=sd)
+                cv = StratifiedKFold(5, shuffle=True, random_state=sd)
+                lin = make_pipeline(StandardScaler(), SVC(kernel="linear"))
+                r.append([cross_val_score(lin, X, y, cv=cv).mean()]
+                         + [cross_val_score(m, X, y, cv=cv).mean() for _, m in _three()])
+            r = np.mean(r, 0)
+            gap = max(r[0], r[1]) - r[3]
+            rows.append((n, d, *r, gap))
+            print("  %6d %5d %10.4f %10.4f %10.4f %10.4f %+14.4f" % (n, d, *r, gap))
+    R = np.array(rows)
+    d5, d500 = R[R[:, 1] == 5], R[R[:, 1] == 500]
+    print()
+    span = lambda a, b: ("%.1f" % a) if "%.1f" % a == "%.1f" % b else "%.1f to %.1f" % (a, b)
+    print("With every feature relevant, the shape is right for the linear models and they lead")
+    print("the forest by %s points at both sizes -- a real edge, and a small one. Bury the"
+          % span(100 * d5[:, 6].min(), 100 * d5[:, 6].max()))
+    print("same line in 495 useless columns and the forest beats both linear models by %s"
+          % span(-100 * d500[:, 6].max(), -100 * d500[:, 6].min()))
+    print("points instead. On this data the useless features decide more than the shape of")
+    print("the truth does: a linear model spreads weight across every column it is given,")
+    print("while a forest picks its splits.")
+    print()
+    print("The rbf SVM never trails the linear SVM by more than %.4f. On a truth that is a line,"
+          % max(0.0, (R[:, 2] - R[:, 4]).max()))
+    print("the kernel costs almost nothing -- which is the flip side of page 13's point that an")
+    print("rbf kernel with a wide reach is nearly linear.")
+
+
+# ------------------------------------------------------------------ #
+# 73. More data
+# ------------------------------------------------------------------ #
+def growth():
+    section("73. what more data buys each model")
+    print("Covertype was the forest's biggest win. Is that its 44 binary soil and wilderness")
+    print("columns, which are zero %.0f%% of the time? Refit on the 10 numeric columns alone"
+          % (100 * (1 - (_covtype(4000)[0][:, 10:] != 0).mean())))
+    print("(the same 4,000 rows, 5-fold, 3 repeats):")
+    print()
+    Xc, yc = _covtype(4000)
+    print("  %-22s %10s %10s %10s %12s" % ("", "rbf SVM", "log. reg.", "forest", "forest lead"))
+    for lab, Z in (("all 54 columns", Xc), ("10 numeric columns", Xc[:, :10])):
+        r = [np.mean([cross_val_score(m, Z, yc, cv=StratifiedKFold(5, shuffle=True,
+                                                                    random_state=sd)).mean()
+                      for sd in range(3)]) for _, m in _three()]
+        print("  %-22s %10.4f %10.4f %10.4f %+12.4f" % (lab, *r, r[2] - r[0]))
+    print()
+    print("Not the binary columns: the forest leads without them too. What the forest does")
+    print("have is room to grow. The two commonest forest types, a fixed test set of 5,000,")
+    print("and training sets from 500 to 16,000 points:")
+    print()
+    from sklearn.datasets import fetch_covtype
+    X, y = fetch_covtype(return_X_y=True)
+    m12 = (y == 1) | (y == 2)
+    X, y = X[m12], y[m12]
+    perm = np.random.RandomState(RS).permutation(len(y))
+    te = perm[:5000]
+    print("  %7s %10s %10s %10s %12s %10s %16s" % ("n", "rbf SVM", "log. reg.", "forest",
+                                                   "SVs", "SV share", "SVM work"))
+    rows = []
+    for n in (500, 1000, 2000, 4000, 8000, 16000):
+        tr = perm[5000:5000 + n]
+        acc = []
+        for name, m in _three():
+            m.fit(X[tr], y[tr])
+            acc.append(m.score(X[te], y[te]))
+            if name == "rbf SVM":
+                sv, it = int(m[-1].n_support_.sum()), int(m[-1].n_iter_.max())
+        rows.append((n, *acc, sv, sv / n, it * n))
+        print("  %7d %10.4f %10.4f %10.4f %12s %10.3f %16s"
+              % (n, *acc, format(sv, ","), sv / n, format(it * n, ",")))
+    R = np.array(rows, dtype=float)
+    print()
+    print("From 500 to 16,000 points the forest gains %.1f points and the SVM %.1f. Even at"
+          % (100 * (R[-1, 3] - R[0, 3]), 100 * (R[-1, 1] - R[0, 1])))
+    print("16,000 the SVM keeps %.0f%% of its training points as support vectors, so the model it"
+          % (100 * R[-1, 5]))
+    print("has to evaluate for every prediction grows in step with the data -- %s points at"
+          % format(int(R[-1, 4]), ","))
+    print("the end -- and its solver work (iterations x points) grows %.0f-fold for a %d-fold"
+          % (R[-1, 6] / R[0, 6], int(R[-1, 0] / R[0, 0])))
+    print("increase in data. On overlapping classes most points end up inside or on the")
+    print("margin, which is exactly what makes them support vectors. Logistic regression stops")
+    print("improving early, %.4f at 2,000 points and %.4f at 16,000. A line is a line however"
+          % (R[2, 2], R[-1, 2]))
+    print("much data you give it.")
+
+
+# ------------------------------------------------------------------ #
+# 74. When one class is rare
+# ------------------------------------------------------------------ #
+def imbalance():
+    section("74. when one class is rare")
+    print("Ten features, five informative, 2,000 points to train on and 2,000 to test, the")
+    print("default rbf SVM, standardised. The rare class is 5% or 1% of the data. Ten draws,")
+    print("averaged. 'found' is the share of the rare class the model catches (recall); 'right")
+    print("when it says so' is the share of its rare-class calls that are correct (precision):")
+    print()
+    from sklearn.metrics import balanced_accuracy_score, precision_score, recall_score
+    print("  %6s %-22s %10s %8s %16s %14s" % ("rare", "", "accuracy", "found", "right when it",
+                                              "balanced"))
+    print("  %6s %-22s %10s %8s %16s %14s" % ("", "", "", "", "says so", "accuracy"))
+    R = {}
+    for w in (0.95, 0.99):
+        for cw, lab in ((None, "default"), ("balanced", "class_weight='balanced'")):
+            r = []
+            base = []
+            for sd in range(10):
+                X, y = make_classification(n_samples=4000, n_features=10, n_informative=5,
+                                           weights=[w], flip_y=0.01, random_state=sd)
+                A, B, ya, yb = X[:2000], X[2000:], y[:2000], y[2000:]
+                base.append(1 - yb.mean())
+                p = make_pipeline(StandardScaler(), SVC(class_weight=cw)).fit(A, ya).predict(B)
+                r.append(((p == yb).mean(), recall_score(yb, p),
+                          precision_score(yb, p, zero_division=0),
+                          balanced_accuracy_score(yb, p)))
+            r = np.mean(r, 0)
+            R[(w, cw)] = r
+            R[(w, "base")] = float(np.mean(base))
+            print("  %6s %-22s %10.4f %8.4f %16.4f %14.4f"
+                  % ("%.0f%%" % (100 * (1 - w)), lab, *r))
+    d1, b1 = R[(0.99, None)], R[(0.99, "balanced")]
+    print()
+    print("At 1%% the default model scores %.4f accuracy and finds %.0f%% of the rare class."
+          % (d1[0], 100 * d1[1]))
+    print("Always answering 'common', with no model at all, would score %.4f. The SVM has"
+          % R[(0.99, "base")])
+    print("learned that 'common' is nearly always right, which is what minimising the hinge")
+    print("loss over mostly-common points rewards. class_weight='balanced' multiplies C for each")
+    print("class by the inverse of its frequency, so the rare class's slack, summed, costs as")
+    print("much as the common class's. It finds %.0f%% of the rare class, and pays in precision:"
+          % (100 * b1[1]))
+    print("only %.0f%% of its rare-class calls are right, and accuracy falls to %.4f. Neither is"
+          % (100 * b1[2], b1[0]))
+    print("'better'. Which one you want depends on what a missed rare case costs against a")
+    print("false alarm -- and accuracy is the wrong number to decide it with.")
+
+
+# ------------------------------------------------------------------ #
+# 75. When the data is large
+# ------------------------------------------------------------------ #
+def approx():
+    section("75. when the data is large: approximate the kernel")
+    print("An exact kernel SVM needs the similarity of every pair it touches. The Nystroem")
+    print("method picks m landmark points, measures every point's similarity to the landmarks")
+    print("only, and fits a LINEAR SVM on those m numbers. covertype, two classes, standardised,")
+    print("gamma='scale', the same 5,000-point test set as page 19:")
+    print()
+    from sklearn.datasets import fetch_covtype
+    from sklearn.kernel_approximation import Nystroem
+    X, y = fetch_covtype(return_X_y=True)
+    m12 = (y == 1) | (y == 2)
+    X, y = X[m12], y[m12]
+    perm = np.random.RandomState(RS).permutation(len(y))
+    te = perm[:5000]
+    print("  %7s %-24s %10s %22s" % ("n", "", "accuracy", "similarities computed"))
+    print("  %7s %-24s %10s %22s" % ("", "", "", "per prediction"))
+    rows = {}
+    for n in (16000, 64000):
+        tr = perm[5000:5000 + n]
+        sc = StandardScaler().fit(X[tr])
+        A, B = sc.transform(X[tr]), sc.transform(X[te])
+        g = 1.0 / (A.shape[1] * A.var())
+        if n == 16000:
+            s = SVC(gamma=g).fit(A, y[tr])
+            rows[(n, "exact")] = s.score(B, y[te])
+            print("  %7s %-24s %10.4f %22s" % (format(n, ","), "exact rbf SVM",
+                                               rows[(n, "exact")],
+                                               format(int(s.n_support_.sum()), ",")))
+        for mc in (100, 300, 1000):
+            p = make_pipeline(Nystroem(gamma=g, n_components=mc, random_state=RS),
+                              LinearSVC()).fit(A, y[tr])
+            rows[(n, mc)] = p.score(B, y[te])
+            print("  %7s %-24s %10.4f %22s" % ("" if n == 16000 or mc != 100 else format(n, ","),
+                                               "Nystroem, %d landmarks" % mc, rows[(n, mc)],
+                                               format(mc, ",")))
+        f = RandomForestClassifier(n_estimators=300, random_state=RS, n_jobs=1).fit(A, y[tr])
+        rows[(n, "forest")] = f.score(B, y[te])
+        print("  %7s %-24s %10.4f %22s" % ("", "random forest", rows[(n, "forest")], "--"))
+    print()
+    print("At 16,000 points, 1,000 landmarks score %.4f against the exact SVM's %.4f, while"
+          % (rows[(16000, 1000)], rows[(16000, "exact")]))
+    print("each prediction compares against 1,000 points instead of 8,133 support vectors. The")
+    print("approximation does not have to be worse: it is a different model -- a linear SVM on")
+    print("1,000 similarity features, with its own C -- and here it does slightly better. It")
+    print("also reaches sizes the exact solver does not: at 64,000 points, 1,000 landmarks")
+    print("score %.4f." % rows[(64000, 1000)])
+    print()
+    print("It does not change what the model is, though. The forest scores %.4f at 64,000"
+          % rows[(64000, "forest")])
+    print("points. Approximation removes the SVM's cost problem, not its fit to the data.")
+
+
+# ------------------------------------------------------------------ #
+# 76. How few landmarks
+# ------------------------------------------------------------------ #
+LANDMARKS = (2, 3, 5, 10, 20, 50)
+LANDMARK_GAMMA = 1.0
+
+
+def _nystroem_gram(Xt, L, g, Z=None):
+    """The kernel the landmarks imply: K(x, z) ~ k_L(x)^T K_LL^{-1} k_L(z).
+
+    For m <= 50 on the lab's points K_LL is well conditioned (smallest eigenvalue over largest
+    at least 5e-8), so a plain solve is exact enough and the browser can do the same.
+    """
+    Kxl = _rbf_cross(Xt, L, g)
+    Kll = _rbf_cross(L, L, g)
+    Kzl = Kxl if Z is None else _rbf_cross(Z, L, g)
+    return Kzl @ np.linalg.solve(Kll, Kxl.T)
+
+
+def _rbf_cross(A, B, g):
+    return np.exp(-g * ((A[:, None, :] - B[None, :, :]) ** 2).sum(-1))
+
+
+def _landmark_case():
+    """Record sklearn's answers on LandmarkLab's points (page 19's moons) at every stop."""
+    import pathlib
+    Xt, yt = _units_points(200, 21)
+    Xv, yv = _units_points(400, 22)
+    ex = SVC(C=1.0, gamma=LANDMARK_GAMMA, tol=1e-10).fit(Xt, yt)
+    cases = [dict(m=0, nsv=int(ex.n_support_.sum()), val=float(ex.score(Xv, yv)),
+                  f=[float(v) for v in np.round(ex.decision_function(Xt), 10)],
+                  objective=_dobj(_sk_alpha(ex, len(yt)), _rbf_cross(Xt, Xt, LANDMARK_GAMMA),
+                                  yt))]
+    for m in LANDMARKS:
+        L = Xt[:m]
+        Kt = _nystroem_gram(Xt, L, LANDMARK_GAMMA)
+        Kv = _nystroem_gram(Xt, L, LANDMARK_GAMMA, Xv)
+        s = SVC(kernel="precomputed", C=1.0, tol=1e-10).fit(Kt, yt)
+        cases.append(dict(m=m, nsv=int(s.n_support_.sum()), val=float(s.score(Kv, yv)),
+                          f=[float(v) for v in np.round(s.decision_function(Kt), 10)],
+                          objective=_dobj(_sk_alpha(s, len(yt)), Kt, yt),
+                          K00=float(Kt[0, 0]), K01=float(Kt[0, 1])))
+    p = pathlib.Path(__file__).resolve().parents[1] / "results" / "svm_landmark_case.json"
+    p.parent.mkdir(exist_ok=True)
+    pts = lambda X, y: [dict(x=float(a), z=float(b), y=float(c)) for (a, b), c in zip(X, y)]
+    p.write_text(json.dumps(dict(gamma=LANDMARK_GAMMA, train=pts(Xt, yt), val=pts(Xv, yv),
+                                 cases=cases)), encoding="utf-8")
+    sys.stderr.write("  [wrote results/svm_landmark_case.json -- %d cases]\n" % len(cases))
+    return cases
+
+
+def landmarks():
+    section("76. how few landmarks are enough")
+    print("The same idea on the moons, small enough to see. 200 points to train on, 400 to")
+    print("test, gamma = 1, C = 1. The landmarks are the first m training points; the kernel the")
+    print("SVM sees is k_L(x)^T K_LL^-1 k_L(z), built from each point's m landmark similarities.")
+    print("Ten draws of the data:")
+    print()
+    print("  %12s %12s %12s %24s" % ("landmarks", "accuracy", "worst draw", "similarities per"))
+    print("  %12s %12s %12s %24s" % ("", "", "", "prediction"))
+    acc = {m: [] for m in LANDMARKS}
+    ex, nsv = [], []
+    for sd in range(10):
+        Xt, yt = _units_points(200, 100 + sd)
+        Xv, yv = _units_points(400, 200 + sd)
+        e = SVC(C=1.0, gamma=LANDMARK_GAMMA).fit(Xt, yt)
+        ex.append(e.score(Xv, yv))
+        nsv.append(int(e.n_support_.sum()))
+        for m in LANDMARKS:
+            L = Xt[:m]
+            s = SVC(kernel="precomputed", C=1.0).fit(_nystroem_gram(Xt, L, LANDMARK_GAMMA), yt)
+            acc[m].append(s.score(_nystroem_gram(Xt, L, LANDMARK_GAMMA, Xv), yv))
+    for m in LANDMARKS:
+        print("  %12d %12.4f %12.4f %24d" % (m, np.mean(acc[m]), np.min(acc[m]), m))
+    print("  %12s %12.4f %12.4f %24s" % ("exact", np.mean(ex), np.min(ex),
+                                         "%d-%d (the SVs)" % (min(nsv), max(nsv))))
+    close = [m for m in LANDMARKS if np.mean(ex) - np.mean(acc[m]) <= 0.005]
+    print()
+    print("From %d landmarks the approximation is within half a point of the exact SVM on"
+          % close[0])
+    print("average, and it asks for %d similarities per prediction where the exact model asks"
+          % close[0])
+    print("for one per support vector. The moons are two curves in a plane; a handful of well")
+    print("placed reference points describe them. Data with more going on needs more landmarks:")
+    print("covertype needed 1,000 to match its exact model.")
+    _landmark_case()
+
+
 CMDS = dict(margin=margin, soft=soft, sparsity=sparsity, losses=losses, kernels=kernels,
             scaling=scaling, multiclass=multiclass, bakeoff=bakeoff, solver=solver,
             rescale=rescale, distance=distance, ranking=ranking, canonical=canonical,
@@ -3759,7 +5537,13 @@ CMDS = dict(margin=margin, soft=soft, sparsity=sparsity, losses=losses, kernels=
             swap=swap, lift=lift, nospace=nospace, allowed=allowed,
             menu=menu, reach=reach, coef0=coef0, lookup=lookup,
             twoatatime=twoatatime, clipbox=clipbox, whichpair=whichpair,
-            stopping=stopping)
+            stopping=stopping,
+            units=units, unitsdial=unitsdial, penalty=penalty, whichscaler=whichscaler,
+            cgrid=cgrid, tuningbuys=tuningbuys, curse=curse, flattop=flattop,
+            twoways=twoways, masking=masking, claims=claims, perk=perk,
+            squash=squash, scale=scale, heldout=heldout, probtrue=probtrue,
+            contest=contest, noisefeat=noisefeat, linear=linear, growth=growth,
+            imbalance=imbalance, approx=approx, landmarks=landmarks)
 
 if __name__ == "__main__":
     want = sys.argv[1:] or list(CMDS)

@@ -47,6 +47,7 @@ import { CAP_TOTAL, CAP_DONE } from "./housingCapstoneTrack";
 import { NEO_TOTAL, NEO_DONE } from "./neoCapstoneTrack";
 import { RL_CAP_TOTAL, RL_CAP_DONE } from "./rlCapstoneTrack";
 import { LOP_CAP_TOTAL, LOP_CAP_DONE } from "./lopCapstoneTrack";
+import { ROUTING_TOTAL, ROUTING_DONE } from "./routingCapstoneTrack";
 
 export type Counts = { done: number; total: number };
 
@@ -97,6 +98,7 @@ export const CAPSTONE_COUNTS: Record<string, Counts> = {
   "/learn/asteroid-hazard-capstone": c(NEO_DONE, NEO_TOTAL),
   "/learn/warehouse-robot-capstone": c(RL_CAP_DONE, RL_CAP_TOTAL),
   "/learn/lies-of-p-capstone": c(LOP_CAP_DONE, LOP_CAP_TOTAL),
+  "/learn/message-routing-capstone": c(ROUTING_DONE, ROUTING_TOTAL),
 };
 
 /** A group's tracks may deep-link into chapters (the pillars do), so fall back to the root. */

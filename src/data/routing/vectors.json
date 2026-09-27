@@ -1,0 +1,766 @@
+{
+ "posts": 11314,
+ "vocab": 109888,
+ "specimens": [
+  {
+   "post": 4394,
+   "forum": "comp.sys.mac.hardware",
+   "text": "AppleTalk ImageWriter LQ compatible needed.\n  Since Image Writer LQ was discontinued, there is no Apple Talk\n  printer with 11\"*15\" continous paper printer.\n\n  I would like to know is there are any possibility to connect\n  an IBM compatible printer to an Apple Talk net directly (or \n  with a Net Serial hardware), and if I need any other software\n  to do it.",
+   "unknown": [],
+   "schemes": {
+    "counts": {
+     "top": [
+      {
+       "w": "to",
+       "n": 4,
+       "df": 8890,
+       "x": 4.0
+      },
+      {
+       "w": "printer",
+       "n": 3,
+       "df": 131,
+       "x": 3.0
+      },
+      {
+       "w": "there",
+       "n": 2,
+       "df": 3481,
+       "x": 2.0
+      },
+      {
+       "w": "with",
+       "n": 2,
+       "df": 5216,
+       "x": 2.0
+      },
+      {
+       "w": "talk",
+       "n": 2,
+       "df": 315,
+       "x": 2.0
+      },
+      {
+       "w": "is",
+       "n": 2,
+       "df": 7439,
+       "x": 2.0
+      },
+      {
+       "w": "lq",
+       "n": 2,
+       "df": 14,
+       "x": 2.0
+      },
+      {
+       "w": "net",
+       "n": 2,
+       "df": 418,
+       "x": 2.0
+      },
+      {
+       "w": "an",
+       "n": 2,
+       "df": 3627,
+       "x": 2.0
+      },
+      {
+       "w": "any",
+       "n": 2,
+       "df": 3097,
+       "x": 2.0
+      }
+     ],
+     "nearest": [
+      {
+       "subject": "Re: How is a Loopback connector made?",
+       "forum": "comp.sys.ibm.pc.hardware",
+       "cos": 0.435
+      },
+      {
+       "subject": "Appletalk hookup?",
+       "forum": "comp.sys.ibm.pc.hardware",
+       "cos": 0.412
+      },
+      {
+       "subject": "Help: OS2 Presentation Mgr port to X",
+       "forum": "comp.windows.x",
+       "cos": 0.41
+      }
+     ]
+    },
+    "tfidf": {
+     "top": [
+      {
+       "w": "printer",
+       "n": 3,
+       "df": 131,
+       "x": 0.4026
+      },
+      {
+       "w": "lq",
+       "n": 2,
+       "df": 14,
+       "x": 0.3755
+      },
+      {
+       "w": "compatible",
+       "n": 2,
+       "df": 113,
+       "x": 0.2756
+      },
+      {
+       "w": "apple",
+       "n": 2,
+       "df": 270,
+       "x": 0.233
+      },
+      {
+       "w": "talk",
+       "n": 2,
+       "df": 315,
+       "x": 0.2254
+      },
+      {
+       "w": "continous",
+       "n": 1,
+       "df": 3,
+       "x": 0.2203
+      },
+      {
+       "w": "net",
+       "n": 2,
+       "df": 418,
+       "x": 0.2115
+      },
+      {
+       "w": "discontinued",
+       "n": 1,
+       "df": 5,
+       "x": 0.2103
+      },
+      {
+       "w": "imagewriter",
+       "n": 1,
+       "df": 10,
+       "x": 0.1954
+      },
+      {
+       "w": "appletalk",
+       "n": 1,
+       "df": 15,
+       "x": 0.1862
+      }
+     ],
+     "nearest": [
+      {
+       "subject": "Hewlett Packard DeskJet 500 inkjet printer for sale...",
+       "forum": "misc.forsale",
+       "cos": 0.294
+      },
+      {
+       "subject": "Panasonic dot matrix printer: $165 complete",
+       "forum": "misc.forsale",
+       "cos": 0.242
+      },
+      {
+       "subject": "24-pin Printer For Sale as well",
+       "forum": "misc.forsale",
+       "cos": 0.239
+      }
+     ]
+    },
+    "router": {
+     "top": [
+      {
+       "w": "lq",
+       "n": 2,
+       "df": 14,
+       "x": 0.3576
+      },
+      {
+       "w": "printer",
+       "n": 3,
+       "df": 131,
+       "x": 0.3169
+      },
+      {
+       "w": "compatible",
+       "n": 2,
+       "df": 113,
+       "x": 0.2625
+      },
+      {
+       "w": "continous",
+       "n": 1,
+       "df": 3,
+       "x": 0.2478
+      },
+      {
+       "w": "discontinued",
+       "n": 1,
+       "df": 5,
+       "x": 0.2366
+      },
+      {
+       "w": "apple",
+       "n": 2,
+       "df": 270,
+       "x": 0.2219
+      },
+      {
+       "w": "imagewriter",
+       "n": 1,
+       "df": 10,
+       "x": 0.2198
+      },
+      {
+       "w": "talk",
+       "n": 2,
+       "df": 315,
+       "x": 0.2147
+      },
+      {
+       "w": "appletalk",
+       "n": 1,
+       "df": 15,
+       "x": 0.2094
+      },
+      {
+       "w": "net",
+       "n": 2,
+       "df": 418,
+       "x": 0.2015
+      }
+     ],
+     "nearest": [
+      {
+       "subject": "Appletalk hookup?",
+       "forum": "comp.sys.ibm.pc.hardware",
+       "cos": 0.188
+      },
+      {
+       "subject": "24-pin Printer For Sale as well",
+       "forum": "misc.forsale",
+       "cos": 0.187
+      },
+      {
+       "subject": "Re: Grayscale Printer",
+       "forum": "comp.graphics",
+       "cos": 0.183
+      }
+     ]
+    }
+   }
+  },
+  {
+   "post": 444,
+   "forum": "comp.sys.mac.hardware",
+   "text": "Powerbook-sleep-init-request\nSomeone asked me if I there existed an init that removes the dialog\n   \"you're gonna disconnect all apletalk users \" or something\nlike that, when the powerbook falls asleep.\n\nHe said he was sure that such a thing existed, and he thought it was\nfreeware. Can anyone help me out with this ?\n\nBTW : Where can I get Switch-a-roo, or something of the kind,\nbut schareware or freeware ?",
+   "unknown": [
+    "apletalk",
+    "roo",
+    "schareware"
+   ],
+   "schemes": {
+    "counts": {
+     "top": [
+      {
+       "w": "the",
+       "n": 3,
+       "df": 9887,
+       "x": 3.0
+      },
+      {
+       "w": "that",
+       "n": 3,
+       "df": 6858,
+       "x": 3.0
+      },
+      {
+       "w": "or",
+       "n": 3,
+       "df": 4542,
+       "x": 3.0
+      },
+      {
+       "w": "he",
+       "n": 3,
+       "df": 1802,
+       "x": 3.0
+      },
+      {
+       "w": "powerbook",
+       "n": 2,
+       "df": 39,
+       "x": 2.0
+      },
+      {
+       "w": "me",
+       "n": 2,
+       "df": 2866,
+       "x": 2.0
+      },
+      {
+       "w": "something",
+       "n": 2,
+       "df": 1147,
+       "x": 2.0
+      },
+      {
+       "w": "was",
+       "n": 2,
+       "df": 3754,
+       "x": 2.0
+      },
+      {
+       "w": "can",
+       "n": 2,
+       "df": 4011,
+       "x": 2.0
+      },
+      {
+       "w": "existed",
+       "n": 2,
+       "df": 50,
+       "x": 2.0
+      }
+     ],
+     "nearest": [
+      {
+       "subject": "Re: some thoughts.",
+       "forum": "alt.atheism",
+       "cos": 0.499
+      },
+      {
+       "subject": "Accounts of Anti-Armenian Human Right Violations in Azerbaijan #012",
+       "forum": "talk.politics.mideast",
+       "cos": 0.494
+      },
+      {
+       "subject": "Accounts of Anti-Armenian Human Right Violations in Azerbaijan #008 A",
+       "forum": "talk.politics.mideast",
+       "cos": 0.491
+      }
+     ]
+    },
+    "tfidf": {
+     "top": [
+      {
+       "w": "init",
+       "n": 2,
+       "df": 14,
+       "x": 0.3724
+      },
+      {
+       "w": "freeware",
+       "n": 2,
+       "df": 20,
+       "x": 0.3559
+      },
+      {
+       "w": "powerbook",
+       "n": 2,
+       "df": 39,
+       "x": 0.3245
+      },
+      {
+       "w": "existed",
+       "n": 2,
+       "df": 50,
+       "x": 0.3126
+      },
+      {
+       "w": "he",
+       "n": 3,
+       "df": 1802,
+       "x": 0.2078
+      },
+      {
+       "w": "removes",
+       "n": 1,
+       "df": 7,
+       "x": 0.2015
+      },
+      {
+       "w": "disconnect",
+       "n": 1,
+       "df": 13,
+       "x": 0.1879
+      },
+      {
+       "w": "asleep",
+       "n": 1,
+       "df": 19,
+       "x": 0.1792
+      },
+      {
+       "w": "dialog",
+       "n": 1,
+       "df": 35,
+       "x": 0.1648
+      },
+      {
+       "w": "something",
+       "n": 2,
+       "df": 1147,
+       "x": 0.1606
+      }
+     ],
+     "nearest": [
+      {
+       "subject": "disabling all power management interrupts",
+       "forum": "comp.sys.mac.hardware",
+       "cos": 0.301
+      },
+      {
+       "subject": "Accounts of Anti-Armenian Human Right Violations in Azerbaijan #012",
+       "forum": "talk.politics.mideast",
+       "cos": 0.211
+      },
+      {
+       "subject": "Re: some thoughts.",
+       "forum": "alt.atheism",
+       "cos": 0.21
+      }
+     ]
+    },
+    "router": {
+     "top": [
+      {
+       "w": "init",
+       "n": 2,
+       "df": 14,
+       "x": 0.3505
+      },
+      {
+       "w": "freeware",
+       "n": 2,
+       "df": 20,
+       "x": 0.3351
+      },
+      {
+       "w": "powerbook",
+       "n": 2,
+       "df": 39,
+       "x": 0.3055
+      },
+      {
+       "w": "existed",
+       "n": 2,
+       "df": 50,
+       "x": 0.2943
+      },
+      {
+       "w": "removes",
+       "n": 1,
+       "df": 7,
+       "x": 0.2241
+      },
+      {
+       "w": "disconnect",
+       "n": 1,
+       "df": 13,
+       "x": 0.2089
+      },
+      {
+       "w": "asleep",
+       "n": 1,
+       "df": 19,
+       "x": 0.1992
+      },
+      {
+       "w": "dialog",
+       "n": 1,
+       "df": 35,
+       "x": 0.1833
+      },
+      {
+       "w": "falls",
+       "n": 1,
+       "df": 55,
+       "x": 0.1713
+      },
+      {
+       "w": "sleep",
+       "n": 1,
+       "df": 62,
+       "x": 0.1681
+      }
+     ],
+     "nearest": [
+      {
+       "subject": "disabling all power management interrupts",
+       "forum": "comp.sys.mac.hardware",
+       "cos": 0.227
+      },
+      {
+       "subject": "Re: PowerBook Batteries",
+       "forum": "comp.sys.mac.hardware",
+       "cos": 0.196
+      },
+      {
+       "subject": "DES: init vector as additional key?",
+       "forum": "sci.crypt",
+       "cos": 0.154
+      }
+     ]
+    }
+   }
+  },
+  {
+   "post": 1659,
+   "forum": "comp.sys.ibm.pc.hardware",
+   "text": "Need specs for a Western Digital IDE HD\nA friend of mine needs spec for a used hard drive he just got:\nIt is a Western Digital, IDE, 340 meg\nwith 1010 cylinders and 12 heads.  We believe the model number is\nwd2340A, but we can't be sure.  It is a 12 ms, 3.5\" model.\n\nAny info would be appreciated, either from somone who knows, or maybe\nwestern digitals phone number\n\nThanks",
+   "unknown": [
+    "digitals",
+    "wd2340a"
+   ],
+   "schemes": {
+    "counts": {
+     "top": [
+      {
+       "w": "western",
+       "n": 3,
+       "df": 126,
+       "x": 3.0
+      },
+      {
+       "w": "is",
+       "n": 3,
+       "df": 7439,
+       "x": 3.0
+      },
+      {
+       "w": "number",
+       "n": 2,
+       "df": 720,
+       "x": 2.0
+      },
+      {
+       "w": "we",
+       "n": 2,
+       "df": 2226,
+       "x": 2.0
+      },
+      {
+       "w": "ide",
+       "n": 2,
+       "df": 122,
+       "x": 2.0
+      },
+      {
+       "w": "it",
+       "n": 2,
+       "df": 7001,
+       "x": 2.0
+      },
+      {
+       "w": "model",
+       "n": 2,
+       "df": 238,
+       "x": 2.0
+      },
+      {
+       "w": "digital",
+       "n": 2,
+       "df": 160,
+       "x": 2.0
+      },
+      {
+       "w": "12",
+       "n": 2,
+       "df": 455,
+       "x": 2.0
+      },
+      {
+       "w": "be",
+       "n": 2,
+       "df": 5215,
+       "x": 2.0
+      }
+     ],
+     "nearest": [
+      {
+       "subject": "Re: Societally acceptable behavior",
+       "forum": "alt.atheism",
+       "cos": 0.406
+      },
+      {
+       "subject": "Re: Atheist's views on Christianity (was: Re: \"Accepting Jeesus in your heart...\") - soc.religion.christian #16242",
+       "forum": "soc.religion.christian",
+       "cos": 0.393
+      },
+      {
+       "subject": "Re: some thoughts.",
+       "forum": "alt.atheism",
+       "cos": 0.389
+      }
+     ]
+    },
+    "tfidf": {
+     "top": [
+      {
+       "w": "western",
+       "n": 3,
+       "df": 126,
+       "x": 0.4136
+      },
+      {
+       "w": "ide",
+       "n": 2,
+       "df": 122,
+       "x": 0.2773
+      },
+      {
+       "w": "digital",
+       "n": 2,
+       "df": 160,
+       "x": 0.2638
+      },
+      {
+       "w": "model",
+       "n": 2,
+       "df": 238,
+       "x": 0.244
+      },
+      {
+       "w": "somone",
+       "n": 1,
+       "df": 5,
+       "x": 0.2145
+      },
+      {
+       "w": "12",
+       "n": 2,
+       "df": 455,
+       "x": 0.2115
+      },
+      {
+       "w": "1010",
+       "n": 1,
+       "df": 8,
+       "x": 0.2043
+      },
+      {
+       "w": "340",
+       "n": 1,
+       "df": 11,
+       "x": 0.1971
+      },
+      {
+       "w": "number",
+       "n": 2,
+       "df": 720,
+       "x": 0.1885
+      },
+      {
+       "w": "cylinders",
+       "n": 1,
+       "df": 18,
+       "x": 0.1856
+      }
+     ],
+     "nearest": [
+      {
+       "subject": "Re: Need phone number for Western Digital (ESDI problem)",
+       "forum": "comp.sys.ibm.pc.hardware",
+       "cos": 0.372
+      },
+      {
+       "subject": "Western Digital HD info needed",
+       "forum": "comp.sys.ibm.pc.hardware",
+       "cos": 0.287
+      },
+      {
+       "subject": "Hard Drive for sale!",
+       "forum": "misc.forsale",
+       "cos": 0.258
+      }
+     ]
+    },
+    "router": {
+     "top": [
+      {
+       "w": "western",
+       "n": 3,
+       "df": 126,
+       "x": 0.3204
+      },
+      {
+       "w": "ide",
+       "n": 2,
+       "df": 122,
+       "x": 0.26
+      },
+      {
+       "w": "digital",
+       "n": 2,
+       "df": 160,
+       "x": 0.2473
+      },
+      {
+       "w": "somone",
+       "n": 1,
+       "df": 5,
+       "x": 0.2376
+      },
+      {
+       "w": "model",
+       "n": 2,
+       "df": 238,
+       "x": 0.2287
+      },
+      {
+       "w": "1010",
+       "n": 1,
+       "df": 8,
+       "x": 0.2263
+      },
+      {
+       "w": "340",
+       "n": 1,
+       "df": 11,
+       "x": 0.2183
+      },
+      {
+       "w": "cylinders",
+       "n": 1,
+       "df": 18,
+       "x": 0.2055
+      },
+      {
+       "w": "12",
+       "n": 2,
+       "df": 455,
+       "x": 0.1983
+      },
+      {
+       "w": "number",
+       "n": 2,
+       "df": 720,
+       "x": 0.1767
+      }
+     ],
+     "nearest": [
+      {
+       "subject": "Re: Need phone number for Western Digital (ESDI problem)",
+       "forum": "comp.sys.ibm.pc.hardware",
+       "cos": 0.302
+      },
+      {
+       "subject": "Hard Drive for sale!",
+       "forum": "misc.forsale",
+       "cos": 0.246
+      },
+      {
+       "subject": "Re: IDE Low Level Format",
+       "forum": "comp.sys.ibm.pc.hardware",
+       "cos": 0.22
+      }
+     ]
+    }
+   }
+  }
+ ]
+}

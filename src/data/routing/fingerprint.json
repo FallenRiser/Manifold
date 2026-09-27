@@ -1,0 +1,246 @@
+{
+ "forum": "soc.religion.christian",
+ "specimen": {
+  "post": 3347,
+  "lines": [
+   [
+    {
+     "part": "meta",
+     "text": "From: p••••••@ecr.mu.oz.au (J••••••••••••• L••)"
+    }
+   ],
+   [
+    {
+     "part": "subject",
+     "text": "Subject: 25 words or less...."
+    }
+   ],
+   [
+    {
+     "part": "meta",
+     "text": "Organization: Computer Science, University of Melbourne, Australia"
+    }
+   ],
+   [
+    {
+     "part": "meta",
+     "text": "Lines: 13"
+    }
+   ],
+   [],
+   [
+    {
+     "part": "body",
+     "text": "Everywhere we see and hear about christianity (due to its",
+     "pen": false
+    }
+   ],
+   [
+    {
+     "part": "body",
+     "text": "evangalistic nature). Witnessing, spreading the gospel, etc.",
+     "pen": false
+    }
+   ],
+   [
+    {
+     "part": "body",
+     "text": "But what I want to know is...",
+     "pen": false
+    }
+   ],
+   [
+    {
+     "part": "body",
+     "text": "",
+     "pen": false
+    }
+   ],
+   [
+    {
+     "part": "body",
+     "text": "\"Why should I (or anyone else) become a Christian?\"",
+     "pen": false
+    }
+   ],
+   [
+    {
+     "part": "body",
+     "text": "",
+     "pen": false
+    }
+   ],
+   [
+    {
+     "part": "body",
+     "text": "(In twenty five words or less).",
+     "pen": false
+    }
+   ],
+   [
+    {
+     "part": "body",
+     "text": "",
+     "pen": false
+    }
+   ],
+   [
+    {
+     "part": "body",
+     "text": "\tZeros and Ones will take us there....",
+     "pen": false
+    }
+   ],
+   [
+    {
+     "part": "body",
+     "text": "\tpeace. p••••••. 1993.",
+     "pen": false
+    }
+   ],
+   [
+    {
+     "part": "body",
+     "text": "",
+     "pen": false
+    }
+   ],
+   [
+    {
+     "part": "body",
+     "text": "[We've had enough discussions about evidence recently that it would",
+     "pen": true
+    }
+   ],
+   [
+    {
+     "part": "body",
+     "text": "probably be best to respond via email.  --c••]",
+     "pen": true
+    }
+   ]
+  ]
+ },
+ "top": [
+  {
+   "w": "god",
+   "x": 1.962,
+   "note": 0.031,
+   "mod": false
+  },
+  {
+   "w": "church",
+   "x": 1.928,
+   "note": 0.092,
+   "mod": false
+  },
+  {
+   "w": "christians",
+   "x": 1.884,
+   "note": 0.114,
+   "mod": false
+  },
+  {
+   "w": "c••",
+   "x": 1.849,
+   "note": 0.964,
+   "mod": true
+  },
+  {
+   "w": "arrogance",
+   "x": 1.488,
+   "note": 0.063,
+   "mod": false
+  },
+  {
+   "w": "christianity",
+   "x": 1.382,
+   "note": 0.037,
+   "mod": false
+  },
+  {
+   "w": "christ",
+   "x": 1.356,
+   "note": 0.041,
+   "mod": false
+  },
+  {
+   "w": "verse",
+   "x": 1.347,
+   "note": 0.0,
+   "mod": false
+  },
+  {
+   "w": "hell",
+   "x": 1.296,
+   "note": 0.03,
+   "mod": false
+  },
+  {
+   "w": "easter",
+   "x": 1.242,
+   "note": 0.03,
+   "mod": false
+  },
+  {
+   "w": "catholic",
+   "x": 1.192,
+   "note": 0.089,
+   "mod": false
+  },
+  {
+   "w": "sin",
+   "x": 1.168,
+   "note": 0.024,
+   "mod": false
+  },
+  {
+   "w": "resurrection",
+   "x": 1.087,
+   "note": 0.084,
+   "mod": false
+  },
+  {
+   "w": "married",
+   "x": 1.078,
+   "note": 0.015,
+   "mod": false
+  },
+  {
+   "w": "christian",
+   "x": 1.075,
+   "note": 0.065,
+   "mod": false
+  },
+  {
+   "w": "accepting",
+   "x": 1.069,
+   "note": 0.024,
+   "mod": false
+  },
+  {
+   "w": "scripture",
+   "x": 1.061,
+   "note": 0.026,
+   "mod": false
+  },
+  {
+   "w": "environmentalism",
+   "x": 1.043,
+   "note": 0.0,
+   "mod": false
+  },
+  {
+   "w": "faith",
+   "x": 1.031,
+   "note": 0.015,
+   "mod": false
+  },
+  {
+   "w": "jesus",
+   "x": 1.024,
+   "note": 0.097,
+   "mod": false
+  }
+ ]
+}

@@ -1,0 +1,311 @@
+{
+ "n": 2527,
+ "median": 92,
+ "p10": 31,
+ "p90": 448,
+ "max": 9395,
+ "empty": 23,
+ "empty_right": 14,
+ "bands": [
+  {
+   "label": "under 10",
+   "lo": 0,
+   "hi": 10,
+   "n": 36,
+   "acc": 0.5,
+   "ci": [
+    0.3333,
+    0.6667
+   ],
+   "margin": 0.321,
+   "sample": [
+    {
+     "subject": "subscribe",
+     "forum": "comp.windows.x",
+     "routed": "comp.windows.x",
+     "words": 9
+    },
+    {
+     "subject": "NetVis for Xfree86??",
+     "forum": "comp.windows.x",
+     "routed": "comp.windows.x",
+     "words": 3
+    },
+    {
+     "subject": "subscrive",
+     "forum": "comp.windows.x",
+     "routed": "comp.graphics",
+     "words": 8
+    },
+    {
+     "subject": "test (please ignore)",
+     "forum": "sci.space",
+     "routed": "misc.forsale",
+     "words": 3
+    },
+    {
+     "subject": "quality management",
+     "forum": "sci.med",
+     "routed": "sci.med",
+     "words": 2
+    },
+    {
+     "subject": "how",
+     "forum": "comp.os.ms-windows.misc",
+     "routed": "comp.windows.x",
+     "words": 1
+    }
+   ]
+  },
+  {
+   "label": "10-19",
+   "lo": 10,
+   "hi": 20,
+   "n": 54,
+   "acc": 0.7593,
+   "ci": [
+    0.6481,
+    0.8704
+   ],
+   "margin": 0.428,
+   "sample": [
+    {
+     "subject": "Bitmaps of team logos",
+     "forum": "rec.sport.baseball",
+     "routed": "rec.sport.baseball",
+     "words": 19
+    },
+    {
+     "subject": "What is 3dO?",
+     "forum": "comp.graphics",
+     "routed": "comp.graphics",
+     "words": 13
+    },
+    {
+     "subject": "Carpeting in Bosnia",
+     "forum": "talk.politics.misc",
+     "routed": "talk.politics.mideast",
+     "words": 16
+    },
+    {
+     "subject": "WANTED: technics 1200 turntables",
+     "forum": "misc.forsale",
+     "routed": "misc.forsale",
+     "words": 14
+    },
+    {
+     "subject": "Natural Alternatives to Estrogen",
+     "forum": "sci.med",
+     "routed": "sci.med",
+     "words": 14
+    },
+    {
+     "subject": "Wanted: fax machine",
+     "forum": "misc.forsale",
+     "routed": "misc.forsale",
+     "words": 10
+    }
+   ]
+  },
+  {
+   "label": "20-39",
+   "lo": 20,
+   "hi": 40,
+   "n": 303,
+   "acc": 0.7723,
+   "ci": [
+    0.7228,
+    0.8218
+   ],
+   "margin": 0.498,
+   "sample": [
+    {
+     "subject": "24bit on LCII?",
+     "forum": "comp.sys.mac.hardware",
+     "routed": "comp.sys.mac.hardware",
+     "words": 36
+    },
+    {
+     "subject": "Newsgroup archive",
+     "forum": "comp.os.ms-windows.misc",
+     "routed": "comp.os.ms-windows.misc",
+     "words": 25
+    },
+    {
+     "subject": "Nikkor 70-210 AF for sale:$175",
+     "forum": "misc.forsale",
+     "routed": "misc.forsale",
+     "words": 20
+    },
+    {
+     "subject": "CD300 Audio CD SCSI commands",
+     "forum": "comp.sys.mac.hardware",
+     "routed": "comp.sys.mac.hardware",
+     "words": 39
+    },
+    {
+     "subject": "surface/contour plot",
+     "forum": "comp.graphics",
+     "routed": "comp.graphics",
+     "words": 35
+    },
+    {
+     "subject": "Any utility that let you remap the keyboard under MS Win?",
+     "forum": "comp.os.ms-windows.misc",
+     "routed": "comp.os.ms-windows.misc",
+     "words": 26
+    }
+   ]
+  },
+  {
+   "label": "40-79",
+   "lo": 40,
+   "hi": 80,
+   "n": 673,
+   "acc": 0.8143,
+   "ci": [
+    0.786,
+    0.8425
+   ],
+   "margin": 0.607,
+   "sample": [
+    {
+     "subject": "DCE RPC, Threads, X/Motif Clients",
+     "forum": "comp.windows.x",
+     "routed": "comp.windows.x",
+     "words": 40
+    },
+    {
+     "subject": "Need Modem & Software Recommendation",
+     "forum": "comp.sys.mac.hardware",
+     "routed": "comp.sys.mac.hardware",
+     "words": 47
+    },
+    {
+     "subject": "ICN (MSDOS) -> PBM/PGM/PPM format?",
+     "forum": "comp.graphics",
+     "routed": "comp.graphics",
+     "words": 44
+    },
+    {
+     "subject": "NASA budget and STS costs",
+     "forum": "sci.space",
+     "routed": "sci.space",
+     "words": 46
+    },
+    {
+     "subject": "XV 3.0 author is on vacation till May 10 or so",
+     "forum": "comp.windows.x",
+     "routed": "comp.graphics",
+     "words": 47
+    },
+    {
+     "subject": "Montreal Canadiens",
+     "forum": "rec.sport.hockey",
+     "routed": "rec.sport.hockey",
+     "words": 47
+    }
+   ]
+  },
+  {
+   "label": "80-159",
+   "lo": 80,
+   "hi": 160,
+   "n": 735,
+   "acc": 0.8327,
+   "ci": [
+    0.8068,
+    0.8599
+   ],
+   "margin": 0.67,
+   "sample": [
+    {
+     "subject": "Isolation amplifiers for EEG/ECG *cheap*",
+     "forum": "sci.med",
+     "routed": "sci.electronics",
+     "words": 81
+    },
+    {
+     "subject": "moon image in weather sat image",
+     "forum": "sci.space",
+     "routed": "comp.graphics",
+     "words": 97
+    },
+    {
+     "subject": "Internet servers for university[D",
+     "forum": "comp.sys.ibm.pc.hardware",
+     "routed": "comp.sys.ibm.pc.hardware",
+     "words": 137
+    },
+    {
+     "subject": "Radius Pivot LE card with 32bit adressing",
+     "forum": "comp.sys.mac.hardware",
+     "routed": "comp.sys.mac.hardware",
+     "words": 109
+    },
+    {
+     "subject": "NEEDED: non-interactive GIF cropper for PC",
+     "forum": "comp.graphics",
+     "routed": "comp.graphics",
+     "words": 80
+    },
+    {
+     "subject": "Mouse Systems driver for mouse control in DOS Window",
+     "forum": "comp.os.ms-windows.misc",
+     "routed": "comp.os.ms-windows.misc",
+     "words": 90
+    }
+   ]
+  },
+  {
+   "label": "160 or more",
+   "lo": 160,
+   "hi": null,
+   "n": 726,
+   "acc": 0.865,
+   "ci": [
+    0.8402,
+    0.8884
+   ],
+   "margin": 0.884,
+   "sample": [
+    {
+     "subject": "Pseudocollisions in MD5",
+     "forum": "sci.crypt",
+     "routed": "sci.crypt",
+     "words": 537
+    },
+    {
+     "subject": "JPEG image compression: Frequently Asked Questions",
+     "forum": "comp.graphics",
+     "routed": "comp.graphics",
+     "words": 9395
+    },
+    {
+     "subject": "Calder Cup schedule",
+     "forum": "rec.sport.hockey",
+     "routed": "rec.sport.hockey",
+     "words": 322
+    },
+    {
+     "subject": "XSoviet Armenia will not get away with the Turkish genocide's cover-up.",
+     "forum": "talk.politics.mideast",
+     "routed": "talk.politics.mideast",
+     "words": 669
+    },
+    {
+     "subject": "WANTED: Floppy controller that can handle multiple floppies",
+     "forum": "comp.sys.ibm.pc.hardware",
+     "routed": "comp.sys.ibm.pc.hardware",
+     "words": 160
+    },
+    {
+     "subject": "Vandalizing the sky",
+     "forum": "sci.space",
+     "routed": "sci.space",
+     "words": 193
+    }
+   ]
+  }
+ ]
+}

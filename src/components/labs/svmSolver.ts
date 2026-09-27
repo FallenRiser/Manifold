@@ -682,3 +682,804 @@ export function rbfFit(pts: Pt[], C: number, gamma: number): KernelFit {
   };
   return { ...fit, f: pts.map((p) => score(p.x, p.z)), score };
 }
+
+// ---------------------------------------------------------------------------------------------
+// Page 15: the same points in different units.
+
+/**
+ * The two moons UnitsDialLab draws. Reproduced exactly by `_units_points` in
+ * scripts/svm_cases.py, which is why there is no trig here: the half-circle is walked with the
+ * rational parameterisation ((1 - m^2), 2m) / (1 + m^2), and +, -, *, / are correctly rounded
+ * in both languages, so both walk the same bits. Lehmer generator (exact under 2^53), noise
+ * from a sum of six uniforms, rounded to three decimals.
+ */
+export function unitsPoints(n: number, seed: number, noise = 0.25): Pt[] {
+  let st = (seed % 2147483646) + 1;
+  const u = () => {
+    st = (st * 48271) % 2147483647;
+    return st / 2147483647;
+  };
+  const gauss = () => {
+    let t = 0;
+    for (let i = 0; i < 6; i += 1) t += u();
+    return (t - 3) / 1.2247;
+  };
+  const out: Pt[] = [];
+  for (let i = 0; i < n; i += 1) {
+    const y = i % 2 === 0 ? 1 : -1;
+    const t = 0.02 + 0.96 * u();
+    const m = t / (1 - t);
+    const c = (1 - m * m) / (1 + m * m);
+    const s = (2 * m) / (1 + m * m);
+    let x = y > 0 ? c : 1 - c;
+    let z = y > 0 ? s : 0.5 - s;
+    x = (x - 0.5 + gauss() * noise) / 0.87;
+    z = (z - 0.25 + gauss() * noise) / 0.5;
+    out.push({ x: Math.round(x * 1000) / 1000, z: Math.round(z * 1000) / 1000, y });
+  }
+  return out;
+}
+
+/**
+ * Page 14's SMO as a solver rather than a demonstration: always the maximal violating pair,
+ * the two-variable step in closed form, clipped to the box, stopped when the largest KKT
+ * violation falls under tol. dualFit's pass-based heuristic stops on a pass cap; on the
+ * stretched and squashed problems page 15 builds, that cap arrived 3e-4 short of the optimum
+ * and moved support vectors. This one stops when the conditions hold, not when it is tired.
+ */
+export function smoFit(
+  y: number[],
+  K: number[][],
+  C: number,
+  tol = 1e-8,
+  maxSteps = 200000,
+): { alpha: number[]; b: number; steps: number } {
+  const n = y.length;
+  const a = new Array(n).fill(0);
+  const u = new Array(n).fill(0); // sum_k a_k y_k K[k][i], kept current step by step
+  let steps = 0;
+  for (; steps < maxSteps; steps += 1) {
+    let top = -1;
+    let bot = -1;
+    for (let k = 0; k < n; k += 1) {
+      const r = y[k] - u[k];
+      const up = (y[k] > 0 && a[k] < C) || (y[k] < 0 && a[k] > 0);
+      const dn = (y[k] < 0 && a[k] < C) || (y[k] > 0 && a[k] > 0);
+      if (up && (top < 0 || r > y[top] - u[top])) top = k;
+      if (dn && (bot < 0 || r < y[bot] - u[bot])) bot = k;
+    }
+    if (top < 0 || bot < 0 || y[top] - u[top] - (y[bot] - u[bot]) < tol) break;
+    const i = top;
+    const j = bot;
+    const eta = 2 * K[i][j] - K[i][i] - K[j][j];
+    if (eta >= 0) break;
+    const [L, H] =
+      y[i] !== y[j]
+        ? [Math.max(0, a[j] - a[i]), Math.min(C, C + a[j] - a[i])]
+        : [Math.max(0, a[i] + a[j] - C), Math.min(C, a[i] + a[j])];
+    const gi = u[i] - y[i];
+    const gj = u[j] - y[j];
+    const ajRaw = Math.min(H, Math.max(L, a[j] - (y[j] * (gi - gj)) / eta));
+    // snap onto the box: a price left at C - 1e-17 by rounding still counts as movable, the
+    // same pair is picked again with no room to move, and the loop never ends.
+    const snap = (v: number) => (v < 1e-12 ? 0 : v > C - 1e-12 ? C : v);
+    const aj = snap(ajRaw);
+    const ai = snap(a[i] + y[i] * y[j] * (a[j] - aj));
+    const di = (ai - a[i]) * y[i];
+    const dj = (aj - a[j]) * y[j];
+    a[i] = ai;
+    a[j] = aj;
+    for (let k = 0; k < n; k += 1) u[k] += di * K[i][k] + dj * K[j][k];
+  }
+  // the offset: every free price puts its point exactly on the margin, so average what each
+  // one says b must be. With none free, b is anywhere in the feasible gap; take its middle.
+  let sum = 0;
+  let cnt = 0;
+  let lo = -Infinity;
+  let hi = Infinity;
+  for (let k = 0; k < n; k += 1) {
+    const r = y[k] - u[k];
+    if (a[k] > 1e-12 && a[k] < C - 1e-12) {
+      sum += r;
+      cnt += 1;
+    }
+    const up = (y[k] > 0 && a[k] < C) || (y[k] < 0 && a[k] > 0);
+    const dn = (y[k] < 0 && a[k] < C) || (y[k] > 0 && a[k] > 0);
+    if (up) lo = Math.max(lo, r);
+    if (dn) hi = Math.min(hi, r);
+  }
+  const b = cnt ? sum / cnt : (lo + hi) / 2;
+  return { alpha: a, b, steps };
+}
+
+export type RbfSmo = {
+  alpha: number[];
+  b: number;
+  steps: number;
+  /** f(x_i) on the training points. */
+  f: number[];
+  /** the decision value anywhere. */
+  score: (x: number, z: number) => number;
+};
+
+/** The default rbf SVM on smoFit: the kernel table, the solve, and the decision function. */
+export function rbfSmo(pts: Pt[], C: number, gamma: number, maxSteps = 200000): RbfSmo {
+  const n = pts.length;
+  const fit = smoFit(
+    pts.map((p) => p.y),
+    rbfGram(pts, gamma),
+    C,
+    1e-8,
+    maxSteps,
+  );
+  const score = (x: number, z: number) => {
+    let sc = fit.b;
+    for (let i = 0; i < n; i += 1) {
+      if (fit.alpha[i] <= 0) continue;
+      const dx = pts[i].x - x;
+      const dz = pts[i].z - z;
+      sc += fit.alpha[i] * pts[i].y * Math.exp(-gamma * (dx * dx + dz * dz));
+    }
+    return sc;
+  };
+  return { ...fit, f: pts.map((p) => score(p.x, p.z)), score };
+}
+
+/** The stops on UnitsDialLab's dial: what the horizontal feature is multiplied by. */
+export const UNITS_DIAL = [0.01, 0.03, 0.1, 0.3, 1, 3, 10, 30, 100];
+
+export type UnitsFit = {
+  alpha: number[];
+  b: number;
+  steps: number;
+  /** f(x_i) on the training points. */
+  f: number[];
+  /** sklearn's gamma='scale': 1 / (n_features * variance of every number in the table). */
+  gamma: number;
+  /** the horizontal feature's share of the average squared distance, var_x / (var_x + var_z). */
+  share: number;
+  /** where a point given in the drawn coordinates lands in the numbers the kernel sees. */
+  map: (x: number, z: number) => [number, number];
+  /** the decision value at a point given in the drawn coordinates. */
+  at: (x: number, z: number) => number;
+};
+
+/**
+ * Multiply the horizontal feature by k, optionally standardise (population sd, like sklearn's
+ * StandardScaler, fitted on these points only), then fit the default rbf SVM: C = 1,
+ * gamma = 'scale'. The same thing section 55 of svm_cases.py hands sklearn, solved by smoFit.
+ */
+export function unitsFit(base: Pt[], k: number, standardise: boolean): UnitsFit {
+  const n = base.length;
+  const raw = base.map((p) => [k * p.x, p.z] as [number, number]);
+  const mean = (j: 0 | 1) => raw.reduce((a, r) => a + r[j], 0) / n;
+  const mu: [number, number] = [mean(0), mean(1)];
+  const sd: [number, number] = [0, 1].map((j) =>
+    Math.sqrt(raw.reduce((a, r) => a + (r[j] - mu[j]) ** 2, 0) / n),
+  ) as [number, number];
+  const map = (x: number, z: number): [number, number] =>
+    standardise ? [(k * x - mu[0]) / sd[0], (z - mu[1]) / sd[1]] : [k * x, z];
+  const pts: Pt[] = base.map((p) => {
+    const [a, b] = map(p.x, p.z);
+    return { x: a, z: b, y: p.y };
+  });
+  let m = 0;
+  for (const p of pts) m += p.x + p.z;
+  m /= 2 * n;
+  let v = 0;
+  let vx = 0;
+  let vz = 0;
+  const mx = pts.reduce((a, p) => a + p.x, 0) / n;
+  const mz = pts.reduce((a, p) => a + p.z, 0) / n;
+  for (const p of pts) {
+    v += (p.x - m) ** 2 + (p.z - m) ** 2;
+    vx += (p.x - mx) ** 2;
+    vz += (p.z - mz) ** 2;
+  }
+  const gamma = 1 / (2 * (v / (2 * n)));
+  const fit = rbfSmo(pts, 1, gamma);
+  const score = fit.score;
+  return {
+    alpha: fit.alpha,
+    b: fit.b,
+    steps: fit.steps,
+    f: fit.f,
+    gamma,
+    share: vx / (vx + vz),
+    map,
+    at: (x: number, z: number) => {
+      const [a, b] = map(x, z);
+      return score(a, b);
+    },
+  };
+}
+
+// ---------------------------------------------------------------------------------------------
+// Page 16: the C x gamma grid.
+
+/** CGridLab's grid. The C = 10000 row is left off: its small-gamma cell takes ~1.4M SMO steps. */
+export const GRID_LAB_C = [0.01, 0.1, 1, 10, 100, 1000];
+export const GRID_LAB_G = [0.03, 0.1, 0.3, 1, 3, 10, 30, 100];
+
+/** CGridLab's points: page 15's moons generator, noisier, 80 to train on and 200 to check. */
+export const gridPoints = () => ({
+  train: unitsPoints(80, 5, 0.45),
+  val: unitsPoints(200, 6, 0.45),
+});
+
+// ---------------------------------------------------------------------------------------------
+// Page 17: many classes from a two-class machine.
+
+export type MultiLayout = "row" | "triangle";
+export type MultiKernel = "linear" | "rbf";
+export type MultiStrategy = "ovr" | "ovo";
+
+/** Where MultiClassLab puts its three classes: in a row (B sandwiched) or at a triangle's corners. */
+export const MULTI_LAYOUTS: Record<MultiLayout, [number, number][]> = {
+  row: [
+    [-2, 0],
+    [0, 0],
+    [2, 0],
+  ],
+  triangle: [
+    [0, 1.6],
+    [-1.8, -1],
+    [1.8, -1],
+  ],
+};
+export const MULTI_GAMMA = 0.5;
+export const MULTI_C = 1;
+
+/** A point with one of three classes, 0 1 2. */
+export type MPt = { x: number; z: number; c: number };
+
+/** n points per class, classes interleaved: Lehmer, six-uniform noise at unit variance, 3 dp. */
+export function multiPoints(n: number, seed: number, layout: MultiLayout, sd = 0.7): MPt[] {
+  let st = (seed % 2147483646) + 1;
+  const u = () => {
+    st = (st * 48271) % 2147483647;
+    return st / 2147483647;
+  };
+  const gauss = () => {
+    let t = 0;
+    for (let i = 0; i < 6; i += 1) t += u();
+    return (t - 3) / Math.SQRT1_2;
+  };
+  const out: MPt[] = [];
+  for (let i = 0; i < 3 * n; i += 1) {
+    const c = i % 3;
+    const [cx, cz] = MULTI_LAYOUTS[layout][c];
+    const x = cx + gauss() * sd;
+    const z = cz + gauss() * sd;
+    out.push({ x: Math.floor(x * 1000 + 0.5) / 1000, z: Math.floor(z * 1000 + 0.5) / 1000, c });
+  }
+  return out;
+}
+
+/** MultiClassLab's points: 30 per class to train on, 200 per class to check. */
+export const multiData = (layout: MultiLayout) => ({
+  train: multiPoints(30, 7, layout),
+  val: multiPoints(200, 8, layout),
+});
+
+export type BinaryModel = {
+  /** the class on the +1 side. */
+  pos: number;
+  /** the class on the -1 side; null means "every other class". */
+  neg: number | null;
+  /** which training points this model was fitted on. */
+  idx: number[];
+  alpha: number[];
+  b: number;
+  steps: number;
+  nsv: number;
+  /** f on its own training points. */
+  f: number[];
+  score: (x: number, z: number) => number;
+};
+
+const kern = (k: MultiKernel, ax: number, az: number, bx: number, bz: number) => {
+  if (k === "linear") return ax * bx + az * bz;
+  const dx = ax - bx;
+  const dz = az - bz;
+  return Math.exp(-MULTI_GAMMA * (dx * dx + dz * dz));
+};
+
+/** One binary SVM on page 14's smoFit: `pos` against `neg`, or against everything else. */
+export function binaryFit(
+  train: MPt[],
+  k: MultiKernel,
+  pos: number,
+  neg: number | null,
+  maxSteps = 200000,
+): BinaryModel {
+  const idx: number[] = [];
+  train.forEach((p, i) => {
+    if (neg === null || p.c === pos || p.c === neg) idx.push(i);
+  });
+  const P = idx.map((i) => train[i]);
+  const y = P.map((p) => (p.c === pos ? 1 : -1));
+  const K = P.map((p) => P.map((q) => kern(k, p.x, p.z, q.x, q.z)));
+  const fit = smoFit(y, K, MULTI_C, 1e-8, maxSteps);
+  const score = (x: number, z: number) => {
+    let s = fit.b;
+    for (let i = 0; i < P.length; i += 1) {
+      if (fit.alpha[i] <= 0) continue;
+      s += fit.alpha[i] * y[i] * kern(k, P[i].x, P[i].z, x, z);
+    }
+    return s;
+  };
+  return {
+    pos,
+    neg,
+    idx,
+    ...fit,
+    nsv: fit.alpha.filter((a) => a > 1e-9).length,
+    f: P.map((p) => score(p.x, p.z)),
+    score,
+  };
+}
+
+export type MultiFit = {
+  models: BinaryModel[];
+  /** the predicted class. OvR: the largest score. OvO: the most duels won, first class on a tie. */
+  predict: (x: number, z: number) => number;
+  /** false where the rule had no clean answer: OvR with no or several models saying "mine",
+   *  OvO with every class on one win. */
+  clean: (x: number, z: number) => boolean;
+};
+
+export const MULTI_PAIRS: [number, number][] = [
+  [0, 1],
+  [0, 2],
+  [1, 2],
+];
+
+export function multiFit(train: MPt[], k: MultiKernel, s: MultiStrategy): MultiFit {
+  if (s === "ovr") {
+    const models = [0, 1, 2].map((c) => binaryFit(train, k, c, null));
+    const scores = (x: number, z: number) => models.map((m) => m.score(x, z));
+    return {
+      models,
+      predict: (x, z) => {
+        const f = scores(x, z);
+        let best = 0;
+        for (let c = 1; c < 3; c += 1) if (f[c] > f[best]) best = c;
+        return best;
+      },
+      clean: (x, z) => scores(x, z).filter((v) => v > 0).length === 1,
+    };
+  }
+  const models = MULTI_PAIRS.map(([a, b]) => binaryFit(train, k, a, b));
+  const votes = (x: number, z: number) => {
+    const v = [0, 0, 0];
+    models.forEach((m) => {
+      v[m.score(x, z) > 0 ? m.pos : (m.neg as number)] += 1;
+    });
+    return v;
+  };
+  return {
+    models,
+    predict: (x, z) => {
+      const v = votes(x, z);
+      let best = 0;
+      for (let c = 1; c < 3; c += 1) if (v[c] > v[best]) best = c;
+      return best;
+    },
+    clean: (x, z) => Math.max(...votes(x, z)) > 1,
+  };
+}
+
+// ---------------------------------------------------------------------------------------------
+// Page 18: probabilities from an SVM.
+
+/** PlattLab's C dial. gamma stays at 1; the points are CGridLab's. */
+export const PLATT_C = [0.01, 0.03, 0.1, 0.3, 1, 3, 10, 100, 1000];
+export const PLATT_GAMMA = 1;
+
+/** Platt's sigmoid, P(y = +1 | f) = 1 / (1 + exp(A f + B)). */
+export const sigmoidAt = (f: number, A: number, B: number) => {
+  const z = A * f + B;
+  return z >= 0 ? Math.exp(-z) / (1 + Math.exp(-z)) : 1 / (1 + Math.exp(z));
+};
+
+/**
+ * Fit A and B by Newton's method on Platt's smoothed targets -- (N+ + 1)/(N+ + 2) for a
+ * positive, 1/(N- + 2) for a negative -- the cross-entropy libsvm and sklearn both minimise.
+ * Two parameters and a convex loss, so Newton with a backtracking line search reaches the
+ * optimum in a handful of steps. Returns the loss at the optimum too, for the guard to compare.
+ */
+export function plattFit(f: number[], y: number[]): { A: number; B: number; loss: number } {
+  const n = f.length;
+  let np = 0;
+  for (const v of y) if (v > 0) np += 1;
+  const nn = n - np;
+  const hi = (np + 1) / (np + 2);
+  const lo = 1 / (nn + 2);
+  const t = y.map((v) => (v > 0 ? hi : lo));
+  // loss with z = A f + B, p = 1/(1+e^z): sum t log(1+e^-z)... written stably
+  const loss = (A: number, B: number) => {
+    let s = 0;
+    for (let i = 0; i < n; i += 1) {
+      const z = A * f[i] + B;
+      // -t log p - (1-t) log(1-p), p = 1/(1+e^z)
+      s += z >= 0 ? t[i] * z + Math.log(1 + Math.exp(-z)) : (t[i] - 1) * z + Math.log(1 + Math.exp(z));
+    }
+    return s;
+  };
+  let A = 0;
+  let B = Math.log((nn + 1) / (np + 1));
+  let L = loss(A, B);
+  for (let it = 0; it < 200; it += 1) {
+    let gA = 0;
+    let gB = 0;
+    let h11 = 1e-12;
+    let h22 = 1e-12;
+    let h21 = 0;
+    for (let i = 0; i < n; i += 1) {
+      const p = sigmoidAt(f[i], A, B);
+      const d1 = t[i] - p; // dL/dz
+      const d2 = p * (1 - p);
+      gA += f[i] * d1;
+      gB += d1;
+      h11 += f[i] * f[i] * d2;
+      h22 += d2;
+      h21 += f[i] * d2;
+    }
+    if (Math.abs(gA) < 1e-11 && Math.abs(gB) < 1e-11) break;
+    const det = h11 * h22 - h21 * h21;
+    const dA = -(h22 * gA - h21 * gB) / det;
+    const dB = -(-h21 * gA + h11 * gB) / det;
+    const slope = gA * dA + gB * dB;
+    let step = 1;
+    let moved = false;
+    while (step >= 1e-12) {
+      const nA = A + step * dA;
+      const nB = B + step * dB;
+      const nL = loss(nA, nB);
+      if (nL <= L + 1e-4 * step * slope) {
+        A = nA;
+        B = nB;
+        L = nL;
+        moved = true;
+        break;
+      }
+      step /= 2;
+    }
+    if (!moved) break;
+  }
+  return { A, B, loss: L };
+}
+
+export type PlattStop = {
+  C: number;
+  fit: RbfSmo;
+  /** the model's own scores for its 80 training points. */
+  ft: number[];
+  /** each training point scored by a model fitted on the other four fifths (fold = i % 5). */
+  fcv: number[];
+  /** scores for the 200 new points. */
+  fv: number[];
+  cvSteps: number[];
+  /** each fold's prices, over the 64 points it was fitted on. */
+  cvAlpha: number[][];
+};
+
+/** One stop on PlattLab's dial: the SVM, its training scores, held-out scores, new-point scores. */
+export function plattStop(train: Pt[], val: Pt[], C: number): PlattStop {
+  const fit = rbfSmo(train, C, PLATT_GAMMA);
+  const fcv = new Array(train.length).fill(0);
+  const cvSteps: number[] = [];
+  const cvAlpha: number[][] = [];
+  for (let k = 0; k < 5; k += 1) {
+    const inFit = train.filter((_, i) => i % 5 !== k);
+    const m = rbfSmo(inFit, C, PLATT_GAMMA);
+    cvSteps.push(m.steps);
+    cvAlpha.push(m.alpha);
+    train.forEach((p, i) => {
+      if (i % 5 === k) fcv[i] = m.score(p.x, p.z);
+    });
+  }
+  return { C, fit, ft: fit.f, fcv, fv: val.map((p) => fit.score(p.x, p.z)), cvSteps, cvAlpha };
+}
+
+// ---------------------------------------------------------------------------------------------
+// Page 19: SVM vs logistic regression vs forest, with useless features added.
+
+/** NoiseFeatureLab's dial: how many pure-noise columns sit next to the two real ones. */
+export const NOISE_K = [0, 1, 2, 5, 10, 20, 50];
+
+/** k-at-most-50 noise columns: Lehmer, six-uniform noise at unit variance, 3 dp. */
+export function noiseColumns(n: number, k: number, seed: number): number[][] {
+  let st = (seed % 2147483646) + 1;
+  const u = () => {
+    st = (st * 48271) % 2147483647;
+    return st / 2147483647;
+  };
+  const out: number[][] = [];
+  for (let i = 0; i < n; i += 1) {
+    const row: number[] = [];
+    for (let j = 0; j < k; j += 1) {
+      let t = 0;
+      for (let m = 0; m < 6; m += 1) t += u();
+      row.push(Math.floor(((t - 3) / Math.SQRT1_2) * 1000 + 0.5) / 1000);
+    }
+    out.push(row);
+  }
+  return out;
+}
+
+/** The lab's data: page 15's moons (200 to train, 400 to check) and 50 noise columns each. */
+export const noiseData = () => ({
+  train: unitsPoints(200, 21),
+  val: unitsPoints(400, 22),
+  extraTrain: noiseColumns(200, 50, 1021),
+  extraVal: noiseColumns(400, 50, 1022),
+});
+
+/** Stack the two real features with the first k noise columns and standardise on the train set. */
+export function noiseMatrix(k: number) {
+  const { train, val, extraTrain, extraVal } = noiseData();
+  const rows = (P: Pt[], E: number[][]) => P.map((p, i) => [p.x, p.z, ...E[i].slice(0, k)]);
+  const A = rows(train, extraTrain);
+  const B = rows(val, extraVal);
+  const d = 2 + k;
+  const mu = new Array(d).fill(0);
+  const sd = new Array(d).fill(0);
+  for (const r of A) for (let j = 0; j < d; j += 1) mu[j] += r[j] / A.length;
+  for (const r of A) for (let j = 0; j < d; j += 1) sd[j] += (r[j] - mu[j]) ** 2 / A.length;
+  for (let j = 0; j < d; j += 1) sd[j] = Math.sqrt(sd[j]) || 1;
+  const z = (M: number[][]) => M.map((r) => r.map((v, j) => (v - mu[j]) / sd[j]));
+  const As = z(A);
+  let m = 0;
+  let v = 0;
+  for (const r of As) for (const x of r) m += x;
+  m /= As.length * d;
+  for (const r of As) for (const x of r) v += (x - m) ** 2;
+  v /= As.length * d;
+  return {
+    A: As,
+    B: z(B),
+    yA: train.map((p) => p.y),
+    yB: val.map((p) => p.y),
+    // sklearn's gamma='scale': 1 / (features x variance of every entry)
+    gamma: 1 / (d * v),
+    mu,
+    sd,
+  };
+}
+
+/** The default rbf SVM in any number of dimensions, on page 14's smoFit. */
+export function rbfSmoD(A: number[][], y: number[], C: number, gamma: number) {
+  const n = A.length;
+  const K = A.map((a) =>
+    A.map((b) => {
+      let s = 0;
+      for (let j = 0; j < a.length; j += 1) s += (a[j] - b[j]) ** 2;
+      return Math.exp(-gamma * s);
+    }),
+  );
+  const fit = smoFit(y, K, C, 1e-8, 200000);
+  const score = (x: number[]) => {
+    let s = fit.b;
+    for (let i = 0; i < n; i += 1) {
+      if (fit.alpha[i] <= 0) continue;
+      let d2 = 0;
+      for (let j = 0; j < x.length; j += 1) d2 += (A[i][j] - x[j]) ** 2;
+      s += fit.alpha[i] * y[i] * Math.exp(-gamma * d2);
+    }
+    return s;
+  };
+  return { ...fit, K, f: A.map((a) => score(a)), score };
+}
+
+/**
+ * sklearn's LogisticRegression at its defaults: minimise (1/2)|w|^2 + C sum log(1 + e^{-y(w.x+b)})
+ * with the intercept unpenalised. Convex and smooth, so Newton's method with a backtracking line
+ * search lands on the same optimum lbfgs does, only more exactly.
+ */
+export function logregFit(A: number[][], y: number[], C = 1) {
+  const n = A.length;
+  const d = A[0].length;
+  const th = new Array(d + 1).fill(0); // w..., b
+  const lin = (t: number[], x: number[]) => {
+    let s = t[d];
+    for (let j = 0; j < d; j += 1) s += t[j] * x[j];
+    return s;
+  };
+  const obj = (t: number[]) => {
+    let s = 0;
+    for (let j = 0; j < d; j += 1) s += 0.5 * t[j] * t[j];
+    for (let i = 0; i < n; i += 1) {
+      const m = y[i] * lin(t, A[i]);
+      s += C * (m > 0 ? Math.log(1 + Math.exp(-m)) : -m + Math.log(1 + Math.exp(m)));
+    }
+    return s;
+  };
+  let F = obj(th);
+  for (let it = 0; it < 100; it += 1) {
+    const g = new Array(d + 1).fill(0);
+    const Hm = Array.from({ length: d + 1 }, () => new Array(d + 1).fill(0));
+    for (let j = 0; j < d; j += 1) {
+      g[j] = th[j];
+      Hm[j][j] = 1;
+    }
+    for (let i = 0; i < n; i += 1) {
+      const x = [...A[i], 1];
+      const m = y[i] * lin(th, A[i]);
+      const s = 1 / (1 + Math.exp(m)); // sigma(-m)
+      for (let a = 0; a <= d; a += 1) {
+        g[a] -= C * y[i] * s * x[a];
+        for (let b = 0; b <= d; b += 1) Hm[a][b] += C * s * (1 - s) * x[a] * x[b];
+      }
+    }
+    let gn = 0;
+    for (const v of g) gn = Math.max(gn, Math.abs(v));
+    if (gn < 1e-10) break;
+    // solve Hm step = -g by Gaussian elimination with partial pivoting
+    const M = Hm.map((r, i) => [...r, -g[i]]);
+    const N = d + 1;
+    for (let c = 0; c < N; c += 1) {
+      let p = c;
+      for (let r = c + 1; r < N; r += 1) if (Math.abs(M[r][c]) > Math.abs(M[p][c])) p = r;
+      [M[c], M[p]] = [M[p], M[c]];
+      for (let r = c + 1; r < N; r += 1) {
+        const q = M[r][c] / M[c][c];
+        for (let k = c; k <= N; k += 1) M[r][k] -= q * M[c][k];
+      }
+    }
+    const step = new Array(N).fill(0);
+    for (let r = N - 1; r >= 0; r -= 1) {
+      let s = M[r][N];
+      for (let k = r + 1; k < N; k += 1) s -= M[r][k] * step[k];
+      step[r] = s / M[r][r];
+    }
+    let t = 1;
+    let moved = false;
+    while (t > 1e-12) {
+      const cand = th.map((v, i) => v + t * step[i]);
+      const Fc = obj(cand);
+      if (Fc <= F) {
+        for (let i = 0; i <= d; i += 1) th[i] = cand[i];
+        F = Fc;
+        moved = true;
+        break;
+      }
+      t /= 2;
+    }
+    if (!moved) break;
+  }
+  return { w: th.slice(0, d), b: th[d], score: (x: number[]) => lin(th, x) };
+}
+
+type TreeNode = { leaf: true; v: number } | { leaf: false; j: number; t: number; lo: TreeNode; hi: TreeNode };
+
+/**
+ * A random forest the way sklearn grows one by default: bootstrap samples, sqrt(d) candidate
+ * features per split, Gini impurity, split points halfway between neighbouring values, grown
+ * until every leaf is pure. Its randomness is not sklearn's, so it cannot match any one sklearn
+ * forest; the guard holds it to the spread of twenty of them instead.
+ */
+export function forestFit(A: number[][], y: number[], trees = 100, seed = 7) {
+  let st = (seed % 2147483646) + 1;
+  const u = () => {
+    st = (st * 48271) % 2147483647;
+    return st / 2147483647;
+  };
+  const d = A[0].length;
+  const mtry = Math.max(1, Math.floor(Math.sqrt(d)));
+  const grow = (idx: number[]): TreeNode => {
+    let pos = 0;
+    for (const i of idx) if (y[i] > 0) pos += 1;
+    if (pos === 0 || pos === idx.length) return { leaf: true, v: pos ? 1 : -1 };
+    const feats = Array.from({ length: d }, (_, j) => j);
+    for (let a = d - 1; a > 0; a -= 1) {
+      const b = Math.floor(u() * (a + 1));
+      [feats[a], feats[b]] = [feats[b], feats[a]];
+    }
+    let best = { g: Infinity, j: -1, t: 0 };
+    // like sklearn, keep drawing features past mtry until at least one gives a valid split
+    for (let fi = 0; fi < d && (fi < mtry || best.j < 0); fi += 1) {
+      const j = feats[fi];
+      const s = [...idx].sort((p, q) => A[p][j] - A[q][j]);
+      let lp = 0;
+      for (let r = 0; r < s.length - 1; r += 1) {
+        if (y[s[r]] > 0) lp += 1;
+        const a = A[s[r]][j];
+        const b = A[s[r + 1]][j];
+        if (a === b) continue;
+        const nl = r + 1;
+        const nr = s.length - nl;
+        const rp = pos - lp;
+        const gl = 1 - (lp / nl) ** 2 - ((nl - lp) / nl) ** 2;
+        const gr = 1 - (rp / nr) ** 2 - ((nr - rp) / nr) ** 2;
+        const gg = nl * gl + nr * gr;
+        if (gg < best.g) best = { g: gg, j, t: (a + b) / 2 };
+      }
+    }
+    if (best.j < 0) return { leaf: true, v: pos * 2 >= idx.length ? 1 : -1 };
+    const lo = idx.filter((i) => A[i][best.j] <= best.t);
+    const hi = idx.filter((i) => A[i][best.j] > best.t);
+    return { leaf: false, j: best.j, t: best.t, lo: grow(lo), hi: grow(hi) };
+  };
+  const forest: TreeNode[] = [];
+  for (let t = 0; t < trees; t += 1) {
+    const idx = A.map(() => Math.floor(u() * A.length));
+    forest.push(grow(idx));
+  }
+  const vote = (x: number[]) => {
+    let s = 0;
+    for (const tr of forest) {
+      let nd = tr;
+      while (!nd.leaf) nd = x[nd.j] <= nd.t ? nd.lo : nd.hi;
+      s += nd.v;
+    }
+    return s / forest.length;
+  };
+  return { score: vote };
+}
+
+// ---------------------------------------------------------------------------------------------
+// Page 20: approximating the kernel with landmarks (Nystroem).
+
+/** LandmarkLab's dial. 0 means the exact SVM. Above 50, K_LL gets too ill-conditioned for a plain solve. */
+export const LANDMARKS = [2, 3, 5, 10, 20, 50, 0];
+export const LANDMARK_GAMMA = 1;
+
+/** Page 19's moons without the noise: 200 to train on, 400 to check. */
+export const landmarkData = () => ({ train: unitsPoints(200, 21), val: unitsPoints(400, 22) });
+
+const rbfAt = (a: Pt, b: Pt, g: number) => Math.exp(-g * ((a.x - b.x) ** 2 + (a.z - b.z) ** 2));
+
+/** Solve S x = r for a symmetric positive-definite S by Cholesky. */
+function cholSolve(S: number[][], r: number[]): number[] {
+  const n = S.length;
+  const L = Array.from({ length: n }, () => new Array(n).fill(0));
+  for (let i = 0; i < n; i += 1) {
+    for (let j = 0; j <= i; j += 1) {
+      let s = S[i][j];
+      for (let k = 0; k < j; k += 1) s -= L[i][k] * L[j][k];
+      L[i][j] = i === j ? Math.sqrt(s) : s / L[j][j];
+    }
+  }
+  const y = new Array(n).fill(0);
+  for (let i = 0; i < n; i += 1) {
+    let s = r[i];
+    for (let k = 0; k < i; k += 1) s -= L[i][k] * y[k];
+    y[i] = s / L[i][i];
+  }
+  const x = new Array(n).fill(0);
+  for (let i = n - 1; i >= 0; i -= 1) {
+    let s = y[i];
+    for (let k = i + 1; k < n; k += 1) s -= L[k][i] * x[k];
+    x[i] = s / L[i][i];
+  }
+  return x;
+}
+
+/**
+ * An SVM on the kernel m landmarks imply, K~(x, z) = k_L(x)^T K_LL^-1 k_L(z), solved by page 14's
+ * smoFit. The landmarks are the first m training points. A prediction needs only the m
+ * similarities k_L(z): the fitted model folds into one m-vector v = K_LL^-1 sum a_i y_i k_L(x_i).
+ */
+export function landmarkFit(train: Pt[], m: number, C = 1) {
+  const g = LANDMARK_GAMMA;
+  const L = train.slice(0, m);
+  const Kll = L.map((a) => L.map((b) => rbfAt(a, b, g)));
+  const kL = train.map((p) => L.map((l) => rbfAt(p, l, g)));
+  // columns of K_LL^-1 k_L(x_i), one solve per training point
+  const W = kL.map((k) => cholSolve(Kll, k));
+  const K = kL.map((ki) => W.map((wj) => ki.reduce((s, v, t) => s + v * wj[t], 0)));
+  const y = train.map((p) => p.y);
+  const fit = smoFit(y, K, C, 1e-8, 200000);
+  const v = new Array(m).fill(0);
+  fit.alpha.forEach((a, i) => {
+    if (a > 0) for (let t = 0; t < m; t += 1) v[t] += a * y[i] * W[i][t];
+  });
+  const score = (x: number, z: number) => {
+    let s = fit.b;
+    for (let t = 0; t < m; t += 1) s += v[t] * Math.exp(-g * ((L[t].x - x) ** 2 + (L[t].z - z) ** 2));
+    return s;
+  };
+  return { ...fit, K, f: train.map((p) => score(p.x, p.z)), score, landmarks: L };
+}

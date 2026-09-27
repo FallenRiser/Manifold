@@ -102,6 +102,29 @@ BLOCKS = {
         "Which": "whichpair",
         "Stop": "stopping",
     },
+    "support-vector-machines/scaling-and-why-an-svm-cannot-skip-it": {
+        "Units": "units", "Dial": "unitsdial",
+        "Penalty": "penalty", "Scaler": "whichscaler",
+    },
+    "support-vector-machines/choosing-c-and-gamma": {
+        "Grid": "cgrid", "Buys": "tuningbuys",
+        "Curse": "curse", "Flat": "flattop",
+    },
+    "support-vector-machines/multi-class-one-vs-one-and-one-vs-rest": {
+        "Two": "twoways", "Mask": "masking",
+        "Claims": "claims", "Cost": "perk",
+    },
+    "support-vector-machines/probabilities-from-an-svm": {
+        "Squash": "squash", "Scale": "scale",
+        "Held": "heldout", "Prob": "probtrue",
+    },
+    "support-vector-machines/svm-vs-logistic-regression-vs-forest": {
+        "Contest": "contest", "Noise": "noisefeat",
+        "Linear": "linear", "Growth": "growth",
+    },
+    "support-vector-machines/when-to-use-an-svm": {
+        "Imbalance": "imbalance", "Approx": "approx", "Landmarks": "landmarks",
+    },
 }
 
 BANNER = re.compile(r"\n={70}\n(.*?)\n={70}\n")

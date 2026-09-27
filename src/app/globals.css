@@ -38,6 +38,9 @@
   --c-space: #4b3fd1;         /* deep-space indigo — asteroid-hazard capstone accent */
   --c-housing: #b0542f;       /* California terracotta — housing capstone accent */
   --c-warehouse: #5f7d0a;     /* hi-vis olive — warehouse-robot RL capstone accent */
+  --c-post: #2c4f86;          /* ribbon navy — message-routing capstone accent. Darker and
+                                 greyer than regression's riso blue, so the two never read as
+                                 one ink on the map. */
   --c-krat: #8f1d2f;          /* oxblood crimson — Lies-of-P imitation capstone accent.
                                  Red was the one unclaimed family hue. Kept deeper and cooler
                                  than --bad (#e0442c) so the two never read as the same ink;
@@ -108,6 +111,24 @@
   --wh-spill: #b3341f;        /* the spill wall */
   --wh-route: #3f6a10;        /* a marked, safe route */
 
+  /* Message-routing capstone — the NEWSREADER PRINTOUT skin. Theme-independent, like the
+     concrete and the ledger: greenbar line-printer paper is pale in either mode. The data is
+     raw text, so the skin is the raw text: posts in monospace on a printout, with the
+     auditor's red pen for anything the model should not be reading. */
+  --nr-paper: #fbfbf5;        /* printout white */
+  --nr-band: #e3eedc;         /* the greenbar band */
+  --nr-edge: #eceee4;         /* the tractor-feed strip */
+  --nr-hole: #d3d7c8;         /* a sprocket hole */
+  --nr-rule: #c5d3bd;
+  --nr-ink: #1d2331;          /* ribbon ink */
+  --nr-ink-soft: #465063;
+  --nr-faint: #737a6c;
+  --nr-accent: #2c4f86;       /* --c-post as it prints on the paper, in either mode */
+  --nr-pen: #c0322b;          /* the auditor's red pen: a leak */
+  --nr-head: #55698e;         /* header lines, written by software */
+  --nr-quote: #97610c;        /* quoted lines, written by someone else */
+  --nr-sig: #7b4fa2;          /* the signature, written by habit */
+
   --good: #009155;
   --warn: #d97a00;
   --bad: #e0442c;            /* riso warm red */
@@ -155,6 +176,7 @@
   --c-space: #9385ff;         /* deep-space indigo → periwinkle in dark */
   --c-housing: #e5936a;       /* California terracotta, lifted for dark */
   --c-warehouse: #a9cb2e;     /* hi-vis olive → safety lime in dark */
+  --c-post: #8eaee0;          /* ribbon navy → slate-periwinkle in dark */
   --c-krat: #e2596e;          /* oxblood → rose-crimson in dark (cooler than --bad #ff6b75) */
 
   --good: #2ecc8f;
@@ -190,6 +212,7 @@
   --color-fundamentals: var(--c-fundamentals);
   --color-metrics: var(--c-metrics);
   --color-space: var(--c-space);
+  --color-post: var(--c-post);
   --color-good: var(--good);
   --color-warn: var(--warn);
   --color-bad: var(--bad);
@@ -688,6 +711,42 @@ a.gtrack:hover { color: var(--accent); padding-left: 5px; }
     linear-gradient(90deg, color-mix(in srgb, var(--wh-seam) 55%, transparent) 1px, transparent 1px),
     radial-gradient(120% 90% at 18% 0%, rgba(255, 255, 255, 0.22), rgba(0, 0, 0, 0.06) 70%);
   background-size: 46px 46px, 46px 46px, 100% 100%;
+}
+
+/* Message-routing capstone: greenbar printout paper. Bands every two 22px lines, a
+   tractor-feed strip down each edge with sprocket holes on a 22px pitch. The strips drop
+   out on a phone, where 32px of holes would cost a sixth of the width. */
+.nr-paper {
+  position: relative;
+  background-color: var(--nr-paper);
+  background-image: repeating-linear-gradient(
+    180deg,
+    var(--nr-band) 0 44px,
+    var(--nr-paper) 44px 88px
+  );
+  color: var(--nr-ink);
+  padding-left: 30px;
+  padding-right: 30px;
+}
+.nr-paper::before,
+.nr-paper::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 22px;
+  background-color: var(--nr-edge);
+  background-image: radial-gradient(circle at 11px 11px, var(--nr-hole) 0 4.5px, transparent 5px);
+  background-size: 22px 22px;
+}
+.nr-paper::before { left: 0; border-right: 1px dashed var(--nr-rule); }
+.nr-paper::after { right: 0; border-left: 1px dashed var(--nr-rule); }
+@media (max-width: 560px) {
+  .nr-paper { padding-left: 14px; padding-right: 14px; }
+  .nr-paper::before, .nr-paper::after { display: none; }
+}
+.nr-mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
 
 /* ----- sugar-high syntax tokens — restrained print pigments in both modes

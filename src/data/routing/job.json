@@ -1,0 +1,116 @@
+{
+ "posts": 7532,
+ "replies": 5005,
+ "new": 2527,
+ "before": 2330,
+ "later": 1573,
+ "missing": 1102,
+ "missing_threads": 539,
+ "lookup": 4466,
+ "model": 3066,
+ "lookup_right": 0.9818,
+ "right_before": 0.9751,
+ "right_later": 0.9917,
+ "mix": [
+  {
+   "forum": "misc.forsale",
+   "all": 390,
+   "new": 353
+  },
+  {
+   "forum": "comp.windows.x",
+   "all": 395,
+   "new": 235
+  },
+  {
+   "forum": "comp.graphics",
+   "all": 389,
+   "new": 212
+  },
+  {
+   "forum": "comp.sys.ibm.pc.hardware",
+   "all": 392,
+   "new": 203
+  },
+  {
+   "forum": "comp.sys.mac.hardware",
+   "all": 385,
+   "new": 184
+  },
+  {
+   "forum": "comp.os.ms-windows.misc",
+   "all": 394,
+   "new": 170
+  },
+  {
+   "forum": "sci.med",
+   "all": 396,
+   "new": 137
+  },
+  {
+   "forum": "rec.sport.hockey",
+   "all": 399,
+   "new": 130
+  },
+  {
+   "forum": "soc.religion.christian",
+   "all": 398,
+   "new": 115
+  },
+  {
+   "forum": "sci.electronics",
+   "all": 393,
+   "new": 114
+  },
+  {
+   "forum": "rec.autos",
+   "all": 396,
+   "new": 103
+  },
+  {
+   "forum": "sci.space",
+   "all": 394,
+   "new": 99
+  },
+  {
+   "forum": "rec.sport.baseball",
+   "all": 397,
+   "new": 93
+  },
+  {
+   "forum": "talk.politics.mideast",
+   "all": 376,
+   "new": 87
+  },
+  {
+   "forum": "sci.crypt",
+   "all": 396,
+   "new": 69
+  },
+  {
+   "forum": "talk.politics.guns",
+   "all": 364,
+   "new": 59
+  },
+  {
+   "forum": "talk.politics.misc",
+   "all": 310,
+   "new": 51
+  },
+  {
+   "forum": "rec.motorcycles",
+   "all": 398,
+   "new": 46
+  },
+  {
+   "forum": "talk.religion.misc",
+   "all": 251,
+   "new": 38
+  },
+  {
+   "forum": "alt.atheism",
+   "all": 319,
+   "new": 29
+  }
+ ]
+}

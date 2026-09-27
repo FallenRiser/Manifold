@@ -888,3 +888,263 @@ fresh tab with zero console errors and zero hydration warnings · 0 KaTeX errors
 blocks exactly 682px in a 682px column · lab swept for text overlap and viewBox spill across
 **360** step/rule states · live run confirmed 9 steps by the rule against 254 at random, both
 landing on objective 2.4638 with 5 support vectors and 3 pinned.
+
+**Page 15 of 20 — 2026-09-26.** *A distance has units* (Scaling, and why an SVM can't skip it),
+at `/learn/support-vector-machines/scaling-and-why-an-svm-cannot-skip-it`. Four new sections in
+`svm_cases.py` (`units`, `unitsdial`, `penalty`, `whichscaler`), a new lab **UnitsDialLab**,
+`unitsPoints` / `unitsFit` / `smoFit` added to `svmSolver.ts`, and a new guard
+`svm_units_check.mjs` backed by `results/svm_units_case.json`. Chapter 4 opened.
+
+The spine: an SVM sees data through a distance (the kernel) or a norm (the margin), both are sums
+over features, and so the units the data arrived in have been choosing the model.
+
+- **The split is exact, not a heuristic.** Averaged over all pairs, |x - z|^2 = 2 sum var_j
+  (938273.9 both ways on breast_cancer), so a feature's share of every distance is its variance
+  over the total. Two area features carry **99.10%**; the 30-feature raw rbf model gives the same
+  label as a *worst-area-only* model on **97.66%** of the test set. Standardised: 0.9064 -> 0.9532.
+  Wine: proline is **99.77%**, 10-fold 0.6627 -> **0.9830**.
+- **One feature's units, nothing else.** Moons over 20 draws: the narrow end of the dial costs
+  **11** points in 100, the wide end **24**. gamma='scale' cannot help — one number, fixes size
+  not ratio. Standardised, all **160 of 160** fits give identical held-out labels.
+- **Standardising is neutral, not optimal.** At k = 3 the stretched model beats standardised on
+  **18 of 20** draws. The page says so and frames per-feature scale as a modelling choice.
+- **The margin has units.** x_j -> k x_j charges w_j by 1/k^2. Shrinking the linear SVM's most
+  relied-on feature to k = 0.01 leaves it worth **1/4,304** of what it was; accuracy moves by one
+  test point. Raw linear SVC hits the **2,000,000** cap; standardised finishes in **903**. Raw rbf
+  finishes in **82** against 164 and scores worse — quick because the problem is 1-D.
+- **Which scaler barely matters; doing it does.** Standard/MinMax/Robust spread 0.0035 and 0.0114,
+  under the smallest fold spread on each dataset (0.0113, 0.0222). Leakage from fitting the scaler
+  outside CV: 0.9736 vs 0.9754, nothing. Random forest: **171/171** labels unchanged, 2 of 171
+  probabilities move by one tree's vote (float rounding of thresholds), x1024 identical to the bit.
+
+**The guard found the shared solver unfit for this lab, twice.** `dualFit` (the track's
+pass-capped Platt heuristic) hit its 400-pass cap on 3 of the 9 raw stops and stopped ~3e-4 short
+of the optimum, moving support vectors and one held-out label. Replaced — for this lab only — by
+`smoFit`, page 14's maximal-violating-pair SMO run to a KKT tolerance of 1e-8. Its first version
+then *cycled* on five stops to the 200,000-step cap: a clipped price left at C - 1e-17 by rounding
+still counts as movable, so the same pair is chosen forever with no room to move. Snapping prices
+onto 0 and C (as libsvm does) fixed it; worst decision-value gap to sklearn is now **1.6e-7** of
+span, so the guard's limit is 1e-5 rather than the 8e-2 page 13's guard has to allow.
+
+**Prose corrected against its own tables before shipping:** "both ends lose around a fifth"
+(11 and 24 points); "finishes in a few hundred" (903); "test accuracy does not move" (one point);
+"standardising puts every row back" asserted but never measured (now 160/160); "the one
+probability that moves" (two). An unmeasured causal claim ("the moons are wider than they are
+tall") and a unit for breast_cancer's area feature were removed. Page 14's closing said page 13
+showed "one polynomial fit" hitting the cap — it was three of three; fixed, and page 14 now links
+forward.
+
+Verified: tsc clean · 796 pages house-rule clean · all **15** guards green · four sections
+byte-identical across two runs · zero console errors or hydration warnings · no KaTeX errors ·
+both math blocks fit at 375px after splitting them onto lines · lab swept across all **18**
+dial/toggle states for text overlap and viewBox spill (none), every readout equal to sklearn's ·
+decision shading moved onto an exact 9px grid after it drew the alpha-seam lattice.
+
+**Page 16 of 20 — 2026-09-26.** *A plateau with cliffs* (Choosing C and gamma), at
+`/learn/support-vector-machines/choosing-c-and-gamma`. Four new sections in `svm_cases.py`
+(`cgrid`, `tuningbuys`, `curse`, `flattop`), a new lab **CGridLab** (48 in-browser fits),
+`rbfSmo` / `gridPoints` / `GRID_LAB_C` / `GRID_LAB_G` in `svmSolver.ts`, and a new guard
+`svm_grid_check.mjs` backed by `results/svm_grid_case.json`.
+
+Measurement changed the page. The planned story was "search a grid to find the best C and
+gamma". The measured story is that on scaled data the defaults already sit on a plateau, the
+search is insurance against cliffs, and the grid's own score is biased.
+
+- **The grid** (breast_cancer, 7x7, 5-fold): best 0.9807; **8 of 49** cells within a point of it;
+  **26 of 49** no better than always guessing the larger class (0.6274). The defaults score
+  0.9771. The best gamma falls as C rises (0.01 -> 0.001 -> 0.0001): the good cells lie on a
+  diagonal because both knobs spend the same thing.
+- **What tuning buys, measured fairly** (nested, 5 repeats, 3 datasets): +0.0015 moons, +0.0018
+  breast_cancer, **-0.0034 wine, where the defaults won 5 of 5**. The `best_score_` a grid reports
+  is above the nested estimate on every dataset by 0.0028-0.0068 — more than tuning gained.
+- **Winner's curse on coin-flip labels:** median cell = majority rate exactly (0.5174); best cell
+  0.5392 (+0.0218); nested 0.5111. 49 noisy estimates, largest kept.
+- **Choosing from a flat top:** simplest-within-1-SE keeps 25-31% fewer support vectors for an
+  accuracy change of -0.0063 to +0.0025. Real trade, priced.
+- **Cost is not uniform:** libsvm iterations 115 to 6,390, slowest at large C / small gamma. The
+  lab drops its C = 10000 row because one cell takes page 14's SMO ~1.4M steps.
+
+**The guard found the reference was the imprecise side.** On seven large-C cells the lab's
+decision values differed from sklearn's by up to 9.6e-5 of span, over the 1e-5 limit — while
+labels, support counts and both accuracies matched exactly. Comparing dual objectives settled
+it: in every such cell the browser's is HIGHER (27942.4808991 vs libsvm's 27942.4808748 at
+C=1000, gamma=0.03), because smoFit runs to a KKT gap of 1e-8 and libsvm stops earlier. The
+guard now records sklearn's objective per cell and fails a decision-value gap only when the
+browser is the LESS optimal side; separately, every fit must be at least as optimal as libsvm's.
+
+**A structural bug on three pages, now a lint rule.** Pages 14, 15 and 16 were written with an
+`<article>` root but no `<div className="lesson">` wrapper. All heading, paragraph and list
+styles live under `.lesson`, so every h2 rendered as plain 16px body text — page 14 shipped that
+way. All three wrapped (0 of 793 LessonHeader pages now lack it), and `check-pages.js` gained
+**R4** so it cannot recur (proved to fire on a probe page).
+
+Also: the regen tool refused to write a block whose table header contained a backslash
+(`C \ gamma` would break the template literal) — header changed to `C | gamma`. A cross-section
+count ("26 of 49") that section 59 quoted from section 58 is now computed rather than pasted.
+Lab: the rotated axis label rendered garbled and was set upright; at gamma >= 30 each point's
+reach is smaller than one 9px shading square, so the plot looked empty exactly where the model
+memorises — it now says so, with the half-life readout. Step counts in the lab can differ by
+engine (52,836 in the browser vs 53,286 in Node for one cell: last-bit differences in Math.exp
+change the SMO path, not the model); the server-rendered default cell matches, no hydration
+warnings.
+
+Verified: tsc clean · 797 pages house-rule clean (R1-R4) · all **16** guards green ·
+`svm_regen --check` clean across all sixteen pages · four sections byte-identical across two runs
+· no console errors or hydration warnings · no KaTeX errors · math fits at 375px with no page
+overflow · lab checked for text overlap and viewBox spill across both colourings and every cell
+(the full 96-state sweep before the height change, the extreme states after it).
+
+**Page 17 of 20 — 2026-09-26.** *Two sides at a time* (Multi-class: one-vs-one & one-vs-rest),
+at `/learn/support-vector-machines/multi-class-one-vs-one-and-one-vs-rest`. Four new sections in
+`svm_cases.py` (`twoways`, `masking`, `claims`, `perk`), a new lab **MultiClassLab** (24
+in-browser binary fits: 2 layouts x linear/rbf x OvR/OvO), `multiPoints` / `binaryFit` /
+`multiFit` in `svmSolver.ts`, and a new guard `svm_multi_check.mjs` backed by
+`results/svm_multi_case.json`.
+
+Measurement changed the page in three places:
+
+- **"OvO fits k(k-1)/2 models, so it is expensive" is backwards.** On digits OvO fits 45 models
+  to OvR's 10 and does 2.6x LESS solver work (iterations x points: 2,894,171 vs 7,608,498), and
+  a prediction visits 847 pooled support vectors vs 1,942. On blobs from k=3 to k=40 the OvR/OvO
+  work ratio stays 2.22-2.50; both rise with k. Accuracy with rbf: within 0.0013 everywhere.
+- **Masking is real and measurable.** Three classes in a row, linear OvR: the middle class's
+  model says "B" to none of B's points in all 60 draws; B recall 0.4665 vs OvO 0.8447 at
+  spacing 2. On iris, versicolor (the middle species on PC1) is the class linear OvR loses:
+  0.856 vs 0.920. rbf removes it (0.940 / 0.944).
+- **A clean vote is not a confident one.** Held-out digits: OvR's "no model claimed it" holds 27
+  of its 33 mistakes (99.3% right where exactly one claimed). OvO's winner swept all 9 duels on
+  895 of 898 points, including 30 of 33 mistakes. Sets up page 18 (probabilities).
+
+Also: sklearn's `SVC` is always OvO; `decision_function_shape='ovr'` gave identical labels on
+all three datasets. Crammer-Singer was the best linear option on 0 of 3 datasets.
+
+**A degenerate optimum, handled in the guard.** In the lab's row layout, linear B-vs-rest has
+optimum w = 0 (constant score -1). libsvm never converges on it (hits any max_iter, 5M tried),
+and the support set is not unique: 64 SVs in the browser vs 67 in sklearn, same objective (60)
+and same decision values. The guard compares support counts except for models whose decision
+values are constant to 1e-5, which it reports instead. The lab shades that model a flat grey
+(levels are rounded first, or the +-1e-6 wobble drew a staircase) and prints w = (0.000,
+0.000), with negative zero suppressed.
+
+Verified: tsc clean · 798 pages house-rule clean (R1-R4) · all **17** guards green ·
+`svm_regen --check` clean across all seventeen pages · no console errors or hydration warnings in
+a fresh tab · no KaTeX errors · math fits at 375px (the OvO vote rule split onto two lines) with
+no page overflow · lab swept at all 32 states (layout x kernel x strategy x view) for text
+overflow and overlap: none.
+
+**Page 18 of 20 — 2026-09-26.** *From a score to a probability* (Probabilities from an SVM), at
+`/learn/support-vector-machines/probabilities-from-an-svm`. Four new sections in `svm_cases.py`
+(`squash`, `scale`, `heldout`, `probtrue`; helpers `_platt`, `_cv_scores`, `_folds`, `_ll`,
+`_ece`), a new lab **PlattLab** (C dial x squash / Platt-on-training / Platt-on-held-out, on
+CGridLab's points), `plattFit` (2-parameter Newton on Platt's smoothed targets) / `plattStop` /
+`sigmoidAt` in `svmSolver.ts`, and a new guard `svm_platt_check.mjs` backed by
+`results/svm_platt_case.json`.
+
+- **Squash vs Platt** (breast_cancer, 1,425 held-out predictions): log loss 0.2641 vs 0.1004,
+  calibration error 0.1813 vs 0.0127. The squash never says more than 0.928; a point ON the
+  margin is 0.731 to the squash and 0.976 to Platt; 99.7% of points past the margin are right.
+- **The score has no units**: across C = 0.01..1000 on moons the 90th-percentile |f| changes
+  18-fold with accuracy within three points; Platt's A goes -9.3 -> -0.69 and its loss stays
+  0.29-0.39 while the squash's swings 0.33-0.58.
+- **Measurement overturned the textbook warning, mostly.** Platt on TRAINING scores costs
+  -0.011..+0.001 wherever train and test accuracy agree (10 of 16 C/gamma rows) and up to +0.377
+  where the model memorises. So the held-out route is insurance for exactly the case where
+  training accuracy looks best.
+- **A trap found by the measurement, not planned:** at C = 0.01 every price is at the cap, b is
+  only pinned to an interval, and unstratified folds (share of positives 0.40-0.60) swing it by
+  +-0.7 -- more than the rest of the score -- so Platt fits the folds (A = -0.49, loss 0.6344 vs
+  0.3903 stratified). I first wrote "libsvm stratifies, so probability=True is safe"; checked it
+  and it is FALSE: probability=True's internal folds are random and its loss at C = 0.01 is
+  0.545-0.628 over ten seeds. The page now says so, measured. At C = 1 the trap closes.
+- **probability=True side effects**: predict() vs argmax(predict_proba) disagree on 0-3 points
+  per dataset; probabilities move with random_state by up to 0.0927 (wine); labels never change.
+  Isotonic says exactly 0 or 1 on 1,094 breast_cancer predictions and has the worst log loss on
+  both datasets; logistic regression wins every column on breast_cancer.
+
+The guard needed page 16's rule again: at C = 1000 fifteen scores differ from libsvm's by up to
+1.75e-5 of span, each from a fit whose dual objective is at or above libsvm's (the case JSON now
+records the full model's and every fold's objective). Platt's A, B match sklearn's L-BFGS to
+7.7e-6, and the Newton fit's loss is never above the loss at sklearn's (A, B).
+
+Verified: tsc clean · 799 pages house-rule clean (R1-R4) · all **18** guards green ·
+`svm_regen --check` clean across all eighteen pages · no console errors or hydration warnings in
+a fresh tab · no KaTeX errors · both math blocks fit at 375px (the squash/Platt pair relabelled
+to fit) with no page overflow · lab swept at all 27 states for text overflow, overlap and NaN
+attributes: none. Prose fix caught in review: "every score lies within +-0.110" was the 90th
+percentile, not the maximum; now says nine in ten.
+
+**Page 19 of 20 — 2026-09-26.** *Which model, on which data* (SVM vs logistic regression vs
+forest), at `/learn/support-vector-machines/svm-vs-logistic-regression-vs-forest`. Four new
+sections in `svm_cases.py` (`contest`, `noisefeat`, `linear`, `growth`; helpers `_three`,
+`_titanic`, `_covtype`, `_extra`), a new lab **NoiseFeatureLab** (k noise columns next to the
+moons; rbf SVM + logistic regression + a 100-tree forest refitted in the browser at 7 stops),
+`noiseColumns` / `noiseMatrix` / `rbfSmoD` / `logregFit` (Newton) / `forestFit` in
+`svmSolver.ts`, and a new guard `svm_noise_check.mjs` backed by `results/svm_noise_case.json`.
+
+- **Contest** (6 datasets, defaults, 5x5 paired CV): SVM best on wine, digits, titanic; logistic
+  regression on breast_cancer; forest on moons and covertype. SVM vs forest never more than 4.7
+  points apart, but on every dataset one of them led on all five repeats.
+- **Noise features**: 5 noise columns cost the SVM 2.9 points and the forest 1.4 (CV, 600
+  moons); the SVM loses at least twice as much at every k. Tuned SVM (nested 7x7 grid) moves it
+  -0.0011..+0.0105 and never catches the forest. By k = 20 the rbf SVM = logistic regression.
+- **Linear truth**: linear models lead the forest by 2.3 with every feature relevant; with 495
+  irrelevant columns the forest wins by 2.3-5.0. The rbf SVM never trails the linear SVM by more
+  than 0.01.
+- **Covertype**: not the 44 binary columns (numeric-only, the forest still leads by 4.1). More
+  data: forest +10.0, SVM +5.1 from 500 to 16,000; still 51% of points are SVs (8,133); SVM
+  solver work 550-fold for 32-fold data; logistic regression flat after 2,000.
+
+Measurement overturned three drafted claims: "the forest is out of place on a linear truth"
+(it wins once irrelevant columns are added), "tuning rescues the SVM" (it does not), and
+"covertype favours the forest because of its binary columns" (it does not; the claim was
+dropped and the refutation is now on the page).
+
+The forest is our own (bootstrap, sqrt(d) features, Gini, fully grown). It cannot match any one
+sklearn forest, so the guard holds it to the spread of twenty sklearn forests (+-0.01) at every
+k -- it lands inside at all seven stops. SVM and logistic regression match sklearn exactly
+(decision values 3.7e-7 of span; weights 3.3e-7).
+
+Verified: tsc clean · 800 pages house-rule clean (R1-R4) · all **19** guards green · no console
+errors (a missing React key on the readout rows was found and fixed) · lab swept at all 21
+states for overflow, overlap and NaN: none · no page overflow at 375px · two visual fixes from
+screenshots (the 1.00 axis label rendered as ".00"; a caption clipped at the right edge).
+
+The full `svm_regen --check` then caught a drifted block on this page: the forest ran with
+n_jobs=-1, and thread-order summation of tree probabilities flipped an exact vote tie between runs
+(titanic forest 0.7895 vs 0.7893). `_three()` now uses n_jobs=1; page 19 checked clean on two
+further runs, pages 1-18 clean in the full check.
+
+**Page 20 of 20 — 2026-09-27. The SVM track is complete.** *When to use an SVM*, at
+`/learn/support-vector-machines/when-to-use-an-svm`. Three new sections in `svm_cases.py`
+(`imbalance`, `approx`, `landmarks`; helpers `_nystroem_gram`, `_rbf_cross`, `_landmark_case`),
+a new lab **LandmarkLab** (Nystroem with m = 2..50 landmarks against the exact SVM, drawn over
+it), `landmarkFit` (Cholesky solve of K_LL, smoFit on the implied kernel, the model folded into
+one m-vector) in `svmSolver.ts`, and a new guard `svm_landmark_check.mjs` backed by
+`results/svm_landmark_case.json`.
+
+- **Rare class** (10 draws): at 1% positives the default SVM scores 0.9858 -- always answering
+  "common" scores 0.9847 -- and finds 9% of the rare class; class_weight='balanced' finds 34%
+  at 9% precision. At 5%: 40% -> 75% found, precision 0.98 -> 0.43.
+- **Large data** (covertype 1 vs 2): at 16,000 points Nystroem with 1,000 landmarks scores
+  0.8124 against the exact SVM's 0.8050, with 1,000 similarities per prediction instead of
+  8,133 SVs; at 64,000 it reaches 0.8282. The forest scores 0.8722 / 0.9188: approximation fixes
+  cost, not fit.
+- **Landmarks on the moons** (10 draws): 20 landmarks are within half a point of exact
+  (0.9850 vs 0.9853); 2 landmarks 0.7227. Above ~50 landmarks K_LL becomes near-singular
+  (eigenvalue ratio 4.5e-14 at m = 100), so the lab's dial stops at 50 where a plain Cholesky
+  solve is exact and matches numpy to 1e-9.
+- **The checklist** closes the page, every item citing the page that measured it (15, 16, 18,
+  19, 20).
+
+Not done: text classification, the classic linear-SVM win. 20 Newsgroups is only partially
+downloaded in ~/scikit_learn_data (a .part file), and fetching it needs a download from an
+external host, which I did not do without asking.
+
+Prose corrected in review: "almost exactly what always guessing common would get" now measured
+(0.9847 vs 0.9858); "won three of six real datasets" (moons is synthetic) and "tens of thousands
+of rows" (its wins were at 178-1,797 rows) rewritten; a lab caption that overflowed the viewBox
+at the exact setting shortened.
+
+Verified: tsc clean · 801 pages house-rule clean (R1-R4) · all **20** guards green · no console
+errors · no KaTeX errors · no page overflow at 375px · lab swept at all 7 states for overflow,
+overlap and NaN (one caption fixed).

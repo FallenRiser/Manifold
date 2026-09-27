@@ -1,0 +1,395 @@
+[
+ {
+  "post": 2780,
+  "forum": "comp.windows.x",
+  "lines": [
+   {
+    "text": "From: b••••@mdavcr.mda.ca (B•••• L•••••)",
+    "part": "meta",
+    "sk": false
+   },
+   {
+    "text": "Subject: Joining the X Consortium ????",
+    "part": "subject",
+    "sk": false
+   },
+   {
+    "text": "Organization: MacDonald Dettwiler, 13800 Commerce Parkway, Richmond, BC, Canada  V6V 2J3",
+    "part": "meta",
+    "sk": false
+   },
+   {
+    "text": "Lines: 6",
+    "part": "meta",
+    "sk": false
+   },
+   {
+    "text": "",
+    "part": "body",
+    "sk": false
+   },
+   {
+    "text": "Hi,",
+    "part": "body",
+    "sk": true
+   },
+   {
+    "text": "",
+    "part": "tail",
+    "sk": false
+   },
+   {
+    "text": "\tDoes anyone have any information on joining the X Consortium ? What",
+    "part": "tail",
+    "sk": false
+   },
+   {
+    "text": "are the costs, what are the benefits, who should I contact ? Thanks",
+    "part": "tail",
+    "sk": false
+   }
+  ],
+  "words": {
+   "all": 49,
+   "ours": 29,
+   "sklearn": 1
+  }
+ },
+ {
+  "post": 6221,
+  "forum": "comp.sys.mac.hardware",
+  "lines": [
+   {
+    "text": "From: \"A•••• J. S••••••\" <a•••••••@nickel.ucs.indiana.edu>",
+    "part": "meta",
+    "sk": false
+   },
+   {
+    "text": "Subject: SE/30 Hard Drive Problem",
+    "part": "subject",
+    "sk": false
+   },
+   {
+    "text": "Content-Type: text/plain; charset=US-ASCII",
+    "part": "meta",
+    "sk": false
+   },
+   {
+    "text": "Content-Transfer-Encoding: 7bit",
+    "part": "meta",
+    "sk": false
+   },
+   {
+    "text": "Organization: Indiana University",
+    "part": "meta",
+    "sk": false
+   },
+   {
+    "text": "Mime-Version: 1.0",
+    "part": "meta",
+    "sk": false
+   },
+   {
+    "text": "Content-Length: 1161      ",
+    "part": "meta",
+    "sk": false
+   },
+   {
+    "text": "Lines: 33",
+    "part": "meta",
+    "sk": false
+   },
+   {
+    "text": "",
+    "part": "body",
+    "sk": false
+   },
+   {
+    "text": "",
+    "part": "body",
+    "sk": false
+   },
+   {
+    "text": "I have an SE/30 with a 80 meg HD which dates back to April 1989.  When I",
+    "part": "body",
+    "sk": true
+   },
+   {
+    "text": "originally purchased it, I experienced the failure to boot problem.  This",
+    "part": "body",
+    "sk": true
+   },
+   {
+    "text": "was fixed soon after by a ROM upgrade on the hard drive.",
+    "part": "body",
+    "sk": true
+   },
+   {
+    "text": "",
+    "part": "body",
+    "sk": true
+   },
+   {
+    "text": "Lately a similar problem has been occuring.  When the computer is",
+    "part": "body",
+    "sk": true
+   },
+   {
+    "text": "powered on the HD light flashes a few times and then I am given",
+    "part": "body",
+    "sk": true
+   },
+   {
+    "text": "the \"no disk to boot from\" icon.  However, upon turing the",
+    "part": "body",
+    "sk": true
+   },
+   {
+    "text": "computer off and on again the drive ALWAYS boots up just fine.  ",
+    "part": "body",
+    "sk": true
+   },
+   {
+    "text": "Furthermore, if instead of turning the power on and off I press the reboot ",
+    "part": "body",
+    "sk": true
+   },
+   {
+    "text": "button the same problem occurs.  But, as I said, turning the power",
+    "part": "body",
+    "sk": true
+   },
+   {
+    "text": "off and on always works.",
+    "part": "body",
+    "sk": true
+   },
+   {
+    "text": "",
+    "part": "body",
+    "sk": true
+   },
+   {
+    "text": "This problem is different from the 1989 boot problem in that before",
+    "part": "body",
+    "sk": true
+   },
+   {
+    "text": "it often required several power off and ons to get it to boot.",
+    "part": "body",
+    "sk": true
+   },
+   {
+    "text": "",
+    "part": "body",
+    "sk": true
+   },
+   {
+    "text": "Does anybody have any suggestions as to what the problem is or how",
+    "part": "body",
+    "sk": true
+   },
+   {
+    "text": "it can be fixed?",
+    "part": "body",
+    "sk": true
+   },
+   {
+    "text": "",
+    "part": "body",
+    "sk": true
+   },
+   {
+    "text": "I'm wondering if it's getting old and requires more time to ",
+    "part": "body",
+    "sk": true
+   },
+   {
+    "text": "\"come up to speed\" now.  Is there a PRAM or SCSI setting that",
+    "part": "body",
+    "sk": true
+   },
+   {
+    "text": "allows me to tell the computer to wait a little longer before ",
+    "part": "body",
+    "sk": true
+   },
+   {
+    "text": "trying to access the HD?",
+    "part": "body",
+    "sk": true
+   },
+   {
+    "text": "",
+    "part": "body",
+    "sk": true
+   },
+   {
+    "text": "Thanks!",
+    "part": "body",
+    "sk": true
+   },
+   {
+    "text": "",
+    "part": "body",
+    "sk": true
+   },
+   {
+    "text": "",
+    "part": "tail",
+    "sk": false
+   },
+   {
+    "text": "A•••• J. S••••••",
+    "part": "tail",
+    "sk": false
+   },
+   {
+    "text": "a•••••••@nickel.ucs.indiana.edu",
+    "part": "tail",
+    "sk": false
+   },
+   {
+    "text": "Indiana University",
+    "part": "tail",
+    "sk": false
+   },
+   {
+    "text": "Computer Science Dept.",
+    "part": "tail",
+    "sk": false
+   }
+  ],
+  "words": {
+   "all": 257,
+   "ours": 225,
+   "sklearn": 206
+  }
+ },
+ {
+  "post": 548,
+  "forum": "misc.forsale",
+  "lines": [
+   {
+    "text": "From: d••@anomaly.sbs.com (Admiral D•••• E. R•••)",
+    "part": "meta",
+    "sk": false
+   },
+   {
+    "text": "Subject: 144mhz/440mhz amps, 2mtr HT for sale",
+    "part": "subject",
+    "sk": false
+   },
+   {
+    "text": "Organization: Small Business Systems, Incorporated, Smithfield, RI 02917",
+    "part": "meta",
+    "sk": false
+   },
+   {
+    "text": "Lines: 18",
+    "part": "meta",
+    "sk": false
+   },
+   {
+    "text": "",
+    "part": "body",
+    "sk": false
+   },
+   {
+    "text": "I have the following equipment for sale:",
+    "part": "body",
+    "sk": true
+   },
+   {
+    "text": "",
+    "part": "body",
+    "sk": true
+   },
+   {
+    "text": "1. Kenwood TH-28A 2mtr HT\t\t\t$250.00",
+    "part": "body",
+    "sk": true
+   },
+   {
+    "text": "",
+    "part": "body",
+    "sk": true
+   },
+   {
+    "text": "2. RF Concepts 2mtr Amp (45in->170out)\t\t$275.00",
+    "part": "body",
+    "sk": true
+   },
+   {
+    "text": "",
+    "part": "body",
+    "sk": true
+   },
+   {
+    "text": "3. Hamtronics Class C Continuous Duty",
+    "part": "body",
+    "sk": true
+   },
+   {
+    "text": "\t440mhz 10watt-in ~40watt-out amp\t$250.00",
+    "part": "body",
+    "sk": true
+   },
+   {
+    "text": "",
+    "part": "body",
+    "sk": true
+   },
+   {
+    "text": "All prices include shipping/insurance.",
+    "part": "body",
+    "sk": true
+   },
+   {
+    "text": "",
+    "part": "body",
+    "sk": true
+   },
+   {
+    "text": "For additional information, contact me at the address below.",
+    "part": "body",
+    "sk": true
+   },
+   {
+    "text": "",
+    "part": "body",
+    "sk": true
+   },
+   {
+    "text": "D•••",
+    "part": "body",
+    "sk": true
+   },
+   {
+    "text": "-- ",
+    "part": "sig",
+    "sk": false
+   },
+   {
+    "text": "| Admiral D•••• E. R•••        \t     |",
+    "part": "sig",
+    "sk": false
+   },
+   {
+    "text": "| d••@anomaly.sbs.com                | ",
+    "part": "sig",
+    "sk": false
+   },
+   {
+    "text": "| ...!uunet!rayssd!anomaly!d••       |",
+    "part": "sig",
+    "sk": false
+   }
+  ],
+  "words": {
+   "all": 92,
+   "ours": 61,
+   "sklearn": 53
+  }
+ }
+]

@@ -1,0 +1,266 @@
+{
+ "pool": 2550,
+ "grid": [
+  {
+   "post": 54,
+   "forum": "talk.politics.mideast",
+   "label": "sig",
+   "lines": 6
+  },
+  {
+   "post": 378,
+   "forum": "talk.politics.mideast",
+   "label": "sig",
+   "lines": 6
+  },
+  {
+   "post": 568,
+   "forum": "comp.sys.mac.hardware",
+   "label": "sig",
+   "lines": 9
+  },
+  {
+   "post": 793,
+   "forum": "sci.med",
+   "label": "both",
+   "lines": 3,
+   "text": "BUT PLEASE E-MAIL ME DIRECTLY because I dont read this newsgroup often (this\nis my first time).\n  \t\t\t\t\t\t....S•••...."
+  },
+  {
+   "post": 813,
+   "forum": "comp.sys.mac.hardware",
+   "label": "sig",
+   "lines": 1
+  },
+  {
+   "post": 977,
+   "forum": "rec.motorcycles",
+   "label": "sig",
+   "lines": 1
+  },
+  {
+   "post": 1088,
+   "forum": "rec.sport.hockey",
+   "label": "words",
+   "lines": 1,
+   "text": "GO LEAFS !!!"
+  },
+  {
+   "post": 1355,
+   "forum": "comp.graphics",
+   "label": "both",
+   "lines": 2,
+   "text": "Thanks for any pointers,\n--V•••••"
+  },
+  {
+   "post": 2449,
+   "forum": "talk.politics.guns",
+   "label": "sig",
+   "lines": 4
+  },
+  {
+   "post": 2780,
+   "forum": "comp.windows.x",
+   "label": "words",
+   "lines": 2,
+   "text": "\tDoes anyone have any information on joining the X Consortium ? What\nare the costs, what are the benefits, who should I contact ? Thanks"
+  },
+  {
+   "post": 2862,
+   "forum": "soc.religion.christian",
+   "label": "sig",
+   "lines": 1
+  },
+  {
+   "post": 2986,
+   "forum": "comp.sys.mac.hardware",
+   "label": "both",
+   "lines": 2,
+   "text": "j••••@csa.bu.edu  (if you have a good idea, please e-mail it to this\naddress if possible, I can't check this newsgroup constantly, thanks)"
+  },
+  {
+   "post": 3102,
+   "forum": "rec.motorcycles",
+   "label": "words",
+   "lines": 1,
+   "text": "thanks."
+  },
+  {
+   "post": 3176,
+   "forum": "comp.windows.x",
+   "label": "sig",
+   "lines": 5
+  },
+  {
+   "post": 3429,
+   "forum": "comp.graphics",
+   "label": "sig",
+   "lines": 2
+  },
+  {
+   "post": 3718,
+   "forum": "comp.sys.ibm.pc.hardware",
+   "label": "sig",
+   "lines": 3
+  },
+  {
+   "post": 3827,
+   "forum": "alt.atheism",
+   "label": "sig",
+   "lines": 1
+  },
+  {
+   "post": 4606,
+   "forum": "sci.electronics",
+   "label": "sig",
+   "lines": 3
+  },
+  {
+   "post": 4642,
+   "forum": "comp.os.ms-windows.misc",
+   "label": "sig",
+   "lines": 2
+  },
+  {
+   "post": 5102,
+   "forum": "comp.sys.mac.hardware",
+   "label": "sig",
+   "lines": 1
+  },
+  {
+   "post": 5216,
+   "forum": "rec.sport.hockey",
+   "label": "sig",
+   "lines": 3
+  },
+  {
+   "post": 5821,
+   "forum": "comp.graphics",
+   "label": "sig",
+   "lines": 2
+  },
+  {
+   "post": 6221,
+   "forum": "comp.sys.mac.hardware",
+   "label": "sig",
+   "lines": 4
+  },
+  {
+   "post": 6298,
+   "forum": "rec.sport.baseball",
+   "label": "sig",
+   "lines": 1
+  },
+  {
+   "post": 6941,
+   "forum": "sci.space",
+   "label": "both",
+   "lines": 4,
+   "text": "Where is Captain Eugenia(sp) when you need it (reference to russian heavy\nlifter, I think).\n==\nM•••••• A••••, n••••@acad3.alaska.edu -- I'm not high, just jacked"
+  },
+  {
+   "post": 7228,
+   "forum": "sci.space",
+   "label": "sig",
+   "lines": 1
+  },
+  {
+   "post": 7374,
+   "forum": "rec.motorcycles",
+   "label": "sig",
+   "lines": 3
+  },
+  {
+   "post": 7457,
+   "forum": "comp.sys.mac.hardware",
+   "label": "rule",
+   "lines": 0
+  },
+  {
+   "post": 7875,
+   "forum": "comp.windows.x",
+   "label": "words",
+   "lines": 59,
+   "text": "screen #0:\n  dimensions:    1024x864 pixels (333x281 millimeters)\n  resolution:    78x78 dots per inch\n  depths (2):    1, 8\n  root window id:    0x29\n  depth of root window:    8 planes\n  number of colormaps:    minimum 1, maximum 1\n  default colormap:    0x27\n  default number of colormap cells:    256\n  preallocated pixels:    black 1, white 0\n  options:    backing-store YES, save-unders YES\n  current input event mask:    0xd0001d\n    KeyPressMask             ButtonPressMask          ButtonReleaseMask\n    EnterWindowMask          SubstructureRedirectMask PropertyChangeMask\n    ColormapChangeMask\n  number of visuals:    5\n  default visual id:  0x21\n  visual:\n    visual id:    0x21\n    class:    PseudoColor\n    depth:    8 planes\n    size of colormap:    256 entries\n    red, green, blue masks:    0x0, 0x0, 0x0\n    significant bits in color specification:    8 bits\n  visual:\n    visual id:    0x22\n    class:    GrayScale\n    depth:    8 planes\n    size of colormap:    256 entries\n    red, green, blue masks:    0x0, 0x0, 0x0\n    significant bits in color specification:    8 bits\n  visual:\n    visual id:    0x23\n    class:    StaticGray\n    depth:    8 planes\n    size of colormap:    256 entries\n    red, green, blue masks:    0x0, 0x0, 0x0\n    significant bits in color specification:    8 bits\n  visual:\n    visual id:    0x24\n    class:    StaticColor\n    depth:    8 planes\n    size of colormap:    256 entries\n    red, green, blue masks:    0x7, 0x38, 0xc0\n    significant bits in color specification:    8 bits\n  visual:\n    visual id:    0x25\n    class:    TrueColor\n    depth:    8 planes\n    size of colormap:    8 entries\n    red, green, blue masks:    0x7, 0x38, 0xc0\n    significant bits in color specification:    8 bits\n  number of mono multibuffer types:    5\n    visual id, max buffers, depth:    0x21, 0, 8\n    visual id, max buffers, depth:    0x22, 0, 8\n    visual id, max buffers, depth:    0x23, 0, 8\n    visual id, max buffers, depth:    0x24, 0, 8\n    visual id, max buffers, depth:    0x25, 0, 8\n  number of stereo multibuffer types:    0"
+  },
+  {
+   "post": 7984,
+   "forum": "rec.sport.hockey",
+   "label": "sig",
+   "lines": 1
+  },
+  {
+   "post": 8790,
+   "forum": "misc.forsale",
+   "label": "sig",
+   "lines": 1
+  },
+  {
+   "post": 9170,
+   "forum": "comp.windows.x",
+   "label": "words",
+   "lines": 3,
+   "text": "  1. Does _XtConstraintBit exist in SCO ODT 2.0? ( Does _XtConstraintBit use\n      in X11R3 & X11R4? And What release does SCO ODT 2.0 use, X11R3 or X11R4?)\n  2. If not, Does someone know how to work around?"
+  },
+  {
+   "post": 9229,
+   "forum": "talk.religion.misc",
+   "label": "sig",
+   "lines": 1
+  },
+  {
+   "post": 9947,
+   "forum": "comp.windows.x",
+   "label": "sig",
+   "lines": 1
+  },
+  {
+   "post": 9983,
+   "forum": "talk.politics.mideast",
+   "label": "sig",
+   "lines": 3
+  },
+  {
+   "post": 10017,
+   "forum": "talk.politics.mideast",
+   "label": "sig",
+   "lines": 4
+  },
+  {
+   "post": 10357,
+   "forum": "sci.electronics",
+   "label": "sig",
+   "lines": 8
+  },
+  {
+   "post": 10421,
+   "forum": "rec.motorcycles",
+   "label": "sig",
+   "lines": 6
+  },
+  {
+   "post": 10434,
+   "forum": "comp.sys.mac.hardware",
+   "label": "sig",
+   "lines": 3
+  },
+  {
+   "post": 11052,
+   "forum": "comp.os.ms-windows.misc",
+   "label": "sig",
+   "lines": 1
+  }
+ ],
+ "views": {
+  "as parsed": [
+   0.8235,
+   0.8527,
+   0.8067
+  ],
+  "last block cut": [
+   0.816,
+   0.8364,
+   0.8042
+  ]
+ }
+}

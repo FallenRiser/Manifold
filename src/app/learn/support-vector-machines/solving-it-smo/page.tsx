@@ -237,346 +237,352 @@ export default function Page() {
         titleSize={42}
       />
 
-      <p>
-        Page 10 finished the dual and stopped there. Maximise
-      </p>
+      <div className="lesson">
+        <p>
+          Page 10 finished the dual and stopped there. Maximise
+        </p>
 
-      <MathBlock>{String.raw`\begin{gathered}
+        <MathBlock>{String.raw`\begin{gathered}
 \sum_i \alpha_i - \tfrac{1}{2}\sum_i\sum_j \alpha_i \alpha_j y_i y_j k(x_i, x_j) \\[6pt]
 \text{subject to}\quad 0 \le \alpha_i \le C, \qquad \sum_i \alpha_i y_i = 0
 \end{gathered}`}</MathBlock>
 
-      <p>
-        and every page since has assumed that happens. It is a convex quadratic program, so you
-        could hand it to a general solver and many people do — page 8 did exactly that. But
-        the solver everyone actually runs, inside libsvm and therefore inside{" "}
-        <code>sklearn.svm.SVC</code>, is not a general one. It is about two hundred lines, it does
-        no linear algebra bigger than a dot product, and it exists because of one small feature of
-        the problem above.
-      </p>
+        <p>
+          and every page since has assumed that happens. It is a convex quadratic program, so you
+          could hand it to a general solver and many people do — page 8 did exactly that. But
+          the solver everyone actually runs, inside libsvm and therefore inside{" "}
+          <code>sklearn.svm.SVC</code>, is not a general one. It is about two hundred lines, it does
+          no linear algebra bigger than a dot product, and it exists because of one small feature of
+          the problem above.
+        </p>
 
-      <h2>Why you cannot move one at a time</h2>
+        <h2>Why you cannot move one at a time</h2>
 
-      <p>
-        The obvious attack on a problem with <M>{String.raw`n`}</M> variables and simple bounds is
-        coordinate ascent: pick one variable, maximise over it with the rest held still, repeat.
-        It is easy, it is cheap, and here it is not available.
-      </p>
+        <p>
+          The obvious attack on a problem with <M>{String.raw`n`}</M> variables and simple bounds is
+          coordinate ascent: pick one variable, maximise over it with the rest held still, repeat.
+          It is easy, it is cheap, and here it is not available.
+        </p>
 
-      <p>
-        The equality constraint is why. <M>{String.raw`\sum_i \alpha_i y_i = 0`}</M> couples every
-        variable to every other one, so changing <M>{String.raw`\alpha_1`}</M> alone moves that sum
-        off zero by <M>{String.raw`\delta y_1`}</M>, and the new point is not a legal answer to the
-        problem at all.
-      </p>
+        <p>
+          The equality constraint is why. <M>{String.raw`\sum_i \alpha_i y_i = 0`}</M> couples every
+          variable to every other one, so changing <M>{String.raw`\alpha_1`}</M> alone moves that sum
+          off zero by <M>{String.raw`\delta y_1`}</M>, and the new point is not a legal answer to the
+          problem at all.
+        </p>
 
-      <CodeOutput source="scripts/svm_cases.py">{outTwo}</CodeOutput>
+        <CodeOutput source="scripts/svm_cases.py">{outTwo}</CodeOutput>
 
-      <p>
-        So two is the smallest move that exists, and that is where the name comes from:{" "}
-        <em>sequential minimal optimisation</em> is sequential because it does one small problem
-        after another, and minimal because two variables is the minimum a legal problem can have.
-      </p>
+        <p>
+          So two is the smallest move that exists, and that is where the name comes from:{" "}
+          <em>sequential minimal optimisation</em> is sequential because it does one small problem
+          after another, and minimal because two variables is the minimum a legal problem can have.
+        </p>
 
-      <p>
-        Fix the other <M>{String.raw`n - 2`}</M> and the pair that is left is not two free numbers.
-        Their weighted sum has to stay where it was, which pins them to a line. Opposite labels fix
-        their difference and the line has slope <M>{String.raw`+1`}</M>; equal labels fix their sum
-        and it has slope <M>{String.raw`-1`}</M>. Along that line the objective is a quadratic in a
-        single variable, and the maximum of a quadratic is a formula:
-      </p>
+        <p>
+          Fix the other <M>{String.raw`n - 2`}</M> and the pair that is left is not two free numbers.
+          Their weighted sum has to stay where it was, which pins them to a line. Opposite labels fix
+          their difference and the line has slope <M>{String.raw`+1`}</M>; equal labels fix their sum
+          and it has slope <M>{String.raw`-1`}</M>. Along that line the objective is a quadratic in a
+          single variable, and the maximum of a quadratic is a formula:
+        </p>
 
-      <MathBlock>{String.raw`\begin{gathered}
+        <MathBlock>{String.raw`\begin{gathered}
 \eta = 2k(x_i,x_j) - k(x_i,x_i) - k(x_j,x_j) \\[6pt]
 \alpha_j \leftarrow \alpha_j - \frac{y_j (E_i - E_j)}{\eta},
 \qquad E_k = f(x_k) - y_k
 \end{gathered}`}</MathBlock>
 
-      <Callout color={PINK} title="Positive semi-definite, arriving as a licence to divide">
+        <Callout color={PINK} title="Positive semi-definite, arriving as a licence to divide">
+          <p>
+            Page 12 demanded a positive semi-definite kernel and justified it geometrically — a
+            negative eigenvalue would put a pair of points at negative squared distance. Here is the
+            same condition doing a completely different job. <M>{String.raw`\eta`}</M> is the
+            curvature of that one-variable quadratic, and PSD is exactly what guarantees it is never
+            positive: measured over all 3,540 pairs, the largest is{" "}
+            <M>{String.raw`-1.211 \times 10^{-3}`}</M>. If it could come out positive the quadratic
+            would open upwards and the formula would step to its <em>minimum</em>.
+          </p>
+          <p>
+            And it is exactly zero, not nearly zero, when two points are identical — the line
+            runs along a level set and there is nothing to step to. That is the branch every SMO
+            implementation carries for skipping a pair, and duplicated rows in a training set are how
+            you meet it.
+          </p>
+        </Callout>
+
+        <h2>A quadratic on a line in a box</h2>
+
         <p>
-          Page 12 demanded a positive semi-definite kernel and justified it geometrically — a
-          negative eigenvalue would put a pair of points at negative squared distance. Here is the
-          same condition doing a completely different job. <M>{String.raw`\eta`}</M> is the
-          curvature of that one-variable quadratic, and PSD is exactly what guarantees it is never
-          positive: measured over all 3,540 pairs, the largest is{" "}
-          <M>{String.raw`-1.211 \times 10^{-3}`}</M>. If it could come out positive the quadratic
-          would open upwards and the formula would step to its <em>minimum</em>.
+          The formula maximises over the whole line. The box enters afterwards, as a clip to the part
+          of that line which is actually feasible:
         </p>
-        <p>
-          And it is exactly zero, not nearly zero, when two points are identical — the line
-          runs along a level set and there is nothing to step to. That is the branch every SMO
-          implementation carries for skipping a pair, and duplicated rows in a training set are how
-          you meet it.
-        </p>
-      </Callout>
 
-      <h2>A quadratic on a line in a box</h2>
-
-      <p>
-        The formula maximises over the whole line. The box enters afterwards, as a clip to the part
-        of that line which is actually feasible:
-      </p>
-
-      <MathBlock>{String.raw`\begin{gathered}
+        <MathBlock>{String.raw`\begin{gathered}
 y_i \ne y_j:\quad L = \max(0,\; \alpha_j - \alpha_i), \quad H = \min(C,\; C + \alpha_j - \alpha_i) \\[6pt]
 y_i = y_j:\quad L = \max(0,\; \alpha_i + \alpha_j - C), \quad H = \min(C,\; \alpha_i + \alpha_j) \\[6pt]
 \alpha_j \leftarrow \min\!\big(H,\; \max(L,\; \alpha_j^{\text{new}})\big)
 \end{gathered}`}</MathBlock>
 
-      <p>
-        That clip is where the soft margin lives. Landing on <M>{String.raw`L`}</M> or{" "}
-        <M>{String.raw`H`}</M> is a price hitting a wall, and a price pinned at{" "}
-        <M>{String.raw`C`}</M> is exactly page 5&apos;s point sitting inside its own margin. Run
-        the whole thing on sixty points and it lands where libsvm lands.
-      </p>
-
-      <CodeOutput source="scripts/svm_cases.py">{outClip}</CodeOutput>
-
-      <p>
-        Two quantities move during that climb and only one of them behaves. The objective goes up
-        on every step without exception — 187 steps, zero decreases — and that is the
-        entire convergence argument: each step maximises over a set that contains the current
-        point, so standing still is always available and the step taken is never worse. It does not
-        need the steps to be large or the pair to be well chosen.
-      </p>
-
-      <p>
-        The KKT violation is not like that at all. It starts at 2.00 and by step 5 it is{" "}
-        <strong>5.65</strong>, higher than it began, and it climbs again by step 20. Fixing the
-        worst violation creates new ones, because every price shares one constraint with all the
-        others. So the number the algorithm stops on is not the number that improves, and a run
-        that looks stuck by that measure may be making guaranteed progress by the other.
-      </p>
-
-      <PredictPrompt
-        prompt="You are going to pick the two prices to move. One rule takes the pair that violates the conditions most; the other takes any two at random. Both are guaranteed to converge. How much slower is random?"
-        options={[
-          "About the same — any violating pair raises the objective",
-          "Two or three times slower",
-          "Tens of times slower",
-          "So much slower it does not finish",
-        ]}
-        accent="var(--c-classification)"
-        nudge="The guarantee and the cost are different questions. Try the lab before the next section."
-      />
-
-      <LabFrame
-        accent={PINK}
-        tryThis={<>Press <em>Step</em> a few times and watch the right-hand panel. The line
-          through the square is the only freedom one step has; the hollow dot is where the
-          formula wants to land and the filled one is where the box lets it. Then press{" "}
-          <em>Reset</em>, switch to <em>pair at random</em>, and press <em>Run to the end</em> on
-          each rule in turn.</>}
-        insight={<>Both rules climb on every single step, and both finish at the same objective,
-          the same five support vectors and the same three pinned at <M>{String.raw`C`}</M>. The
-          maximal-violating pair gets there in <strong>9</strong> steps; drawing the pair at
-          random takes <strong>254</strong>. Convergence and usefulness are different properties,
-          and only one of them is what the proof gives you.</>}
-      >
-        <SmoStepLab />
-      </LabFrame>
-
-      <h2>Which two, and why that is the whole algorithm</h2>
-
-      <p>
-        Nothing above says which pair to step on, and convergence genuinely does not care: any
-        violating pair raises the objective. Practicality cares about almost nothing else. The rule
-        is to take <M>{String.raw`i`}</M> where <M>{String.raw`-y_i \nabla_i`}</M> is largest among
-        the prices that may rise and <M>{String.raw`j`}</M> where it is smallest among those that
-        may fall — the pair whose step a first-order model says buys the most.
-      </p>
-
-      <p>
-        Which is worth an ablation rather than an assertion, so: keep the rule for one end of the
-        pair and draw the other at random, then draw both.
-      </p>
-
-      <CodeOutput source="scripts/svm_cases.py">{outWhich}</CodeOutput>
-
-      <p>
-        Picking one end well and the other at random costs 68 times the steps. Picking neither does
-        not finish: four hundred thousand steps in, it is still further from the optimum than the
-        rule was after <strong>573</strong>. That is the real shape of this algorithm. The step
-        is a formula and the convergence proof is one line, so all of the engineering sits in the
-        selection — and a version with the selection removed is not a slower SVM solver, it is
-        not an SVM solver.
-      </p>
-
-      <h2>When to stop, and what it costs</h2>
-
-      <p>
-        The loop ends when the KKT violation drops under a tolerance you pick. Which raises the
-        obvious question of what that tolerance buys, and the answer is worth having before you
-        ever reach for it to fix a bad score.
-      </p>
-
-      <CodeOutput source="scripts/svm_cases.py">{outStop}</CodeOutput>
-
-      <Callout color={PINK} title="Nine orders of magnitude, one point">
         <p>
-          The gap to the optimum falls through twelve orders of magnitude across that table. The
-          test accuracy moves once, by 0.0033 — one point out of three hundred — between
-          the first row and the second, and then never again. The support count settles by{" "}
-          <M>{String.raw`\texttt{tol}=10^{-2}`}</M> and stays.
+          That clip is where the soft margin lives. Landing on <M>{String.raw`L`}</M> or{" "}
+          <M>{String.raw`H`}</M> is a price hitting a wall, and a price pinned at{" "}
+          <M>{String.raw`C`}</M> is exactly page 5&apos;s point sitting inside its own margin. Run
+          the whole thing on sixty points and it lands where libsvm lands.
         </p>
+
+        <CodeOutput source="scripts/svm_cases.py">{outClip}</CodeOutput>
+
         <p>
-          Everything after that row buys a better answer to the dual and the same model. A
-          tolerance is a statement about the optimisation, not about the fit, and tightening it is
-          not a way to make a model better — it is a way to make it slower.
+          Two quantities move during that climb and only one of them behaves. The objective goes up
+          on every step without exception — 187 steps, zero decreases — and that is the
+          entire convergence argument: each step maximises over a set that contains the current
+          point, so standing still is always available and the step taken is never worse. It does not
+          need the steps to be large or the pair to be well chosen.
         </p>
-      </Callout>
 
-      <p>
-        The per-step cost is where the design shows. Every step changes two prices, so the errors
-        of all <M>{String.raw`n`}</M> points change — and the whole trick is to{" "}
-        <em>update</em> them rather than recompute them. Updating touches two kernel rows,{" "}
-        <M>{String.raw`2n`}</M> numbers; recomputing multiplies the whole matrix,{" "}
-        <M>{String.raw`n^2`}</M>. By <M>{String.raw`n = 1600`}</M> that is 758 times the arithmetic
-        for the same tolerance.
-      </p>
-
-      <p>
-        Step counts, though, are the part nobody can promise you. A few per point on average, but
-        at <M>{String.raw`n = 400`}</M> five draws from one generator span 747 to 2,700 steps —
-        a range wider than the gap between <M>{String.raw`n = 100`}</M> and{" "}
-        <M>{String.raw`n = 800`}</M>. There is no step count to quote, only a shape.
-      </p>
-
-      <Callout color={PINK} title="The number that does not depend on your luck">
         <p>
-          The kernel matrix has <M>{String.raw`n^2`}</M> entries and any of them may be asked for.
-          Ten thousand points is a comfortable 763 MB. A hundred thousand is{" "}
-          <strong>74.5 GB</strong>, and that is the wall — not the step count, not the kernel,
-          not <M>{String.raw`C`}</M>.
+          The KKT violation is not like that at all. It starts at 2.00 and by step 5 it is{" "}
+          <strong>5.65</strong>, higher than it began, and it climbs again by step 20. Fixing the
+          worst violation creates new ones, because every price shares one constraint with all the
+          others. So the number the algorithm stops on is not the number that improves, and a run
+          that looks stuck by that measure may be making guaranteed progress by the other.
         </p>
+
+        <PredictPrompt
+          prompt="You are going to pick the two prices to move. One rule takes the pair that violates the conditions most; the other takes any two at random. Both are guaranteed to converge. How much slower is random?"
+          options={[
+            "About the same — any violating pair raises the objective",
+            "Two or three times slower",
+            "Tens of times slower",
+            "So much slower it does not finish",
+          ]}
+          accent="var(--c-classification)"
+          nudge="The guarantee and the cost are different questions. Try the lab before the next section."
+        />
+
+        <LabFrame
+          accent={PINK}
+          tryThis={<>Press <em>Step</em> a few times and watch the right-hand panel. The line
+            through the square is the only freedom one step has; the hollow dot is where the
+            formula wants to land and the filled one is where the box lets it. Then press{" "}
+            <em>Reset</em>, switch to <em>pair at random</em>, and press <em>Run to the end</em> on
+            each rule in turn.</>}
+          insight={<>Both rules climb on every single step, and both finish at the same objective,
+            the same five support vectors and the same three pinned at <M>{String.raw`C`}</M>. The
+            maximal-violating pair gets there in <strong>9</strong> steps; drawing the pair at
+            random takes <strong>254</strong>. Convergence and usefulness are different properties,
+            and only one of them is what the proof gives you.</>}
+        >
+          <SmoStepLab />
+        </LabFrame>
+
+        <h2>Which two, and why that is the whole algorithm</h2>
+
         <p>
-          Real solvers cache a slice of the matrix and recompute the rest, trading the memory for
-          time without changing the shape. It is the single most useful thing to know about when an
-          SVM is the wrong tool, which page 20 is about.
+          Nothing above says which pair to step on, and convergence genuinely does not care: any
+          violating pair raises the objective. Practicality cares about almost nothing else. The rule
+          is to take <M>{String.raw`i`}</M> where <M>{String.raw`-y_i \nabla_i`}</M> is largest among
+          the prices that may rise and <M>{String.raw`j`}</M> where it is smallest among those that
+          may fall — the pair whose step a first-order model says buys the most.
         </p>
-      </Callout>
 
-      <h2>Where this leaves you</h2>
+        <p>
+          Which is worth an ablation rather than an assertion, so: keep the rule for one end of the
+          pair and draw the other at random, then draw both.
+        </p>
 
-      <p>
-        The algorithm behind every SVM you have ever fitted is: pick two prices, move them along a
-        line inside a square by a closed-form amount, repeat. The convergence proof fits in a
-        sentence. The kernel enters only through <M>{String.raw`\eta`}</M> and the errors, which is
-        why page 12&apos;s substitution really was a one-line change here too.
-      </p>
+        <CodeOutput source="scripts/svm_cases.py">{outWhich}</CodeOutput>
 
-      <p>
-        What is not simple is the selection, and that asymmetry is the page. An algorithm can be
-        provably correct under any choice and still be useless under most of them — 68 times
-        the work for one end chosen badly, and no finish at all for both.
-      </p>
+        <p>
+          Picking one end well and the other at random costs 68 times the steps. Picking neither does
+          not finish: four hundred thousand steps in, it is still further from the optimum than the
+          rule was after <strong>573</strong>. That is the real shape of this algorithm. The step
+          is a formula and the convergence proof is one line, so all of the engineering sits in the
+          selection — and a version with the selection removed is not a slower SVM solver, it is
+          not an SVM solver.
+        </p>
 
-      <p>
-        Page 15 goes back to the data. Every solver on this track has been handed standardised
-        features without much comment, and page 13 already showed one polynomial fit hitting a
-        two-million-iteration cap because it was not. Scaling is not hygiene here; it is the
-        difference between the loop above terminating and not.
-      </p>
+        <h2>When to stop, and what it costs</h2>
 
-      <Quiz
-        questions={[
-          {
-            q: (
-              <>
-                Why does SMO move two multipliers at a time rather than one?
-              </>
-            ),
-            options: [
-              "Two converges faster than one",
-              "The constraint ∑ αᵢ yᵢ = 0 makes any single-variable move infeasible",
-              "The box constraints 0 ≤ α ≤ C require it",
-              "Because the kernel is evaluated on pairs of points",
-            ],
-            answer: 1,
-            explain: (
-              <>
-                The equality constraint couples all <M>{String.raw`n`}</M> variables. Changing one
-                by <M>{String.raw`\delta`}</M> moves the sum by <M>{String.raw`\delta y_i`}</M>,
-                so the result is not a feasible point at all — the only legal single-variable
-                step is no step. Two is the minimum, which is the &ldquo;minimal&rdquo; in the name.
-                The box constraints would be perfectly happy with one variable at a time.
-              </>
-            ),
-          },
-          {
-            q: <>What does it mean when a step gets clipped to L or H?</>,
-            options: [
-              "The solver has failed to converge and should be restarted",
-              "The kernel is not positive semi-definite",
-              "The unconstrained optimum lies outside the box, so a price lands on a bound",
-              "The two points are identical",
-            ],
-            answer: 2,
-            explain: (
-              <>
-                The formula maximises along the whole line; the clip cuts it to the feasible
-                segment. Landing on a bound is completely normal — about a quarter of the
-                steps in the run above — and landing on <M>{String.raw`H = C`}</M> is how a
-                point becomes one of page 10&apos;s margin violators. Identical points are the
-                separate <M>{String.raw`\eta = 0`}</M> case, where the pair is skipped.
-              </>
-            ),
-          },
-          {
-            q: (
-              <>
-                During a run, the objective rises on every step but the KKT violation goes{" "}
-                <em>up</em> between step 1 and step 5. Is something wrong?
-              </>
-            ),
-            options: [
-              "Yes — the violation must decrease monotonically",
-              "No — only the objective is guaranteed monotone; fixing one violation creates others",
-              "Yes — it means the pair selection rule is broken",
-              "No — but only because the tolerance has not been reached yet",
-            ],
-            answer: 1,
-            explain: (
-              <>
-                Each step maximises over a set containing the current point, so the objective
-                cannot fall. Nothing makes the same promise about the violation: every price shares
-                the equality constraint, so repairing the worst one disturbs others. It starts at
-                2.00 and reaches 5.65 by step 5 in the measured run. The quantity you stop on and
-                the quantity that improves are not the same quantity.
-              </>
-            ),
-          },
-          {
-            q: (
-              <>
-                Your SVM scores poorly. Someone suggests tightening <code>tol</code> from{" "}
-                1e-3 to 1e-9. What should you expect?
-              </>
-            ),
-            options: [
-              "A better score, since the dual is solved more accurately",
-              "A better score only if the kernel is rbf",
-              "Roughly 5x the steps and the same model",
-              "A worse score, from overfitting the dual",
-            ],
-            answer: 2,
-            explain: (
-              <>
-                In the measured sweep the tolerance ran over nine orders of magnitude, the gap to
-                the optimum fell through twelve, and the test accuracy moved once by one point in
-                three hundred — between the two loosest rows — then held. Steps went from
-                573 to 3,162. A tolerance is a statement about the optimisation, not about the fit;
-                a bad score is a question for <M>{String.raw`C`}</M>, the kernel, or the features.
-              </>
-            ),
-          },
-        ]}
-      />
+        <p>
+          The loop ends when the KKT violation drops under a tolerance you pick. Which raises the
+          obvious question of what that tolerance buys, and the answer is worth having before you
+          ever reach for it to fix a bad score.
+        </p>
+
+        <CodeOutput source="scripts/svm_cases.py">{outStop}</CodeOutput>
+
+        <Callout color={PINK} title="Nine orders of magnitude, one point">
+          <p>
+            The gap to the optimum falls through twelve orders of magnitude across that table. The
+            test accuracy moves once, by 0.0033 — one point out of three hundred — between
+            the first row and the second, and then never again. The support count settles by{" "}
+            <M>{String.raw`\texttt{tol}=10^{-2}`}</M> and stays.
+          </p>
+          <p>
+            Everything after that row buys a better answer to the dual and the same model. A
+            tolerance is a statement about the optimisation, not about the fit, and tightening it is
+            not a way to make a model better — it is a way to make it slower.
+          </p>
+        </Callout>
+
+        <p>
+          The per-step cost is where the design shows. Every step changes two prices, so the errors
+          of all <M>{String.raw`n`}</M> points change — and the whole trick is to{" "}
+          <em>update</em> them rather than recompute them. Updating touches two kernel rows,{" "}
+          <M>{String.raw`2n`}</M> numbers; recomputing multiplies the whole matrix,{" "}
+          <M>{String.raw`n^2`}</M>. By <M>{String.raw`n = 1600`}</M> that is 758 times the arithmetic
+          for the same tolerance.
+        </p>
+
+        <p>
+          Step counts, though, are the part nobody can promise you. A few per point on average, but
+          at <M>{String.raw`n = 400`}</M> five draws from one generator span 747 to 2,700 steps —
+          a range wider than the gap between <M>{String.raw`n = 100`}</M> and{" "}
+          <M>{String.raw`n = 800`}</M>. There is no step count to quote, only a shape.
+        </p>
+
+        <Callout color={PINK} title="The number that does not depend on your luck">
+          <p>
+            The kernel matrix has <M>{String.raw`n^2`}</M> entries and any of them may be asked for.
+            Ten thousand points is a comfortable 763 MB. A hundred thousand is{" "}
+            <strong>74.5 GB</strong>, and that is the wall — not the step count, not the kernel,
+            not <M>{String.raw`C`}</M>.
+          </p>
+          <p>
+            Real solvers cache a slice of the matrix and recompute the rest, trading the memory for
+            time without changing the shape. It is the single most useful thing to know about when an
+            SVM is the wrong tool, which page 20 is about.
+          </p>
+        </Callout>
+
+        <h2>Where this leaves you</h2>
+
+        <p>
+          The algorithm behind every SVM you have ever fitted is: pick two prices, move them along a
+          line inside a square by a closed-form amount, repeat. The convergence proof fits in a
+          sentence. The kernel enters only through <M>{String.raw`\eta`}</M> and the errors, which is
+          why page 12&apos;s substitution really was a one-line change here too.
+        </p>
+
+        <p>
+          What is not simple is the selection, and that asymmetry is the page. An algorithm can be
+          provably correct under any choice and still be useless under most of them — 68 times
+          the work for one end chosen badly, and no finish at all for both.
+        </p>
+
+        <p>
+          Page 15 goes back to the data. Every solver on this track has been handed standardised
+          features without much comment, and page 13 already showed three polynomial fits hitting a
+          two-million-iteration cap because it was not. Scaling is not hygiene here; it is the
+          difference between the loop above terminating and not.
+        </p>
+
+        <Quiz
+          questions={[
+            {
+              q: (
+                <>
+                  Why does SMO move two multipliers at a time rather than one?
+                </>
+              ),
+              options: [
+                "Two converges faster than one",
+                "The constraint ∑ αᵢ yᵢ = 0 makes any single-variable move infeasible",
+                "The box constraints 0 ≤ α ≤ C require it",
+                "Because the kernel is evaluated on pairs of points",
+              ],
+              answer: 1,
+              explain: (
+                <>
+                  The equality constraint couples all <M>{String.raw`n`}</M> variables. Changing one
+                  by <M>{String.raw`\delta`}</M> moves the sum by <M>{String.raw`\delta y_i`}</M>,
+                  so the result is not a feasible point at all — the only legal single-variable
+                  step is no step. Two is the minimum, which is the &ldquo;minimal&rdquo; in the name.
+                  The box constraints would be perfectly happy with one variable at a time.
+                </>
+              ),
+            },
+            {
+              q: <>What does it mean when a step gets clipped to L or H?</>,
+              options: [
+                "The solver has failed to converge and should be restarted",
+                "The kernel is not positive semi-definite",
+                "The unconstrained optimum lies outside the box, so a price lands on a bound",
+                "The two points are identical",
+              ],
+              answer: 2,
+              explain: (
+                <>
+                  The formula maximises along the whole line; the clip cuts it to the feasible
+                  segment. Landing on a bound is completely normal — about a quarter of the
+                  steps in the run above — and landing on <M>{String.raw`H = C`}</M> is how a
+                  point becomes one of page 10&apos;s margin violators. Identical points are the
+                  separate <M>{String.raw`\eta = 0`}</M> case, where the pair is skipped.
+                </>
+              ),
+            },
+            {
+              q: (
+                <>
+                  During a run, the objective rises on every step but the KKT violation goes{" "}
+                  <em>up</em> between step 1 and step 5. Is something wrong?
+                </>
+              ),
+              options: [
+                "Yes — the violation must decrease monotonically",
+                "No — only the objective is guaranteed monotone; fixing one violation creates others",
+                "Yes — it means the pair selection rule is broken",
+                "No — but only because the tolerance has not been reached yet",
+              ],
+              answer: 1,
+              explain: (
+                <>
+                  Each step maximises over a set containing the current point, so the objective
+                  cannot fall. Nothing makes the same promise about the violation: every price shares
+                  the equality constraint, so repairing the worst one disturbs others. It starts at
+                  2.00 and reaches 5.65 by step 5 in the measured run. The quantity you stop on and
+                  the quantity that improves are not the same quantity.
+                </>
+              ),
+            },
+            {
+              q: (
+                <>
+                  Your SVM scores poorly. Someone suggests tightening <code>tol</code> from{" "}
+                  1e-3 to 1e-9. What should you expect?
+                </>
+              ),
+              options: [
+                "A better score, since the dual is solved more accurately",
+                "A better score only if the kernel is rbf",
+                "Roughly 5x the steps and the same model",
+                "A worse score, from overfitting the dual",
+              ],
+              answer: 2,
+              explain: (
+                <>
+                  In the measured sweep the tolerance ran over nine orders of magnitude, the gap to
+                  the optimum fell through twelve, and the test accuracy moved once by one point in
+                  three hundred — between the two loosest rows — then held. Steps went from
+                  573 to 3,162. A tolerance is a statement about the optimisation, not about the fit;
+                  a bad score is a question for <M>{String.raw`C`}</M>, the kernel, or the features.
+                </>
+              ),
+            },
+          ]}
+        />
+      </div>
 
       <PrevNext
         prev={{
           label: "Kernels you'll actually use",
           href: "/learn/support-vector-machines/kernels-you-will-actually-use",
+        }}
+        next={{
+          label: "Scaling, and why an SVM can't skip it",
+          href: "/learn/support-vector-machines/scaling-and-why-an-svm-cannot-skip-it",
         }}
       />
     </article>

@@ -1,0 +1,232 @@
+{
+ "forum": "rec.motorcycles",
+ "scores": {
+  "whole post": [
+   [
+    "rec.motorcycles",
+    0.535
+   ],
+   [
+    "rec.autos",
+    -0.755
+   ],
+   [
+    "rec.sport.baseball",
+    -0.804
+   ]
+  ],
+  "channels": {
+   "sig": 0.842,
+   "quotes": 0.279,
+   "meta": 0.267,
+   "body": 0.036,
+   "subject": 0.011
+  },
+  "router's view": [
+   [
+    "sci.electronics",
+    -0.677
+   ],
+   [
+    "rec.motorcycles",
+    -0.689
+   ],
+   [
+    "rec.sport.baseball",
+    -0.764
+   ]
+  ]
+ },
+ "lines": [
+  [
+   {
+    "part": "meta",
+    "text": "From: ",
+    "pen": false
+   },
+   {
+    "part": "meta",
+    "text": "c••••••",
+    "pen": true
+   },
+   {
+    "part": "meta",
+    "text": "@",
+    "pen": false
+   },
+   {
+    "part": "meta",
+    "text": "mbunix",
+    "pen": true
+   },
+   {
+    "part": "meta",
+    "text": ".",
+    "pen": false
+   },
+   {
+    "part": "meta",
+    "text": "mitre",
+    "pen": true
+   },
+   {
+    "part": "meta",
+    "text": ".org (C••••••)",
+    "pen": false
+   }
+  ],
+  [
+   {
+    "part": "subject",
+    "text": "Subject: Re: Good Reasons to Wave at each other",
+    "pen": false
+   }
+  ],
+  [
+   {
+    "part": "meta",
+    "text": "Nntp-Posting-Host: mbunix.mitre.org",
+    "pen": false
+   }
+  ],
+  [
+   {
+    "part": "meta",
+    "text": "Organization: The MITRE Corporation, Bedford, MA",
+    "pen": false
+   }
+  ],
+  [
+   {
+    "part": "meta",
+    "text": "Lines: 13",
+    "pen": false
+   }
+  ],
+  [
+   {
+    "part": "quotes",
+    "text": "In article <a•••••••••••••••@infmx> a•••••@informix.com (A••••• V•••) writes:",
+    "pen": false
+   }
+  ],
+  [
+   {
+    "part": "quotes",
+    "text": ">Has anyone else ever caught themselves waving at oncoming ",
+    "pen": false
+   },
+   {
+    "part": "quotes",
+    "text": "motorcycle",
+    "pen": true
+   },
+   {
+    "part": "quotes",
+    "text": " ",
+    "pen": false
+   },
+   {
+    "part": "quotes",
+    "text": "riders",
+    "pen": true
+   }
+  ],
+  [
+   {
+    "part": "quotes",
+    "text": ">while in a car?",
+    "pen": false
+   }
+  ],
+  [
+   {
+    "part": "quotes",
+    "text": ">",
+    "pen": false
+   }
+  ],
+  [
+   {
+    "part": "body",
+    "text": "I've caught myself doing it while on my bicycle.  Does that count?",
+    "pen": false
+   }
+  ],
+  [],
+  [
+   {
+    "part": "body",
+    "text": "D•••",
+    "pen": false
+   }
+  ],
+  [],
+  [
+   {
+    "part": "sig",
+    "text": "-- ",
+    "pen": false
+   }
+  ],
+  [
+   {
+    "part": "sig",
+    "text": "| D••• C•••••• / d•••••••@mitre.org / 617 •••-••••    | ",
+    "pen": false
+   },
+   {
+    "part": "sig",
+    "text": "DoD",
+    "pen": true
+   },
+   {
+    "part": "sig",
+    "text": " #•••  ",
+    "pen": false
+   },
+   {
+    "part": "sig",
+    "text": "AMA",
+    "pen": true
+   },
+   {
+    "part": "sig",
+    "text": " #•••••• |",
+    "pen": false
+   }
+  ],
+  [
+   {
+    "part": "sig",
+    "text": "| The MITRE Corp. Burlington Rd., Bedford, Ma. •••••  | KotNML  /  KotB       |",
+    "pen": false
+   }
+  ],
+  [
+   {
+    "part": "sig",
+    "text": "| \"The ",
+    "pen": false
+   },
+   {
+    "part": "sig",
+    "text": "road",
+    "pen": true
+   },
+   {
+    "part": "sig",
+    "text": " is my shepherd and I shall not stop\"      | '92 VFR750F           |",
+    "pen": false
+   }
+  ],
+  [
+   {
+    "part": "sig",
+    "text": "| -Sam Eliott, Road Hogs MTV 1993                     | '88 Bianchi Limited   |",
+    "pen": false
+   }
+  ],
+  []
+ ]
+}

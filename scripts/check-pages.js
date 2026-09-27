@@ -16,6 +16,10 @@
 //       independently.  Several hundred hand-written maths answers are the
 //       largest source of silently-wrong numbers this site can have: a sign
 //       error passes tsc, passes R1 and R2, and passes a careful read.
+//   R4  A page with a <LessonHeader> must wrap its body in className="lesson".
+//       Every heading, paragraph and list style lives under .lesson in
+//       globals.css; without the wrapper the page compiles, renders, and shows
+//       every h2 as plain 16px body text. Three SVM pages shipped like that.
 //
 // Exit 0 = clean.  Exit 1 = violations, listed.
 const fs = require("fs");
@@ -74,6 +78,14 @@ for (const file of pages) {
     violations.push(
       `R3  ${rel}  renders <Worked>/<Practice> but is not listed in scripts/math_check.py's ` +
         `PAGES map — every published answer must be recomputed independently.`
+    );
+  }
+
+  // R4  the body styles only apply inside .lesson.
+  if (/<LessonHeader[\s>]/.test(src) && !/className="lesson[" ]/.test(src)) {
+    violations.push(
+      `R4  ${rel}  has a <LessonHeader> but no className="lesson" wrapper — its headings, ` +
+        `paragraphs and lists will render unstyled.`
     );
   }
 }
