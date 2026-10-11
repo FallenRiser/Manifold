@@ -1,0 +1,21 @@
+{
+ "seeds": 5,
+ "combos": {
+  "none": 0.8744,
+  "meta": 0.8894,
+  "quotes": 0.9121,
+  "meta+quotes": 0.9243,
+  "sig": 0.878,
+  "meta+sig": 0.8867,
+  "quotes+sig": 0.9145,
+  "meta+quotes+sig": 0.923,
+  "tail": 0.8782,
+  "meta+tail": 0.89,
+  "quotes+tail": 0.9162,
+  "meta+quotes+tail": 0.9264,
+  "sig+tail": 0.8838,
+  "meta+sig+tail": 0.8867,
+  "quotes+sig+tail": 0.9193,
+  "meta+quotes+sig+tail": 0.9247
+ }
+}

@@ -1,0 +1,364 @@
+{
+ "reading": "+ all four",
+ "setting": 0.01,
+ "beta": 1.0,
+ "pick": 1.0,
+ "harness": {
+  "n": {
+   "usual": 1548,
+   "other": 77,
+   "never": 177,
+   "new": 2164
+  },
+  "known": 0.3653,
+  "rows": [
+   {
+    "w": 0.0,
+    "all": 0.855,
+    "weighted": 0.8482,
+    "usual": 0.9193,
+    "other": 0.8571,
+    "never": 0.7175,
+    "new": 0.8202,
+    "fixed": {
+     "usual": 0,
+     "other": 0,
+     "never": 0,
+     "new": 0
+    },
+    "broken": {
+     "usual": 0,
+     "other": 0,
+     "never": 0,
+     "new": 0
+    }
+   },
+   {
+    "w": 0.01,
+    "all": 0.8553,
+    "weighted": 0.8484,
+    "usual": 0.9199,
+    "other": 0.8571,
+    "never": 0.7175,
+    "new": 0.8202,
+    "fixed": {
+     "usual": 1,
+     "other": 0,
+     "never": 0,
+     "new": 0
+    },
+    "broken": {
+     "usual": 0,
+     "other": 0,
+     "never": 0,
+     "new": 0
+    }
+   },
+   {
+    "w": 0.03,
+    "all": 0.8555,
+    "weighted": 0.8486,
+    "usual": 0.9212,
+    "other": 0.8571,
+    "never": 0.7119,
+    "new": 0.8202,
+    "fixed": {
+     "usual": 3,
+     "other": 0,
+     "never": 0,
+     "new": 0
+    },
+    "broken": {
+     "usual": 0,
+     "other": 0,
+     "never": 1,
+     "new": 0
+    }
+   },
+   {
+    "w": 0.1,
+    "all": 0.8585,
+    "weighted": 0.851,
+    "usual": 0.9289,
+    "other": 0.8571,
+    "never": 0.7119,
+    "new": 0.8202,
+    "fixed": {
+     "usual": 15,
+     "other": 0,
+     "never": 0,
+     "new": 0
+    },
+    "broken": {
+     "usual": 0,
+     "other": 0,
+     "never": 1,
+     "new": 0
+    }
+   },
+   {
+    "w": 0.3,
+    "all": 0.8651,
+    "weighted": 0.8563,
+    "usual": 0.9477,
+    "other": 0.8442,
+    "never": 0.7006,
+    "new": 0.8202,
+    "fixed": {
+     "usual": 44,
+     "other": 0,
+     "never": 0,
+     "new": 0
+    },
+    "broken": {
+     "usual": 0,
+     "other": 1,
+     "never": 3,
+     "new": 0
+    }
+   },
+   {
+    "w": 1.0,
+    "all": 0.8732,
+    "weighted": 0.8628,
+    "usual": 0.98,
+    "other": 0.8052,
+    "never": 0.6158,
+    "new": 0.8202,
+    "fixed": {
+     "usual": 94,
+     "other": 1,
+     "never": 0,
+     "new": 0
+    },
+    "broken": {
+     "usual": 0,
+     "other": 5,
+     "never": 18,
+     "new": 0
+    }
+   },
+   {
+    "w": 3.0,
+    "all": 0.8628,
+    "weighted": 0.8545,
+    "usual": 0.9961,
+    "other": 0.7013,
+    "never": 0.2881,
+    "new": 0.8202,
+    "fixed": {
+     "usual": 119,
+     "other": 1,
+     "never": 0,
+     "new": 0
+    },
+    "broken": {
+     "usual": 0,
+     "other": 13,
+     "never": 76,
+     "new": 0
+    }
+   },
+   {
+    "w": 10.0,
+    "all": 0.8472,
+    "weighted": 0.8419,
+    "usual": 0.9981,
+    "other": 0.4805,
+    "never": 0.0169,
+    "new": 0.8202,
+    "fixed": {
+     "usual": 122,
+     "other": 1,
+     "never": 0,
+     "new": 0
+    },
+    "broken": {
+     "usual": 0,
+     "other": 30,
+     "never": 124,
+     "new": 0
+    }
+   }
+  ]
+ },
+ "later": {
+  "n": {
+   "usual": 756,
+   "other": 48,
+   "never": 119,
+   "new": 1604
+  },
+  "known": 0.3653,
+  "rows": [
+   {
+    "w": 0.0,
+    "all": 0.8469,
+    "weighted": 0.8469,
+    "usual": 0.9167,
+    "other": 0.7083,
+    "never": 0.6555,
+    "new": 0.8323,
+    "fixed": {
+     "usual": 0,
+     "other": 0,
+     "never": 0,
+     "new": 0
+    },
+    "broken": {
+     "usual": 0,
+     "other": 0,
+     "never": 0,
+     "new": 0
+    }
+   },
+   {
+    "w": 0.01,
+    "all": 0.8469,
+    "weighted": 0.8469,
+    "usual": 0.9167,
+    "other": 0.7083,
+    "never": 0.6555,
+    "new": 0.8323,
+    "fixed": {
+     "usual": 0,
+     "other": 0,
+     "never": 0,
+     "new": 0
+    },
+    "broken": {
+     "usual": 0,
+     "other": 0,
+     "never": 0,
+     "new": 0
+    }
+   },
+   {
+    "w": 0.03,
+    "all": 0.8472,
+    "weighted": 0.8472,
+    "usual": 0.918,
+    "other": 0.7083,
+    "never": 0.6555,
+    "new": 0.8323,
+    "fixed": {
+     "usual": 1,
+     "other": 0,
+     "never": 0,
+     "new": 0
+    },
+    "broken": {
+     "usual": 0,
+     "other": 0,
+     "never": 0,
+     "new": 0
+    }
+   },
+   {
+    "w": 0.1,
+    "all": 0.8492,
+    "weighted": 0.8492,
+    "usual": 0.9246,
+    "other": 0.7083,
+    "never": 0.6555,
+    "new": 0.8323,
+    "fixed": {
+     "usual": 6,
+     "other": 0,
+     "never": 0,
+     "new": 0
+    },
+    "broken": {
+     "usual": 0,
+     "other": 0,
+     "never": 0,
+     "new": 0
+    }
+   },
+   {
+    "w": 0.3,
+    "all": 0.8548,
+    "weighted": 0.8548,
+    "usual": 0.9431,
+    "other": 0.75,
+    "never": 0.6387,
+    "new": 0.8323,
+    "fixed": {
+     "usual": 20,
+     "other": 3,
+     "never": 0,
+     "new": 0
+    },
+    "broken": {
+     "usual": 0,
+     "other": 1,
+     "never": 2,
+     "new": 0
+    }
+   },
+   {
+    "w": 1.0,
+    "all": 0.856,
+    "weighted": 0.856,
+    "usual": 0.9669,
+    "other": 0.7083,
+    "never": 0.5294,
+    "new": 0.8323,
+    "fixed": {
+     "usual": 38,
+     "other": 5,
+     "never": 0,
+     "new": 0
+    },
+    "broken": {
+     "usual": 0,
+     "other": 5,
+     "never": 15,
+     "new": 0
+    }
+   },
+   {
+    "w": 3.0,
+    "all": 0.8453,
+    "weighted": 0.8453,
+    "usual": 0.9921,
+    "other": 0.5417,
+    "never": 0.2101,
+    "new": 0.8323,
+    "fixed": {
+     "usual": 57,
+     "other": 5,
+     "never": 0,
+     "new": 0
+    },
+    "broken": {
+     "usual": 0,
+     "other": 13,
+     "never": 53,
+     "new": 0
+    }
+   },
+   {
+    "w": 10.0,
+    "all": 0.8366,
+    "weighted": 0.8366,
+    "usual": 0.996,
+    "other": 0.4375,
+    "never": 0.042,
+    "new": 0.8323,
+    "fixed": {
+     "usual": 60,
+     "other": 5,
+     "never": 0,
+     "new": 0
+    },
+    "broken": {
+     "usual": 0,
+     "other": 18,
+     "never": 73,
+     "new": 0
+    }
+   }
+  ]
+ }
+}

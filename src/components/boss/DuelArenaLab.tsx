@@ -12,6 +12,7 @@ import { ACTION_NAMES, N_OBS } from "./duelSim";
 import { argmax, decodeNet, margin, qValues, type Net } from "./trainedPolicy";
 import { asset } from "@/lib/asset";
 import { blobTexture, buildArena, envMap } from "./arenaScene";
+import { moveEighth, rollQuarter } from "./controls";
 import { SKIN, buildBoss, buildKnight, disposeFighters, poseBoss, poseKnight } from "./fighters";
 
 // The duel you can actually stand in. The simulation is duelSim.ts, which scripts/boss_port_check.mjs
@@ -43,29 +44,9 @@ const NET_URL = "/boss/dqn_2000k_s0.bin";
 
 type Held = { w: boolean; a: boolean; s: boolean; d: boolean };
 
-/**
- * WASD, in the boss-relative frame the world uses: eighth 0 is straight at the boss, 4 straight
- * away, and the eighths climb the opposite way round from the screen.
- *
- * The player is locked on, so its rotation.y is the player-to-boss angle, and the camera sits
- * BEHIND it looking along the knight's local +z. Looking ALONG +z is the reverse of three.js's
- * default view, which flips the horizontal: local +x lands on the LEFT of the picture. Eighth 2
- * steps along local +x, so binding d to it walked the knight the wrong way. "Go right" is the
- * eighth that steps along local -x, which is 6.
- */
-function heldToEighth(h: Held): number | null {
-  const f = (h.w ? 1 : 0) - (h.s ? 1 : 0);
-  const r = (h.d ? 1 : 0) - (h.a ? 1 : 0);
-  if (f === 0 && r === 0) return null;
-  if (f > 0 && r === 0) return 0;
-  if (f > 0 && r > 0) return 7;
-  if (f === 0 && r > 0) return 6;
-  if (f < 0 && r > 0) return 5;
-  if (f < 0 && r === 0) return 4;
-  if (f < 0 && r < 0) return 3;
-  if (f === 0 && r < 0) return 2;
-  return 1;
-}
+/** WASD as the world's eighths; the table lives in controls.ts, shared with the v2 arena. */
+const axis = (plus: boolean, minus: boolean) => (plus ? 1 : 0) - (minus ? 1 : 0);
+const heldToEighth = (h: Held) => moveEighth(axis(h.w, h.s), axis(h.d, h.a));
 
 const pct = (v: number, max: number) => `${Math.max(0, Math.min(100, (v / max) * 100))}%`;
 
@@ -487,6 +468,8 @@ export function DuelArenaLab({ showNet = false }: { showNet?: boolean } = {}) {
       }
       camAim.lerp(new THREE.Vector3((e.px + e.bx) / 2, 1.45, (e.pz + e.bz) / 2), 1 - Math.pow(0.002, dt));
       camera.lookAt(camAim);
+      // anything of the room standing between the lens and either fighter fades out of the way
+      arena.clearView(camera.position, e.px, e.pz, e.bx, e.bz, dt);
 
       renderer.render(scene, camera);
 
@@ -567,9 +550,8 @@ export function DuelArenaLab({ showNet = false }: { showNet?: boolean } = {}) {
         if (code === "KeyJ") B.queued = A_ATK;
         else if (code === "KeyK") B.queued = A_PARRY;
         else if (code === "Space") {
-          const k = heldToEighth(B.held);
-          const quarter = k === null ? 2 : Math.round(k / 2) % 4; // in / right / back / left
-          B.queued = A_ROLL0 + quarter;
+          // toward the held direction; a diagonal rolls to its side (controls.ts says why)
+          B.queued = A_ROLL0 + rollQuarter(axis(B.held.w, B.held.s), axis(B.held.d, B.held.a));
         }
       }
     };
@@ -739,7 +721,7 @@ export function DuelArenaLab({ showNet = false }: { showNet?: boolean } = {}) {
           <option value={0.25}>quarter speed</option>
         </select>
         <span style={{ ...mono, color: "var(--faint)" }}>
-          W A S D move · J attack · K parry · Shift guard · Space roll
+          W A S D move · J attack · K parry · Shift guard · Space roll (toward W A S D)
         </span>
       </div>
 

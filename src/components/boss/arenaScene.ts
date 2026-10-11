@@ -12,13 +12,19 @@
 
 import * as THREE from "three";
 import { ARENA } from "./duelSim";
+import { ARCH, BANNER, PILLAR, alongRing, facingIn, hides, layout, pieces, type Kind } from "./sightline";
 
 export type ArenaSet = {
   group: THREE.Group;
   /** brazier flicker, embers, drifting dust, banner sway; t is seconds */
   tick: (t: number, dt: number) => void;
+  /** fade every piece of the room that stands between the camera and the knight at (px, pz) or the
+   *  boss at (bx, bz); call it after the camera has moved, every frame */
+  clearView: (cam: THREE.Vector3, px: number, pz: number, bx: number, bz: number, dt: number) => void;
   dispose: () => void;
 };
+
+type Fadeable = { mats: { m: THREE.Material; base: number }[]; alpha: number };
 
 const junk: { dispose: () => void }[] = [];
 const keep = <T extends { dispose: () => void }>(x: T) => {
@@ -302,6 +308,23 @@ export function buildArena(radius: number = ARENA): ArenaSet {
   wall.position.y = 6.6;
   group.add(wall);
 
+  // ---------------------------------------------------------------- the pieces that can fade
+  // The chase camera swings out past the colonnade whenever the knight is near the edge, and then
+  // any of these can stand between it and a fighter. Each one gets its own materials so it can fade
+  // on its own; clearView() below decides which. Every position and size comes from sightline.ts,
+  // so the shapes the fade tests are the shapes drawn here.
+  const L = layout(R);
+  const fadeByKind: Record<Kind, Fadeable[]> = { pillar: [], brazier: [], statue: [], throne: [], banner: [], arch: [] };
+  // a fading piece is drawn in the transparent pass from the start, at opacity 1, so fading it never
+  // swaps its shader
+  const own = <M extends THREE.Material>(m: M) => {
+    const c = keep(m.clone() as M);
+    c.transparent = true;
+    return c;
+  };
+  const fadeable = (kind: Kind, mats: THREE.Material[]) =>
+    fadeByKind[kind].push({ mats: mats.map((m) => ({ m, base: m.opacity })), alpha: 1 });
+
   // ---------------------------------------------------------------- the colonnade
   // Two tiers. The near ring of buttresses stands inside the wall and is what the fighters are
   // read against; the arcade behind it is only ever seen in silhouette, which is the cheapest
@@ -309,107 +332,100 @@ export function buildArena(radius: number = ARENA): ArenaSet {
   const stoneMat = keep(new THREE.MeshStandardMaterial({ color: 0x232733, roughness: 0.95 }));
   const darkStone = keep(new THREE.MeshStandardMaterial({ color: 0x171a23, roughness: 1 }));
 
-  const N_PILLAR = 16;
-  const pillarGeo = keep(new THREE.CylinderGeometry(0.34, 0.5, 11, 7));
-  const pillars = new THREE.InstancedMesh(pillarGeo, stoneMat, N_PILLAR);
-  const capGeo = keep(new THREE.BoxGeometry(1.15, 0.42, 1.15));
-  const caps = new THREE.InstancedMesh(capGeo, darkStone, N_PILLAR * 2);
-  const tmp = new THREE.Object3D();
-  for (let i = 0; i < N_PILLAR; i++) {
-    const a = (i / N_PILLAR) * Math.PI * 2 + 0.1;
-    const rad = R + 2.1;
-    const h = 0.8 + ((i * 7) % 5) * 0.1;
-    tmp.position.set(Math.sin(a) * rad, 5.2 * h, Math.cos(a) * rad);
-    tmp.rotation.set(0, -a, 0);
-    tmp.scale.set(1, h, 1);
-    tmp.updateMatrix();
-    pillars.setMatrixAt(i, tmp.matrix);
-
+  const pillarGeo = keep(new THREE.CylinderGeometry(PILLAR.rTop, PILLAR.rBottom, PILLAR.height, 7));
+  const capGeo = keep(new THREE.BoxGeometry(PILLAR.cap, PILLAR.capH, PILLAR.cap));
+  for (const p of L.pillars) {
+    const shaftMat = own(stoneMat);
+    const capMat = own(darkStone);
+    const col = new THREE.Group();
+    col.position.set(p.x, 0, p.z);
+    col.rotation.y = alongRing(p.a);
+    const shaft = new THREE.Mesh(pillarGeo, shaftMat);
+    shaft.position.y = PILLAR.centre * p.h;
+    shaft.scale.y = p.h;
     // a base and a capital, which is most of what makes a cylinder look like a column
-    tmp.scale.set(1, 1, 1);
-    tmp.position.set(Math.sin(a) * rad, 0.2, Math.cos(a) * rad);
-    tmp.updateMatrix();
-    caps.setMatrixAt(i * 2, tmp.matrix);
-    tmp.position.y = 5.2 * h * 2 - 0.2;
-    tmp.updateMatrix();
-    caps.setMatrixAt(i * 2 + 1, tmp.matrix);
+    const base = new THREE.Mesh(capGeo, capMat);
+    base.position.y = 0.2;
+    const capital = new THREE.Mesh(capGeo, capMat);
+    capital.position.y = PILLAR.centre * p.h * 2 - 0.2;
+    col.add(shaft, base, capital);
+    group.add(col);
+    fadeable("pillar", [shaftMat, capMat]);
   }
-  group.add(pillars, caps);
 
   // the arcade: a far ring of arches, deliberately unlit
-  const N_ARCH = 26;
-  const archGeo = keep(new THREE.TorusGeometry(1.5, 0.34, 5, 10, Math.PI));
-  const arches = new THREE.InstancedMesh(archGeo, darkStone, N_ARCH);
-  for (let i = 0; i < N_ARCH; i++) {
-    const a = (i / N_ARCH) * Math.PI * 2;
-    const rad = R + 7.5;
-    tmp.position.set(Math.sin(a) * rad, 3.4, Math.cos(a) * rad);
-    tmp.rotation.set(0, -a + Math.PI / 2, 0);
-    tmp.scale.set(1, 1, 1);
-    tmp.updateMatrix();
-    arches.setMatrixAt(i, tmp.matrix);
+  const archGeo = keep(new THREE.TorusGeometry(ARCH.r, ARCH.tube, 5, 10, Math.PI));
+  for (const c of L.arches) {
+    const m = own(darkStone);
+    const arch = new THREE.Mesh(archGeo, m);
+    arch.position.set(c.x, ARCH.y, c.z);
+    arch.rotation.y = alongRing(c.a);
+    group.add(arch);
+    fadeable("arch", [m]);
   }
-  group.add(arches);
 
   // ---------------------------------------------------------------- the throne wall
   // One big asymmetric feature behind the boss's starting side. A room that is the same in every
   // direction has no orientation, and an arena you cannot orient yourself in is a worse arena.
+  const throneMat = own(stoneMat);
   const throne = new THREE.Group();
-  throne.position.set(0, 0, -(R + 2.4));
-  const dais = new THREE.Mesh(keep(new THREE.CylinderGeometry(3.4, 4.0, 0.7, 12, 1, false, 0, Math.PI)), stoneMat);
+  throne.position.set(L.throne.x, 0, L.throne.z);
+  const dais = new THREE.Mesh(keep(new THREE.CylinderGeometry(3.4, 4.0, 0.7, 12, 1, false, 0, Math.PI)), throneMat);
   dais.rotation.y = Math.PI / 2;
   dais.position.y = -0.1;
   throne.add(dais);
-  const greatArch = new THREE.Mesh(keep(new THREE.TorusGeometry(2.7, 0.6, 6, 16, Math.PI)), stoneMat);
+  const greatArch = new THREE.Mesh(keep(new THREE.TorusGeometry(2.7, 0.6, 6, 16, Math.PI)), throneMat);
   greatArch.position.y = 4.4;
   throne.add(greatArch);
   for (const s of [-1, 1]) {
-    const jamb = new THREE.Mesh(keep(new THREE.BoxGeometry(1.2, 4.6, 1.2)), stoneMat);
+    const jamb = new THREE.Mesh(keep(new THREE.BoxGeometry(1.2, 4.6, 1.2)), throneMat);
     jamb.position.set(s * 2.7, 2.2, 0);
     throne.add(jamb);
   }
   // the dark behind the arch: a black disc, so the arch reads as an opening and not a decoration
-  const gate = new THREE.Mesh(
-    keep(new THREE.CircleGeometry(2.6, 24)),
-    keep(new THREE.MeshBasicMaterial({ color: 0x05060a }))
-  );
+  const gateMat = own(new THREE.MeshBasicMaterial({ color: 0x05060a }));
+  const gate = new THREE.Mesh(keep(new THREE.CircleGeometry(2.6, 24)), gateMat);
   gate.position.set(0, 4.4, -0.3);
   throne.add(gate);
   group.add(throne);
+  fadeable("throne", [throneMat, gateMat]);
 
   // two colossal figures flanking it, hooded, faceless, holding swords point-down
   const statueMat = keep(new THREE.MeshStandardMaterial({ color: 0x1d212b, roughness: 0.98 }));
   const robeGeo = keep(new THREE.CylinderGeometry(0.62, 1.5, 4.6, 8));
   const hoodGeo = keep(new THREE.SphereGeometry(0.62, 8, 6));
   const bladeGeo = keep(new THREE.BoxGeometry(0.22, 3.6, 0.06));
-  for (const s of [-1, 1]) {
+  for (const s of L.statues) {
+    const m = own(statueMat);
     const st = new THREE.Group();
-    st.position.set(s * 6.4, 0, -(R + 1.2));
-    const robe = new THREE.Mesh(robeGeo, statueMat);
+    st.position.set(s.x, 0, s.z);
+    const robe = new THREE.Mesh(robeGeo, m);
     robe.position.y = 2.3;
-    const hood = new THREE.Mesh(hoodGeo, statueMat);
+    const hood = new THREE.Mesh(hoodGeo, m);
     hood.position.y = 4.8;
     hood.scale.set(1, 1.3, 1.05);
-    const blade = new THREE.Mesh(bladeGeo, statueMat);
+    const blade = new THREE.Mesh(bladeGeo, m);
     blade.position.set(0, 2.2, 0.66);
     st.add(robe, hood, blade);
-    st.rotation.y = -s * 0.32;
+    st.rotation.y = -s.s * 0.32;
     group.add(st);
+    fadeable("statue", [m]);
   }
 
   // ---------------------------------------------------------------- banners
   const bannerMat = keep(
     new THREE.MeshStandardMaterial({ color: 0x5a1f24, roughness: 0.98, side: THREE.DoubleSide })
   );
-  const bGeo = bannerGeometry(1.7, 4.4);
+  const bGeo = bannerGeometry(BANNER.w, BANNER.h);
   const banners: THREE.Mesh[] = [];
-  for (let i = 0; i < 6; i++) {
-    const a = ((i + 0.5) / 6) * Math.PI * 2 + 0.1;
-    const b = new THREE.Mesh(bGeo, bannerMat);
-    b.position.set(Math.sin(a) * (R + 2.45), 7.6, Math.cos(a) * (R + 2.45));
-    b.rotation.y = -a + Math.PI;
+  for (const c of L.banners) {
+    const m = own(bannerMat);
+    const b = new THREE.Mesh(bGeo, m);
+    b.position.set(c.x, BANNER.top, c.z);
+    b.rotation.y = facingIn(c.a);
     banners.push(b);
     group.add(b);
+    fadeable("banner", [m]);
   }
 
   // ---------------------------------------------------------------- fire
@@ -423,31 +439,38 @@ export function buildArena(radius: number = ARENA): ArenaSet {
   const flameGeo = keep(new THREE.SphereGeometry(0.22, 10, 8));
   const flames: THREE.Mesh[] = [];
   const fires: THREE.PointLight[] = [];
-  const N_FIRE = 6;
   const firePos: THREE.Vector3[] = [];
-  for (let i = 0; i < N_FIRE; i++) {
-    const a = (i / N_FIRE) * Math.PI * 2 + Math.PI / 6;
-    const x = Math.sin(a) * (R + 1.35);
-    const z = Math.cos(a) * (R + 1.35);
+  L.braziers.forEach(({ x, z }, i) => {
     firePos.push(new THREE.Vector3(x, 3.1, z));
-    const stem = new THREE.Mesh(stemGeo, ironMat);
+    const iron = own(ironMat);
+    const fm = own(flameMat);
+    const cm = own(coreMat);
+    const stem = new THREE.Mesh(stemGeo, iron);
     stem.position.set(x, 1.45, z);
-    const bowl = new THREE.Mesh(bowlGeo, ironMat);
+    const bowl = new THREE.Mesh(bowlGeo, iron);
     bowl.position.set(x, 3.0, z);
-    const fl = new THREE.Mesh(flameGeo, flameMat);
+    const fl = new THREE.Mesh(flameGeo, fm);
     fl.position.set(x, 3.2, z);
     fl.scale.set(1, 1.4, 1);
-    const core = new THREE.Mesh(flameGeo, coreMat);
+    const core = new THREE.Mesh(flameGeo, cm);
     core.position.set(x, 3.14, z);
     core.scale.setScalar(0.5);
     flames.push(fl);
     group.add(stem, bowl, fl, core);
+    fadeable("brazier", [iron, fm, cm]);
     if (i === 0 || i === 3) {
       const pl = new THREE.PointLight(0xff8a3d, 40, 30, 2);
       pl.position.set(x, 3.5, z);
       fires.push(pl);
       group.add(pl);
     }
+  });
+
+  // the fadeables in the order pieces() lists them, so the i-th test drives the i-th piece
+  const shapes = pieces(R);
+  const fades = (["pillar", "brazier", "statue", "throne", "banner", "arch"] as Kind[]).flatMap((k) => fadeByKind[k]);
+  if (fades.length !== shapes.length || shapes.some((s, i) => fadeByKind[s.kind].indexOf(fades[i]) < 0)) {
+    throw new Error("arenaScene: the fading pieces do not line up with sightline.pieces()");
   }
 
   // ---------------------------------------------------------------- embers
@@ -570,7 +593,27 @@ export function buildArena(radius: number = ARENA): ArenaSet {
     }
   };
 
+  // ---------------------------------------------------------------- clearing the view
+  const GHOST = 0.14; // what is left of a piece in the way: enough to keep the room readable
+  const clearView = (cam: THREE.Vector3, px: number, pz: number, bx: number, bz: number, dt: number) => {
+    for (let i = 0; i < shapes.length; i++) {
+      const f = fades[i];
+      // once faded, a piece stays faded until it is clearly out of the way, so it does not flicker
+      // while the camera grazes its edge
+      const inWay = hides(shapes[i], cam, px, pz, bx, bz, f.alpha < 0.99 ? 0.3 : 0);
+      const target = inWay ? GHOST : 1;
+      if (f.alpha === target) continue;
+      const rate = inWay ? 14 : 5; // get out of the way fast, come back gently
+      f.alpha += (target - f.alpha) * (1 - Math.exp(-rate * dt));
+      if (Math.abs(f.alpha - target) < 0.004) f.alpha = target;
+      for (const { m, base } of f.mats) {
+        m.opacity = base * f.alpha;
+        m.depthWrite = f.alpha === 1;
+      }
+    }
+  };
+
   const owned = junk.slice();
   const dispose = () => owned.forEach((o) => o.dispose());
-  return { group, tick, dispose };
+  return { group, tick, clearView, dispose };
 }

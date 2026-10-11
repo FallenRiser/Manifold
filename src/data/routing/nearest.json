@@ -1,0 +1,604 @@
+{
+ "harness": {
+  "words": {
+   "forum": 0.6952,
+   "forum_met": 0.7925,
+   "forum_new": 0.6141,
+   "sender": 0.3579
+  },
+  "meaning": {
+   "forum": 0.7953,
+   "forum_met": 0.8518,
+   "forum_new": 0.7482,
+   "sender": 0.2863
+  }
+ },
+ "specimens": [
+  {
+   "post": 601,
+   "forum": "rec.sport.hockey",
+   "subject": "Sabre fans",
+   "text": "Yes, Yes, I can see it now >>>> all those Sabre fans FINALLY taking their Sabre sweaters out of the moth balls and proudly wearing them. After 9 years of playoff frustration and being up 3 games to nil I guess it is a pretty ...",
+   "length": 70,
+   "words": [
+    {
+     "forum": "sci.electronics",
+     "subject": "Re: Electric power line \"balls\"",
+     "sim": 0.186,
+     "shared": [
+      "balls",
+      "bet"
+     ]
+    },
+    {
+     "forum": "rec.sport.hockey",
+     "subject": "Bruins in the Playoffs",
+     "sim": 0.182,
+     "shared": [
+      "frustration",
+      "playoff",
+      "fans",
+      "finally"
+     ]
+    },
+    {
+     "forum": "rec.sport.hockey",
+     "subject": "Re: What's so bad about the new playoff format?",
+     "sim": 0.166,
+     "shared": [
+      "sabre",
+      "playoff"
+     ]
+    },
+    {
+     "forum": "rec.sport.baseball",
+     "subject": "Re: Darrrrrrrrryl",
+     "sim": 0.158,
+     "shared": [
+      "fans",
+      "throw",
+      "team",
+      "yes"
+     ]
+    },
+    {
+     "forum": "rec.sport.hockey",
+     "subject": "Re: My Predictions of a classic playoff year!",
+     "sim": 0.135,
+     "shared": [
+      "playoff",
+      "games",
+      "year",
+      "don"
+     ]
+    }
+   ],
+   "meaning": [
+    {
+     "forum": "rec.sport.hockey",
+     "subject": "Did The Blues Pull It Out?",
+     "sim": 0.826,
+     "shared": [
+      "yes"
+     ]
+    },
+    {
+     "forum": "rec.sport.hockey",
+     "subject": "Bruins in the Playoffs",
+     "sim": 0.815,
+     "shared": [
+      "frustration",
+      "playoff",
+      "fans",
+      "finally"
+     ]
+    },
+    {
+     "forum": "rec.sport.hockey",
+     "subject": "Re: V\u2022\u2022\u2022's Playoff Picks",
+     "sim": 0.815,
+     "shared": [
+      "playoff",
+      "bet",
+      "fans",
+      "games"
+     ]
+    },
+    {
+     "forum": "rec.sport.hockey",
+     "subject": "Re: If You Were Pat Burns ...",
+     "sim": 0.815,
+     "shared": []
+    },
+    {
+     "forum": "rec.sport.hockey",
+     "subject": "Re: the hawks WILL return to the finals!!!!!",
+     "sim": 0.811,
+     "shared": [
+      "don"
+     ]
+    }
+   ]
+  },
+  {
+   "post": 1413,
+   "forum": "misc.forsale",
+   "subject": "Wanted:  Large dog cage",
+   "text": "I need a large dog cage, the kind you use to housebreak a dog when you are not around. I have been adopted by a 11 month old non-housetrained huskey. I am in the Pittsburgh area. My number is 4\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022.",
+   "length": 41,
+   "words": [
+    {
+     "forum": "rec.motorcycles",
+     "subject": "Re: Boom! Dog attack!",
+     "sim": 0.24,
+     "shared": [
+      "cage",
+      "dog"
+     ]
+    },
+    {
+     "forum": "rec.motorcycles",
+     "subject": "Re: Boom! Dog attack!",
+     "sim": 0.206,
+     "shared": [
+      "cage",
+      "dog",
+      "large"
+     ]
+    },
+    {
+     "forum": "rec.motorcycles",
+     "subject": "Re: bikes with big dogs",
+     "sim": 0.201,
+     "shared": [
+      "dog",
+      "large"
+     ]
+    },
+    {
+     "forum": "rec.motorcycles",
+     "subject": "Re: Motorcycle Security",
+     "sim": 0.195,
+     "shared": [
+      "dog"
+     ]
+    },
+    {
+     "forum": "rec.motorcycles",
+     "subject": "Re: dogs",
+     "sim": 0.194,
+     "shared": [
+      "dog",
+      "large"
+     ]
+    }
+   ],
+   "meaning": [
+    {
+     "forum": "misc.forsale",
+     "subject": "WANTED:  FUTON",
+     "sim": 0.651,
+     "shared": [
+      "large",
+      "wanted"
+     ]
+    },
+    {
+     "forum": "misc.forsale",
+     "subject": "Wanted: AIRCONDITIONER",
+     "sim": 0.62,
+     "shared": [
+      "wanted"
+     ]
+    },
+    {
+     "forum": "misc.forsale",
+     "subject": "16 Space Rack FOR SALE (Lower Price)",
+     "sim": 0.611,
+     "shared": []
+    },
+    {
+     "forum": "rec.sport.hockey",
+     "subject": "wanted: mail order hockey equipment",
+     "sim": 0.608,
+     "shared": [
+      "wanted"
+     ]
+    },
+    {
+     "forum": "sci.space",
+     "subject": "Re: *** HELP I NEED SOME ADDRESSES ***",
+     "sim": 0.604,
+     "shared": [
+      "need"
+     ]
+    }
+   ]
+  },
+  {
+   "post": 1193,
+   "forum": "sci.med",
+   "subject": "Iridology - Any credence to it???",
+   "text": "I saw a printed up flyer that stated the person was a \"licensed herbologist and iridologist\" What are your opinions? How much can you tell about a person's health by looking into their eyes?",
+   "length": 35,
+   "words": [
+    {
+     "forum": "talk.politics.mideast",
+     "subject": "Zionism",
+     "sim": 0.15,
+     "shared": [
+      "flyer"
+     ]
+    },
+    {
+     "forum": "sci.med",
+     "subject": "Re: Homeopathy: a respectable medical tradition?",
+     "sim": 0.142,
+     "shared": [
+      "health",
+      "stated",
+      "person"
+     ]
+    },
+    {
+     "forum": "comp.os.ms-windows.misc",
+     "subject": "Re: Can I Change \"Licensed To\" Data in Windows 3.1?",
+     "sim": 0.142,
+     "shared": [
+      "licensed"
+     ]
+    },
+    {
+     "forum": "talk.politics.guns",
+     "subject": "Constitutionality of 18 U.S.C 922(o)",
+     "sim": 0.138,
+     "shared": [
+      "person",
+      "looking",
+      "tell"
+     ]
+    },
+    {
+     "forum": "soc.religion.christian",
+     "subject": "When are two people married in God's eyes?",
+     "sim": 0.134,
+     "shared": [
+      "eyes",
+      "opinions"
+     ]
+    }
+   ],
+   "meaning": [
+    {
+     "forum": "sci.med",
+     "subject": "Scientific Yawn",
+     "sim": 0.751,
+     "shared": [
+      "health",
+      "person"
+     ]
+    },
+    {
+     "forum": "sci.med",
+     "subject": "Re: Science and methodology (was: Homeopathy ... tradition?)",
+     "sim": 0.745,
+     "shared": []
+    },
+    {
+     "forum": "sci.med",
+     "subject": "Re: Good Grief! (was Re: Candida Albicans: what is it?)",
+     "sim": 0.744,
+     "shared": []
+    },
+    {
+     "forum": "sci.med",
+     "subject": "Great Post! (was Re: Candida (yeast) Bloom...) (VERY LONG)",
+     "sim": 0.738,
+     "shared": [
+      "health",
+      "stated",
+      "saw",
+      "person"
+     ]
+    },
+    {
+     "forum": "sci.med",
+     "subject": "Selective Placebo",
+     "sim": 0.737,
+     "shared": [
+      "health",
+      "person"
+     ]
+    }
+   ]
+  },
+  {
+   "post": 1144,
+   "forum": "sci.crypt",
+   "subject": "Encryption Chip Availibility",
+   "text": "Hi everybody! Does anyone know of companies that are currently manufacturing encryption chips for sale to the general public? Get them while you can! Some pointers would be greatly appreciated. Thanks",
+   "length": 34,
+   "words": [
+    {
+     "forum": "soc.religion.christian",
+     "subject": "Mission Aviation Fellowship",
+     "sim": 0.209,
+     "shared": [
+      "appreciated",
+      "hi",
+      "thanks",
+      "does"
+     ]
+    },
+    {
+     "forum": "sci.crypt",
+     "subject": "Re: text of White House announcement and Q&As on clipper chip encryption",
+     "sim": 0.201,
+     "shared": [
+      "companies",
+      "chips",
+      "encryption",
+      "chip"
+     ]
+    },
+    {
+     "forum": "sci.crypt",
+     "subject": "Re: White House Public Encryption Management Fact Sheet",
+     "sim": 0.192,
+     "shared": [
+      "encryption",
+      "public",
+      "does"
+     ]
+    },
+    {
+     "forum": "sci.crypt",
+     "subject": "Re: White House Public Encryption Management Fact Sheet",
+     "sim": 0.189,
+     "shared": [
+      "companies",
+      "chips",
+      "encryption",
+      "public"
+     ]
+    },
+    {
+     "forum": "sci.crypt",
+     "subject": "Re: Is there ANY security in the Clipper?",
+     "sim": 0.186,
+     "shared": [
+      "encryption",
+      "chip"
+     ]
+    }
+   ],
+   "meaning": [
+    {
+     "forum": "sci.crypt",
+     "subject": "Re: Off the shelf cheap DES keyseach machine (Was: Re: Corporate acceptance of the wiretap chip)",
+     "sim": 0.857,
+     "shared": [
+      "chips",
+      "chip"
+     ]
+    },
+    {
+     "forum": "sci.crypt",
+     "subject": "Re: White House Public Encryption Management Fact Sheet",
+     "sim": 0.84,
+     "shared": [
+      "encryption",
+      "public"
+     ]
+    },
+    {
+     "forum": "sci.crypt",
+     "subject": "Re: Off the shelf cheap DES keyseach machine (Was: Re: Corporate acceptance of the wiretap chip)",
+     "sim": 0.836,
+     "shared": [
+      "chips",
+      "chip",
+      "know"
+     ]
+    },
+    {
+     "forum": "sci.crypt",
+     "subject": "Re: Off the shelf cheap DES keyseach machine (Was: Re: Corporate acceptance of the wiretap chip)",
+     "sim": 0.833,
+     "shared": [
+      "chip"
+     ]
+    },
+    {
+     "forum": "sci.crypt",
+     "subject": "Re: Clipper chip -- technical details",
+     "sim": 0.83,
+     "shared": [
+      "chip"
+     ]
+    }
+   ]
+  },
+  {
+   "post": 3145,
+   "forum": "comp.sys.mac.hardware",
+   "subject": "What was the ....",
+   "text": "In light of the 100 letter over \"What was the LISA\" I thought I'd start a new one. What was the IIvx? I hear it was some machine that predated the main 040 line by about 6 mos, but used obsolete tech. Rumor has it ...",
+   "length": 47,
+   "words": [
+    {
+     "forum": "comp.sys.mac.hardware",
+     "subject": "IIvx -> C650 Upgrade Question",
+     "sim": 0.158,
+     "shared": [
+      "iivx",
+      "new"
+     ]
+    },
+    {
+     "forum": "comp.sys.mac.hardware",
+     "subject": "Re: what do y'all think of the IIvx?",
+     "sim": 0.138,
+     "shared": [
+      "iivx"
+     ]
+    },
+    {
+     "forum": "comp.sys.mac.hardware",
+     "subject": "Re: Centris Cache & Bernoulli Box",
+     "sim": 0.133,
+     "shared": [
+      "040",
+      "tech",
+      "machine"
+     ]
+    },
+    {
+     "forum": "comp.sys.mac.hardware",
+     "subject": "Re: IIvx -> C650 Upgrade Question",
+     "sim": 0.131,
+     "shared": [
+      "iivx",
+      "new"
+     ]
+    },
+    {
+     "forum": "comp.sys.mac.hardware",
+     "subject": "Daystar Turbo 040 Opinions?",
+     "sim": 0.125,
+     "shared": [
+      "040"
+     ]
+    }
+   ],
+   "meaning": [
+    {
+     "forum": "comp.sys.ibm.pc.hardware",
+     "subject": "The \"P24T\"",
+     "sim": 0.749,
+     "shared": []
+    },
+    {
+     "forum": "misc.forsale",
+     "subject": "Bunch-O-PC-Stuff for sale",
+     "sim": 0.742,
+     "shared": [
+      "100"
+     ]
+    },
+    {
+     "forum": "sci.electronics",
+     "subject": "Re: what to do with old 2",
+     "sim": 0.737,
+     "shared": []
+    },
+    {
+     "forum": "comp.sys.ibm.pc.hardware",
+     "subject": "Re: DX3/99",
+     "sim": 0.736,
+     "shared": []
+    },
+    {
+     "forum": "comp.sys.ibm.pc.hardware",
+     "subject": "Connection Machine",
+     "sim": 0.735,
+     "shared": [
+      "machine"
+     ]
+    }
+   ]
+  },
+  {
+   "post": 5748,
+   "forum": "sci.med",
+   "subject": "Can I sell my TENS unit?",
+   "text": "Sci med people: Can I sell my TENS unit or does it have to be sold by a physician or other liscened person?",
+   "length": 26,
+   "words": [
+    {
+     "forum": "sci.med",
+     "subject": "What about sci.med.chemistry",
+     "sim": 0.209,
+     "shared": [
+      "med",
+      "sci"
+     ]
+    },
+    {
+     "forum": "sci.med",
+     "subject": "Re: Patient-Physician Diplomacy",
+     "sim": 0.15,
+     "shared": [
+      "physician"
+     ]
+    },
+    {
+     "forum": "sci.crypt",
+     "subject": "Re: Once tapped, your code is no good any more.",
+     "sim": 0.14,
+     "shared": [
+      "tens",
+      "people"
+     ]
+    },
+    {
+     "forum": "sci.med",
+     "subject": "Re: Candida(yeast) Bloom, Fact or Fiction",
+     "sim": 0.129,
+     "shared": [
+      "physician",
+      "people"
+     ]
+    },
+    {
+     "forum": "sci.med",
+     "subject": "Re: Patient-Physician Diplomacy",
+     "sim": 0.124,
+     "shared": [
+      "physician",
+      "person",
+      "people"
+     ]
+    }
+   ],
+   "meaning": [
+    {
+     "forum": "sci.electronics",
+     "subject": "Re: what to do with old 256k SIMMs?",
+     "sim": 0.647,
+     "shared": [
+      "sell"
+     ]
+    },
+    {
+     "forum": "misc.forsale",
+     "subject": "Re: Realistic PRO-34 Hand-held Scanner",
+     "sim": 0.629,
+     "shared": [
+      "sell"
+     ]
+    },
+    {
+     "forum": "comp.sys.mac.hardware",
+     "subject": "FOR SALE: 2 4MB 80ns SIMMs",
+     "sim": 0.628,
+     "shared": [
+      "sell"
+     ]
+    },
+    {
+     "forum": "sci.crypt",
+     "subject": "Re: Once tapped, your code is no good any more.",
+     "sim": 0.626,
+     "shared": []
+    },
+    {
+     "forum": "misc.forsale",
+     "subject": "<><><><>SIPPs MEMORY FORSALE<><><><>",
+     "sim": 0.62,
+     "shared": []
+    }
+   ]
+  }
+ ]
+}

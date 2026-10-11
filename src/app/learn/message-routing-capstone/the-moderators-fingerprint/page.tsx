@@ -43,9 +43,9 @@ a scan that knows nothing about moderators, on the earlier posts' router's view:
   words in 20+ posts, 95%+ of those posts in one forum: 158. The initials are one, used by
   61 different senders; 'bike', the most widely used, by 136
   the same 158 sorted by how often a word wears the same wrapping (the 2 characters before it,
-  the 1 after): the initials rank 8, 97.6% of their uses the same; the 7 above them come
-  from 3 signatures typed without a '-- ' line (5 words) and 2 subject lines repeated down
-  their threads`;
+  the 1 after): the initials rank 8, 97.6% of their uses wrapped '--' before and ']' after;
+  the 7 above them come from 3 signatures typed without a '-- ' line (5 words) and 2
+  subject lines repeated down their threads`;
 
 const outNotesCost = `taking the notes out, the 2527 later new threads (linear SVM, C=0.3)
                                                    accuracy   routes changed
@@ -270,13 +270,16 @@ export default function ModeratorsFingerprintPage() {
           it by where it sits and how it is wrapped, and take it out, even when taking it out moves no prediction.
         </Followup>
 
-        <SigRule n={9}>
+        <SigRule n={8}>
           <strong>List everyone who touches a record before it is saved with its label.</strong> Anything written
           after the label was chosen comes out of the features, even when removing it moves no prediction, because
           it will never be there when the model runs.
         </SigRule>
 
-        <PrevNext prev={{ href: `${R}/reading-the-weights`, label: <>← Reading the weights</> }} />
+        <PrevNext
+          prev={{ href: `${R}/reading-the-weights`, label: <>← Reading the weights</> }}
+          next={{ href: `${R}/closing-the-channels`, label: <>Next up · Closing the channels →</> }}
+        />
       </div>
     </article>
   );

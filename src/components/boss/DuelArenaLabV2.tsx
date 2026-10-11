@@ -14,6 +14,7 @@ import {
   SKIN, buildBoss, buildKnight, disposeFighters, poseBoss, poseKnight, type PoseRules,
 } from "./fighters";
 import { decodeNet, qValues, top2, type NetV2 } from "./trainedPolicyV2";
+import { moveEighth, rollQuarter } from "./controls";
 import { asset } from "@/lib/asset";
 
 // The v2 duel you can stand in. The simulation is duelSimV2.ts, which
@@ -62,6 +63,7 @@ function decisiveness(m: number) {
 }
 
 type Held = { w: boolean; a: boolean; s: boolean; d: boolean; guard: boolean };
+const axis = (plus: boolean, minus: boolean) => (plus ? 1 : 0) - (minus ? 1 : 0);
 
 export function DuelArenaLabV2() {
   const mount = useRef<HTMLDivElement>(null);
@@ -322,15 +324,8 @@ export function DuelArenaLabV2() {
         return q;
       }
       const h = B.held;
-      const fwd = (h.w ? 1 : 0) - (h.s ? 1 : 0);
-      const side = (h.d ? 1 : 0) - (h.a ? 1 : 0);
-      if (fwd || side) {
-        // eighths measured from "towards the boss", which is what _shift expects
-        const table: Record<string, number> = {
-          "1,0": 0, "1,1": 1, "0,1": 2, "-1,1": 3, "-1,0": 4, "-1,-1": 5, "0,-1": 6, "1,-1": 7,
-        };
-        return A_MOVE0 + table[`${fwd},${side}`];
-      }
+      const k = moveEighth(axis(h.w, h.s), axis(h.d, h.a));
+      if (k !== null) return A_MOVE0 + k;
       return h.guard ? A_GUARD : A_IDLE;
     };
 
@@ -416,7 +411,8 @@ export function DuelArenaLabV2() {
         const [kind] = phaseAt(mv, e.bf);
         arcMesh.geometry = arcGeos[e.bm];
         arcMesh.position.set(e.bx, 0.035, e.bz);
-        arcMesh.rotation.y = -e.bang;
+        // the ring is centred on local +x; turning it by bang - pi/2 lands that on (sin bang, cos bang)
+        arcMesh.rotation.y = e.bang - Math.PI / 2;
         arcMesh.visible = true;
         // windup and delay look the same on purpose; active is the one that hurts
         const live = kind === "h";
@@ -473,6 +469,8 @@ export function DuelArenaLabV2() {
       }
       camAim.lerp(new THREE.Vector3((e.px + e.bx) / 2, 1.5, (e.pz + e.bz) / 2), 1 - Math.pow(0.002, dt));
       camera.lookAt(camAim);
+      // anything of the room standing between the lens and either fighter fades out of the way
+      arena.clearView(camera.position, e.px, e.pz, e.bx, e.bz, dt);
       renderer.render(scene, camera);
 
       // ---- HUD -----------------------------------------------------------
@@ -558,7 +556,11 @@ export function DuelArenaLabV2() {
       else if (k === "j") B.queued = A_ATK;
       else if (k === "l") B.queued = A_HEAVY;
       else if (k === "k") B.queued = A_PARRY;
-      else if (k === " ") { B.queued = A_ROLL0 + 2; ev.preventDefault(); }
+      else if (k === " ") {
+        // toward the held direction; a diagonal rolls to its side (controls.ts says why)
+        B.queued = A_ROLL0 + rollQuarter(axis(B.held.w, B.held.s), axis(B.held.d, B.held.a));
+        ev.preventDefault();
+      }
     };
     const onUp = (ev: KeyboardEvent) => {
       const k = ev.key.toLowerCase();
@@ -753,7 +755,7 @@ export function DuelArenaLabV2() {
           <option value={0.25}>quarter speed</option>
         </select>
         <span style={{ ...mono, color: "var(--faint)" }}>
-          W A S D move · J light · L heavy · K parry · Shift guard · Space roll
+          W A S D move · J light · L heavy · K parry · Shift guard · Space roll (toward W A S D)
         </span>
       </div>
 

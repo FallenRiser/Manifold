@@ -5,6 +5,7 @@ import { Reveal } from "@/components/Reveal";
 import { HousingGeoMap } from "@/components/figures/HousingGeoMap";
 import { NeoField } from "@/components/figures/NeoField";
 import { WarehouseFloor } from "@/components/figures/WarehouseFloor";
+import { RoutingWaffle } from "@/components/figures/RoutingWaffle";
 import { CapstoneCard } from "@/components/CapstoneCard";
 import { Shelf } from "@/components/Shelf";
 import { CAPSTONES, FAMILIES, PILLARS, FOUNDATIONS } from "@/lib/siteMap";
@@ -19,7 +20,7 @@ const TIERS = [
 
 const ARC = ["Hook", "Intuition", "Mechanics", "Math", "Code", "Levers", "When & why"];
 
-const FIGURES = [<HousingGeoMap key="h" wide />, <NeoField key="n" />, <WarehouseFloor key="w" />];
+const FIGURES = [<HousingGeoMap key="h" wide />, <NeoField key="n" />, <WarehouseFloor key="w" />, <RoutingWaffle key="r" />];
 
 const RULES = [
   {

@@ -220,7 +220,7 @@ export default function WordsIntoNumbersPage() {
           thirty times smaller than the router&rsquo;s here, and a shared C would have rigged the comparison.
         </Followup>
 
-        <SigRule n={7}>
+        <SigRule n={6}>
           <strong>Treat the vectorizer as part of the model:</strong> fit it on training data only, tune each
           variant separately before comparing them, and read what fills the most common columns.
         </SigRule>

@@ -1,6 +1,7 @@
 import { CAP_TOTAL } from "./housingCapstoneTrack";
 import { NEO_TOTAL } from "./neoCapstoneTrack";
 import { RL_CAP_TOTAL } from "./rlCapstoneTrack";
+import { ROUTING_TOTAL } from "./routingCapstoneTrack";
 
 // `partial` = the track is live but its outline is not fully built yet; /map
 // must say so rather than present it like a finished track (PROJECT.md §10.5).
@@ -62,6 +63,18 @@ export const CAPSTONES: Capstone[] = [
     from: "−816",
     to: "21.2",
     note: "matches the oracle",
+  },
+  {
+    title: "Message routing",
+    href: "/learn/message-routing-capstone",
+    color: "var(--c-post)",
+    kind: "Text classification",
+    pages: ROUTING_TOTAL,
+    blurb:
+      "18,846 Usenet posts, scored on the job a router really does: next month's new threads. Then the system around the model: a lookup, a threshold and a person.",
+    metric: "new threads routed right",
+    from: "0.824",
+    to: "0.881",
   },
 ];
 

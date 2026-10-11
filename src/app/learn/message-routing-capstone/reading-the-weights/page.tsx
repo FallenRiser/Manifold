@@ -188,7 +188,7 @@ export default function ReadingTheWeightsPage() {
           will actually meet, not by the size of their coefficients.
         </Followup>
 
-        <SigRule n={8}>
+        <SigRule n={7}>
           <strong>Read the heaviest weights, and ask of each whether it is there because of what a record says or
           who produced it.</strong> Then measure what it contributes on the job&rsquo;s records before acting on
           it.

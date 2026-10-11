@@ -216,7 +216,7 @@ export default function FirstLookPage() {
           it does not.
         </Followup>
 
-        <SigRule n={6}>
+        <SigRule n={5}>
           <strong>Look for the records an average hides: the empty, the huge, the repeated and the
           contradictory.</strong> Count each group, read some of it, and decide what to do with it by how the live
           system would meet it.

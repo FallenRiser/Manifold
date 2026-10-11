@@ -93,8 +93,9 @@ export default function RoutingCapstoneHubPage() {
           <strong>0.824 to 0.860</strong>. A router that files only the posts it is sure of, with its threshold
           set on older posts to be 95% accurate, files <strong>81%</strong> of the new threads by itself, and on
           the later posts it delivers <strong>93.3%, not 95%</strong>. Why the promise slipped, and what a real
-          system does about it, is most of the last act. The posts it hands off go to a moderator with three
-          suggestions, and the right forum is among them 88.5% of the time.
+          system does about it, is most of the last act. By the end, the router routes <strong>0.881</strong> of the
+          new threads right, files 80% of them by itself at 94.4%, and hands the rest to a moderator with three
+          suggestions, the right forum among them 92.6% of the time.
         </Callout>
 
         <h2>The situations you will meet</h2>
@@ -126,8 +127,8 @@ export default function RoutingCapstoneHubPage() {
         </ol>
         <p>
           Each page adds one rule to a running <strong>Playbook</strong>, signed at the bottom of the page the way a
-          Usenet post was signed. At the end you get the whole Playbook, a notebook that reproduces every number,
-          and two fresh text datasets to work on your own, with no answers given.
+          Usenet post was signed. At the end you get the whole Playbook, a notebook that rebuilds the router from the
+          raw posts, and two fresh text datasets to work through yourself before you see what the measurements found.
         </p>
 
         <h2>The arc</h2>

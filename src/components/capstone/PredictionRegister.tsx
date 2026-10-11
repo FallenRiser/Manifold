@@ -112,7 +112,9 @@ export function PredictionRegister() {
           <div key={e.id} style={{ fontSize: 13, lineHeight: 1.55, color: "var(--muted)" }}>
             <span style={{ ...mono, fontWeight: 700, color: "var(--ink)", marginRight: 8 }}>{e.id}</span>
             {e.question}{" "}
-            <span style={{ ...mono, fontSize: 11, color: "var(--faint)", whiteSpace: "nowrap" }}>measured in act {e.act} · {e.page}</span>
+            <span style={{ ...mono, fontSize: 11, color: "var(--faint)", whiteSpace: "nowrap" }}>
+              measured in act {e.act} · {e.measured ? <Link href={e.measured} style={{ color: POST }}>{e.page}</Link> : e.page}
+            </span>
           </div>
         ))}
       </div>
@@ -169,6 +171,99 @@ export function Settled({ id, children }: { id: string; children: React.ReactNod
             {answer(bet, h.verdict)}
           </>
         )}
+      </div>
+    </figure>
+  );
+}
+
+/* ------------------------------------------------------------------ *
+ * Measured: the page that measures one of the register's estimates.
+ * There was no prediction, so there is no bet to answer.
+ * ------------------------------------------------------------------ */
+export function Measured({ id, children }: { id: string; children: React.ReactNode }) {
+  const e = ESTIMATES.find((x) => x.id === id);
+  if (!e || !e.measured) throw new Error(`register estimate ${id} has not been measured yet`);
+
+  return (
+    <figure aria-labelledby={`measured-${id}`} style={{ margin: "22px 0 6px", background: "var(--surface)", border: "1px solid var(--border)", borderLeft: `3px solid ${POST}`, borderRadius: "0 12px 12px 0", padding: "12px 15px 13px" }}>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: "2px 10px", alignItems: "baseline" }}>
+        <span id={`measured-${id}`} style={{ ...mono, fontSize: 13, fontWeight: 700, color: POST }}>{e.id}</span>
+        <span style={{ fontSize: 12, color: "var(--muted)", flex: "1 1 200px" }}>an estimate: the register made no prediction</span>
+        <span style={{ ...mono, fontSize: 11, fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase", color: POST, border: `1px solid ${POST}`, borderRadius: 5, padding: "1px 6px" }}>measured</span>
+      </div>
+      <p style={{ margin: "7px 0 0", fontSize: 14.5, lineHeight: 1.55, color: "var(--ink)", fontWeight: 500 }}>{e.question}</p>
+      <div style={{ margin: "10px 0 0", paddingTop: 9, borderTop: "1px solid var(--border)", fontSize: 14, lineHeight: 1.6, color: "var(--muted)" }}>
+        {children}
+      </div>
+    </figure>
+  );
+}
+
+/* ------------------------------------------------------------------ *
+ * Scorecard: the whole register once every entry is settled, each with
+ * what its page measured and how the reader's bet came out.
+ * ------------------------------------------------------------------ */
+function outcome(bet: Bet | undefined, v: Verdict): { text: string; colour: string } {
+  if (!bet) return { text: "no bet", colour: "var(--faint)" };
+  const said = bet === "agree" ? "agreed" : "bet against";
+  if (v === "not settled") return { text: `${said} · neither side wins`, colour: "var(--muted)" };
+  const won = (bet === "agree") === (v === "confirmed");
+  return { text: `${said} · ${won ? "right" : "wrong"}`, colour: won ? "var(--good)" : "var(--bad)" };
+}
+
+export function Scorecard() {
+  // undefined until the browser has been read, so the server and the first render agree
+  const [bets, setBets] = useState<Record<string, Bet> | undefined>(undefined);
+  useEffect(() => setBets(load()), []);
+  if (HYPOTHESES.some((h) => !h.verdict || !h.result) || ESTIMATES.some((e) => !e.measured || !e.result))
+    throw new Error("the scorecard needs every register entry settled, with its result");
+
+  const placed = bets ? HYPOTHESES.filter((h) => bets[h.id]) : [];
+  const decided = placed.filter((h) => h.verdict !== "not settled");
+  const won = decided.filter((h) => (bets![h.id] === "agree") === (h.verdict === "confirmed"));
+
+  return (
+    <figure style={{ margin: "22px 0 6px", padding: "14px 14px 12px", background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: 14 }}>
+      <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", gap: "4px 12px", alignItems: "baseline", marginBottom: 10 }}>
+        <span style={{ ...mono, fontSize: 11.5, color: "var(--faint)" }}>the register · settled</span>
+        <span style={{ fontSize: 12.5, color: "var(--muted)", minHeight: "1.4em" }}>
+          {bets !== undefined && (placed.length
+            ? <>your bets: <strong style={{ ...mono, color: "var(--ink)" }}>{won.length}</strong> right of the {decided.length} the posts could decide</>
+            : <>no bets in this browser</>)}
+        </span>
+      </div>
+      <div style={{ display: "grid", gap: 6 }}>
+        {HYPOTHESES.map((h) => {
+          const st = STATUS[h.verdict!];
+          const oc = bets !== undefined ? outcome(bets[h.id], h.verdict!) : null;
+          return (
+            <section key={h.id} aria-labelledby={`score-${h.id}`} style={{ background: "var(--surface)", border: "1px solid var(--border)", borderLeft: `3px solid ${st.colour}`, borderRadius: "0 10px 10px 0", padding: "8px 12px 9px" }}>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "2px 10px", alignItems: "baseline" }}>
+                <span id={`score-${h.id}`} style={{ ...mono, fontSize: 13, fontWeight: 700, color: POST }}>{h.id}</span>
+                <span style={{ ...mono, fontSize: 10.5, fontWeight: 600, letterSpacing: "0.05em", textTransform: "uppercase", color: st.colour }}>{st.label}</span>
+                <span style={{ fontSize: 12, color: "var(--muted)", flex: "1 1 180px" }}>{h.decides.toLowerCase()}</span>
+                {oc && <span style={{ ...mono, fontSize: 11, color: oc.colour }}>{oc.text}</span>}
+              </div>
+              <p style={{ margin: "4px 0 0", fontSize: 13.5, lineHeight: 1.55, color: "var(--ink)" }}>
+                {h.result}{" "}
+                <Link href={h.settled!} style={{ ...mono, fontSize: 11, color: POST, whiteSpace: "nowrap" }}>{h.page}</Link>
+              </p>
+            </section>
+          );
+        })}
+        {ESTIMATES.map((e) => (
+          <section key={e.id} aria-labelledby={`score-${e.id}`} style={{ background: "var(--surface)", border: "1px dashed var(--border-strong)", borderRadius: 10, padding: "8px 12px 9px" }}>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "2px 10px", alignItems: "baseline" }}>
+              <span id={`score-${e.id}`} style={{ ...mono, fontSize: 13, fontWeight: 700, color: POST }}>{e.id}</span>
+              <span style={{ ...mono, fontSize: 10.5, fontWeight: 600, letterSpacing: "0.05em", textTransform: "uppercase", color: POST }}>measured</span>
+              <span style={{ fontSize: 12, color: "var(--muted)", flex: "1 1 180px" }}>{e.question}</span>
+            </div>
+            <p style={{ margin: "4px 0 0", fontSize: 13.5, lineHeight: 1.55, color: "var(--ink)" }}>
+              {e.result}{" "}
+              <Link href={e.measured!} style={{ ...mono, fontSize: 11, color: POST, whiteSpace: "nowrap" }}>{e.page}</Link>
+            </p>
+          </section>
+        ))}
       </div>
     </figure>
   );

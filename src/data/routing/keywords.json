@@ -1,0 +1,2109 @@
+{
+ "k": [
+  3,
+  5,
+  10,
+  25,
+  50,
+  100,
+  250,
+  1000
+ ],
+ "pick": 100,
+ "rows": [
+  {
+   "K": 3,
+   "h": 0.2499,
+   "w": 0.2445,
+   "h_fires": 0.1515,
+   "h_prec": 0.9451,
+   "h_svm": 0.9517,
+   "l": 0.2212,
+   "l_fires": 0.1211,
+   "l_prec": 0.9085,
+   "l_svm": 0.9281,
+   "forum_h": [
+    0.0,
+    0.0432,
+    0.058,
+    0.0662,
+    0.1835,
+    0.0576,
+    0.9921,
+    0.0342,
+    0.2109,
+    0.2671,
+    0.4029,
+    0.4286,
+    0.0398,
+    0.0429,
+    0.1223,
+    0.0175,
+    0.1646,
+    0.5116,
+    0.0685,
+    0.0323
+   ]
+  },
+  {
+   "K": 5,
+   "h": 0.2827,
+   "w": 0.2766,
+   "h_fires": 0.2118,
+   "h_prec": 0.9202,
+   "h_svm": 0.9298,
+   "l": 0.2513,
+   "l_fires": 0.1662,
+   "l_prec": 0.9071,
+   "l_svm": 0.9262,
+   "forum_h": [
+    0.0,
+    0.1096,
+    0.058,
+    0.1356,
+    0.2472,
+    0.0865,
+    0.9823,
+    0.0548,
+    0.2109,
+    0.3292,
+    0.4417,
+    0.5143,
+    0.0841,
+    0.0552,
+    0.1862,
+    0.0351,
+    0.1646,
+    0.5174,
+    0.1096,
+    0.0645
+   ]
+  },
+  {
+   "K": 10,
+   "h": 0.351,
+   "w": 0.344,
+   "h_fires": 0.3517,
+   "h_prec": 0.8882,
+   "h_svm": 0.9147,
+   "l": 0.3106,
+   "l_fires": 0.3162,
+   "l_prec": 0.8636,
+   "l_svm": 0.8874,
+   "forum_h": [
+    0.1429,
+    0.206,
+    0.0616,
+    0.2271,
+    0.3446,
+    0.1297,
+    0.9803,
+    0.1644,
+    0.3828,
+    0.4099,
+    0.5146,
+    0.5643,
+    0.2035,
+    0.0859,
+    0.2713,
+    0.117,
+    0.3165,
+    0.5756,
+    0.2055,
+    0.1129
+   ]
+  },
+  {
+   "K": 25,
+   "h": 0.4942,
+   "w": 0.4893,
+   "h_fires": 0.5401,
+   "h_prec": 0.8511,
+   "h_svm": 0.8982,
+   "l": 0.4404,
+   "l_fires": 0.486,
+   "l_prec": 0.8404,
+   "l_svm": 0.8803,
+   "forum_h": [
+    0.2286,
+    0.3987,
+    0.1087,
+    0.4132,
+    0.4981,
+    0.4986,
+    0.9409,
+    0.363,
+    0.7344,
+    0.5342,
+    0.5874,
+    0.6214,
+    0.3097,
+    0.2638,
+    0.4681,
+    0.2865,
+    0.5696,
+    0.6512,
+    0.3699,
+    0.1935
+   ]
+  },
+  {
+   "K": 50,
+   "h": 0.5943,
+   "w": 0.5872,
+   "h_fires": 0.6848,
+   "h_prec": 0.8281,
+   "h_svm": 0.8807,
+   "l": 0.5702,
+   "l_fires": 0.6656,
+   "l_prec": 0.8228,
+   "l_svm": 0.8728,
+   "forum_h": [
+    0.3143,
+    0.5515,
+    0.1558,
+    0.4953,
+    0.6667,
+    0.5937,
+    0.8957,
+    0.5959,
+    0.6797,
+    0.6646,
+    0.6408,
+    0.8571,
+    0.3584,
+    0.4969,
+    0.617,
+    0.4503,
+    0.7848,
+    0.8198,
+    0.4247,
+    0.3065
+   ]
+  },
+  {
+   "K": 100,
+   "h": 0.6543,
+   "w": 0.6454,
+   "h_fires": 0.7637,
+   "h_prec": 0.8247,
+   "h_svm": 0.8683,
+   "l": 0.6312,
+   "l_fires": 0.7582,
+   "l_prec": 0.8022,
+   "l_svm": 0.8606,
+   "forum_h": [
+    0.4,
+    0.6179,
+    0.1993,
+    0.5394,
+    0.6292,
+    0.6888,
+    0.8642,
+    0.637,
+    0.6562,
+    0.7764,
+    0.8641,
+    0.8857,
+    0.4027,
+    0.6442,
+    0.7553,
+    0.6725,
+    0.7975,
+    0.8488,
+    0.589,
+    0.2258
+   ]
+  },
+  {
+   "K": 250,
+   "h": 0.6367,
+   "w": 0.6274,
+   "h_fires": 0.8225,
+   "h_prec": 0.7526,
+   "h_svm": 0.8581,
+   "l": 0.6343,
+   "l_fires": 0.8227,
+   "l_prec": 0.7494,
+   "l_svm": 0.8514,
+   "forum_h": [
+    0.3714,
+    0.5349,
+    0.2065,
+    0.7571,
+    0.4494,
+    0.6888,
+    0.8268,
+    0.6096,
+    0.5547,
+    0.7081,
+    0.8883,
+    0.7857,
+    0.4646,
+    0.5951,
+    0.734,
+    0.6901,
+    0.7468,
+    0.8314,
+    0.6164,
+    0.0484
+   ]
+  },
+  {
+   "K": 1000,
+   "h": 0.2297,
+   "w": 0.2215,
+   "h_fires": 0.943,
+   "h_prec": 0.2334,
+   "h_svm": 0.8302,
+   "l": 0.1903,
+   "l_fires": 0.9573,
+   "l_prec": 0.186,
+   "l_svm": 0.8214,
+   "forum_h": [
+    0.0,
+    0.0532,
+    0.0978,
+    0.1388,
+    0.03,
+    0.2075,
+    0.5118,
+    0.0274,
+    0.0078,
+    0.1553,
+    0.3835,
+    0.5143,
+    0.0133,
+    0.0982,
+    0.2074,
+    0.9708,
+    0.0633,
+    0.4128,
+    0.0411,
+    0.0
+   ]
+  }
+ ],
+ "majority": {
+  "the most common forum of all posts": {
+   "forum": "rec.sport.hockey",
+   "h": 0.0363,
+   "w": 0.0345,
+   "l": 0.0514
+  },
+  "the most common forum of new threads": {
+   "forum": "misc.forsale",
+   "h": 0.1281,
+   "w": 0.1325,
+   "l": 0.1397
+  }
+ },
+ "svm": {
+  "h": 0.825,
+  "w": 0.8181,
+  "l": 0.8168
+ },
+ "forums": [
+  {
+   "name": "alt.atheism",
+   "words": [
+    {
+     "w": "inimitable",
+     "df": 25,
+     "share": 1.0,
+     "tag": "thread",
+     "thread": 0.6
+    },
+    {
+     "w": "b••••",
+     "df": 17,
+     "share": 1.0,
+     "tag": "person",
+     "thread": 0.12
+    },
+    {
+     "w": "b•••••••••",
+     "df": 16,
+     "share": 1.0,
+     "tag": "person",
+     "thread": 0.12
+    },
+    {
+     "w": "m•••••••",
+     "df": 12,
+     "share": 1.0,
+     "tag": "person",
+     "thread": 0.17
+    },
+    {
+     "w": "rushdie",
+     "df": 45,
+     "share": 0.98,
+     "tag": "",
+     "thread": 0.42
+    },
+    {
+     "w": "queens",
+     "df": 17,
+     "share": 0.94,
+     "tag": "",
+     "thread": 0.12
+    },
+    {
+     "w": "sank",
+     "df": 19,
+     "share": 0.84,
+     "tag": "",
+     "thread": 0.11
+    },
+    {
+     "w": "atheists",
+     "df": 159,
+     "share": 0.82,
+     "tag": "",
+     "thread": 0.27
+    },
+    {
+     "w": "atheism",
+     "df": 83,
+     "share": 0.82,
+     "tag": "",
+     "thread": 0.14
+    },
+    {
+     "w": "agnostics",
+     "df": 16,
+     "share": 0.81,
+     "tag": "thread",
+     "thread": 0.69
+    },
+    {
+     "w": "i••",
+     "df": 21,
+     "share": 0.81,
+     "tag": "person",
+     "thread": 0.1
+    },
+    {
+     "w": "bronx",
+     "df": 20,
+     "share": 0.8,
+     "tag": "",
+     "thread": 0.1
+    }
+   ],
+   "svm_h": 0.4571
+  },
+  {
+   "name": "comp.graphics",
+   "words": [
+    {
+     "w": "cview",
+     "df": 20,
+     "share": 1.0,
+     "tag": "thread",
+     "thread": 0.85
+    },
+    {
+     "w": "bezier",
+     "df": 11,
+     "share": 1.0,
+     "tag": "thread",
+     "thread": 0.55
+    },
+    {
+     "w": "geometric",
+     "df": 10,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.2
+    },
+    {
+     "w": "pov",
+     "df": 28,
+     "share": 0.96,
+     "tag": "",
+     "thread": 0.14
+    },
+    {
+     "w": "3do",
+     "df": 22,
+     "share": 0.95,
+     "tag": "thread",
+     "thread": 0.91
+    },
+    {
+     "w": "fractals",
+     "df": 12,
+     "share": 0.92,
+     "tag": "",
+     "thread": 0.25
+    },
+    {
+     "w": "tga",
+     "df": 12,
+     "share": 0.92,
+     "tag": "",
+     "thread": 0.08
+    },
+    {
+     "w": "polygon",
+     "df": 34,
+     "share": 0.91,
+     "tag": "",
+     "thread": 0.24
+    },
+    {
+     "w": "mpeg",
+     "df": 11,
+     "share": 0.91,
+     "tag": "",
+     "thread": 0.18
+    },
+    {
+     "w": "polygons",
+     "df": 16,
+     "share": 0.88,
+     "tag": "",
+     "thread": 0.19
+    },
+    {
+     "w": "siggraph",
+     "df": 16,
+     "share": 0.88,
+     "tag": "",
+     "thread": 0.06
+    },
+    {
+     "w": "texture",
+     "df": 13,
+     "share": 0.85,
+     "tag": "",
+     "thread": 0.08
+    }
+   ],
+   "svm_h": 0.7708
+  },
+  {
+   "name": "comp.os.ms-windows.misc",
+   "words": [
+    {
+     "w": "0t",
+     "df": 15,
+     "share": 1.0,
+     "tag": "encoded",
+     "thread": 0.2
+    },
+    {
+     "w": "lg",
+     "df": 15,
+     "share": 1.0,
+     "tag": "encoded",
+     "thread": 0.2
+    },
+    {
+     "w": "34u",
+     "df": 14,
+     "share": 1.0,
+     "tag": "encoded",
+     "thread": 0.07
+    },
+    {
+     "w": "6ei",
+     "df": 14,
+     "share": 1.0,
+     "tag": "encoded",
+     "thread": 0.07
+    },
+    {
+     "w": "1d9",
+     "df": 13,
+     "share": 1.0,
+     "tag": "encoded",
+     "thread": 0.08
+    },
+    {
+     "w": "b8f",
+     "df": 13,
+     "share": 1.0,
+     "tag": "encoded",
+     "thread": 0.08
+    },
+    {
+     "w": "bhj",
+     "df": 13,
+     "share": 1.0,
+     "tag": "encoded",
+     "thread": 0.08
+    },
+    {
+     "w": "g9v",
+     "df": 13,
+     "share": 1.0,
+     "tag": "encoded",
+     "thread": 0.08
+    },
+    {
+     "w": "_o",
+     "df": 12,
+     "share": 1.0,
+     "tag": "encoded",
+     "thread": 0.25
+    },
+    {
+     "w": "a86",
+     "df": 12,
+     "share": 1.0,
+     "tag": "encoded",
+     "thread": 0.08
+    },
+    {
+     "w": "bj200",
+     "df": 12,
+     "share": 1.0,
+     "tag": "thread",
+     "thread": 0.92
+    },
+    {
+     "w": "g9",
+     "df": 12,
+     "share": 1.0,
+     "tag": "encoded",
+     "thread": 0.17
+    }
+   ],
+   "svm_h": 0.837
+  },
+  {
+   "name": "comp.sys.ibm.pc.hardware",
+   "words": [
+    {
+     "w": "booting",
+     "df": 16,
+     "share": 0.88,
+     "tag": "thread",
+     "thread": 0.5
+    },
+    {
+     "w": "adaptec",
+     "df": 22,
+     "share": 0.86,
+     "tag": "",
+     "thread": 0.09
+    },
+    {
+     "w": "esdi",
+     "df": 19,
+     "share": 0.84,
+     "tag": "",
+     "thread": 0.32
+    },
+    {
+     "w": "irq",
+     "df": 28,
+     "share": 0.79,
+     "tag": "",
+     "thread": 0.25
+    },
+    {
+     "w": "harddisk",
+     "df": 14,
+     "share": 0.79,
+     "tag": "",
+     "thread": 0.07
+    },
+    {
+     "w": "ide",
+     "df": 119,
+     "share": 0.78,
+     "tag": "",
+     "thread": 0.28
+    },
+    {
+     "w": "vlb",
+     "df": 54,
+     "share": 0.78,
+     "tag": "",
+     "thread": 0.07
+    },
+    {
+     "w": "seagate",
+     "df": 25,
+     "share": 0.76,
+     "tag": "",
+     "thread": 0.08
+    },
+    {
+     "w": "dx2",
+     "df": 20,
+     "share": 0.75,
+     "tag": "",
+     "thread": 0.1
+    },
+    {
+     "w": "motherboards",
+     "df": 16,
+     "share": 0.75,
+     "tag": "",
+     "thread": 0.12
+    },
+    {
+     "w": "controler",
+     "df": 12,
+     "share": 0.75,
+     "tag": "thread",
+     "thread": 0.5
+    },
+    {
+     "w": "nanao",
+     "df": 12,
+     "share": 0.75,
+     "tag": "",
+     "thread": 0.25
+    }
+   ],
+   "svm_h": 0.7003
+  },
+  {
+   "name": "comp.sys.mac.hardware",
+   "words": [
+    {
+     "w": "powerbook",
+     "df": 39,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.05
+    },
+    {
+     "w": "iisi",
+     "df": 38,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.13
+    },
+    {
+     "w": "lciii",
+     "df": 29,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.14
+    },
+    {
+     "w": "c650",
+     "df": 26,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.23
+    },
+    {
+     "w": "adb",
+     "df": 20,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.3
+    },
+    {
+     "w": "macuser",
+     "df": 11,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.18
+    },
+    {
+     "w": "q700",
+     "df": 11,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.27
+    },
+    {
+     "w": "iivx",
+     "df": 10,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.2
+    },
+    {
+     "w": "centris",
+     "df": 66,
+     "share": 0.94,
+     "tag": "",
+     "thread": 0.08
+    },
+    {
+     "w": "iici",
+     "df": 12,
+     "share": 0.92,
+     "tag": "",
+     "thread": 0.17
+    },
+    {
+     "w": "nubus",
+     "df": 31,
+     "share": 0.9,
+     "tag": "",
+     "thread": 0.16
+    },
+    {
+     "w": "68040",
+     "df": 18,
+     "share": 0.89,
+     "tag": "",
+     "thread": 0.17
+    }
+   ],
+   "svm_h": 0.8015
+  },
+  {
+   "name": "comp.windows.x",
+   "words": [
+    {
+     "w": "xputimage",
+     "df": 21,
+     "share": 1.0,
+     "tag": "thread",
+     "thread": 0.62
+    },
+    {
+     "w": "tvtwm",
+     "df": 19,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.21
+    },
+    {
+     "w": "xdm",
+     "df": 19,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.16
+    },
+    {
+     "w": "olwm",
+     "df": 18,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.11
+    },
+    {
+     "w": "xsun",
+     "df": 16,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.19
+    },
+    {
+     "w": "imake",
+     "df": 15,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.13
+    },
+    {
+     "w": "intrinsics",
+     "df": 15,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.4
+    },
+    {
+     "w": "openlook",
+     "df": 14,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.14
+    },
+    {
+     "w": "pixmaps",
+     "df": 14,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.43
+    },
+    {
+     "w": "colormaps",
+     "df": 13,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.23
+    },
+    {
+     "w": "twm",
+     "df": 13,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.15
+    },
+    {
+     "w": "xcopyarea",
+     "df": 13,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.38
+    }
+   ],
+   "svm_h": 0.8242
+  },
+  {
+   "name": "misc.forsale",
+   "words": [
+    {
+     "w": "sega",
+     "df": 12,
+     "share": 0.92,
+     "tag": "",
+     "thread": 0.17
+    },
+    {
+     "w": "forsale",
+     "df": 73,
+     "share": 0.9,
+     "tag": "",
+     "thread": 0.03
+    },
+    {
+     "w": "obo",
+     "df": 40,
+     "share": 0.9,
+     "tag": "",
+     "thread": 0.07
+    },
+    {
+     "w": "cod",
+     "df": 26,
+     "share": 0.85,
+     "tag": "",
+     "thread": 0.04
+    },
+    {
+     "w": "mint",
+     "df": 21,
+     "share": 0.81,
+     "tag": "",
+     "thread": 0.1
+    },
+    {
+     "w": "cassette",
+     "df": 24,
+     "share": 0.79,
+     "tag": "",
+     "thread": 0.04
+    },
+    {
+     "w": "comics",
+     "df": 13,
+     "share": 0.77,
+     "tag": "",
+     "thread": 0.15
+    },
+    {
+     "w": "sale",
+     "df": 462,
+     "share": 0.76,
+     "tag": "",
+     "thread": 0.01
+    },
+    {
+     "w": "charger",
+     "df": 12,
+     "share": 0.75,
+     "tag": "",
+     "thread": 0.08
+    },
+    {
+     "w": "marvel",
+     "df": 11,
+     "share": 0.73,
+     "tag": "",
+     "thread": 0.18
+    },
+    {
+     "w": "lens",
+     "df": 18,
+     "share": 0.72,
+     "tag": "",
+     "thread": 0.11
+    },
+    {
+     "w": "shipping",
+     "df": 180,
+     "share": 0.71,
+     "tag": "",
+     "thread": 0.03
+    }
+   ],
+   "svm_h": 0.874
+  },
+  {
+   "name": "rec.autos",
+   "words": [
+    {
+     "w": "mustang",
+     "df": 16,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.12
+    },
+    {
+     "w": "awd",
+     "df": 11,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.36
+    },
+    {
+     "w": "sundance",
+     "df": 11,
+     "share": 1.0,
+     "tag": "thread",
+     "thread": 0.91
+    },
+    {
+     "w": "automotive",
+     "df": 51,
+     "share": 0.96,
+     "tag": "thread",
+     "thread": 0.57
+    },
+    {
+     "w": "dumbest",
+     "df": 41,
+     "share": 0.95,
+     "tag": "thread",
+     "thread": 0.71
+    },
+    {
+     "w": "chevy",
+     "df": 18,
+     "share": 0.94,
+     "tag": "",
+     "thread": 0.17
+    },
+    {
+     "w": "sedan",
+     "df": 12,
+     "share": 0.92,
+     "tag": "",
+     "thread": 0.08
+    },
+    {
+     "w": "mr2",
+     "df": 11,
+     "share": 0.91,
+     "tag": "",
+     "thread": 0.36
+    },
+    {
+     "w": "saab",
+     "df": 11,
+     "share": 0.91,
+     "tag": "",
+     "thread": 0.09
+    },
+    {
+     "w": "subaru",
+     "df": 11,
+     "share": 0.91,
+     "tag": "",
+     "thread": 0.18
+    },
+    {
+     "w": "audi",
+     "df": 10,
+     "share": 0.9,
+     "tag": "",
+     "thread": 0.1
+    },
+    {
+     "w": "buick",
+     "df": 10,
+     "share": 0.9,
+     "tag": "",
+     "thread": 0.2
+    }
+   ],
+   "svm_h": 0.774
+  },
+  {
+   "name": "rec.motorcycles",
+   "words": [
+    {
+     "w": "bikes",
+     "df": 80,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.05
+    },
+    {
+     "w": "countersteering_faq",
+     "df": 24,
+     "share": 1.0,
+     "tag": "thread",
+     "thread": 0.96
+    },
+    {
+     "w": "harley",
+     "df": 23,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.13
+    },
+    {
+     "w": "bikers",
+     "df": 16,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.19
+    },
+    {
+     "w": "countersteering",
+     "df": 16,
+     "share": 1.0,
+     "tag": "thread",
+     "thread": 0.69
+    },
+    {
+     "w": "kawasaki",
+     "df": 15,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.2
+    },
+    {
+     "w": "riceburner",
+     "df": 13,
+     "share": 1.0,
+     "tag": "thread",
+     "thread": 0.85
+    },
+    {
+     "w": "wheelies",
+     "df": 13,
+     "share": 1.0,
+     "tag": "thread",
+     "thread": 0.85
+    },
+    {
+     "w": "bdi",
+     "df": 12,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.42
+    },
+    {
+     "w": "wibbled",
+     "df": 12,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.17
+    },
+    {
+     "w": "cagers",
+     "df": 11,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.45
+    },
+    {
+     "w": "ducati",
+     "df": 10,
+     "share": 1.0,
+     "tag": "thread",
+     "thread": 0.6
+    }
+   ],
+   "svm_h": 0.8594
+  },
+  {
+   "name": "rec.sport.baseball",
+   "words": [
+    {
+     "w": "phillies",
+     "df": 47,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.17
+    },
+    {
+     "w": "hitter",
+     "df": 44,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.09
+    },
+    {
+     "w": "pitcher",
+     "df": 36,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.14
+    },
+    {
+     "w": "pitchers",
+     "df": 30,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.07
+    },
+    {
+     "w": "dodgers",
+     "df": 28,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.07
+    },
+    {
+     "w": "alomar",
+     "df": 26,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.42
+    },
+    {
+     "w": "rbi",
+     "df": 24,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.17
+    },
+    {
+     "w": "bullpen",
+     "df": 22,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.09
+    },
+    {
+     "w": "royals",
+     "df": 22,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.18
+    },
+    {
+     "w": "innings",
+     "df": 20,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.15
+    },
+    {
+     "w": "marlins",
+     "df": 20,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.25
+    },
+    {
+     "w": "clemens",
+     "df": 19,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.21
+    }
+   ],
+   "svm_h": 0.9255
+  },
+  {
+   "name": "rec.sport.hockey",
+   "words": [
+    {
+     "w": "nhl",
+     "df": 146,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.13
+    },
+    {
+     "w": "leafs",
+     "df": 62,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.08
+    },
+    {
+     "w": "bruins",
+     "df": 44,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.07
+    },
+    {
+     "w": "goalie",
+     "df": 39,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.21
+    },
+    {
+     "w": "lemieux",
+     "df": 33,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.12
+    },
+    {
+     "w": "lindros",
+     "df": 32,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.09
+    },
+    {
+     "w": "winnipeg",
+     "df": 31,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.1
+    },
+    {
+     "w": "hawks",
+     "df": 28,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.14
+    },
+    {
+     "w": "oilers",
+     "df": 27,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.11
+    },
+    {
+     "w": "potvin",
+     "df": 25,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.08
+    },
+    {
+     "w": "smythe",
+     "df": 23,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.22
+    },
+    {
+     "w": "bure",
+     "df": 22,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.14
+    }
+   ],
+   "svm_h": 0.9709
+  },
+  {
+   "name": "sci.crypt",
+   "words": [
+    {
+     "w": "crypto",
+     "df": 117,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.28
+    },
+    {
+     "w": "rsa",
+     "df": 47,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.09
+    },
+    {
+     "w": "denning",
+     "df": 43,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.09
+    },
+    {
+     "w": "decrypt",
+     "df": 38,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.11
+    },
+    {
+     "w": "crypt",
+     "df": 36,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.06
+    },
+    {
+     "w": "cipher",
+     "df": 30,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.3
+    },
+    {
+     "w": "cryptographic",
+     "df": 30,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.07
+    },
+    {
+     "w": "escrowed",
+     "df": 28,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.18
+    },
+    {
+     "w": "encrypt",
+     "df": 27,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.07
+    },
+    {
+     "w": "keyseach",
+     "df": 25,
+     "share": 1.0,
+     "tag": "thread",
+     "thread": 0.76
+    },
+    {
+     "w": "hellman",
+     "df": 24,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.12
+    },
+    {
+     "w": "plaintext",
+     "df": 23,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.13
+    }
+   ],
+   "svm_h": 0.9
+  },
+  {
+   "name": "sci.electronics",
+   "words": [
+    {
+     "w": "120vac",
+     "df": 17,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.41
+    },
+    {
+     "w": "transformer",
+     "df": 14,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.14
+    },
+    {
+     "w": "adcom",
+     "df": 10,
+     "share": 1.0,
+     "tag": "thread",
+     "thread": 0.8
+    },
+    {
+     "w": "8051",
+     "df": 12,
+     "share": 0.92,
+     "tag": "",
+     "thread": 0.33
+    },
+    {
+     "w": "diode",
+     "df": 12,
+     "share": 0.92,
+     "tag": "",
+     "thread": 0.17
+    },
+    {
+     "w": "capacitors",
+     "df": 10,
+     "share": 0.9,
+     "tag": "",
+     "thread": 0.2
+    },
+    {
+     "w": "resistor",
+     "df": 23,
+     "share": 0.83,
+     "tag": "",
+     "thread": 0.09
+    },
+    {
+     "w": "towers",
+     "df": 22,
+     "share": 0.82,
+     "tag": "thread",
+     "thread": 0.77
+    },
+    {
+     "w": "volt",
+     "df": 22,
+     "share": 0.82,
+     "tag": "",
+     "thread": 0.09
+    },
+    {
+     "w": "relays",
+     "df": 11,
+     "share": 0.82,
+     "tag": "thread",
+     "thread": 0.55
+    },
+    {
+     "w": "rs232",
+     "df": 11,
+     "share": 0.82,
+     "tag": "",
+     "thread": 0.27
+    },
+    {
+     "w": "circuit",
+     "df": 81,
+     "share": 0.81,
+     "tag": "",
+     "thread": 0.04
+    }
+   ],
+   "svm_h": 0.6903
+  },
+  {
+   "name": "sci.med",
+   "words": [
+    {
+     "w": "homeopathy",
+     "df": 35,
+     "share": 1.0,
+     "tag": "thread",
+     "thread": 0.69
+    },
+    {
+     "w": "candida",
+     "df": 25,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.32
+    },
+    {
+     "w": "albicans",
+     "df": 19,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.42
+    },
+    {
+     "w": "infections",
+     "df": 19,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.21
+    },
+    {
+     "w": "migraine",
+     "df": 17,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.18
+    },
+    {
+     "w": "barbecued",
+     "df": 16,
+     "share": 1.0,
+     "tag": "thread",
+     "thread": 1.0
+    },
+    {
+     "w": "krillean",
+     "df": 16,
+     "share": 1.0,
+     "tag": "thread",
+     "thread": 1.0
+    },
+    {
+     "w": "lyme",
+     "df": 15,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.33
+    },
+    {
+     "w": "antibiotics",
+     "df": 14,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.29
+    },
+    {
+     "w": "inflammation",
+     "df": 13,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.38
+    },
+    {
+     "w": "glutamate",
+     "df": 12,
+     "share": 1.0,
+     "tag": "thread",
+     "thread": 0.75
+    },
+    {
+     "w": "allergies",
+     "df": 11,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.27
+    }
+   ],
+   "svm_h": 0.8589
+  },
+  {
+   "name": "sci.space",
+   "words": [
+    {
+     "w": "vandalizing",
+     "df": 26,
+     "share": 1.0,
+     "tag": "thread",
+     "thread": 0.77
+    },
+    {
+     "w": "moonbase",
+     "df": 20,
+     "share": 1.0,
+     "tag": "thread",
+     "thread": 0.5
+    },
+    {
+     "w": "orbiter",
+     "df": 20,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.1
+    },
+    {
+     "w": "ssto",
+     "df": 20,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.2
+    },
+    {
+     "w": "orbiting",
+     "df": 19,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.05
+    },
+    {
+     "w": "payloads",
+     "df": 16,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.12
+    },
+    {
+     "w": "asteroids",
+     "df": 14,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.14
+    },
+    {
+     "w": "sdio",
+     "df": 13,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.15
+    },
+    {
+     "w": "ssf",
+     "df": 12,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.17
+    },
+    {
+     "w": "billboards",
+     "df": 11,
+     "share": 1.0,
+     "tag": "thread",
+     "thread": 0.64
+    },
+    {
+     "w": "aiaa",
+     "df": 10,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.3
+    },
+    {
+     "w": "bursters",
+     "df": 10,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.4
+    }
+   ],
+   "svm_h": 0.8989
+  },
+  {
+   "name": "soc.religion.christian",
+   "words": [
+    {
+     "w": "environmentalism",
+     "df": 15,
+     "share": 1.0,
+     "tag": "thread",
+     "thread": 0.6
+    },
+    {
+     "w": "5of5",
+     "df": 12,
+     "share": 1.0,
+     "tag": "thread",
+     "thread": 1.0
+    },
+    {
+     "w": "pantheism",
+     "df": 12,
+     "share": 1.0,
+     "tag": "thread",
+     "thread": 0.75
+    },
+    {
+     "w": "jeesus",
+     "df": 28,
+     "share": 0.96,
+     "tag": "",
+     "thread": 0.43
+    },
+    {
+     "w": "corinthians",
+     "df": 16,
+     "share": 0.94,
+     "tag": "",
+     "thread": 0.06
+    },
+    {
+     "w": "communion",
+     "df": 13,
+     "share": 0.92,
+     "tag": "",
+     "thread": 0.15
+    },
+    {
+     "w": "cor",
+     "df": 13,
+     "share": 0.92,
+     "tag": "",
+     "thread": 0.15
+    },
+    {
+     "w": "bishops",
+     "df": 10,
+     "share": 0.9,
+     "tag": "thread",
+     "thread": 0.5
+    },
+    {
+     "w": "congregation",
+     "df": 10,
+     "share": 0.9,
+     "tag": "",
+     "thread": 0.2
+    },
+    {
+     "w": "trinity",
+     "df": 14,
+     "share": 0.86,
+     "tag": "",
+     "thread": 0.21
+    },
+    {
+     "w": "arrogance",
+     "df": 60,
+     "share": 0.85,
+     "tag": "thread",
+     "thread": 0.65
+    },
+    {
+     "w": "apostles",
+     "df": 23,
+     "share": 0.83,
+     "tag": "",
+     "thread": 0.13
+    }
+   ],
+   "svm_h": 0.807
+  },
+  {
+   "name": "talk.politics.guns",
+   "words": [
+    {
+     "w": "ranch",
+     "df": 49,
+     "share": 1.0,
+     "tag": "thread",
+     "thread": 0.88
+    },
+    {
+     "w": "dividian",
+     "df": 48,
+     "share": 1.0,
+     "tag": "thread",
+     "thread": 0.9
+    },
+    {
+     "w": "firearm",
+     "df": 35,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.09
+    },
+    {
+     "w": "homicides",
+     "df": 15,
+     "share": 1.0,
+     "tag": "thread",
+     "thread": 0.6
+    },
+    {
+     "w": "backcountry",
+     "df": 14,
+     "share": 1.0,
+     "tag": "thread",
+     "thread": 0.86
+    },
+    {
+     "w": "hci",
+     "df": 13,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.15
+    },
+    {
+     "w": "shotguns",
+     "df": 13,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.23
+    },
+    {
+     "w": "glock",
+     "df": 11,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.45
+    },
+    {
+     "w": "sporting",
+     "df": 10,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.2
+    },
+    {
+     "w": "rkba",
+     "df": 30,
+     "share": 0.97,
+     "tag": "",
+     "thread": 0.23
+    },
+    {
+     "w": "atf",
+     "df": 75,
+     "share": 0.95,
+     "tag": "thread",
+     "thread": 0.57
+    },
+    {
+     "w": "handgun",
+     "df": 43,
+     "share": 0.93,
+     "tag": "",
+     "thread": 0.23
+    }
+   ],
+   "svm_h": 0.8861
+  },
+  {
+   "name": "talk.politics.mideast",
+   "words": [
+    {
+     "w": "armenians",
+     "df": 97,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.11
+    },
+    {
+     "w": "a••••",
+     "df": 87,
+     "share": 1.0,
+     "tag": "person",
+     "thread": 0.07
+    },
+    {
+     "w": "s•••••",
+     "df": 86,
+     "share": 1.0,
+     "tag": "person",
+     "thread": 0.08
+    },
+    {
+     "w": "hezbollah",
+     "df": 48,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.48
+    },
+    {
+     "w": "azerbaijan",
+     "df": 39,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.15
+    },
+    {
+     "w": "azeris",
+     "df": 38,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.47
+    },
+    {
+     "w": "karabakh",
+     "df": 30,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.23
+    },
+    {
+     "w": "azeri",
+     "df": 27,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.26
+    },
+    {
+     "w": "kurdish",
+     "df": 26,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.08
+    },
+    {
+     "w": "azerbaijani",
+     "df": 25,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.12
+    },
+    {
+     "w": "cpr",
+     "df": 24,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.08
+    },
+    {
+     "w": "nagorno",
+     "df": 24,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.12
+    }
+   ],
+   "svm_h": 0.9535
+  },
+  {
+   "name": "talk.politics.misc",
+   "words": [
+    {
+     "w": "t•••",
+     "df": 13,
+     "share": 1.0,
+     "tag": "person",
+     "thread": 0.23
+    },
+    {
+     "w": "j••",
+     "df": 12,
+     "share": 1.0,
+     "tag": "person",
+     "thread": 0.58
+    },
+    {
+     "w": "molesters",
+     "df": 21,
+     "share": 0.95,
+     "tag": "thread",
+     "thread": 0.71
+    },
+    {
+     "w": "c•••••",
+     "df": 16,
+     "share": 0.94,
+     "tag": "person",
+     "thread": 0.19
+    },
+    {
+     "w": "immunization",
+     "df": 13,
+     "share": 0.92,
+     "tag": "thread",
+     "thread": 0.69
+    },
+    {
+     "w": "stimulus",
+     "df": 15,
+     "share": 0.87,
+     "tag": "",
+     "thread": 0.13
+    },
+    {
+     "w": "vat",
+     "df": 14,
+     "share": 0.86,
+     "tag": "thread",
+     "thread": 0.5
+    },
+    {
+     "w": "deficit",
+     "df": 31,
+     "share": 0.81,
+     "tag": "",
+     "thread": 0.16
+    },
+    {
+     "w": "pork",
+     "df": 15,
+     "share": 0.8,
+     "tag": "",
+     "thread": 0.13
+    },
+    {
+     "w": "libertarians",
+     "df": 26,
+     "share": 0.77,
+     "tag": "",
+     "thread": 0.46
+    },
+    {
+     "w": "promiscuous",
+     "df": 13,
+     "share": 0.77,
+     "tag": "thread",
+     "thread": 0.69
+    },
+    {
+     "w": "hypocrisy",
+     "df": 27,
+     "share": 0.74,
+     "tag": "thread",
+     "thread": 0.74
+    }
+   ],
+   "svm_h": 0.8493
+  },
+  {
+   "name": "talk.religion.misc",
+   "words": [
+    {
+     "w": "rosicrucian",
+     "df": 17,
+     "share": 1.0,
+     "tag": "thread",
+     "thread": 0.82
+    },
+    {
+     "w": "merlin",
+     "df": 11,
+     "share": 1.0,
+     "tag": "thread",
+     "thread": 0.91
+    },
+    {
+     "w": "mithras",
+     "df": 11,
+     "share": 1.0,
+     "tag": "thread",
+     "thread": 0.91
+    },
+    {
+     "w": "hypocrite",
+     "df": 10,
+     "share": 1.0,
+     "tag": "",
+     "thread": 0.3
+    },
+    {
+     "w": "magick",
+     "df": 13,
+     "share": 0.92,
+     "tag": "thread",
+     "thread": 0.77
+    },
+    {
+     "w": "sabin",
+     "df": 10,
+     "share": 0.9,
+     "tag": "thread",
+     "thread": 0.7
+    },
+    {
+     "w": "lds",
+     "df": 18,
+     "share": 0.83,
+     "tag": "",
+     "thread": 0.11
+    },
+    {
+     "w": "cites",
+     "df": 18,
+     "share": 0.72,
+     "tag": "thread",
+     "thread": 0.72
+    },
+    {
+     "w": "herring",
+     "df": 12,
+     "share": 0.67,
+     "tag": "",
+     "thread": 0.17
+    },
+    {
+     "w": "tyre",
+     "df": 17,
+     "share": 0.65,
+     "tag": "",
+     "thread": 0.29
+    },
+    {
+     "w": "contradictions",
+     "df": 26,
+     "share": 0.62,
+     "tag": "",
+     "thread": 0.31
+    },
+    {
+     "w": "loving",
+     "df": 46,
+     "share": 0.59,
+     "tag": "",
+     "thread": 0.3
+    }
+   ],
+   "svm_h": 0.4839
+  }
+ ],
+ "min_df": 10
+}

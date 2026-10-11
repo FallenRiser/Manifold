@@ -1,0 +1,820 @@
+{
+ "specimens": [
+  {
+   "post": 5811,
+   "forum": "comp.windows.x",
+   "words": "comp.graphics",
+   "subject": "X audio extension",
+   "segments": [
+    {
+     "t": "X",
+     "hit": true
+    },
+    {
+     "t": " ",
+     "hit": false
+    },
+    {
+     "t": "audio",
+     "hit": false
+    },
+    {
+     "t": " ",
+     "hit": false
+    },
+    {
+     "t": "extension",
+     "hit": false
+    },
+    {
+     "t": "\n\n",
+     "hit": false
+    },
+    {
+     "t": "Is",
+     "hit": false
+    },
+    {
+     "t": " ",
+     "hit": false
+    },
+    {
+     "t": "there",
+     "hit": false
+    },
+    {
+     "t": " ",
+     "hit": false
+    },
+    {
+     "t": "an",
+     "hit": false
+    },
+    {
+     "t": " \"",
+     "hit": false
+    },
+    {
+     "t": "official",
+     "hit": false
+    },
+    {
+     "t": " ",
+     "hit": false
+    },
+    {
+     "t": "extension",
+     "hit": false
+    },
+    {
+     "t": "\" ",
+     "hit": false
+    },
+    {
+     "t": "to",
+     "hit": false
+    },
+    {
+     "t": " ",
+     "hit": false
+    },
+    {
+     "t": "X",
+     "hit": true
+    },
+    {
+     "t": " ",
+     "hit": false
+    },
+    {
+     "t": "which",
+     "hit": false
+    },
+    {
+     "t": " ",
+     "hit": false
+    },
+    {
+     "t": "allows",
+     "hit": false
+    },
+    {
+     "t": " ",
+     "hit": false
+    },
+    {
+     "t": "the",
+     "hit": false
+    },
+    {
+     "t": " ",
+     "hit": false
+    },
+    {
+     "t": "use",
+     "hit": false
+    },
+    {
+     "t": " ",
+     "hit": false
+    },
+    {
+     "t": "of",
+     "hit": false
+    },
+    {
+     "t": " ",
+     "hit": false
+    },
+    {
+     "t": "audio",
+     "hit": false
+    },
+    {
+     "t": "? ",
+     "hit": false
+    },
+    {
+     "t": "Most",
+     "hit": false
+    },
+    {
+     "t": " ",
+     "hit": false
+    },
+    {
+     "t": "of",
+     "hit": false
+    },
+    {
+     "t": " ",
+     "hit": false
+    },
+    {
+     "t": "the",
+     "hit": false
+    },
+    {
+     "t": " ",
+     "hit": false
+    },
+    {
+     "t": "X",
+     "hit": true
+    },
+    {
+     "t": " ",
+     "hit": false
+    },
+    {
+     "t": "audio",
+     "hit": false
+    },
+    {
+     "t": " ",
+     "hit": false
+    },
+    {
+     "t": "programs",
+     "hit": false
+    },
+    {
+     "t": " ",
+     "hit": false
+    },
+    {
+     "t": "use",
+     "hit": false
+    },
+    {
+     "t": " ",
+     "hit": false
+    },
+    {
+     "t": "system",
+     "hit": false
+    },
+    {
+     "t": "-",
+     "hit": false
+    },
+    {
+     "t": "specific",
+     "hit": false
+    },
+    {
+     "t": " ",
+     "hit": false
+    },
+    {
+     "t": "ways",
+     "hit": false
+    },
+    {
+     "t": " ",
+     "hit": false
+    },
+    {
+     "t": "to",
+     "hit": false
+    },
+    {
+     "t": " ",
+     "hit": false
+    },
+    {
+     "t": "access",
+     "hit": false
+    },
+    {
+     "t": " ",
+     "hit": false
+    },
+    {
+     "t": "the",
+     "hit": false
+    },
+    {
+     "t": " ",
+     "hit": false
+    },
+    {
+     "t": "audio",
+     "hit": false
+    },
+    {
+     "t": " ",
+     "hit": false
+    },
+    {
+     "t": "capabilities",
+     "hit": false
+    },
+    {
+     "t": " ",
+     "hit": false
+    },
+    {
+     "t": "of",
+     "hit": false
+    },
+    {
+     "t": " ",
+     "hit": false
+    },
+    {
+     "t": "the",
+     "hit": false
+    },
+    {
+     "t": " ",
+     "hit": false
+    },
+    {
+     "t": "computer",
+     "hit": false
+    },
+    {
+     "t": " ",
+     "hit": false
+    },
+    {
+     "t": "they",
+     "hit": false
+    },
+    {
+     "t": " ",
+     "hit": false
+    },
+    {
+     "t": "run",
+     "hit": false
+    },
+    {
+     "t": " ",
+     "hit": false
+    },
+    {
+     "t": "on",
+     "hit": false
+    },
+    {
+     "t": ". ",
+     "hit": false
+    },
+    {
+     "t": "Is",
+     "hit": false
+    },
+    {
+     "t": " ",
+     "hit": false
+    },
+    {
+     "t": "there",
+     "hit": false
+    },
+    {
+     "t": " ",
+     "hit": false
+    },
+    {
+     "t": "a",
+     "hit": false
+    },
+    {
+     "t": " ",
+     "hit": false
+    },
+    {
+     "t": "hardware",
+     "hit": false
+    },
+    {
+     "t": "-",
+     "hit": false
+    },
+    {
+     "t": "independent",
+     "hit": false
+    },
+    {
+     "t": " ",
+     "hit": false
+    },
+    {
+     "t": "way",
+     "hit": false
+    },
+    {
+     "t": " ",
+     "hit": false
+    },
+    {
+     "t": "to",
+     "hit": false
+    },
+    {
+     "t": " ",
+     "hit": false
+    },
+    {
+     "t": "do",
+     "hit": false
+    },
+    {
+     "t": " ",
+     "hit": false
+    },
+    {
+     "t": "this",
+     "hit": false
+    },
+    {
+     "t": " (",
+     "hit": false
+    },
+    {
+     "t": "like",
+     "hit": false
+    },
+    {
+     "t": " ",
+     "hit": false
+    },
+    {
+     "t": "the",
+     "hit": false
+    },
+    {
+     "t": " ",
+     "hit": false
+    },
+    {
+     "t": "video",
+     "hit": false
+    },
+    {
+     "t": " ",
+     "hit": false
+    },
+    {
+     "t": "extension",
+     "hit": false
+    },
+    {
+     "t": " ",
+     "hit": false
+    },
+    {
+     "t": "XV",
+     "hit": true
+    },
+    {
+     "t": ")? ",
+     "hit": false
+    },
+    {
+     "t": "Thanks",
+     "hit": false
+    },
+    {
+     "t": " ",
+     "hit": false
+    },
+    {
+     "t": "for",
+     "hit": false
+    },
+    {
+     "t": " ",
+     "hit": false
+    },
+    {
+     "t": "any",
+     "hit": false
+    },
+    {
+     "t": " ",
+     "hit": false
+    },
+    {
+     "t": "help",
+     "hit": false
+    },
+    {
+     "t": ".",
+     "hit": false
+    }
+   ],
+   "top": [
+    {
+     "f": " x",
+     "piece": true,
+     "c": 0.214
+    },
+    {
+     "f": " x ",
+     "piece": true,
+     "c": 0.102
+    },
+    {
+     "f": "extension",
+     "piece": false,
+     "c": 0.068
+    },
+    {
+     "f": "an",
+     "piece": false,
+     "c": 0.052
+    },
+    {
+     "f": "audio",
+     "piece": false,
+     "c": 0.05
+    },
+    {
+     "f": "x ",
+     "piece": true,
+     "c": 0.037
+    }
+   ],
+   "from": {
+    "words": -0.084,
+    "pieces": 0.265
+   }
+  },
+  {
+   "post": 7226,
+   "forum": "sci.crypt",
+   "words": "sci.electronics",
+   "subject": "Birthday attack?",
+   "segments": [
+    {
+     "t": "Birthday",
+     "hit": false
+    },
+    {
+     "t": " ",
+     "hit": false
+    },
+    {
+     "t": "attack",
+     "hit": false
+    },
+    {
+     "t": "?\n\n",
+     "hit": false
+    },
+    {
+     "t": "I",
+     "hit": false
+    },
+    {
+     "t": " ",
+     "hit": false
+    },
+    {
+     "t": "recently",
+     "hit": false
+    },
+    {
+     "t": " ",
+     "hit": false
+    },
+    {
+     "t": "saw",
+     "hit": false
+    },
+    {
+     "t": " ",
+     "hit": false
+    },
+    {
+     "t": "a",
+     "hit": false
+    },
+    {
+     "t": " ",
+     "hit": false
+    },
+    {
+     "t": "message",
+     "hit": false
+    },
+    {
+     "t": " ",
+     "hit": false
+    },
+    {
+     "t": "here",
+     "hit": false
+    },
+    {
+     "t": " (",
+     "hit": false
+    },
+    {
+     "t": "posted",
+     "hit": false
+    },
+    {
+     "t": " ",
+     "hit": false
+    },
+    {
+     "t": "by",
+     "hit": false
+    },
+    {
+     "t": " ",
+     "hit": false
+    },
+    {
+     "t": "B",
+     "hit": false
+    },
+    {
+     "t": "•• ",
+     "hit": false
+    },
+    {
+     "t": "S",
+     "hit": false
+    },
+    {
+     "t": "••••••••, ",
+     "hit": false
+    },
+    {
+     "t": "I",
+     "hit": false
+    },
+    {
+     "t": " ",
+     "hit": false
+    },
+    {
+     "t": "think",
+     "hit": false
+    },
+    {
+     "t": ") ",
+     "hit": false
+    },
+    {
+     "t": "which",
+     "hit": false
+    },
+    {
+     "t": " ",
+     "hit": false
+    },
+    {
+     "t": "referred",
+     "hit": false
+    },
+    {
+     "t": " ",
+     "hit": false
+    },
+    {
+     "t": "to",
+     "hit": false
+    },
+    {
+     "t": " ",
+     "hit": false
+    },
+    {
+     "t": "a",
+     "hit": false
+    },
+    {
+     "t": " \"",
+     "hit": false
+    },
+    {
+     "t": "birthday",
+     "hit": false
+    },
+    {
+     "t": "\" ",
+     "hit": false
+    },
+    {
+     "t": "attack",
+     "hit": false
+    },
+    {
+     "t": " ",
+     "hit": false
+    },
+    {
+     "t": "on",
+     "hit": false
+    },
+    {
+     "t": " ",
+     "hit": false
+    },
+    {
+     "t": "a",
+     "hit": false
+    },
+    {
+     "t": " ",
+     "hit": false
+    },
+    {
+     "t": "cryptosystem",
+     "hit": true
+    },
+    {
+     "t": ". ",
+     "hit": false
+    },
+    {
+     "t": "I",
+     "hit": false
+    },
+    {
+     "t": "'",
+     "hit": false
+    },
+    {
+     "t": "m",
+     "hit": false
+    },
+    {
+     "t": " ",
+     "hit": false
+    },
+    {
+     "t": "looking",
+     "hit": false
+    },
+    {
+     "t": " ",
+     "hit": false
+    },
+    {
+     "t": "for",
+     "hit": false
+    },
+    {
+     "t": " ",
+     "hit": false
+    },
+    {
+     "t": "references",
+     "hit": false
+    },
+    {
+     "t": " ",
+     "hit": false
+    },
+    {
+     "t": "on",
+     "hit": false
+    },
+    {
+     "t": ", ",
+     "hit": false
+    },
+    {
+     "t": "and",
+     "hit": false
+    },
+    {
+     "t": " ",
+     "hit": false
+    },
+    {
+     "t": "explanations",
+     "hit": false
+    },
+    {
+     "t": " ",
+     "hit": false
+    },
+    {
+     "t": "of",
+     "hit": false
+    },
+    {
+     "t": ", ",
+     "hit": false
+    },
+    {
+     "t": "this",
+     "hit": false
+    },
+    {
+     "t": " ",
+     "hit": false
+    },
+    {
+     "t": "type",
+     "hit": false
+    },
+    {
+     "t": " ",
+     "hit": false
+    },
+    {
+     "t": "of",
+     "hit": false
+    },
+    {
+     "t": " ",
+     "hit": false
+    },
+    {
+     "t": "attack",
+     "hit": false
+    },
+    {
+     "t": ".",
+     "hit": false
+    }
+   ],
+   "top": [
+    {
+     "f": "attack",
+     "piece": false,
+     "c": 0.061
+    },
+    {
+     "f": "crypt",
+     "piece": true,
+     "c": 0.046
+    },
+    {
+     "f": "cryp",
+     "piece": true,
+     "c": 0.046
+    },
+    {
+     "f": "rypt",
+     "piece": true,
+     "c": 0.045
+    },
+    {
+     "f": "ryp",
+     "piece": true,
+     "c": 0.045
+    },
+    {
+     "f": "ypt",
+     "piece": true,
+     "c": 0.042
+    }
+   ],
+   "from": {
+    "words": 0.059,
+    "pieces": 0.57
+   }
+  }
+ ]
+}

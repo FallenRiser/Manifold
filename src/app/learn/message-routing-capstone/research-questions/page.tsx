@@ -298,7 +298,7 @@ export default function ResearchQuestionsPage() {
           ones you got wrong.
         </Followup>
 
-        <SigRule n={5}>
+        <SigRule n={4}>
           <strong>Write each prediction down before you look: the decision it feeds, the result you expect, and
           the result that would prove it wrong.</strong> Check first that your test set can resolve a difference
           that size.

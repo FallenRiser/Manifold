@@ -1,0 +1,428 @@
+{
+ "n": {
+  "all": 2527,
+  "known": 923,
+  "new": 1604
+ },
+ "combos": {
+  "none": {
+   "all": {
+    "acc": 0.8168,
+    "diff": 0.0,
+    "lo": 0.0,
+    "hi": 0.0
+   },
+   "known": {
+    "acc": 0.8364,
+    "diff": 0.0,
+    "lo": 0.0,
+    "hi": 0.0
+   },
+   "new": {
+    "acc": 0.8055,
+    "diff": 0.0,
+    "lo": 0.0,
+    "hi": 0.0
+   }
+  },
+  "meta": {
+   "all": {
+    "acc": 0.8243,
+    "diff": 0.75,
+    "lo": -0.28,
+    "hi": 1.78
+   },
+   "known": {
+    "acc": 0.8722,
+    "diff": 3.58,
+    "lo": 1.95,
+    "hi": 5.2
+   },
+   "new": {
+    "acc": 0.7968,
+    "diff": -0.87,
+    "lo": -2.18,
+    "hi": 0.37
+   }
+  },
+  "quotes": {
+   "all": {
+    "acc": 0.8259,
+    "diff": 0.91,
+    "lo": 0.16,
+    "hi": 1.66
+   },
+   "known": {
+    "acc": 0.8537,
+    "diff": 1.73,
+    "lo": 0.54,
+    "hi": 3.03
+   },
+   "new": {
+    "acc": 0.8099,
+    "diff": 0.44,
+    "lo": -0.44,
+    "hi": 1.37
+   }
+  },
+  "meta+quotes": {
+   "all": {
+    "acc": 0.8231,
+    "diff": 0.63,
+    "lo": -0.48,
+    "hi": 1.7
+   },
+   "known": {
+    "acc": 0.8743,
+    "diff": 3.79,
+    "lo": 2.16,
+    "hi": 5.53
+   },
+   "new": {
+    "acc": 0.7936,
+    "diff": -1.18,
+    "lo": -2.5,
+    "hi": 0.19
+   }
+  },
+  "sig": {
+   "all": {
+    "acc": 0.8164,
+    "diff": -0.04,
+    "lo": -0.75,
+    "hi": 0.67
+   },
+   "known": {
+    "acc": 0.844,
+    "diff": 0.76,
+    "lo": -0.43,
+    "hi": 1.84
+   },
+   "new": {
+    "acc": 0.8005,
+    "diff": -0.5,
+    "lo": -1.43,
+    "hi": 0.5
+   }
+  },
+  "meta+sig": {
+   "all": {
+    "acc": 0.818,
+    "diff": 0.12,
+    "lo": -1.03,
+    "hi": 1.19
+   },
+   "known": {
+    "acc": 0.8678,
+    "diff": 3.14,
+    "lo": 1.41,
+    "hi": 4.98
+   },
+   "new": {
+    "acc": 0.7893,
+    "diff": -1.62,
+    "lo": -2.99,
+    "hi": -0.19
+   }
+  },
+  "quotes+sig": {
+   "all": {
+    "acc": 0.8223,
+    "diff": 0.55,
+    "lo": -0.32,
+    "hi": 1.42
+   },
+   "known": {
+    "acc": 0.8581,
+    "diff": 2.17,
+    "lo": 0.87,
+    "hi": 3.58
+   },
+   "new": {
+    "acc": 0.8017,
+    "diff": -0.37,
+    "lo": -1.5,
+    "hi": 0.69
+   }
+  },
+  "meta+quotes+sig": {
+   "all": {
+    "acc": 0.8227,
+    "diff": 0.59,
+    "lo": -0.55,
+    "hi": 1.7
+   },
+   "known": {
+    "acc": 0.8754,
+    "diff": 3.9,
+    "lo": 2.06,
+    "hi": 5.74
+   },
+   "new": {
+    "acc": 0.7924,
+    "diff": -1.31,
+    "lo": -2.68,
+    "hi": 0.0
+   }
+  },
+  "tail": {
+   "all": {
+    "acc": 0.8231,
+    "diff": 0.63,
+    "lo": 0.0,
+    "hi": 1.31
+   },
+   "known": {
+    "acc": 0.8516,
+    "diff": 1.52,
+    "lo": 0.54,
+    "hi": 2.6
+   },
+   "new": {
+    "acc": 0.8067,
+    "diff": 0.12,
+    "lo": -0.69,
+    "hi": 1.0
+   }
+  },
+  "meta+tail": {
+   "all": {
+    "acc": 0.8259,
+    "diff": 0.91,
+    "lo": -0.16,
+    "hi": 1.94
+   },
+   "known": {
+    "acc": 0.8722,
+    "diff": 3.58,
+    "lo": 1.95,
+    "hi": 5.2
+   },
+   "new": {
+    "acc": 0.7993,
+    "diff": -0.62,
+    "lo": -2.0,
+    "hi": 0.75
+   }
+  },
+  "quotes+tail": {
+   "all": {
+    "acc": 0.8279,
+    "diff": 1.11,
+    "lo": 0.28,
+    "hi": 1.94
+   },
+   "known": {
+    "acc": 0.857,
+    "diff": 2.06,
+    "lo": 0.76,
+    "hi": 3.47
+   },
+   "new": {
+    "acc": 0.8111,
+    "diff": 0.56,
+    "lo": -0.44,
+    "hi": 1.68
+   }
+  },
+  "meta+quotes+tail": {
+   "all": {
+    "acc": 0.8231,
+    "diff": 0.63,
+    "lo": -0.55,
+    "hi": 1.7
+   },
+   "known": {
+    "acc": 0.8732,
+    "diff": 3.68,
+    "lo": 1.95,
+    "hi": 5.42
+   },
+   "new": {
+    "acc": 0.7943,
+    "diff": -1.12,
+    "lo": -2.5,
+    "hi": 0.31
+   }
+  },
+  "sig+tail": {
+   "all": {
+    "acc": 0.8231,
+    "diff": 0.63,
+    "lo": -0.28,
+    "hi": 1.46
+   },
+   "known": {
+    "acc": 0.8537,
+    "diff": 1.73,
+    "lo": 0.43,
+    "hi": 3.03
+   },
+   "new": {
+    "acc": 0.8055,
+    "diff": 0.0,
+    "lo": -1.12,
+    "hi": 1.18
+   }
+  },
+  "meta+sig+tail": {
+   "all": {
+    "acc": 0.8192,
+    "diff": 0.24,
+    "lo": -0.91,
+    "hi": 1.35
+   },
+   "known": {
+    "acc": 0.8667,
+    "diff": 3.03,
+    "lo": 1.3,
+    "hi": 4.77
+   },
+   "new": {
+    "acc": 0.7918,
+    "diff": -1.37,
+    "lo": -2.81,
+    "hi": 0.12
+   }
+  },
+  "quotes+sig+tail": {
+   "all": {
+    "acc": 0.8263,
+    "diff": 0.95,
+    "lo": 0.0,
+    "hi": 1.94
+   },
+   "known": {
+    "acc": 0.8613,
+    "diff": 2.49,
+    "lo": 1.08,
+    "hi": 4.12
+   },
+   "new": {
+    "acc": 0.8061,
+    "diff": 0.06,
+    "lo": -1.12,
+    "hi": 1.25
+   }
+  },
+  "meta+quotes+sig+tail": {
+   "all": {
+    "acc": 0.8231,
+    "diff": 0.63,
+    "lo": -0.51,
+    "hi": 1.78
+   },
+   "known": {
+    "acc": 0.8732,
+    "diff": 3.68,
+    "lo": 1.84,
+    "hi": 5.53
+   },
+   "new": {
+    "acc": 0.7943,
+    "diff": -1.12,
+    "lo": -2.56,
+    "hi": 0.31
+   }
+  }
+ },
+ "first": {
+  "all": 0.8235,
+  "known": 0.8527,
+  "new": 0.8067
+ },
+ "specimen": {
+  "post": 1165,
+  "forum": "sci.med",
+  "lines": [
+   {
+    "part": "meta",
+    "text": "From: D••••• M••••• <D••••••••••••@med.umich.edu>"
+   },
+   {
+    "part": "subject",
+    "text": "Subject: Re: Iridology - Any credence to it???"
+   },
+   {
+    "part": "meta",
+    "text": "Organization: UM Anesthesiology"
+   },
+   {
+    "part": "meta",
+    "text": "Lines: 13"
+   },
+   {
+    "part": "meta",
+    "text": "Distribution: world"
+   },
+   {
+    "part": "meta",
+    "text": "NNTP-Posting-Host: 141.214.86.38"
+   },
+   {
+    "part": "meta",
+    "text": "X-UserAgent: Nuntius v1.1.1d9"
+   },
+   {
+    "part": "meta",
+    "text": "X-XXDate: Tue, 27 Apr 93 17:38:21 GMT"
+   },
+   {
+    "part": "body",
+    "text": ""
+   },
+   {
+    "part": "quotes",
+    "text": "In article <9•••••••••••••••••@DPW.COM> J••••• P••••, j•••••@dpw.com"
+   },
+   {
+    "part": "quotes",
+    "text": "writes:"
+   },
+   {
+    "part": "quotes",
+    "text": ">How much can you tell about a person's health by looking into their"
+   },
+   {
+    "part": "body",
+    "text": "eyes?"
+   },
+   {
+    "part": "body",
+    "text": ""
+   },
+   {
+    "part": "body",
+    "text": "By looking at the iris (iridology) - virtually nothing."
+   },
+   {
+    "part": "body",
+    "text": ""
+   },
+   {
+    "part": "body",
+    "text": "Looking at the retina allows one to visualise the small blood"
+   },
+   {
+    "part": "body",
+    "text": "vessels and is helpful in assessing various systemic diseases,"
+   },
+   {
+    "part": "body",
+    "text": "hypertension and diabetes for example."
+   },
+   {
+    "part": "tail",
+    "text": ""
+   },
+   {
+    "part": "tail",
+    "text": "D•• M••••• - his opinion"
+   },
+   {
+    "part": "tail",
+    "text": "UM will disavow"
+   }
+  ]
+ }
+}
